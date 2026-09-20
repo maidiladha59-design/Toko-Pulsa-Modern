@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+const root=process.cwd();
+const read=(p)=>fs.readFileSync(path.join(root,p),'utf8');
+test('v40 migration defines refund center and reconciliation',()=>{const s=read('supabase/migrations_v40_reconciliation_refund.sql');assert.match(s,/create table if not exists public\.refunds/);assert.match(s,/unique\(order_id\)/);assert.match(s,/payment_reconciliation/);assert.match(s,/create_system_refund/);});
+test('automatic PPOB failure uses refund center',()=>{const s=read('supabase/migrations_v40_reconciliation_refund.sql');assert.match(s,/perform public\.create_system_refund\(v_order\.id/);});
+test('admin reconciliation API exists',()=>{const s=read('src/app/api/admin/reconciliation/route.ts');assert.match(s,/payment_reconciliation/);assert.match(s,/refunds/);});
+test('admin reconciliation page exists',()=>{assert.ok(fs.existsSync(path.join(root,'src/app/admin/reconciliation/page.tsx')));});

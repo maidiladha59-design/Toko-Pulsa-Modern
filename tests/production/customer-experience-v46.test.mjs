@@ -1,0 +1,7 @@
+import test from 'node:test';import assert from 'node:assert/strict';import fs from 'node:fs';
+const read=(p)=>fs.readFileSync(new URL(`../../${p}`,import.meta.url),'utf8');
+test('v46 migration adds one-active-topup, KYC account type and configurable methods',()=>{const s=read('supabase/migrations_v46_customer_experience_security.sql');assert.match(s,/topups_one_active_per_user_idx/);assert.match(s,/account_type/);assert.match(s,/topup_payment_methods/);assert.match(s,/admin_review_kyc/);});
+test('v46 topup UI supports cancellation, history and payment methods',()=>{const s=read('src/app/wallet/topup/page.tsx');assert.match(s,/Batalkan Top Up/);assert.match(s,/Riwayat Top Up/);assert.match(s,/payment-methods/);assert.match(s,/Top Up Saldo Otomatis/);});
+test('v46 auth gate and onboarding exist',()=>{const m=read('src/lib/supabase/middleware.ts');const w=read('src/app/welcome/page.tsx');assert.match(m,/\/welcome/);assert.match(w,/Daftar Akun/);assert.match(w,/Lewati promosi/);});
+test('v46 admin KYC and FAQ centers exist',()=>{assert.ok(fs.existsSync(new URL('../../src/app/admin/kyc/page.tsx',import.meta.url)));assert.ok(fs.existsSync(new URL('../../src/app/admin/faq/page.tsx',import.meta.url)));assert.ok(fs.existsSync(new URL('../../src/app/api/admin/kyc/route.ts',import.meta.url)));assert.ok(fs.existsSync(new URL('../../src/app/api/admin/faq/route.ts',import.meta.url)));});
+test('cart navigation is removed from navbar',()=>{const s=read('src/components/Navbar.tsx');assert.doesNotMatch(s,/🛒/);});

@@ -1,0 +1,58 @@
+AIDIL STORE — v56 FINAL PRODUCTION AUDIT
+PASS file:package.json: present
+PASS file:next.config.js: present
+PASS file:vercel.json: present
+PASS file:.env.example: present
+PASS file:.gitignore: present
+PASS file:middleware.ts: present
+PASS file:supabase/migrations_v39_transaction_security.sql: present
+PASS file:supabase/migrations_v40_reconciliation_refund.sql: present
+PASS file:supabase/migrations_v49_fraud_rate_limit.sql: present
+PASS file:supabase/migrations_v50_reconciliation_refund_operational.sql: present
+PASS file:supabase/migrations_v54_pwa_realtime_push.sql: present
+PASS file:supabase/migrations_v55_monitoring_provider_alerts.sql: present
+PASS file:src/app/api/ppob/webhook/route.ts: present
+PASS file:src/app/api/payments/pakasir/webhook/route.ts: present
+PASS file:src/app/api/ppob/cron/route.ts: present
+PASS file:src/app/api/reconciliation/cron/route.ts: present
+PASS file:src/app/api/monitoring/cron/route.ts: present
+PASS file:src/lib/security/transaction-pin.ts: present
+PASS file:public/manifest.webmanifest: present
+PASS file:public/sw.js: present
+PASS version: 1.0.56
+PASS env:NEXT_PUBLIC_SUPABASE_URL: documented
+PASS env:NEXT_PUBLIC_SUPABASE_ANON_KEY: documented
+PASS env:SUPABASE_SERVICE_ROLE_KEY: documented
+PASS env:NEXT_PUBLIC_SITE_URL: documented
+PASS env:PAKASIR_PROJECT: documented
+PASS env:PAKASIR_API_KEY: documented
+PASS env:DIGIFLAZZ_USERNAME: documented
+PASS env:DIGIFLAZZ_API_KEY: documented
+PASS env:DIGIFLAZZ_WEBHOOK_SECRET: documented
+PASS env:CRON_SECRET: documented
+PASS gitignore:.env.local: excluded
+PASS gitignore:.env: excluded
+PASS gitignore:node_modules: excluded
+PASS gitignore:.next: excluded
+PASS gitignore:.vercel: excluded
+PASS secret-scan: no obvious service-role/live-secret exposure in src
+PASS guard:ppob-webhook: guard present
+PASS guard:ppob-cron: guard present
+PASS guard:reconciliation-cron: guard present
+PASS guard:monitoring-cron: guard present
+PASS cron:/api/ppob/cron: scheduled
+PASS cron:/api/reconciliation/cron: scheduled
+PASS cron:/api/monitoring/cron: scheduled
+PASS migration-preflight: v55 is required and checked
+PASS feature:transaction-pin: static check passed
+PASS feature:refund-center: static check passed
+PASS feature:reconciliation: static check passed
+PASS feature:support: static check passed
+PASS feature:loyalty: static check passed
+PASS feature:pwa-manifest: static check passed
+PASS feature:push-worker: static check passed
+PASS feature:provider-health: static check passed
+PASS migration-preflight-run: completed with exit code 0
+WARN lockfile: package-lock.json is absent; generate and commit a lockfile before production deployment.
+WARN legacy-audit: v45 audit script remains legacy; use final-production-audit-v56.mjs for the v56 gate.
+AUDIT PASSED with 2 warning(s).

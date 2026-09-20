@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { scroll-behavior: smooth; }
+html, body { min-height: 100%; }
+body { @apply bg-[#faf9f6] text-zinc-950 antialiased; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+::selection { @apply bg-zinc-950 text-[#F5C542]; }
+button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
+
+@keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes float-soft { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+.animate-page-in { animation: page-in .45s ease-out both; }
+.dashboard-card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
+.dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 18px 35px rgba(9, 9, 11, .18); border-color: #F5C542; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+}
+
+.app-hero { position: relative; background: radial-gradient(circle at 80% 15%, rgba(245, 197, 66, .22), transparent 30%), radial-gradient(circle at 15% 100%, rgba(245, 197, 66, .10), transparent 38%), #09090b; box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }
+.app-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 0%, rgba(245,197,66,.05) 45%, transparent 70%); pointer-events: none; }
+.section-kicker { font-size: 10px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; color: #B8941F; }
+.section-title { margin-top: .25rem; font-size: 1.35rem; line-height: 1.25; font-weight: 900; color: #09090b; }
+.app-panel { border: 1px solid #F0E2B6; border-radius: 1.5rem; background: #fff; padding: 1rem; box-shadow: 0 8px 25px rgba(9,9,11,.06); }
+.service-tile { display: block; border: 1px solid #F0E2B6; border-radius: 1.25rem; background: #fff; padding: 1rem; box-shadow: 0 5px 18px rgba(9,9,11,.04); transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
+.service-tile:hover { transform: translateY(-3px); border-color: #F5C542; box-shadow: 0 14px 28px rgba(9,9,11,.10); }
+.service-icon { display: flex; width: 3rem; height: 3rem; align-items: center; justify-content: center; border-radius: 1rem; background: #FFFBEA; font-size: 1.45rem; }
+.product-card { overflow: hidden; border: 1px solid #F0E2B6; border-radius: 1.25rem; background: #fff; box-shadow: 0 5px 18px rgba(9,9,11,.04); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.product-card:hover { transform: translateY(-3px); border-color: #F5C542; box-shadow: 0 16px 30px rgba(9,9,11,.10); }
+.feature-card { display: flex; gap: .8rem; border: 1px solid #F0E2B6; border-radius: 1.25rem; background: #fff; padding: 1rem; }
+.feature-card > span { display: flex; height: 2.7rem; width: 2.7rem; flex: 0 0 auto; align-items: center; justify-content: center; border-radius: .9rem; background: #FFFBEA; font-size: 1.2rem; }
+.app-footer { border-radius: 1.5rem; background: #09090b; padding: 1.25rem; color: #fff; }
+.brand-purple { color:#09090b; }
+.brand-yellow { color:#F5C542; }
+.brand-card { border:1px solid #F0E2B6; background:#fff; border-radius:1.5rem; box-shadow:0 12px 32px rgba(9,9,11,.10); }
+.brand-button { background:linear-gradient(135deg,#F5C542,#D4AF37); color:#09090b; font-weight:800; }
+.brand-button:hover { background:linear-gradient(135deg,#E4B93A,#B8941F); }
+@media (min-width: 640px) { .app-panel { padding: 1.25rem; } .section-title { font-size: 1.5rem; } .app-footer { padding: 1.5rem; } }
+@media (max-width: 767px) { body { padding-bottom: 4.4rem; } }
+@media print { body { background:#fff !important; } .no-print { display:none !important; } }
+.nav-link { border-radius:.75rem; padding:.5rem .75rem; font-size:.875rem; font-weight:700; color:#3f3f46; }
+.nav-link:hover { background:#FFFBEA; color:#09090b; }
+.mobile-link { display:flex; flex-direction:column; align-items:center; gap:.2rem; padding:.65rem .5rem; font-size:10px; font-weight:800; color:#71717a; }

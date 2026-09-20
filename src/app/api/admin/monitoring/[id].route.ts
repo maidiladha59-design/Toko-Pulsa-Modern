@@ -1,0 +1,3 @@
+import {NextResponse} from 'next/server';
+import {createClient} from '@/lib/supabase/server';
+export async function PATCH(_:Request,{params}:{params:{id:string}}){const s=createClient();const{data:{user}}=await s.auth.getUser();if(!user)return NextResponse.json({message:'Unauthorized'},{status:401});const{data:p}=await s.from('profiles').select('role').eq('id',user.id).single();if(!p||!['ADMIN','SUPER_ADMIN'].includes(p.role))return NextResponse.json({message:'Forbidden'},{status:403});const{error}=await s.rpc('resolve_monitoring_alert',{p_id:params.id});if(error)return NextResponse.json({message:error.message},{status:500});return NextResponse.json({ok:true});}

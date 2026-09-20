@@ -1,0 +1,24 @@
+{
+  "crons": [
+    {
+      "path": "/api/ppob/cron",
+      "schedule": "*/2 * * * *"
+    },
+    {
+      "path": "/api/admin/monitoring",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/reconciliation/cron",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/monitoring/cron",
+      "schedule": "*/5 * * * *"
+    },
+    {
+      "path": "/api/rankings/cron",
+      "schedule": "*/2 * * * *"
+    }
+  ]
+}

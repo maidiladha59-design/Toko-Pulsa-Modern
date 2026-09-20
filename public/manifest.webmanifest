@@ -1,0 +1,23 @@
+{
+  "name": "AIDIL STORE",
+  "short_name": "AIDIL STORE",
+  "description": "Marketplace digital dan PPOB AIDIL STORE",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#09090b",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/aidil-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/aidil-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

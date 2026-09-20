@@ -1,0 +1,13 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+const root=process.cwd();
+const mig=fs.readFileSync(path.join(root,'supabase/migrations_v50_reconciliation_refund_operational.sql'),'utf8');
+const cron=fs.readFileSync(path.join(root,'src/app/api/reconciliation/cron/route.ts'),'utf8');
+const refunds=fs.readFileSync(path.join(root,'src/app/api/refunds/route.ts'),'utf8');
+const vercel=JSON.parse(fs.readFileSync(path.join(root,'vercel.json'),'utf8'));
+test('v50 migration exists and is idempotent-friendly',()=>{assert.match(mig,/create index if not exists/i);assert.match(mig,/request_customer_refund/i);assert.match(mig,/process_customer_refund/i);assert.match(mig,/create_system_refund/i)});
+test('v50 customer refund API queues requests and exposes history',()=>{assert.match(refunds,/export async function GET/);assert.match(refunds,/export async function POST/);assert.match(refunds,/request_customer_refund/)});
+test('v50 reconciliation cron is secret protected and checks Pakasir',()=>{assert.match(cron,/CRON_SECRET/);assert.match(cron,/getPakasirTransactionDetail/);assert.match(cron,/payment_reconciliation/)});
+test('v50 reconciliation cron is scheduled',()=>{assert.ok(vercel.crons.some(x=>x.path==='/api/reconciliation/cron'&&x.schedule==='*/5 * * * *'))});

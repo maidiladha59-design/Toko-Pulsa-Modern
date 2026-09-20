@@ -1,0 +1,664 @@
+TAP version 13
+# Subtest: happy path: wallet -> provider -> webhook success -> completed
+ok 1 - happy path: wallet -> provider -> webhook success -> completed
+  ---
+  duration_ms: 0.70849
+  type: 'test'
+  ...
+# Subtest: failed provider -> exactly one refund
+ok 2 - failed provider -> exactly one refund
+  ---
+  duration_ms: 0.152691
+  type: 'test'
+  ...
+# Subtest: duplicate webhook is ignored
+ok 3 - duplicate webhook is ignored
+  ---
+  duration_ms: 0.196547
+  type: 'test'
+  ...
+# Subtest: double click with same idempotency key does not debit twice
+ok 4 - double click with same idempotency key does not debit twice
+  ---
+  duration_ms: 0.72861
+  type: 'test'
+  ...
+# Subtest: insufficient balance does not create debit
+ok 5 - insufficient balance does not create debit
+  ---
+  duration_ms: 0.378562
+  type: 'test'
+  ...
+# Subtest: webhook can finish a provider-pending transaction without another debit
+ok 6 - webhook can finish a provider-pending transaction without another debit
+  ---
+  duration_ms: 0.143537
+  type: 'test'
+  ...
+# Subtest: v43 migration defines granular permissions and protected updater
+ok 7 - v43 migration defines granular permissions and protected updater
+  ---
+  duration_ms: 0.770233
+  type: 'test'
+  ...
+# Subtest: v43 admin APIs exist
+ok 8 - v43 admin APIs exist
+  ---
+  duration_ms: 0.226202
+  type: 'test'
+  ...
+# Subtest: v43 admin pages and sidebar exist
+ok 9 - v43 admin pages and sidebar exist
+  ---
+  duration_ms: 0.961452
+  type: 'test'
+  ...
+# Subtest: v43 updater is super-admin protected
+ok 10 - v43 updater is super-admin protected
+  ---
+  duration_ms: 0.163146
+  type: 'test'
+  ...
+# Subtest: v53 migration fixes enum/text permission comparison and locks SUPER_ADMIN permissions
+ok 11 - v53 migration fixes enum/text permission comparison and locks SUPER_ADMIN permissions
+  ---
+  duration_ms: 1.040241
+  type: 'test'
+  ...
+# Subtest: v53 audit API enforces audit.view and supports filters/pagination
+ok 12 - v53 audit API enforces audit.view and supports filters/pagination
+  ---
+  duration_ms: 0.167944
+  type: 'test'
+  ...
+# Subtest: v53 permission API only changes ADMIN permissions
+ok 13 - v53 permission API only changes ADMIN permissions
+  ---
+  duration_ms: 0.90702
+  type: 'test'
+  ...
+# Subtest: v53 migration preflight includes version 53
+ok 14 - v53 migration preflight includes version 53
+  ---
+  duration_ms: 0.169906
+  type: 'test'
+  ...
+# Subtest: v46 migration adds one-active-topup, KYC account type and configurable methods
+ok 15 - v46 migration adds one-active-topup, KYC account type and configurable methods
+  ---
+  duration_ms: 0.877615
+  type: 'test'
+  ...
+# Subtest: v46 topup UI supports cancellation, history and payment methods
+ok 16 - v46 topup UI supports cancellation, history and payment methods
+  ---
+  duration_ms: 0.993691
+  type: 'test'
+  ...
+# Subtest: v46 auth gate and onboarding exist
+ok 17 - v46 auth gate and onboarding exist
+  ---
+  duration_ms: 0.21854
+  type: 'test'
+  ...
+# Subtest: v46 admin KYC and FAQ centers exist
+ok 18 - v46 admin KYC and FAQ centers exist
+  ---
+  duration_ms: 0.255335
+  type: 'test'
+  ...
+# Subtest: cart navigation is removed from navbar
+ok 19 - cart navigation is removed from navbar
+  ---
+  duration_ms: 0.169656
+  type: 'test'
+  ...
+# Subtest: v41.1 security migration removes broad ticket updates
+ok 20 - v41.1 security migration removes broad ticket updates
+  ---
+  duration_ms: 0.884525
+  type: 'test'
+  ...
+# Subtest: customer ticket creation is atomic through one RPC
+ok 21 - customer ticket creation is atomic through one RPC
+  ---
+  duration_ms: 0.180082
+  type: 'test'
+  ...
+# Subtest: touch_support_ticket validates caller ownership or admin role
+ok 22 - touch_support_ticket validates caller ownership or admin role
+  ---
+  duration_ms: 1.195675
+  type: 'test'
+  ...
+# Subtest: v41 support routes and admin center remain present
+ok 23 - v41 support routes and admin center remain present
+  ---
+  duration_ms: 0.240613
+  type: 'test'
+  ...
+# Subtest: v31 deployment audit passes
+ok 24 - v31 deployment audit passes
+  ---
+  duration_ms: 50.934361
+  type: 'test'
+  ...
+# Subtest: v47 migration adds KTP + selfie KYC fields and admin notification flow
+ok 25 - v47 migration adds KTP + selfie KYC fields and admin notification flow
+  ---
+  duration_ms: 0.922283
+  type: 'test'
+  ...
+# Subtest: registration uses email OTP instead of email redirect link
+ok 26 - registration uses email OTP instead of email redirect link
+  ---
+  duration_ms: 0.9271
+  type: 'test'
+  ...
+# Subtest: verification page confirms OTP then sets password
+ok 27 - verification page confirms OTP then sets password
+  ---
+  duration_ms: 0.241205
+  type: 'test'
+  ...
+# Subtest: KYC customer upload requires KTP and selfie capture
+ok 28 - KYC customer upload requires KTP and selfie capture
+  ---
+  duration_ms: 0.161344
+  type: 'test'
+  ...
+# Subtest: admin KYC review sends authenticated RPC with review note
+ok 29 - admin KYC review sends authenticated RPC with review note
+  ---
+  duration_ms: 0.193282
+  type: 'test'
+  ...
+# Subtest: v38 financial schema and idempotent triggers exist
+ok 30 - v38 financial schema and idempotent triggers exist
+  ---
+  duration_ms: 0.925307
+  type: 'test'
+  ...
+# Subtest: v38 dashboard supports daily weekly monthly and csv
+ok 31 - v38 dashboard supports daily weekly monthly and csv
+  ---
+  duration_ms: 0.855502
+  type: 'test'
+  ...
+# Subtest: v38 dashboard is linked in admin navigation
+ok 32 - v38 dashboard is linked in admin navigation
+  ---
+  duration_ms: 0.1592
+  type: 'test'
+  ...
+# Subtest: v49 migration creates DB-backed rate limits and risk tables
+ok 33 - v49 migration creates DB-backed rate limits and risk tables
+  ---
+  duration_ms: 0.845797
+  type: 'test'
+  ...
+# Subtest: v49 middleware applies endpoint-specific rate limits
+ok 34 - v49 middleware applies endpoint-specific rate limits
+  ---
+  duration_ms: 0.229276
+  type: 'test'
+  ...
+# Subtest: transaction PIN failures feed the risk engine
+ok 35 - transaction PIN failures feed the risk engine
+  ---
+  duration_ms: 0.204048
+  type: 'test'
+  ...
+# Subtest: admin Fraud & Risk center exists
+ok 36 - admin Fraud & Risk center exists
+  ---
+  duration_ms: 0.300884
+  type: 'test'
+  ...
+# Subtest: v48 migration creates maintenance settings and RLS policies
+ok 37 - v48 migration creates maintenance settings and RLS policies
+  ---
+  duration_ms: 0.850774
+  type: 'test'
+  ...
+# Subtest: middleware enforces maintenance for pages and customer APIs while preserving operational APIs
+ok 38 - middleware enforces maintenance for pages and customer APIs while preserving operational APIs
+  ---
+  duration_ms: 0.197949
+  type: 'test'
+  ...
+# Subtest: admin maintenance page exposes on/off and scheduling controls
+ok 39 - admin maintenance page exposes on/off and scheduling controls
+  ---
+  duration_ms: 0.886939
+  type: 'test'
+  ...
+# Subtest: admin API records maintenance audit actions
+ok 40 - admin API records maintenance audit actions
+  ---
+  duration_ms: 0.292321
+  type: 'test'
+  ...
+# Subtest: maintenance page has a client-side retry button
+ok 41 - maintenance page has a client-side retry button
+  ---
+  duration_ms: 0.201043
+  type: 'test'
+  ...
+# Subtest: migration preflight passes required checks
+ok 42 - migration preflight passes required checks
+  ---
+  duration_ms: 43.025521
+  type: 'test'
+  ...
+# Subtest: v44 migration contains alert dedupe and run ledger
+ok 43 - v44 migration contains alert dedupe and run ledger
+  ---
+  duration_ms: 0.820359
+  type: 'test'
+  ...
+# Subtest: v44 monitoring API checks reconciliation, refunds, webhooks and stale PPOB
+ok 44 - v44 monitoring API checks reconciliation, refunds, webhooks and stale PPOB
+  ---
+  duration_ms: 1.031358
+  type: 'test'
+  ...
+# Subtest: v44 admin UI exists and is linked
+ok 45 - v44 admin UI exists and is linked
+  ---
+  duration_ms: 0.226562
+  type: 'test'
+  ...
+# Subtest: v44 resolve endpoint uses server-side RPC
+ok 46 - v44 resolve endpoint uses server-side RPC
+  ---
+  duration_ms: 0.160442
+  type: 'test'
+  ...
+# Subtest: v44 monitoring is scheduled through CRON_SECRET
+ok 47 - v44 monitoring is scheduled through CRON_SECRET
+  ---
+  duration_ms: 0.224469
+  type: 'test'
+  ...
+# Subtest: migration preflight requires v44
+ok 48 - migration preflight requires v44
+  ---
+  duration_ms: 0.19141
+  type: 'test'
+  ...
+# Subtest: v55 migration defines provider health telemetry
+ok 49 - v55 migration defines provider health telemetry
+  ---
+  duration_ms: 0.844465
+  type: 'test'
+  ...
+# Subtest: v55 monitoring cron requires CRON_SECRET
+ok 50 - v55 monitoring cron requires CRON_SECRET
+  ---
+  duration_ms: 0.155254
+  type: 'test'
+  ...
+# Subtest: v55 schedules provider monitoring every five minutes
+ok 51 - v55 schedules provider monitoring every five minutes
+  ---
+  duration_ms: 0.936625
+  type: 'test'
+  ...
+# Subtest: admin monitoring exposes provider health
+ok 52 - admin monitoring exposes provider health
+  ---
+  duration_ms: 0.51598
+  type: 'test'
+  ...
+# Subtest: v34 automatic Pakasir wallet topup wiring exists
+ok 53 - v34 automatic Pakasir wallet topup wiring exists
+  ---
+  duration_ms: 0.738726
+  type: 'test'
+  ...
+# Subtest: wallet payment is idempotent at database level
+ok 54 - wallet payment is idempotent at database level
+  ---
+  duration_ms: 1.472164
+  type: 'test'
+  ...
+# Subtest: wallet payment requires authenticated owner and target
+ok 55 - wallet payment requires authenticated owner and target
+  ---
+  duration_ms: 0.116866
+  type: 'test'
+  ...
+# Subtest: wallet debit is protected by row lock and insufficient balance check
+ok 56 - wallet debit is protected by row lock and insufficient balance check
+  ---
+  duration_ms: 0.164068
+  type: 'test'
+  ...
+# Subtest: refund is idempotent
+ok 57 - refund is idempotent
+  ---
+  duration_ms: 0.209477
+  type: 'test'
+  ...
+# Subtest: provider transaction has an atomic claim gate
+ok 58 - provider transaction has an atomic claim gate
+  ---
+  duration_ms: 0.153031
+  type: 'test'
+  ...
+# Subtest: same transaction is not claimable after max attempts or before cooldown
+ok 59 - same transaction is not claimable after max attempts or before cooldown
+  ---
+  duration_ms: 0.216677
+  type: 'test'
+  ...
+# Subtest: terminal order status logic is deterministic
+ok 60 - terminal order status logic is deterministic
+  ---
+  duration_ms: 0.175796
+  type: 'test'
+  ...
+# Subtest: webhook rejects invalid signature before processing payload
+ok 61 - webhook rejects invalid signature before processing payload
+  ---
+  duration_ms: 0.138099
+  type: 'test'
+  ...
+# Subtest: cron remains protected by CRON_SECRET
+ok 62 - cron remains protected by CRON_SECRET
+  ---
+  duration_ms: 0.365753
+  type: 'test'
+  ...
+# Subtest: v45 migration hardens voucher redemption and loyalty awarding
+ok 63 - v45 migration hardens voucher redemption and loyalty awarding
+  ---
+  duration_ms: 0.829223
+  type: 'test'
+  ...
+# Subtest: v45 provides server-side voucher application before gateway payment
+ok 64 - v45 provides server-side voucher application before gateway payment
+  ---
+  duration_ms: 1.077408
+  type: 'test'
+  ...
+# Subtest: v45 wallet checkout applies voucher atomically before wallet debit
+ok 65 - v45 wallet checkout applies voucher atomically before wallet debit
+  ---
+  duration_ms: 0.31777
+  type: 'test'
+  ...
+# Subtest: v45 migration is required by preflight and production audit exists
+ok 66 - v45 migration is required by preflight and production audit exists
+  ---
+  duration_ms: 0.248846
+  type: 'test'
+  ...
+# Subtest: v52 migration exists and contains operational loyalty trigger
+ok 67 - v52 migration exists and contains operational loyalty trigger
+  ---
+  duration_ms: 0.690863
+  type: 'test'
+  ...
+# Subtest: v52 loyalty calculation is server-side and idempotent
+ok 68 - v52 loyalty calculation is server-side and idempotent
+  ---
+  duration_ms: 0.314255
+  type: 'test'
+  ...
+# Subtest: v52 customer API and page exist
+ok 69 - v52 customer API and page exist
+  ---
+  duration_ms: 0.209236
+  type: 'test'
+  ...
+# Subtest: v52 migration preflight checks v52
+ok 70 - v52 migration preflight checks v52
+  ---
+  duration_ms: 0.974877
+  type: 'test'
+  ...
+# Subtest: v42 migration exists and core tables/functions are present
+ok 71 - v42 migration exists and core tables/functions are present
+  ---
+  duration_ms: 0.871246
+  type: 'test'
+  ...
+# Subtest: voucher validation enforces server-side limits
+ok 72 - voucher validation enforces server-side limits
+  ---
+  duration_ms: 0.904045
+  type: 'test'
+  ...
+# Subtest: voucher redemption is idempotent
+ok 73 - voucher redemption is idempotent
+  ---
+  duration_ms: 0.150928
+  type: 'test'
+  ...
+# Subtest: loyalty award is idempotent
+ok 74 - loyalty award is idempotent
+  ---
+  duration_ms: 0.1655
+  type: 'test'
+  ...
+# Subtest: customer promo API and admin center exist
+ok 75 - customer promo API and admin center exist
+  ---
+  duration_ms: 0.41732
+  type: 'test'
+  ...
+# Subtest: v54 migration creates secure push subscription storage
+ok 76 - v54 migration creates secure push subscription storage
+  ---
+  duration_ms: 0.983225
+  type: 'test'
+  ...
+# Subtest: v54 includes PWA manifest and service worker
+ok 77 - v54 includes PWA manifest and service worker
+  ---
+  duration_ms: 0.223247
+  type: 'test'
+  ...
+# Subtest: v54 push API authenticates and validates subscription
+ok 78 - v54 push API authenticates and validates subscription
+  ---
+  duration_ms: 0.209186
+  type: 'test'
+  ...
+# Subtest: v54 registers service worker without requesting permission automatically
+ok 79 - v54 registers service worker without requesting permission automatically
+  ---
+  duration_ms: 0.143967
+  type: 'test'
+  ...
+# Subtest: v54 notification page subscribes to Supabase Realtime
+ok 80 - v54 notification page subscribes to Supabase Realtime
+  ---
+  duration_ms: 0.276257
+  type: 'test'
+  ...
+# Subtest: v54 layout exposes PWA manifest and registrar
+ok 81 - v54 layout exposes PWA manifest and registrar
+  ---
+  duration_ms: 0.140973
+  type: 'test'
+  ...
+# Subtest: v40 migration defines refund center and reconciliation
+ok 82 - v40 migration defines refund center and reconciliation
+  ---
+  duration_ms: 1.082415
+  type: 'test'
+  ...
+# Subtest: automatic PPOB failure uses refund center
+ok 83 - automatic PPOB failure uses refund center
+  ---
+  duration_ms: 1.011678
+  type: 'test'
+  ...
+# Subtest: admin reconciliation API exists
+ok 84 - admin reconciliation API exists
+  ---
+  duration_ms: 0.159431
+  type: 'test'
+  ...
+# Subtest: admin reconciliation page exists
+ok 85 - admin reconciliation page exists
+  ---
+  duration_ms: 0.175154
+  type: 'test'
+  ...
+# Subtest: v50 migration exists and is idempotent-friendly
+ok 86 - v50 migration exists and is idempotent-friendly
+  ---
+  duration_ms: 0.739417
+  type: 'test'
+  ...
+# Subtest: v50 customer refund API queues requests and exposes history
+ok 87 - v50 customer refund API queues requests and exposes history
+  ---
+  duration_ms: 0.116716
+  type: 'test'
+  ...
+# Subtest: v50 reconciliation cron is secret protected and checks Pakasir
+ok 88 - v50 reconciliation cron is secret protected and checks Pakasir
+  ---
+  duration_ms: 0.850114
+  type: 'test'
+  ...
+# Subtest: v50 reconciliation cron is scheduled
+ok 89 - v50 reconciliation cron is scheduled
+  ---
+  duration_ms: 0.148524
+  type: 'test'
+  ...
+# Subtest: v32 final release gate passes
+ok 90 - v32 final release gate passes
+  ---
+  duration_ms: 44.084762
+  type: 'test'
+  ...
+# Subtest: v30 Supabase smoke-test script and core object manifest exist
+ok 91 - v30 Supabase smoke-test script and core object manifest exist
+  ---
+  duration_ms: 0.866689
+  type: 'test'
+  ...
+# Subtest: v51 migration contains ticket hardening functions and notification trigger
+ok 92 - v51 migration contains ticket hardening functions and notification trigger
+  ---
+  duration_ms: 0.937616
+  type: 'test'
+  ...
+# Subtest: customer support UI exposes close/reopen workflow
+ok 93 - customer support UI exposes close/reopen workflow
+  ---
+  duration_ms: 0.27839
+  type: 'test'
+  ...
+# Subtest: migration preflight requires v51
+ok 94 - migration preflight requires v51
+  ---
+  duration_ms: 0.950445
+  type: 'test'
+  ...
+# Subtest: v35 configurable topup fee wiring exists
+ok 95 - v35 configurable topup fee wiring exists
+  ---
+  duration_ms: 1.243058
+  type: 'test'
+  ...
+# Subtest: fee arithmetic keeps wallet credit separate from payment amount
+ok 96 - fee arithmetic keeps wallet credit separate from payment amount
+  ---
+  duration_ms: 0.871045
+  type: 'test'
+  ...
+# Subtest: v39 transaction security schema and PIN hashing exist
+ok 97 - v39 transaction security schema and PIN hashing exist
+  ---
+  duration_ms: 0.713918
+  type: 'test'
+  ...
+# Subtest: wallet-spend routes require transaction PIN
+ok 98 - wallet-spend routes require transaction PIN
+  ---
+  duration_ms: 0.405643
+  type: 'test'
+  ...
+# Subtest: PIN policy rejects obvious six-digit PINs
+ok 99 - PIN policy rejects obvious six-digit PINs
+  ---
+  duration_ms: 1.040952
+  type: 'test'
+  ...
+# Subtest: settings page exposes PIN setup/change without plaintext persistence
+ok 100 - settings page exposes PIN setup/change without plaintext persistence
+  ---
+  duration_ms: 0.298091
+  type: 'test'
+  ...
+# Subtest: v33 production integration verifier passes static contract
+ok 101 - v33 production integration verifier passes static contract
+  ---
+  duration_ms: 86.966846
+  type: 'test'
+  ...
+# Subtest: v36 platform migration contains requested tables/functions
+ok 102 - v36 platform migration contains requested tables/functions
+  ---
+  duration_ms: 1.30465
+  type: 'test'
+  ...
+# Subtest: v36 removes customer search from home navbar and adds QRIS/referral/mission routes
+ok 103 - v36 removes customer search from home navbar and adds QRIS/referral/mission routes
+  ---
+  duration_ms: 0.267934
+  type: 'test'
+  ...
+# Subtest: v36 automatic topup separates credit amount from charge amount
+ok 104 - v36 automatic topup separates credit amount from charge amount
+  ---
+  duration_ms: 0.301445
+  type: 'test'
+  ...
+# Subtest: v36 admin platform and wallet adjustment routes exist
+ok 105 - v36 admin platform and wallet adjustment routes exist
+  ---
+  duration_ms: 0.312763
+  type: 'test'
+  ...
+# Subtest: v37 migration adds pricing rules and provider price snapshots
+ok 106 - v37 migration adds pricing rules and provider price snapshots
+  ---
+  duration_ms: 0.854621
+  type: 'test'
+  ...
+# Subtest: v37 pricing resolves SKU before brand/category/global
+ok 107 - v37 pricing resolves SKU before brand/category/global
+  ---
+  duration_ms: 0.185871
+  type: 'test'
+  ...
+# Subtest: v37 admin pricing page and API exist
+ok 108 - v37 admin pricing page and API exist
+  ---
+  duration_ms: 1.006451
+  type: 'test'
+  ...
+# Subtest: v37 prepaid sync applies pricing rule and postpaid inquiry stores aidil fee
+ok 109 - v37 prepaid sync applies pricing rule and postpaid inquiry stores aidil fee
+  ---
+  duration_ms: 0.337299
+  type: 'test'
+  ...
+1..109
+# tests 109
+# suites 0
+# pass 109
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1708.319147
