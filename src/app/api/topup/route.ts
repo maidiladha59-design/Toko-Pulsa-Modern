@@ -31,6 +31,13 @@ function feeGroup(method: string) {
   return "bank";
 }
 
+// v2: nomor pembayaran ada di field berbeda tergantung metode.
+function extractPaymentNumber(payment: { payment_method: string; qr_string?: string; va_number?: string; payment_link?: string }) {
+  if (payment.payment_method === "qris") return payment.qr_string || "";
+  if (payment.payment_method === "payment_link") return payment.payment_link || "";
+  return payment.va_number || "";
+}
+
 export async function GET(request: Request) {
   if (!isPakasirConfigured()) return NextResponse.json({ message: "Top Up otomatis belum dikonfigurasi." }, { status: 503 });
   const supabase = createClient();
@@ -86,12 +93,20 @@ export async function POST(request: Request) {
 
   try {
     const payment = await createPakasirTransaction(providerOrderId, paymentAmount, method as PakasirMethod);
+    const paymentNumber = extractPaymentNumber(payment);
     const providerExpiry = new Date(payment.expired_at).getTime();
     const adminExpiry = Date.now() + deadlineMinutes * 60 * 1000;
     const effectiveExpiry = new Date(Math.min(providerExpiry, adminExpiry)).toISOString();
-    const { error: updateError } = await admin.from("topups").update({ payment_number: payment.payment_number, gateway_fee: payment.fee, gateway_total_payment: payment.total_payment, expires_at: effectiveExpiry, updated_at: new Date().toISOString() }).eq("id", topup.id).eq("status", "PENDING");
+    const { error: updateError } = await admin.from("topups").update({
+      payment_number: paymentNumber,
+      provider_txn_id: payment.txn_id,
+      gateway_fee: payment.fee ?? 0,
+      gateway_total_payment: payment.total_payment ?? paymentAmount,
+      expires_at: effectiveExpiry,
+      updated_at: new Date().toISOString(),
+    }).eq("id", topup.id).eq("status", "PENDING");
     if (updateError) throw updateError;
-    return NextResponse.json({ id: topup.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, status: "PENDING", order_id: providerOrderId, payment_method: payment.payment_method, payment_number: payment.payment_number, fee: payment.fee, total_payment: payment.total_payment, expired_at: effectiveExpiry }, { status: 201 });
+    return NextResponse.json({ id: topup.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, status: "PENDING", order_id: providerOrderId, payment_method: payment.payment_method, payment_number: paymentNumber, fee: payment.fee ?? 0, total_payment: payment.total_payment ?? paymentAmount, expired_at: effectiveExpiry }, { status: 201 });
   } catch (error) {
     await admin.from("topups").update({ status: "CANCELLED", updated_at: new Date().toISOString() }).eq("id", topup.id).eq("status", "PENDING");
     if (process.env.NODE_ENV !== "production") console.error("TOPUP PAKASIR CREATE ERROR:", error);

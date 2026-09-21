@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { HttpsProxyAgent } from 'https-proxy-agent';
 
 const BASE_URL = 'https://api.digiflazz.com/v1';
 
@@ -27,12 +28,20 @@ function sign(additional: string) {
   return crypto.createHash('md5').update(username + apiKey + additional).digest('hex');
 }
 
+function getProxyAgent() {
+  const proxyUrl = process.env.DIGIFLAZZ_PROXY_URL;
+  if (!proxyUrl) throw new Error('DIGIFLAZZ_PROXY_URL_NOT_CONFIGURED');
+  return new HttpsProxyAgent(proxyUrl);
+}
+
 async function post(path: string, body: Record<string, unknown>) {
   const response = await fetch(`${BASE_URL}${path}`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
     cache: 'no-store',
+    // @ts-ignore - agent didukung di Node.js runtime, tidak ada di tipe standar fetch
+    agent: getProxyAgent(),
   });
   const json = await response.json().catch(() => null);
   if (!response.ok) throw new Error(json?.data?.message || `DIGIFLAZZ_HTTP_${response.status}`);

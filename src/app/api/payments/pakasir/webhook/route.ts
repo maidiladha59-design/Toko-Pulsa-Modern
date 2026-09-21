@@ -2,17 +2,30 @@ import crypto from "node:crypto";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPakasirTransactionDetail, isPakasirConfigured } from "@/lib/pakasir";
+import { getPakasirTransactionDetail, isPakasirConfigured, verifyPakasirWebhookSecret } from "@/lib/pakasir";
 import { fulfillPpobOrder } from "@/lib/ppob/fulfill";
 import { notifyUser } from "@/lib/notification-engine";
 
+// v2: payload webhook TIDAK lagi berisi "project" maupun "payment_method".
 const webhookSchema = z.object({
-  amount: z.number(), order_id: z.string(), project: z.string(), status: z.string(),
-  payment_method: z.string().optional(), completed_at: z.string().optional(),
+  txn_id: z.string(),
+  order_id: z.string(),
+  amount: z.number(),
+  is_sandbox: z.boolean().optional(),
+  status: z.string(),
+  completed_at: z.string().nullable().optional(),
 });
 
 export async function POST(request: Request) {
   if (!isPakasirConfigured()) return NextResponse.json({ ok: true });
+
+  // Lapisan pertama: verifikasi header X-Secret (fitur baru di API v2).
+  const secretHeader = request.headers.get("x-secret");
+  const secretValid = verifyPakasirWebhookSecret(secretHeader);
+  if (!secretValid && process.env.NODE_ENV === "production") {
+    // Di production, tolak langsung kalau secret tidak cocok/tidak diset.
+    return NextResponse.json({ ok: true }, { status: 401 });
+  }
 
   const rawBody = await request.text();
   let body: unknown = null;
@@ -22,19 +35,21 @@ export async function POST(request: Request) {
   const payload = parsed.data;
   const admin = createAdminClient();
 
-  // Pakasir documents webhook delivery without an HMAC signature. We therefore
-  // use the project/order/amount checks below and re-query Transaction Detail.
-  const eventKey = crypto.createHash("sha256").update(`${payload.project}|${payload.order_id}|${payload.amount}|${payload.status}|${payload.completed_at || ""}`).digest("hex");
+  // Lapisan kedua (tetap dipertahankan): body webhook tidak pernah dipercaya
+  // begitu saja walau X-Secret valid — status selalu dikonfirmasi ulang lewat
+  // Transaction Status API menggunakan txn_id.
+  const eventKey = crypto.createHash("sha256").update(`${payload.txn_id}|${payload.order_id}|${payload.amount}|${payload.status}|${payload.completed_at || ""}`).digest("hex");
 
   // TOPUP webhook path: same Pakasir webhook URL can safely handle both orders and wallet deposits.
   if (payload.order_id.startsWith("TOPUP-")) {
     const { data: topup } = await admin
       .from("topups")
-      .select("id, user_id, amount, status, provider, provider_order_id, payment_method, gateway_total_payment, payment_amount, webhook_event_key")
+      .select("id, user_id, amount, status, provider, provider_order_id, provider_txn_id, payment_method, gateway_total_payment, payment_amount, webhook_event_key")
       .eq("provider_order_id", payload.order_id)
       .maybeSingle();
 
     if (!topup || topup.provider !== "pakasir" || Number(topup.payment_amount || topup.amount) !== Number(payload.amount)) return NextResponse.json({ ok: true });
+    if (topup.provider_txn_id && topup.provider_txn_id !== payload.txn_id) return NextResponse.json({ ok: true });
     if (topup.status === "APPROVED") return NextResponse.json({ ok: true, duplicate: true });
 
     const { data: event } = await admin.from("ppob_webhook_events").insert({
@@ -47,16 +62,18 @@ export async function POST(request: Request) {
     if (!event) return NextResponse.json({ ok: true, duplicate: true });
 
     try {
-      const detail = await getPakasirTransactionDetail(payload.order_id, Number(topup.payment_amount || topup.amount));
-      const valid = detail.project === payload.project && detail.order_id === payload.order_id && detail.status === "completed" && Number(detail.amount) === Number(topup.payment_amount || topup.amount);
+      const statusTxnId = topup.provider_txn_id || payload.txn_id;
+      const detail = await getPakasirTransactionDetail(statusTxnId);
+      const valid = detail.order_id === payload.order_id && detail.txn_id === statusTxnId && detail.status === "completed" && Number(detail.amount) === Number(topup.payment_amount || topup.amount);
       if (!valid) {
         await admin.from("ppob_webhook_events").update({ status: "IGNORED", error_message: "PAYMENT_NOT_CONFIRMED", processed_at: new Date().toISOString() }).eq("id", event.id);
         return NextResponse.json({ ok: true });
       }
 
+      // v2: payment_method tidak lagi dikirim di webhook/status, pakai yang sudah tersimpan saat create.
       const { error } = await admin.rpc("confirm_pakasir_topup", {
         p_topup_id: topup.id,
-        p_payment_method: detail.payment_method || payload.payment_method || topup.payment_method || "unknown",
+        p_payment_method: topup.payment_method || "unknown",
         p_completed_at: detail.completed_at || payload.completed_at || new Date().toISOString(),
       });
       if (error) throw error;
@@ -72,6 +89,11 @@ export async function POST(request: Request) {
   }
 
   // Existing order payment path.
+  // TODO: jalur ini masih memakai order_id+amount untuk cross-check (gaya v1).
+  // Di API v2, cek status idealnya memakai txn_id. Tabel `orders` perlu kolom
+  // seperti `gateway_txn_id` (lihat catatan di migration v35) yang diisi saat
+  // order dibuat, lalu dipakai di sini menggantikan pemanggilan berbasis
+  // order_id+amount. Sesuaikan setelah kolom tersebut tersedia.
   const { data: order } = await admin
     .from("orders")
     .select("id, status, payment_method, gateway_method, total_amount, gateway_reference")
@@ -82,8 +104,9 @@ export async function POST(request: Request) {
   if (!order || order.status !== "PENDING") return NextResponse.json({ ok: true });
 
   try {
-    const detail = await getPakasirTransactionDetail(payload.order_id, order.total_amount);
-    if (detail.project === process.env.PAKASIR_PROJECT && detail.order_id === payload.order_id && detail.status === "completed" && Number(detail.amount) === Number(order.total_amount) && Number(payload.amount) === Number(order.total_amount)) {
+    // Sementara memakai payload.txn_id langsung karena `orders` belum menyimpan txn_id sendiri.
+    const detail = await getPakasirTransactionDetail(payload.txn_id);
+    if (detail.order_id === payload.order_id && detail.status === "completed" && Number(detail.amount) === Number(order.total_amount) && Number(payload.amount) === Number(order.total_amount)) {
       const { error } = await admin.rpc("confirm_gateway_payment", { p_order_id: order.id });
       if (error) console.error("CONFIRM PAYMENT ERROR:", error);
       else {

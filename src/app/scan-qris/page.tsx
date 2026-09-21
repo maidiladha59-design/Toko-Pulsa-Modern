@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 
@@ -37,6 +38,7 @@ function parseQris(raw: string): QRISData {
   const merchantName = map.get('59');
 
   // Tag 54 biasanya digunakan untuk nominal.
+  // Kosong = QRIS statis, nominal harus diisi manual oleh user.
   const amount = map.get('54');
 
   return {
@@ -47,12 +49,14 @@ function parseQris(raw: string): QRISData {
 }
 
 export default function ScanQRIS() {
+  const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
   const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const controlsRef = useRef<{ stop: () => void } | null>(null);
 
   const [code, setCode] = useState('');
   const [qris, setQris] = useState<QRISData | null>(null);
+  const [manualAmount, setManualAmount] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
   const [cameraActive, setCameraActive] = useState(false);
@@ -89,6 +93,7 @@ export default function ScanQRIS() {
     setError('');
     setCode('');
     setQris(null);
+    setManualAmount('');
 
     if (!videoRef.current) {
       setError('Kamera belum siap.');
@@ -151,7 +156,32 @@ export default function ScanQRIS() {
   function clearResult() {
     setCode('');
     setQris(null);
+    setManualAmount('');
     setError('');
+  }
+
+  function goToPayment() {
+    if (!qris) return;
+
+    const finalAmount = qris.amount || manualAmount.replace(/\D/g, '');
+
+    if (!finalAmount || Number(finalAmount) <= 0) {
+      setError('Masukkan nominal pembayaran terlebih dahulu.');
+      return;
+    }
+
+    // Simpan data QRIS sementara untuk dipakai halaman konfirmasi pembayaran
+    sessionStorage.setItem(
+      'qris_payment',
+      JSON.stringify({
+        raw: qris.raw,
+        merchantName: qris.merchantName || 'Merchant QRIS',
+        amount: finalAmount,
+        isStatic: !qris.amount,
+      })
+    );
+
+    router.push('/qris/confirm');
   }
 
   useEffect(() => {
@@ -256,7 +286,7 @@ export default function ScanQRIS() {
                   </div>
                 )}
 
-                {qris.amount && (
+                {qris.amount ? (
                   <div className="mb-3">
                     <p className="text-xs font-medium uppercase text-green-700">
                       Nominal
@@ -265,6 +295,24 @@ export default function ScanQRIS() {
                     <p className="font-semibold text-slate-900">
                       Rp {Number(qris.amount).toLocaleString('id-ID')}
                     </p>
+                  </div>
+                ) : (
+                  <div className="mb-3">
+                    <label className="mb-1 block text-xs font-medium uppercase text-green-700">
+                      Masukkan Nominal Pembayaran
+                    </label>
+                    <div className="flex items-center rounded-xl border border-green-300 bg-white px-3">
+                      <span className="text-sm font-semibold text-slate-500">Rp</span>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={manualAmount ? Number(manualAmount).toLocaleString('id-ID') : ''}
+                        onChange={(e) => setManualAmount(e.target.value.replace(/\D/g, ''))}
+                        placeholder="0"
+                        className="w-full bg-transparent px-2 py-2.5 text-sm font-semibold text-slate-900 outline-none"
+                      />
+                    </div>
+                    <p className="mt-1 text-xs text-green-700">QRIS ini statis, nominal perlu diisi manual.</p>
                   </div>
                 )}
 
@@ -282,8 +330,16 @@ export default function ScanQRIS() {
 
                 <button
                   type="button"
+                  onClick={goToPayment}
+                  className="mt-4 w-full rounded-xl bg-gold-600 px-4 py-3 text-sm font-black text-white transition hover:bg-gold-700"
+                >
+                  💳 Lanjutkan ke Pembayaran
+                </button>
+
+                <button
+                  type="button"
                   onClick={clearResult}
-                  className="mt-4 w-full rounded-xl border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-100"
+                  className="mt-2 w-full rounded-xl border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-100"
                 >
                   Bersihkan Hasil
                 </button>

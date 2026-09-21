@@ -27,6 +27,7 @@
     "@supabase/supabase-js": "^2.45.4",
     "@zxing/browser": "^0.1.5",
     "@zxing/library": "^0.21.3",
+    "https-proxy-agent": "^9.1.0",
     "next": "14.2.5",
     "qrcode": "^1.5.4",
     "react": "^18.3.1",

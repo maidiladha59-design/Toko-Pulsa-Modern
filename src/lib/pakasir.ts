@@ -1,10 +1,12 @@
-// Helper untuk integrasi Pakasir (payment gateway QRIS otomatis).
-// Dokumentasi resmi: https://pakasir.com/p/docs
+// Helper untuk integrasi Pakasir (payment gateway QRIS/VA otomatis) — API v2.
+// Dokumentasi resmi: https://pakasir.com/p/docs (Panduan v2)
 //
-// PENTING: Pakasir tidak mengirim signature/HMAC pada webhook-nya, jadi
-// status pembayaran SELALU dikonfirmasi ulang lewat Transaction Detail API
-// (getTransactionDetail) sebelum order ditandai selesai. Jangan pernah
-// mempercayai body webhook begitu saja.
+// PENTING (v2): Pakasir SEKARANG mengirim header "X-Secret" pada webhook untuk
+// verifikasi keaslian pengirim (lihat verifyPakasirWebhookSecret). Meskipun
+// begitu, status pembayaran tetap dikonfirmasi ulang lewat Transaction Status
+// API (getPakasirTransactionDetail) sebelum order/topup ditandai selesai,
+// sebagai lapisan pertahanan kedua. Jangan pernah mempercayai body webhook
+// begitu saja hanya karena header secret cocok.
 
 const BASE_URL = "https://app.pakasir.com";
 
@@ -26,36 +28,46 @@ export type PakasirMethod =
   | "bnc_va"
   | "maybank_va"
   | "permata_va"
-  | "atm_bersama_va"
   | "artha_graha_va"
-  | "bri_va"
-  | "bni_va";
+  | "payment_link";
 
-export type PakasirPayment = {
-  project: string;
-  order_id: string;
+// Response POST /api/v2/create-transaction/{slug}/{order_id}
+export type PakasirTransaction = {
+  txn_id: string;
+  project?: string;
+  order_id?: string;
   amount: number;
-  fee: number;
-  total_payment: number;
+  fee?: number;
+  total_payment?: number;
   payment_method: string;
-  payment_number: string; // QR string (EMV) untuk QRIS, atau nomor VA untuk metode lain
+  qr_string?: string; // untuk method "qris"
+  va_number?: string; // untuk method *_va
+  payment_link?: string; // untuk method "payment_link"
   expired_at: string;
+  is_sandbox?: boolean;
+  status: "pending" | "completed" | "canceled" | string;
+  completed_at?: string | null;
 };
 
+// Response GET /api/v2/transaction-status/{slug}/{txn_id}
 export type PakasirTransactionStatus = {
-  amount: number;
+  txn_id: string;
   order_id: string;
-  project: string;
-  status: "pending" | "completed" | "expired" | "cancelled" | string;
-  payment_method: string;
-  completed_at?: string;
+  amount: number;
+  is_sandbox: boolean;
+  status: "pending" | "completed" | "canceled" | string;
+  completed_at?: string | null;
 };
 
-async function postJson<T>(path: string, body: Record<string, unknown>): Promise<T> {
+async function apiRequest<T>(path: string, init: RequestInit): Promise<T> {
+  const { apiKey } = requireEnv();
   const res = await fetch(`${BASE_URL}${path}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(body),
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "X-Api-Key": apiKey,
+      ...(init.headers || {}),
+    },
     cache: "no-store",
   });
   const json = await res.json().catch(() => null);
@@ -65,42 +77,51 @@ async function postJson<T>(path: string, body: Record<string, unknown>): Promise
   return json as T;
 }
 
-// Membuat transaksi baru di Pakasir. order_id HARUS unik per (project, order_id, amount).
-// Kita pakai order_number internal (mis. INV-20260917-abcdef) sebagai order_id di Pakasir.
-export async function createPakasirTransaction(orderId: string, amount: number, method: PakasirMethod = "qris") {
-  const { project, apiKey } = requireEnv();
-  const data = await postJson<{ payment: PakasirPayment }>(`/api/transactioncreate/${method}`, {
-    project,
-    order_id: orderId,
-    amount,
-    api_key: apiKey,
-  });
-  return data.payment;
+// Membuat transaksi baru di Pakasir (v2). order_id HARUS unik per project.
+// Kita pakai order_number internal (mis. TOPUP-20260921-abcdef) sebagai order_id.
+export async function createPakasirTransaction(
+  orderId: string,
+  amount: number,
+  method: PakasirMethod = "qris"
+) {
+  const { project } = requireEnv();
+  return apiRequest<PakasirTransaction>(
+    `/api/v2/create-transaction/${project}/${encodeURIComponent(orderId)}`,
+    {
+      method: "POST",
+      body: JSON.stringify({ method, amount }),
+    }
+  );
 }
 
-// Cross-check status transaksi langsung ke Pakasir (lebih dipercaya daripada webhook saja).
-export async function getPakasirTransactionDetail(orderId: string, amount: number) {
-  const { project, apiKey } = requireEnv();
-  const params = new URLSearchParams({ project, amount: String(amount), order_id: orderId, api_key: apiKey });
-  const res = await fetch(`${BASE_URL}/api/transactiondetail?${params.toString()}`, { cache: "no-store" });
-  const json = await res.json().catch(() => null);
-  if (!res.ok) {
-    throw new Error(json?.message || `PAKASIR_ERROR_${res.status}`);
-  }
-  return (json as { transaction: PakasirTransactionStatus }).transaction;
+// Cross-check status langsung ke Pakasir memakai txn_id (hasil dari createPakasirTransaction).
+// Nama fungsi dipertahankan (getPakasirTransactionDetail) untuk kompatibilitas
+// pemanggil lama, walau sekarang parameternya txn_id, bukan order_id+amount.
+export async function getPakasirTransactionDetail(txnId: string) {
+  const { project } = requireEnv();
+  return apiRequest<PakasirTransactionStatus>(
+    `/api/v2/transaction-status/${project}/${encodeURIComponent(txnId)}`,
+    { method: "GET" }
+  );
 }
 
-export async function cancelPakasirTransaction(orderId: string, amount: number) {
-  const { project, apiKey } = requireEnv();
-  return postJson(`/api/transactioncancel`, { project, order_id: orderId, amount, api_key: apiKey });
-}
-
-// Hanya berfungsi jika Proyek Pakasir masih dalam mode Sandbox.
-export async function simulatePakasirPayment(orderId: string, amount: number) {
-  const { project, apiKey } = requireEnv();
-  return postJson(`/api/paymentsimulation`, { project, order_id: orderId, amount, api_key: apiKey });
+// Verifikasi header X-Secret yang dikirim Pakasir pada webhook.
+// Selalu gunakan bersamaan dengan getPakasirTransactionDetail (defense in depth) —
+// jangan proses webhook hanya berdasarkan header ini saja.
+export function verifyPakasirWebhookSecret(headerValue: string | null) {
+  const secret = process.env.PAKASIR_WEBHOOK_SECRET;
+  if (!secret) return false;
+  if (!headerValue) return false;
+  return headerValue === secret;
 }
 
 export function isPakasirConfigured() {
   return Boolean(process.env.PAKASIR_PROJECT && process.env.PAKASIR_API_KEY);
 }
+
+// CATATAN: endpoint cancel/simulation tidak lagi didokumentasikan di API v2.
+// Jika kode kamu punya route /api/topup/[id]/cancel yang memanggil
+// cancelPakasirTransaction dari versi lama, route tersebut perlu diperiksa —
+// kemungkinan cukup mengubah status di database internal saja (transaksi di
+// Pakasir akan otomatis "canceled" setelah 1x24 jam sesuai dokumentasi Status
+// Transaksi), tanpa perlu memanggil API Pakasir untuk membatalkan.

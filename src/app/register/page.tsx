@@ -13,11 +13,72 @@ const TERMS_SHORT =
 const PRIV_SHORT =
   "Data akun, transaksi, kontak dan data yang diperlukan untuk keamanan diproses untuk menyediakan layanan. Dokumen KYC disimpan privat dan digunakan untuk verifikasi.";
 
+// Ganti/lengkapi teks ini dengan isi lengkap Ketentuan Layanan & Kebijakan Privasi kamu
+const TERMS_FULL = `${TERMS_SHORT}
+
+Dengan menggunakan layanan AIDIL STORE, pengguna dianggap telah membaca dan menyetujui seluruh ketentuan ini, termasuk namun tidak terbatas pada: kewajiban menjaga kerahasiaan akun, larangan penyalahgunaan layanan, serta mengikuti seluruh kebijakan yang berlaku dari penyedia layanan pihak ketiga (provider).`;
+
+const PRIV_FULL = `${PRIV_SHORT}
+
+Kami berkomitmen untuk menjaga kerahasiaan data pribadi pengguna. Data hanya digunakan untuk keperluan operasional layanan, verifikasi identitas (KYC), dan tidak akan dibagikan kepada pihak ketiga tanpa persetujuan, kecuali diwajibkan oleh peraturan perundang-undangan yang berlaku.`;
+
 function formatTime(seconds: number) {
   const safe = Math.max(0, seconds);
   const minutes = Math.floor(safe / 60);
   const secs = safe % 60;
   return `${minutes}:${secs.toString().padStart(2, "0")}`;
+}
+
+function InfoModal({
+  title,
+  content,
+  onClose,
+}: {
+  title: string;
+  content: string;
+  onClose: () => void;
+}) {
+  useEffect(() => {
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === "Escape") onClose();
+    }
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 p-4"
+      onClick={onClose}
+    >
+      <div
+        className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between gap-4">
+          <h3 className="text-lg font-black text-black">{title}</h3>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg px-2 py-1 text-sm font-bold text-slate-500 hover:bg-slate-100"
+            aria-label="Tutup"
+          >
+            ✕
+          </button>
+        </div>
+        <p className="mt-4 whitespace-pre-line text-sm leading-6 text-slate-600">
+          {content}
+        </p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-6 w-full rounded-xl bg-gold-700 px-4 py-3 text-sm font-black text-white transition hover:bg-zinc-900"
+        >
+          Tutup
+        </button>
+      </div>
+    </div>
+  );
 }
 
 function RegisterForm() {
@@ -41,6 +102,7 @@ function RegisterForm() {
   const [otpExpiresAt, setOtpExpiresAt] = useState<number | null>(null);
   const [resendAvailableAt, setResendAvailableAt] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
+  const [activeModal, setActiveModal] = useState<"terms" | "privacy" | null>(null);
 
   const referralCode = useMemo(
     () => searchParams.get("ref") || "",
@@ -294,12 +356,30 @@ function RegisterForm() {
           </label>
 
           <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-4">
-            <div className="flex items-center justify-between gap-3"><b className="text-sm text-black">📋 Ketentuan Layanan</b><Link href="/terms" target="_blank" className="text-xs font-black text-gold-700 hover:underline">Baca selengkapnya</Link></div>
+            <div className="flex items-center justify-between gap-3">
+              <b className="text-sm text-black">📋 Ketentuan Layanan</b>
+              <button
+                type="button"
+                onClick={() => setActiveModal("terms")}
+                className="text-xs font-black text-gold-700 hover:underline"
+              >
+                Baca selengkapnya
+              </button>
+            </div>
             <p className="mt-2 text-xs leading-5 text-slate-600">{TERMS_SHORT}</p>
           </div>
 
           <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4">
-            <div className="flex items-center justify-between gap-3"><b className="text-sm text-black">🔐 Kebijakan Privasi</b><Link href="/privacy" target="_blank" className="text-xs font-black text-gold-700 hover:underline">Baca selengkapnya</Link></div>
+            <div className="flex items-center justify-between gap-3">
+              <b className="text-sm text-black">🔐 Kebijakan Privasi</b>
+              <button
+                type="button"
+                onClick={() => setActiveModal("privacy")}
+                className="text-xs font-black text-gold-700 hover:underline"
+              >
+                Baca selengkapnya
+              </button>
+            </div>
             <p className="mt-2 text-xs leading-5 text-slate-600">{PRIV_SHORT}</p>
           </div>
 
@@ -335,19 +415,4 @@ function RegisterForm() {
             <div className="mt-4 space-y-4">
               <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-xs font-black text-black">1</span><div><p className="text-sm font-bold text-white">Isi data akun</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan nama, email, nomor WhatsApp dan password.</p></div></div>
               <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-600 text-xs font-black text-white">2</span><div><p className="text-sm font-bold text-white">Verifikasi email</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan OTP 6 digit yang berlaku selama 5 menit.</p></div></div>
-              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-xs font-black text-black">3</span><div><p className="text-sm font-bold text-white">Daftar sekarang</p><p className="mt-1 text-xs leading-5 text-zinc-400">Akun baru dibuat setelah email berhasil diverifikasi.</p></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default function RegisterPage() {
-  return (
-    <Suspense fallback={null}>
-      <RegisterForm />
-    </Suspense>
-  );
-}
+              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-xs font-black text-black">3</span><div><p classNam
