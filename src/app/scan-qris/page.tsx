@@ -181,7 +181,7 @@ export default function ScanQRIS() {
       })
     );
 
-    router.push('/qris/confirm');
+    router.push('/scan-qris/qris-confirm');
   }
 
   useEffect(() => {
