@@ -28,6 +28,7 @@ export type PakasirMethod =
   | "bnc_va"
   | "maybank_va"
   | "permata_va"
+  | "atm_bersama_va"
   | "artha_graha_va"
   | "payment_link";
 
@@ -113,6 +114,22 @@ export function verifyPakasirWebhookSecret(headerValue: string | null) {
   if (!secret) return false;
   if (!headerValue) return false;
   return headerValue === secret;
+}
+
+// v2: nomor pembayaran ada di field berbeda tergantung metode
+// (qr_string untuk QRIS, va_number untuk VA, payment_link untuk payment link).
+export function extractPakasirPaymentNumber(
+  payment: Pick<PakasirTransaction, "payment_method" | "qr_string" | "va_number" | "payment_link">
+) {
+  if (payment.payment_method === "qris") return payment.qr_string || "";
+  if (payment.payment_method === "payment_link") return payment.payment_link || "";
+  return payment.va_number || "";
+}
+
+// Status akhir "gagal" di Pakasir. Dokumentasi v2 memakai ejaan "canceled";
+// ejaan lain disertakan supaya aman terhadap variasi respons.
+export function isPakasirFailedStatus(status: string | null | undefined) {
+  return ["canceled", "cancelled", "expired", "failed"].includes(String(status || "").toLowerCase());
 }
 
 export function isPakasirConfigured() {

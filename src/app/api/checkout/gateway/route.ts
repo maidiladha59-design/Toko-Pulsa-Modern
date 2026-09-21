@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createPakasirTransaction, isPakasirConfigured, type PakasirMethod } from "@/lib/pakasir";
+import { createPakasirTransaction, extractPakasirPaymentNumber, isPakasirConfigured, type PakasirMethod } from "@/lib/pakasir";
 import QRCode from "qrcode";
 
 const bodySchema = z.object({
@@ -126,15 +126,19 @@ export async function POST(request: Request) {
   try {
     const payment = await createPakasirTransaction(o.order_number, Number(existing?.total_amount ?? o.total_amount), method as PakasirMethod);
     const isQris = method === "qris";
+    const paymentNumber = extractPakasirPaymentNumber(payment);
+    const totalPayment = payment.total_payment ?? Number(existing?.total_amount ?? o.total_amount);
+    if (!payment.txn_id || !paymentNumber) throw new Error("PAKASIR_INVALID_RESPONSE");
     const { error: saveError } = await admin.from("orders").update({
       payment_method: isQris ? "QRIS" : "BANK_VA",
       gateway_reference: o.order_number,
+      gateway_txn_id: payment.txn_id,
       gateway_method: method,
-      payment_number: payment.payment_number,
-      qris_payload: isQris ? payment.payment_number : null,
+      payment_number: paymentNumber,
+      qris_payload: isQris ? paymentNumber : null,
       qris_expired_at: payment.expired_at,
-      gateway_fee: payment.fee,
-      gateway_total_payment: payment.total_payment,
+      gateway_fee: payment.fee ?? 0,
+      gateway_total_payment: totalPayment,
       updated_at: new Date().toISOString(),
     }).eq("id", o.order_id).eq("status", "PENDING");
 
@@ -143,14 +147,14 @@ export async function POST(request: Request) {
     return NextResponse.json({
       order_id: o.order_id,
       order_number: o.order_number,
-      amount: payment.total_payment,
+      amount: totalPayment,
       base_amount: payment.amount,
-      fee: payment.fee,
+      fee: payment.fee ?? 0,
       payment_method: isQris ? "QRIS" : "BANK_VA",
       gateway_method: method,
-      payment_number: payment.payment_number,
+      payment_number: paymentNumber,
       expired_at: payment.expired_at,
-      qris_image: isQris ? await QRCode.toDataURL(payment.payment_number, { margin: 1, width: 360 }) : null,
+      qris_image: isQris ? await QRCode.toDataURL(paymentNumber, { margin: 1, width: 360 }) : null,
     }, { status: 201 });
   } catch (gatewayError) {
     await admin.from("orders").update({ status: "FAILED", updated_at: new Date().toISOString() }).eq("id", o.order_id).eq("status", "PENDING");

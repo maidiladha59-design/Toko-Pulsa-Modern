@@ -415,4 +415,25 @@ function RegisterForm() {
             <div className="mt-4 space-y-4">
               <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-xs font-black text-black">1</span><div><p className="text-sm font-bold text-white">Isi data akun</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan nama, email, nomor WhatsApp dan password.</p></div></div>
               <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-600 text-xs font-black text-white">2</span><div><p className="text-sm font-bold text-white">Verifikasi email</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan OTP 6 digit yang berlaku selama 5 menit.</p></div></div>
-              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-xs font-black text-black">3</span><div><p classNam
+              <div className="flex gap-3">
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-xs font-black text-black">3</span>
+                <div>
+                  <p className="text-sm font-bold text-white">Selesai &amp; login</p>
+                  <p className="mt-1 text-xs leading-5 text-zinc-400">Akun langsung aktif dan siap digunakan.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-sm text-slate-400">Memuat...</div>}>
+      <RegisterForm />
+    </Suspense>
+  );
+}

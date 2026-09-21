@@ -77,7 +77,7 @@ export async function POST(request: Request) {
         p_completed_at: detail.completed_at || payload.completed_at || new Date().toISOString(),
       });
       if (error) throw error;
-      await notifyUser({ userId: topup.user_id, eventKey: "TOPUP_SUCCESS", variables: { amount: `Rp${Number(topup.amount).toLocaleString("id-ID")}`, reference: topup.provider_order_id }, referenceType: "topup", referenceId: topup.id, url: "/topup/history" });
+      await notifyUser({ userId: topup.user_id, eventKey: "TOPUP_SUCCESS", variables: { amount: `Rp${Number(topup.amount).toLocaleString("id-ID")}`, reference: topup.provider_order_id }, referenceType: "topup", referenceId: topup.id, url: "/wallet/topup" });
 
       await admin.from("ppob_webhook_events").update({ status: "PROCESSED", processed_at: new Date().toISOString() }).eq("id", event.id);
       return NextResponse.json({ ok: true });
@@ -89,27 +89,30 @@ export async function POST(request: Request) {
   }
 
   // Existing order payment path.
-  // TODO: jalur ini masih memakai order_id+amount untuk cross-check (gaya v1).
-  // Di API v2, cek status idealnya memakai txn_id. Tabel `orders` perlu kolom
-  // seperti `gateway_txn_id` (lihat catatan di migration v35) yang diisi saat
-  // order dibuat, lalu dipakai di sini menggantikan pemanggilan berbasis
-  // order_id+amount. Sesuaikan setelah kolom tersebut tersedia.
+  // orders.gateway_reference = order_id yang kita kirim ke Pakasir (order_number),
+  // orders.gateway_txn_id    = txn_id milik Pakasir (diisi saat order dibuat, v73).
   const { data: order } = await admin
     .from("orders")
-    .select("id, status, payment_method, gateway_method, total_amount, gateway_reference")
+    .select("id, status, payment_method, gateway_method, total_amount, gateway_reference, gateway_txn_id")
     .eq("gateway_reference", payload.order_id)
     .in("payment_method", ["QRIS", "BANK_VA"])
     .maybeSingle();
 
   if (!order || order.status !== "PENDING") return NextResponse.json({ ok: true });
 
+  // Bila txn_id sudah tersimpan, webhook harus membawa txn_id yang sama.
+  if (order.gateway_txn_id && order.gateway_txn_id !== payload.txn_id) return NextResponse.json({ ok: true });
+
   try {
-    // Sementara memakai payload.txn_id langsung karena `orders` belum menyimpan txn_id sendiri.
-    const detail = await getPakasirTransactionDetail(payload.txn_id);
-    if (detail.order_id === payload.order_id && detail.status === "completed" && Number(detail.amount) === Number(order.total_amount) && Number(payload.amount) === Number(order.total_amount)) {
+    // Order lama (sebelum v73) belum punya gateway_txn_id: pakai txn_id dari payload,
+    // tetap aman karena order_id + nominal dicocokkan ulang dengan respons Pakasir.
+    const statusTxnId = order.gateway_txn_id || payload.txn_id;
+    const detail = await getPakasirTransactionDetail(statusTxnId);
+    if (detail.txn_id === statusTxnId && detail.order_id === payload.order_id && detail.status === "completed" && Number(detail.amount) === Number(order.total_amount) && Number(payload.amount) === Number(order.total_amount)) {
       const { error } = await admin.rpc("confirm_gateway_payment", { p_order_id: order.id });
       if (error) console.error("CONFIRM PAYMENT ERROR:", error);
       else {
+        if (!order.gateway_txn_id) await admin.from("orders").update({ gateway_txn_id: statusTxnId }).eq("id", order.id).is("gateway_txn_id", null);
         const { data: ready } = await admin.from("ppob_transactions").select("id").eq("order_id", order.id).neq("customer_no", "pending-target").limit(1);
         if (ready?.length) await fulfillPpobOrder(order.id);
         const { data: orderUser } = await admin.from("orders").select("user_id").eq("id", order.id).single();

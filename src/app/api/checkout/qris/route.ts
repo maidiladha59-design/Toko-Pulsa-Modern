@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createPakasirTransaction, isPakasirConfigured } from "@/lib/pakasir";
+import { createPakasirTransaction, extractPakasirPaymentNumber, isPakasirConfigured } from "@/lib/pakasir";
 import QRCode from "qrcode";
 
 const bodySchema = z.object({
@@ -111,9 +111,22 @@ export async function POST(request: Request) {
 
   try {
     const payment = await createPakasirTransaction(order_number, payableAmount, "qris");
-    await admin.from("orders").update({ qris_payload: payment.payment_number, qris_expired_at: payment.expired_at, updated_at: new Date().toISOString() }).eq("id", order_id);
-    const qrImage = await QRCode.toDataURL(payment.payment_number, { margin: 1, width: 320 });
-    return NextResponse.json({ order_id, order_number, amount: payment.total_payment, expired_at: payment.expired_at, qris_image: qrImage }, { status: 201 });
+    const qrString = extractPakasirPaymentNumber(payment);
+    if (!payment.txn_id || !qrString) throw new Error("PAKASIR_INVALID_RESPONSE");
+    const { error: saveError } = await admin.from("orders").update({
+      gateway_reference: order_number,
+      gateway_txn_id: payment.txn_id,
+      gateway_method: "qris",
+      qris_payload: qrString,
+      payment_number: qrString,
+      qris_expired_at: payment.expired_at,
+      gateway_fee: payment.fee ?? 0,
+      gateway_total_payment: payment.total_payment ?? payableAmount,
+      updated_at: new Date().toISOString(),
+    }).eq("id", order_id).eq("status", "PENDING");
+    if (saveError) throw saveError;
+    const qrImage = await QRCode.toDataURL(qrString, { margin: 1, width: 320 });
+    return NextResponse.json({ order_id, order_number, amount: payment.total_payment ?? payableAmount, expired_at: payment.expired_at, qris_image: qrImage }, { status: 201 });
   } catch (gatewayError: any) {
     // Order sudah terlanjur dibuat; tandai gagal supaya tidak menggantung sebagai PENDING kosong.
     await admin.from("orders").update({ status: "FAILED", updated_at: new Date().toISOString() }).eq("id", order_id);
