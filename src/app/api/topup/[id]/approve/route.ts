@@ -80,6 +80,6 @@ export async function POST(
 
   const admin = createAdminClient();
   const { data: topup } = await admin.from("topups").select("user_id, amount, provider_order_id").eq("id", params.id).maybeSingle();
-  if (topup) await notifyUser({ userId: topup.user_id, eventKey: "TOPUP_SUCCESS", variables: { amount: `Rp${Number(topup.amount).toLocaleString("id-ID")}`, reference: topup.provider_order_id || params.id }, referenceType: "topup", referenceId: params.id, url: "/topup/history" });
+  if (topup) await notifyUser({ userId: topup.user_id, eventKey: "TOPUP_SUCCESS", variables: { amount: `Rp${Number(topup.amount).toLocaleString("id-ID")}`, reference: topup.provider_order_id || params.id }, referenceType: "topup", referenceId: params.id, url: "/wallet/topup" });
   return NextResponse.json({ message: "Top Up berhasil disetujui." });
 }

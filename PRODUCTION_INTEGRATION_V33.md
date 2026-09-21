@@ -1,16 +1,16 @@
 # AIDIL STORE — v33 Production Integration Verification
 
-Generated: 2026-09-18T17:43:28.706Z
+Generated: 2026-09-21T13:11:40.809Z
 
 ## Scope
 Static verification of the Supabase/Vercel/Pakasir/Digiflazz/OAuth/cron integration contract. Live external verification is only performed when the --live flag is explicitly used in a real deployment environment.
 
 ## Result
-- Checks: 33
-- Failures: 0
-- Warnings: 3
+- Checks: 34
+- Failures: 3
+- Warnings: 4
 
-✅ **PASSED**
+❌ **FAILED**
 
 ## Checks
 - PASS — file:package.json
@@ -31,6 +31,7 @@ Static verification of the Supabase/Vercel/Pakasir/Digiflazz/OAuth/cron integrat
 - PASS — env:DIGIFLAZZ_WEBHOOK_SECRET
 - PASS — env:INTERNAL_CRON_SECRET
 - PASS — env:CRON_SECRET
+- WARN — local-env-present — Do not commit .env.local; values are intentionally not inspected.
 - WARN — pakasir-default — No explicit sandbox=true default; verify before live use.
 - WARN — digiflazz-default — No explicit testing=true default; verify before live use.
 - PASS — cron-auth — Cron route references CRON_SECRET.
@@ -39,15 +40,16 @@ Static verification of the Supabase/Vercel/Pakasir/Digiflazz/OAuth/cron integrat
 - PASS — pakasir-webhook-handler — Pakasir webhook handler present.
 - PASS — oauth-exchange — OAuth callback exchanges code for session.
 - PASS — oauth-error-path — OAuth callback contains an error/redirect path.
-- PASS — vercel-cron-route — vercel.json references PPOB cron.
-- PASS — vercel-cron-schedule — Cron schedule declaration present.
+- FAIL — vercel-cron-route — PPOB cron route not found in vercel.json.
+- FAIL — vercel-cron-schedule — No cron schedule declaration.
 - PASS — digiflazz-transaction-endpoint
 - PASS — digiflazz-pricelist-endpoint
 - PASS — pakasir-client — Pakasir integration module present.
 - WARN — live-verification — Not run: use npm run verify:integration:live only inside the production environment with real credentials.
-- PASS — production-tests — Production test suite completed successfully.
+- FAIL — production-tests — Production tests failed.
 
 ## Warnings
+- local-env-present: Do not commit .env.local; values are intentionally not inspected.
 - pakasir-default: No explicit sandbox=true default; verify before live use.
 - digiflazz-default: No explicit testing=true default; verify before live use.
 - live-verification: Not run: use npm run verify:integration:live only inside the production environment with real credentials.
