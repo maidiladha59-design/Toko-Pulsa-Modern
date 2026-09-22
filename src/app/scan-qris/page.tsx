@@ -233,7 +233,9 @@ export default function ScanQRIS() {
       })
     );
 
-    router.push('/qris/confirm');
+    // FIX: path sebelumnya '/qris/confirm' tidak ada -> 404.
+    // Halaman konfirmasi yang benar ada di /scan-qris/qris-confirm.
+    router.push('/scan-qris/qris-confirm');
   }
 
   useEffect(() => {
