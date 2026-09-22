@@ -41,12 +41,20 @@ function LoginForm() {
     setLoading(false);
 
     if (error) {
-      const msg = humanizeError(error.message);
+      // Kalau bukan salah satu pesan spesifik yang dikenali (mis. email/password
+      // salah, email belum diverifikasi), tampilkan pesan default login yang
+      // mengarahkan user mengecek koneksi atau data yang diinput.
+      const humanized = humanizeError(error.message);
+      const msg =
+        humanized === "Terjadi kesalahan. Silakan coba lagi."
+          ? "Login gagal. Silakan periksa koneksi atau data Anda kembali."
+          : humanized;
       setError(msg);
       toast.show(msg, "error");
       return;
     }
 
+    toast.show("Login berhasil.", "success");
     toast.show("Login berhasil.", "success");
     void fetch("/api/notifications/login-event", { method: "POST" }).catch(() => {});
     router.push(redirectTo);

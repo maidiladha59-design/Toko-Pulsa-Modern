@@ -5,28 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import Button from "@/components/Button";
-import GatewayPayment from "@/components/GatewayPayment";
 import { formatRupiah } from "@/lib/utils";
 
 type Product = { id: string; name: string; price: number; thumbnail_url: string | null; product_type?: string };
 type PPOBService = { id: string; provider: string; provider_sku: string; service_kind: "prepaid" | "postpaid"; category: string; brand: string | null; target_schema: { fields?: Array<{ name: string; label: string; type?: string; required?: boolean; placeholder?: string }> } | null };
-type PayMethod = "WALLET" | "QRIS" | "BANK";
-type BankMethod = {
-  value: string;
-  label: string;
-};
-
-const BANKS: BankMethod[] = [
-  { value: "bri_va", label: "BRI Virtual Account" },
-  { value: "bni_va", label: "BNI Virtual Account" },
-  { value: "cimb_niaga_va", label: "CIMB Niaga Virtual Account" },
-  { value: "permata_va", label: "Permata Virtual Account" },
-  { value: "maybank_va", label: "Maybank Virtual Account" },
-  { value: "bnc_va", label: "BNC Virtual Account" },
-  { value: "sampoerna_va", label: "Sampoerna Virtual Account" },
-  { value: "atm_bersama_va", label: "ATM Bersama Virtual Account" },
-  { value: "artha_graha_va", label: "Artha Graha Virtual Account" },
-];
 const MAX_TARGET_FILE_SIZE = 100 * 1024 * 1024;
 
 function CheckoutForm() {
@@ -47,15 +29,8 @@ function CheckoutForm() {
   const [balance, setBalance] = useState(0);
   const [loading, setLoading] = useState(true);
   const [confirming, setConfirming] = useState(false);
-  const [method, setMethod] = useState<PayMethod>("WALLET");
-  const [bankMethod, setBankMethod] = useState(BANKS[0].value);
-  const [gatewayMethods, setGatewayMethods] = useState<{provider_method:string;label:string;payment_type:"QRIS"|"VA"}[]>([]);
   const [targetText, setTargetText] = useState("");
   const [targetFile, setTargetFile] = useState<File | null>(null);
-  const [payment, setPayment] = useState<{
-    orderId: string; paymentMethod: "QRIS" | "BANK_VA"; gatewayMethod: string;
-    paymentNumber: string; qrisImage?: string | null; amount: number; expiredAt: string;
-  } | null>(null);
 
   const idempotencyKey = useMemo(
     () => `${productId}-${qty}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -72,17 +47,11 @@ function CheckoutForm() {
         router.push(`/login?redirectTo=${encodeURIComponent(target)}`);
         return;
       }
-      const [{ data: p }, { data: wallet }, { data: ppobService }, methodRes] = await Promise.all([
+      const [{ data: p }, { data: wallet }, { data: ppobService }] = await Promise.all([
         supabase.from("products").select("id, name, price, thumbnail_url, product_type").eq("id", productId).single(),
         supabase.from("wallets").select("balance").eq("user_id", user.id).single(),
         supabase.from("ppob_services").select("id, provider, provider_sku, service_kind, category, brand, target_schema").eq("product_id", productId).eq("provider_active", true).maybeSingle(),
-        fetch("/api/payment-methods"),
       ]);
-      const methodJson = await methodRes.json().catch(() => ({ methods: [] }));
-      const configuredMethods = (methodJson.methods || []) as {provider_method:string;label:string;payment_type:"QRIS"|"VA"}[];
-      setGatewayMethods(configuredMethods);
-      const firstBank = configuredMethods.find((m) => m.payment_type === "VA");
-      if (firstBank) setBankMethod(firstBank.provider_method);
       setProduct(p as Product);
       setPpob((ppobService as PPOBService | null) || null);
       if (ppobService?.target_schema?.fields) {
@@ -207,54 +176,12 @@ function CheckoutForm() {
     }
   }
 
-  async function payGateway(gatewayMethod: string) {
-    if (!product || confirming || !validateJasaInput() || !validatePpobInput()) return;
-    setConfirming(true);
-    try {
-      if (ppob?.service_kind === "postpaid" && inquiryId) {
-        const res = await fetch("/api/ppob/postpaid/pay", {
-          method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ inquiry_id: inquiryId, idempotency_key: idempotencyKey, method: gatewayMethod === "qris" ? "QRIS" : "BANK", gateway_method: gatewayMethod }),
-        });
-        const json = await res.json();
-        if (!res.ok) { toast.show(json.message || "Gagal membuat pembayaran tagihan.", "error"); return; }
-        setPayment({ orderId: json.order_id, paymentMethod: json.payment_method, gatewayMethod: json.gateway_method, paymentNumber: json.payment_number, qrisImage: json.qris_image, amount: Number(json.amount), expiredAt: json.expired_at });
-        return;
-      }
-      const res = await fetch("/api/checkout/gateway", {
-        method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items: [{ product_id: product.id, quantity: qty }], idempotency_key: idempotencyKey, method: gatewayMethod, targets: ppob ? { [product.id]: { customer_no: ppobTargets.customer_no || "", target_data: ppobTargets } } : undefined }),
-      });
-      const json = await res.json();
-      if (!res.ok) { toast.show(json.message || "Gagal membuat pembayaran.", "error"); return; }
-      const { data: { user } } = await supabase.auth.getUser();
-      if (user) await saveSubmission(json.order_id, user.id);
-      setPayment({ orderId: json.order_id, paymentMethod: json.payment_method, gatewayMethod: json.gateway_method, paymentNumber: json.payment_number, qrisImage: json.qris_image, amount: Number(json.amount), expiredAt: json.expired_at });
-    } catch {
-      toast.show("Koneksi bermasalah. Silakan coba lagi.", "error");
-    } finally {
-      setConfirming(false);
-    }
-  }
-
   if (!productId || qty < 1) return <p className="text-sm text-slate-500">Parameter produk atau jumlah tidak valid.</p>;
   if (loading) return <div className="mx-auto max-w-lg animate-pulse rounded-[2rem] bg-white p-8 shadow-sm">Memuat checkout...</div>;
   if (!product) return <p className="text-sm text-slate-500">Produk tidak ditemukan.</p>;
 
   const subtotal = ppob?.service_kind === "postpaid" && inquiry ? Number(inquiry.quote_amount || inquiry.selling_price || 0) : product.price * qty;
   const enoughBalance = balance >= subtotal;
-
-  if (payment) {
-    return (
-      <div className="mx-auto max-w-xl animate-page-in">
-        <div className="mb-5 flex items-center gap-3">
-          <img src="/aidil-logo.png" alt="Aidil Store" className="h-12 w-12 rounded-2xl object-cover shadow-lg" />
-          <div><p className="text-xs font-black uppercase tracking-[.2em] text-amber-600">AIDIL STORE</p><h1 className="text-2xl font-black">Selesaikan Pembayaran</h1></div>
-        </div>
-        <GatewayPayment {...payment} />
-      </div>
-    );
-  }
 
   return (
     <div className="mx-auto max-w-6xl animate-page-in">
@@ -326,30 +253,16 @@ function CheckoutForm() {
 
           <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
             <div className="flex items-end justify-between">
-              <div><p className="text-xs font-black uppercase tracking-widest text-gold-600">Metode</p><h2 className="mt-1 text-xl font-black">Pilih cara bayar</h2></div>
+              <div><p className="text-xs font-black uppercase tracking-widest text-gold-600">Metode</p><h2 className="mt-1 text-xl font-black">Cara bayar</h2></div>
               <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">Otomatis</span>
             </div>
 
-            <div className="mt-4 grid gap-3 md:grid-cols-3">
-              <button type="button" onClick={() => setMethod("WALLET")} className={`rounded-2xl border-2 p-4 text-left transition ${method === "WALLET" ? "border-gold-500 bg-gold-50" : "border-slate-200 hover:border-gold-200"}`}>
-                <span className="text-2xl">💰</span><p className="mt-2 font-black">Saldo Wallet</p><p className="mt-1 text-xs text-slate-500">{formatRupiah(balance)} tersedia</p>
-              </button>
-              <button type="button" onClick={() => setMethod("QRIS")} className={`rounded-2xl border-2 p-4 text-left transition ${method === "QRIS" ? "border-amber-500 bg-amber-50" : "border-slate-200 hover:border-amber-200"}`}>
-                <span className="text-2xl">📱</span><p className="mt-2 font-black">QRIS / E-Wallet</p><p className="mt-1 text-xs text-slate-500">QRIS, m-banking & e-wallet yang mendukung QRIS</p>
-              </button>
-              <button type="button" onClick={() => setMethod("BANK")} className={`rounded-2xl border-2 p-4 text-left transition ${method === "BANK" ? "border-gold-500 bg-gold-50" : "border-slate-200 hover:border-gold-200"}`}>
-                <span className="text-2xl">🏦</span><p className="mt-2 font-black">Bank Virtual Account</p><p className="mt-1 text-xs text-slate-500">Nomor VA unik, terdeteksi otomatis</p>
-              </button>
+            <div className="mt-4 rounded-2xl border-2 border-gold-500 bg-gold-50 p-4">
+              <span className="text-2xl">💰</span>
+              <p className="mt-2 font-black">Saldo Wallet AIDIL STORE</p>
+              <p className="mt-1 text-xs text-slate-500">{formatRupiah(balance)} tersedia</p>
+              <p className="mt-3 text-[11px] leading-5 text-slate-500">Untuk saat ini, semua transaksi pembelian produk hanya dapat dibayar menggunakan saldo akun. Jika saldo belum cukup, silakan top up terlebih dahulu.</p>
             </div>
-
-            {method === "BANK" && (
-              <div className="mt-4 rounded-2xl bg-slate-50 p-4">
-                <label className="text-sm font-bold text-slate-700">Pilih bank</label>
-                <select value={bankMethod} onChange={(e) => setBankMethod(e.target.value)} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm font-semibold outline-none focus:border-gold-400">
-                  {(gatewayMethods.filter((m) => m.payment_type === "VA").length ? gatewayMethods.filter((m) => m.payment_type === "VA") : BANKS.map((b) => ({provider_method:b.value,label:b.label,payment_type:"VA" as const}))).map((b) => <option key={b.provider_method} value={b.provider_method}>{b.label}</option>)}
-                </select>
-              </div>
-            )}
           </div>
         </div>
 
@@ -362,20 +275,12 @@ function CheckoutForm() {
             <div className="border-t border-slate-100 pt-3 flex justify-between text-lg"><span className="font-black">Total</span><b className="text-gold-600">{formatRupiah(subtotal)}</b></div>
           </div>
 
-          {method === "WALLET" ? (
-            <>
-              <div className={`mt-5 rounded-2xl p-3 text-xs font-bold ${enoughBalance ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>{enoughBalance ? "✓ Saldo mencukupi." : "Saldo kurang. Gunakan QRIS/Bank atau Top Up."}</div>
-              <Button className="mt-4 w-full" onClick={payWallet} loading={confirming} disabled={!enoughBalance || (ppob?.service_kind === "postpaid" && !inquiryId)}>Bayar dengan Saldo</Button>
-              {!enoughBalance && <Button variant="secondary" className="mt-2 w-full" onClick={() => router.push(`/wallet/topup?amount=${encodeURIComponent(String(subtotal - balance))}`)}>Top Up Saldo</Button>}
-            </>
-          ) : (
-            <Button className="mt-5 w-full" onClick={() => payGateway(method === "QRIS" ? "qris" : bankMethod)} loading={confirming} disabled={ppob?.service_kind === "postpaid" && !inquiryId}>
-              {method === "QRIS" ? "Buat QRIS Pembayaran" : "Buat Virtual Account"}
-            </Button>
-          )}
+          <div className={`mt-5 rounded-2xl p-3 text-xs font-bold ${enoughBalance ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>{enoughBalance ? "✓ Saldo mencukupi." : "Saldo kurang, silakan top up terlebih dahulu."}</div>
+          <Button className="mt-4 w-full" onClick={payWallet} loading={confirming} disabled={!enoughBalance || (ppob?.service_kind === "postpaid" && !inquiryId)}>Bayar dengan Saldo</Button>
+          {!enoughBalance && <Button variant="secondary" className="mt-2 w-full" onClick={() => router.push(`/wallet/topup?amount=${encodeURIComponent(String(subtotal - balance))}`)}>Top Up Saldo</Button>}
 
           <div className="mt-5 space-y-2 text-xs text-slate-500">
-            <p>🔒 Status pembayaran diverifikasi otomatis melalui gateway.</p>
+            <p>🔒 Pembayaran saldo diproses instan & aman.</p>
             <p>📥 Produk digital yang lunas langsung tersedia di Pesanan.</p>
             <p>🚫 Tidak perlu upload bukti transfer atau menunggu approve admin.</p>
           </div>

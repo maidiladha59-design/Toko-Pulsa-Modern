@@ -8,8 +8,15 @@ import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 type QRISData = {
   raw: string;
   merchantName?: string;
+  merchantCity?: string;
+  postalCode?: string;
+  countryCode?: string;
+  currency?: string;
+  nmid?: string;
   amount?: string;
 };
+
+const CURRENCY_MAP: Record<string, string> = { '360': 'IDR (Rupiah)' };
 
 function parseQris(raw: string): QRISData {
   const map = new Map<string, string>();
@@ -37,6 +44,21 @@ function parseQris(raw: string): QRISData {
   // Namun beberapa QRIS bisa menggunakan struktur berbeda.
   const merchantName = map.get('59');
 
+  // Tag 60 = kota merchant, 61 = kode pos, 58 = kode negara, 53 = mata uang.
+  const merchantCity = map.get('60');
+  const postalCode = map.get('61');
+  const countryCode = map.get('58');
+  const currencyRaw = map.get('53');
+  const currency = currencyRaw ? CURRENCY_MAP[currencyRaw] || currencyRaw : undefined;
+
+  // NMID (National Merchant ID) biasanya ada di subfield tag 51/26-51, ambil apa adanya jika ditemukan.
+  const merchantAccountBlock = map.get('51') || map.get('26');
+  let nmid: string | undefined;
+  if (merchantAccountBlock) {
+    const idMatch = merchantAccountBlock.match(/ID\d{2}(\w{8,15})/);
+    if (idMatch) nmid = idMatch[1];
+  }
+
   // Tag 54 biasanya digunakan untuk nominal.
   // Kosong = QRIS statis, nominal harus diisi manual oleh user.
   const amount = map.get('54');
@@ -44,8 +66,35 @@ function parseQris(raw: string): QRISData {
   return {
     raw,
     merchantName,
+    merchantCity,
+    postalCode,
+    countryCode,
+    currency,
+    nmid,
     amount,
   };
+}
+
+function shortRef(raw: string) {
+  // Referensi singkat non-sensitif untuk ditampilkan ke pengguna, diambil dari data mentah QRIS.
+  let hash = 0;
+  for (let i = 0; i < raw.length; i++) {
+    hash = (hash * 31 + raw.charCodeAt(i)) >>> 0;
+  }
+  return `QRS-${hash.toString(36).toUpperCase().slice(0, 8)}`;
+}
+
+function DetailRow({ label, value, mono, badge }: { label: string; value: string; mono?: boolean; badge?: 'success' }) {
+  return (
+    <div className="flex items-center justify-between gap-3 bg-white px-4 py-3">
+      <span className="text-xs font-bold uppercase tracking-wide text-slate-400">{label}</span>
+      {badge === 'success' ? (
+        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">{value}</span>
+      ) : (
+        <span className={`text-right text-sm font-black text-slate-900 ${mono ? 'font-mono text-xs' : ''}`}>{value}</span>
+      )}
+    </div>
+  );
 }
 
 export default function ScanQRIS() {
@@ -56,6 +105,7 @@ export default function ScanQRIS() {
 
   const [code, setCode] = useState('');
   const [qris, setQris] = useState<QRISData | null>(null);
+  const [scannedAt, setScannedAt] = useState<Date | null>(null);
   const [manualAmount, setManualAmount] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -127,6 +177,7 @@ export default function ScanQRIS() {
 
             setCode(raw);
             setQris(parseQris(raw));
+            setScannedAt(new Date());
             setError('');
             stopScanner();
           }
@@ -156,6 +207,7 @@ export default function ScanQRIS() {
   function clearResult() {
     setCode('');
     setQris(null);
+    setScannedAt(null);
     setManualAmount('');
     setError('');
   }
@@ -181,7 +233,7 @@ export default function ScanQRIS() {
       })
     );
 
-    router.push('/scan-qris/qris-confirm');
+    router.push('/qris/confirm');
   }
 
   useEffect(() => {
@@ -263,91 +315,102 @@ export default function ScanQRIS() {
               </div>
             )}
 
-            {/* Result */}
-            {qris && (
-              <div className="rounded-2xl border border-green-200 bg-green-50 p-5">
-                <div className="mb-3 flex items-center gap-2">
-                  <span className="text-xl">✅</span>
+          </div>
+        </div>
+      </div>
 
-                  <h2 className="font-bold text-green-800">
-                    QR Code berhasil dibaca
-                  </h2>
+      {/* Popup detail QRIS */}
+      {qris && (
+        <div
+          className="fixed inset-0 z-50 flex items-end justify-center bg-slate-950/60 p-0 backdrop-blur-sm sm:items-center sm:p-4"
+          role="dialog"
+          aria-modal="true"
+          onClick={(e) => { if (e.target === e.currentTarget) clearResult(); }}
+        >
+          <div className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white shadow-2xl sm:max-w-md sm:rounded-3xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-3 rounded-t-3xl bg-slate-950 px-6 py-5 text-white">
+              <div className="flex items-center gap-2">
+                <span className="text-xl">✅</span>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[.2em] text-emerald-300">QRIS berhasil dibaca</p>
+                  <h2 className="text-lg font-black">Detail Pembayaran QRIS</h2>
                 </div>
+              </div>
+              <button type="button" onClick={clearResult} aria-label="Tutup" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-lg font-bold hover:bg-white/20">✕</button>
+            </div>
 
-                {qris.merchantName && (
-                  <div className="mb-3">
-                    <p className="text-xs font-medium uppercase text-green-700">
-                      Merchant
-                    </p>
-
-                    <p className="font-semibold text-slate-900">
-                      {qris.merchantName}
-                    </p>
-                  </div>
-                )}
-
+            <div className="space-y-4 p-6">
+              {/* Nominal - paling atas & menonjol */}
+              <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4 text-center">
+                <p className="text-xs font-black uppercase tracking-widest text-gold-700">Total Nominal</p>
                 {qris.amount ? (
-                  <div className="mb-3">
-                    <p className="text-xs font-medium uppercase text-green-700">
-                      Nominal
-                    </p>
-
-                    <p className="font-semibold text-slate-900">
-                      Rp {Number(qris.amount).toLocaleString('id-ID')}
-                    </p>
-                  </div>
+                  <p className="mt-1 text-3xl font-black text-slate-900">Rp {Number(qris.amount).toLocaleString('id-ID')}</p>
                 ) : (
-                  <div className="mb-3">
-                    <label className="mb-1 block text-xs font-medium uppercase text-green-700">
-                      Masukkan Nominal Pembayaran
-                    </label>
-                    <div className="flex items-center rounded-xl border border-green-300 bg-white px-3">
+                  <>
+                    <div className="mx-auto mt-2 flex max-w-[220px] items-center rounded-xl border border-gold-300 bg-white px-3">
                       <span className="text-sm font-semibold text-slate-500">Rp</span>
                       <input
                         type="text"
                         inputMode="numeric"
+                        autoFocus
                         value={manualAmount ? Number(manualAmount).toLocaleString('id-ID') : ''}
                         onChange={(e) => setManualAmount(e.target.value.replace(/\D/g, ''))}
                         placeholder="0"
-                        className="w-full bg-transparent px-2 py-2.5 text-sm font-semibold text-slate-900 outline-none"
+                        className="w-full bg-transparent px-2 py-2.5 text-center text-lg font-black text-slate-900 outline-none"
                       />
                     </div>
-                    <p className="mt-1 text-xs text-green-700">QRIS ini statis, nominal perlu diisi manual.</p>
-                  </div>
+                    <p className="mt-2 text-[11px] font-semibold text-gold-700">QRIS statis · nominal diisi manual</p>
+                  </>
                 )}
+              </div>
 
-                <div>
-                  <p className="mb-1 text-xs font-medium uppercase text-green-700">
-                    Data QR
-                  </p>
+              {/* Detail rapi */}
+              <div className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200">
+                <DetailRow label="Nama Merchant" value={qris.merchantName || 'Tidak diketahui'} />
+                {qris.merchantCity && <DetailRow label="Kota Merchant" value={qris.merchantCity} />}
+                {qris.postalCode && <DetailRow label="Kode Pos" value={qris.postalCode} />}
+                {qris.nmid && <DetailRow label="NMID" value={qris.nmid} mono />}
+                <DetailRow label="Mata Uang" value={qris.currency || 'IDR (Rupiah)'} />
+                <DetailRow label="Tipe QRIS" value={qris.amount ? 'Dinamis (nominal tetap)' : 'Statis (nominal manual)'} />
+                <DetailRow label="Referensi" value={shortRef(qris.raw)} mono />
+                <DetailRow label="Waktu Scan" value={scannedAt ? scannedAt.toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'medium' }) : '-'} />
+                <DetailRow label="Status" value="Berhasil dibaca" badge="success" />
+              </div>
 
-                  <div className="max-h-32 overflow-auto rounded-xl bg-white p-3">
-                    <p className="break-all text-xs text-slate-700">
-                      {code}
-                    </p>
-                  </div>
+              <div>
+                <p className="mb-1 text-xs font-bold uppercase text-slate-400">Data mentah QR</p>
+                <div className="max-h-24 overflow-auto rounded-xl bg-slate-50 p-3">
+                  <p className="break-all text-[11px] leading-5 text-slate-500">{code}</p>
                 </div>
+              </div>
 
+              <div className="space-y-2 pt-1">
                 <button
                   type="button"
                   onClick={goToPayment}
-                  className="mt-4 w-full rounded-xl bg-gold-600 px-4 py-3 text-sm font-black text-white transition hover:bg-gold-700"
+                  className="w-full rounded-2xl bg-gold-600 px-4 py-3.5 text-sm font-black text-white transition hover:bg-gold-700"
                 >
                   💳 Lanjutkan ke Pembayaran
                 </button>
-
+                <button
+                  type="button"
+                  onClick={startScanner}
+                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50"
+                >
+                  🔄 Scan Ulang
+                </button>
                 <button
                   type="button"
                   onClick={clearResult}
-                  className="mt-2 w-full rounded-xl border border-green-300 bg-white px-4 py-2 text-sm font-semibold text-green-700 hover:bg-green-100"
+                  className="w-full rounded-2xl px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-600"
                 >
-                  Bersihkan Hasil
+                  Batalkan
                 </button>
               </div>
-            )}
+            </div>
           </div>
         </div>
-      </div>
+      )}
     </main>
   );
 }

@@ -38,5 +38,20 @@ export function humanizeError(rawMessage: string | undefined | null): string {
   if (msg.includes("row-level security") || msg.includes("permission denied"))
     return "Anda tidak memiliki akses untuk melakukan ini.";
 
+  // Kalau bukan salah satu pola teknis di atas, kemungkinan besar ini pesan
+  // yang sudah ditulis manusiawi oleh API kita sendiri (mis. "Email belum
+  // diverifikasi dengan OTP.") — tampilkan apa adanya, jangan dibuang jadi
+  // generik, supaya user tahu apa yang sebenarnya salah.
+  const looksLikeRawTechnicalError =
+    msg.includes("error:") ||
+    msg.includes("exception") ||
+    msg.includes("stack") ||
+    msg.includes("undefined") ||
+    msg.includes("null") ||
+    msg.includes("{") ||
+    rawMessage.length > 200;
+
+  if (rawMessage.trim() && !looksLikeRawTechnicalError) return rawMessage;
+
   return "Terjadi kesalahan. Silakan coba lagi.";
 }

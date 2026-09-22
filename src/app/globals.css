@@ -10,6 +10,10 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 
 @keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes float-soft { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
+@keyframes toast-pop-in { from { opacity: 0; transform: translateY(-14px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes toast-pop-out { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-10px) scale(.97); } }
+.toast-pop { animation: toast-pop-in .25s ease-out both; }
+.toast-pop-out { animation: toast-pop-out .2s ease-in forwards; }
 .animate-page-in { animation: page-in .45s ease-out both; }
 .dashboard-card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
 .dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 18px 35px rgba(9, 9, 11, .18); border-color: #F5C542; }
