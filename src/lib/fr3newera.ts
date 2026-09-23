@@ -96,6 +96,8 @@ async function apiRequest<T>(path: string, init: RequestInit & { body?: string }
   return json as T;
 }
 
+// Normalisasi status dari FR3 NEWERA ke status internal.
+// Semua jalur WAJIB return (ada default), kalau tidak TypeScript gagal compile.
 function mapFr3Status(raw: string | undefined | null): GatewayTransaction["status"] {
   switch (String(raw || "").toUpperCase()) {
     case "SUCCESS":
@@ -103,6 +105,16 @@ function mapFr3Status(raw: string | undefined | null): GatewayTransaction["statu
     case "PAID":
     case "SETTLED":
       return "completed";
+    case "CANCELED":
+    case "CANCELLED":
+      return "canceled";
+    case "EXPIRED":
+      return "expired";
+    case "FAILED":
+    case "FAILURE":
+      return "failed";
+    default:
+      return "pending";
   }
 }
 
@@ -122,13 +134,16 @@ export async function createGatewayTransaction(
     method: "POST",
     body: JSON.stringify({ apikey: apiKey, nominal: amount, add_mdr_to_customer: false }),
   });
-  console.log("FR3 CHECK-STATUS RAW:", JSON.stringify(json));
+  console.log("FR3 TOPUP RAW:", JSON.stringify(json));
   const d = json.data;
+  if (!d || !d.trxId) {
+    throw new Error("GATEWAY_INVALID_RESPONSE");
+  }
   return {
-    txn_id: d.trxId ?? txnId,
-    amount: d.amount ?? amount,
-    fee: d.mdr?.mdr_amount ?? d.fee ?? 0,
-    total_payment: d.totalTransfer ?? d.amount ?? amount,
+    txn_id: String(d.trxId),
+    amount: Number(d.amount ?? amount),
+    fee: Number(d.mdr?.mdr_amount ?? d.fee ?? 0),
+    total_payment: Number(d.totalTransfer ?? d.amount ?? amount),
     payment_method: "qris",
     qr_string: d.qr_string,
     expired_at: new Date(Number(d.expiry)).toISOString(),
@@ -144,11 +159,12 @@ export async function getGatewayTransactionDetail(txnId: string): Promise<Gatewa
     { method: "GET" }
   );
   const d = json.data;
+  const mapped = mapFr3Status(d.status);
   return {
-    txn_id: d.trxId,
+    txn_id: String(d.trxId ?? txnId),
     amount: Number(d.amount),
-    status: mapFr3Status(d.status),
-    completed_at: mapFr3Status(d.status) === "completed" ? new Date().toISOString() : null,
+    status: mapped,
+    completed_at: mapped === "completed" ? new Date().toISOString() : null,
   };
 }
 
