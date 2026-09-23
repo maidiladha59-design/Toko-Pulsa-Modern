@@ -21,6 +21,8 @@
 //    dari dashboard FR3 NEWERA (menu Webhooks > Verifikasi Signature).
 
 import crypto from "node:crypto";
+import https from "node:https";
+import { HttpsProxyAgent } from "https-proxy-agent";
 
 const BASE_URL = "https://fr3newera.com/api/v1";
 
@@ -55,18 +57,41 @@ export type GatewayTransactionStatus = {
   completed_at?: string | null;
 };
 
+// FR3 NEWERA memakai IP Whitelist. Kalau FR3NEWERA_PROXY_URL (atau DIGIFLAZZ_PROXY_URL)
+// diisi, semua request ke FR3 dikirim lewat proxy ber-IP tetap itu, jadi cukup
+// daftarkan IP proxy tersebut di dashboard FR3 NEWERA > IP Whitelist.
+function getProxyAgent() {
+  const proxyUrl = process.env.FR3NEWERA_PROXY_URL || process.env.DIGIFLAZZ_PROXY_URL;
+  return proxyUrl ? new HttpsProxyAgent(proxyUrl) : undefined;
+}
+
 async function apiRequest<T>(path: string, init: RequestInit & { body?: string } = {}): Promise<T> {
-  const res = await fetch(`${BASE_URL}${path}`, {
-    ...init,
-    headers: {
-      "Content-Type": "application/json",
-      ...(init.headers || {}),
-    },
-    cache: "no-store",
+  const url = new URL(`${BASE_URL}${path}`);
+  const { status, text } = await new Promise<{ status: number; text: string }>((resolve, reject) => {
+    const req = https.request(
+      url,
+      {
+        method: (init.method || "GET").toUpperCase(),
+        headers: { "Content-Type": "application/json", ...((init.headers as Record<string, string>) || {}) },
+        agent: getProxyAgent(),
+        timeout: 20000,
+      },
+      (res) => {
+        let data = "";
+        res.on("data", (chunk) => (data += chunk));
+        res.on("end", () => resolve({ status: res.statusCode || 0, text: data }));
+      }
+    );
+    req.on("timeout", () => req.destroy(new Error("GATEWAY_TIMEOUT")));
+    req.on("error", reject);
+    if (init.body) req.write(init.body);
+    req.end();
   });
-  const json = await res.json().catch(() => null);
-  if (!res.ok || (json && typeof json.status === "number" && json.status >= 400)) {
-    throw new Error(json?.message || `GATEWAY_ERROR_${res.status}`);
+  let json: any = null;
+  try { json = JSON.parse(text); } catch { json = null; }
+  const ok = status >= 200 && status < 300;
+  if (!ok || (json && typeof json.status === "number" && json.status >= 400)) {
+    throw new Error(json?.error || json?.message || `GATEWAY_ERROR_${status}`);
   }
   return json as T;
 }
