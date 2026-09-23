@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createPakasirTransaction, extractPakasirPaymentNumber, isPakasirConfigured, type PakasirMethod } from "@/lib/pakasir";
+import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured, type GatewayMethod } from "@/lib/fr3newera";
 import QRCode from "qrcode";
 
 const bodySchema = z.object({
@@ -13,24 +13,14 @@ const bodySchema = z.object({
   idempotency_key: z.string().min(10),
   voucher_code: z.string().trim().max(64).optional(),
   targets: z.record(z.object({ customer_no: z.string().min(3).max(64), target_data: z.record(z.unknown()).optional() })).optional(),
-  method: z.enum([
-    "qris",
-    "bri_va",
-    "bni_va",
-    "cimb_niaga_va",
-    "sampoerna_va",
-    "bnc_va",
-    "maybank_va",
-    "permata_va",
-    "atm_bersama_va",
-    "artha_graha_va",
-  ]),
+  // FR3 NEWERA hanya menyediakan QRIS (tidak ada Virtual Account seperti Pakasir).
+  method: z.enum(["qris"]),
 });
 
 export async function POST(request: Request) {
-  if (!isPakasirConfigured()) {
+  if (!isGatewayConfigured()) {
     return NextResponse.json(
-      { message: "Pembayaran otomatis belum dikonfigurasi. Tambahkan PAKASIR_PROJECT dan PAKASIR_API_KEY di environment server." },
+      { message: "Pembayaran otomatis belum dikonfigurasi. Tambahkan FR3NEWERA_API_KEY di environment server." },
       { status: 503 }
     );
   }
@@ -124,11 +114,11 @@ export async function POST(request: Request) {
   }
 
   try {
-    const payment = await createPakasirTransaction(o.order_number, Number(existing?.total_amount ?? o.total_amount), method as PakasirMethod);
+    const payment = await createGatewayTransaction(o.order_number, Number(existing?.total_amount ?? o.total_amount), method as GatewayMethod);
     const isQris = method === "qris";
-    const paymentNumber = extractPakasirPaymentNumber(payment);
+    const paymentNumber = extractGatewayPaymentNumber(payment);
     const totalPayment = payment.total_payment ?? Number(existing?.total_amount ?? o.total_amount);
-    if (!payment.txn_id || !paymentNumber) throw new Error("PAKASIR_INVALID_RESPONSE");
+    if (!payment.txn_id || !paymentNumber) throw new Error("GATEWAY_INVALID_RESPONSE");
     const { error: saveError } = await admin.from("orders").update({
       payment_method: isQris ? "QRIS" : "BANK_VA",
       gateway_reference: o.order_number,

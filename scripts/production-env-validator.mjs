@@ -12,8 +12,8 @@ const required = [
   'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   'SUPABASE_SERVICE_ROLE_KEY',
   'NEXT_PUBLIC_SITE_URL',
-  'PAKASIR_PROJECT',
-  'PAKASIR_API_KEY',
+  
+  'FR3NEWERA_API_KEY',
   'DIGIFLAZZ_USERNAME',
   'DIGIFLAZZ_API_KEY',
   'DIGIFLAZZ_WEBHOOK_SECRET',
@@ -57,10 +57,9 @@ if (env.NEXT_PUBLIC_SITE_URL) {
   } catch { errors.push('NEXT_PUBLIC_SITE_URL is not a valid URL'); }
 }
 
-if (env.PAKASIR_SANDBOX === 'true') warnings.push('PAKASIR_SANDBOX=true: payment gateway is still in sandbox mode');
 if (env.DIGIFLAZZ_TESTING === 'true') warnings.push('DIGIFLAZZ_TESTING=true: provider requests are in testing mode');
 
-for (const key of ['SUPABASE_SERVICE_ROLE_KEY','PAKASIR_API_KEY','DIGIFLAZZ_API_KEY','DIGIFLAZZ_WEBHOOK_SECRET','INTERNAL_CRON_SECRET','CRON_SECRET']) {
+for (const key of ['SUPABASE_SERVICE_ROLE_KEY','FR3NEWERA_API_KEY','DIGIFLAZZ_API_KEY','DIGIFLAZZ_WEBHOOK_SECRET','INTERNAL_CRON_SECRET','CRON_SECRET']) {
   if (env[key] && env[key].length < 16) errors.push(`${key} is present but looks too short; use the real secret/key`);
 }
 

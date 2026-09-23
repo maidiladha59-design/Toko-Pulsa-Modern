@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createPakasirTransaction, extractPakasirPaymentNumber, isPakasirConfigured } from "@/lib/pakasir";
+import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured } from "@/lib/fr3newera";
 import QRCode from "qrcode";
 
 const bodySchema = z.object({
@@ -15,7 +15,7 @@ const bodySchema = z.object({
 // Membuat order QRIS: order & item disimpan dulu (status PENDING, saldo TIDAK
 // disentuh), lalu transaksi dibuat di Pakasir untuk mendapatkan QR code.
 export async function POST(request: Request) {
-  if (!isPakasirConfigured()) {
+  if (!isGatewayConfigured()) {
     return NextResponse.json({ message: "Pembayaran QRIS belum dikonfigurasi. Silakan hubungi admin." }, { status: 503 });
   }
 
@@ -110,9 +110,9 @@ export async function POST(request: Request) {
   }
 
   try {
-    const payment = await createPakasirTransaction(order_number, payableAmount, "qris");
-    const qrString = extractPakasirPaymentNumber(payment);
-    if (!payment.txn_id || !qrString) throw new Error("PAKASIR_INVALID_RESPONSE");
+    const payment = await createGatewayTransaction(order_number, payableAmount, "qris");
+    const qrString = extractGatewayPaymentNumber(payment);
+    if (!payment.txn_id || !qrString) throw new Error("GATEWAY_INVALID_RESPONSE");
     const { error: saveError } = await admin.from("orders").update({
       gateway_reference: order_number,
       gateway_txn_id: payment.txn_id,

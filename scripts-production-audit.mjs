@@ -16,7 +16,7 @@ const required = [
 const failures = [];
 for (const file of required) if (!fs.existsSync(path.join(root, file))) failures.push(`Missing: ${file}`);
 const env = fs.readFileSync(path.join(root, '.env.example'), 'utf8');
-for (const key of ['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_ANON_KEY','SUPABASE_SERVICE_ROLE_KEY','PAKASIR_PROJECT','PAKASIR_API_KEY','DIGIFLAZZ_USERNAME','DIGIFLAZZ_API_KEY','CRON_SECRET','INTERNAL_CRON_SECRET']) {
+for (const key of ['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_ANON_KEY','SUPABASE_SERVICE_ROLE_KEY','FR3NEWERA_PROJECT_UNUSED','FR3NEWERA_API_KEY','DIGIFLAZZ_USERNAME','DIGIFLAZZ_API_KEY','CRON_SECRET','INTERNAL_CRON_SECRET']) {
   if (!env.includes(`${key}=`)) failures.push(`Missing env declaration: ${key}`);
 }
 const cron = fs.readFileSync(path.join(root, 'src/app/api/ppob/cron/route.ts'), 'utf8');

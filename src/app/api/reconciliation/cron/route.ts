@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { getPakasirTransactionDetail, isPakasirConfigured } from '@/lib/pakasir';
+import { getGatewayTransactionDetail, isGatewayConfigured } from '@/lib/fr3newera';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -16,25 +16,25 @@ export async function GET(request: Request) {
   const checked: Array<{ type: string; id: string; state?: string }> = [];
   const errors: Array<{ type: string; id: string; message: string }> = [];
 
-  // Check recent Pakasir topups even when the internal status is stale. This catches
+  // Check recent FR3 NEWERA topups even when the internal status is stale. This catches
   // a successful payment whose webhook was delayed or missed.
-  const { data: topups } = await admin.from('topups').select('id,status,amount,payment_amount,provider,provider_order_id,provider_txn_id,payment_method,expires_at,created_at').eq('provider','pakasir').not('provider_order_id','is',null).order('created_at',{ascending:false}).limit(150);
+  const { data: topups } = await admin.from('topups').select('id,status,amount,payment_amount,provider,provider_order_id,provider_txn_id,payment_method,expires_at,created_at').eq('provider','fr3newera').not('provider_order_id','is',null).order('created_at',{ascending:false}).limit(150);
   for (const t of topups || []) {
     try {
       if (["PENDING","VERIFYING"].includes(t.status) && t.expires_at && new Date(t.expires_at).getTime() <= Date.now()) {
         await admin.from("topups").update({ status: "EXPIRED", updated_at: new Date().toISOString() }).eq("id", t.id).in("status", ["PENDING","VERIFYING"]);
       }
-      // API v2: status dicek lewat txn_id Pakasir, bukan order_id. Top Up tanpa txn_id (gagal saat create) dilewati.
-      const provider = isPakasirConfigured() && t.provider_txn_id ? await getPakasirTransactionDetail(t.provider_txn_id) : null;
+      // API v2: status dicek lewat txn_id FR3 NEWERA, bukan order_id. Top Up tanpa txn_id (gagal saat create) dilewati.
+      const provider = isGatewayConfigured() && t.provider_txn_id ? await getGatewayTransactionDetail(t.provider_txn_id) : null;
       const { data: internal } = await admin.rpc('reconcile_internal_financial_record',{p_source_type:'TOPUP',p_source_id:t.id});
       if (provider) {
         let state = internal?.state || 'REVIEW';
         let discrepancy = internal?.discrepancy || null;
         const internalAmount = Number(t.payment_amount || t.amount);
         const providerAmount = Number(provider.amount);
-        if (providerAmount !== internalAmount) { state='MISMATCH'; discrepancy='Nominal Pakasir berbeda dengan nominal internal.'; }
-        else if (provider.status === 'completed' && t.status !== 'APPROVED') { state='MISMATCH'; discrepancy='Pakasir completed tetapi Top Up belum APPROVED; webhook mungkin terlewat.'; }
-        await admin.from('payment_reconciliation').upsert({source_type:'TOPUP',source_id:t.id,provider:'pakasir',internal_status:t.status,provider_status:provider.status,internal_amount:internalAmount,provider_amount:providerAmount,wallet_amount:internal?.wallet_amount ?? null,state,discrepancy,checked_at:new Date().toISOString(),metadata:{runner:'v50-cron',payment_method:t.payment_method}}, {onConflict:'source_type,source_id'});
+        if (providerAmount !== internalAmount) { state='MISMATCH'; discrepancy='Nominal FR3 NEWERA berbeda dengan nominal internal.'; }
+        else if (provider.status === 'completed' && t.status !== 'APPROVED') { state='MISMATCH'; discrepancy='FR3 NEWERA completed tetapi Top Up belum APPROVED; webhook mungkin terlewat.'; }
+        await admin.from('payment_reconciliation').upsert({source_type:'TOPUP',source_id:t.id,provider:'fr3newera',internal_status:t.status,provider_status:provider.status,internal_amount:internalAmount,provider_amount:providerAmount,wallet_amount:internal?.wallet_amount ?? null,state,discrepancy,checked_at:new Date().toISOString(),metadata:{runner:'v50-cron',payment_method:t.payment_method}}, {onConflict:'source_type,source_id'});
         checked.push({type:'TOPUP',id:t.id,state});
       } else { checked.push({type:'TOPUP',id:t.id,state:internal?.state}); }
     } catch (e:any) { errors.push({type:'TOPUP',id:t.id,message:String(e?.message || e)}); }
@@ -47,14 +47,14 @@ export async function GET(request: Request) {
     try {
       const {data}=await admin.rpc('reconcile_internal_financial_record',{p_source_type:'ORDER',p_source_id:o.id});
       let state = data?.state;
-      // Order QRIS/VA yang masih menggantung: cross-check ke Pakasir memakai gateway_txn_id.
-      if (isPakasirConfigured() && o.gateway_txn_id && ['QRIS','BANK_VA'].includes(o.payment_method) && ['PENDING','PROCESSING'].includes(o.status)) {
-        const provider = await getPakasirTransactionDetail(o.gateway_txn_id);
+      // Order QRIS/VA yang masih menggantung: cross-check ke FR3 NEWERA memakai gateway_txn_id.
+      if (isGatewayConfigured() && o.gateway_txn_id && ['QRIS','BANK_VA'].includes(o.payment_method) && ['PENDING','PROCESSING'].includes(o.status)) {
+        const provider = await getGatewayTransactionDetail(o.gateway_txn_id);
         let discrepancy = data?.discrepancy || null;
         state = data?.state || 'REVIEW';
-        if (Number(provider.amount) !== Number(o.total_amount)) { state='MISMATCH'; discrepancy='Nominal Pakasir berbeda dengan nominal order.'; }
-        else if (provider.status === 'completed' && o.status === 'PENDING') { state='MISMATCH'; discrepancy='Pakasir completed tetapi order masih PENDING; webhook mungkin terlewat.'; }
-        await admin.from('payment_reconciliation').upsert({source_type:'ORDER',source_id:o.id,provider:'pakasir',internal_status:o.status,provider_status:provider.status,internal_amount:Number(o.total_amount),provider_amount:Number(provider.amount),wallet_amount:data?.wallet_amount ?? null,state,discrepancy,checked_at:new Date().toISOString(),metadata:{runner:'v73-cron',order_number:o.order_number,gateway_method:o.gateway_method}}, {onConflict:'source_type,source_id'});
+        if (Number(provider.amount) !== Number(o.total_amount)) { state='MISMATCH'; discrepancy='Nominal FR3 NEWERA berbeda dengan nominal order.'; }
+        else if (provider.status === 'completed' && o.status === 'PENDING') { state='MISMATCH'; discrepancy='FR3 NEWERA completed tetapi order masih PENDING; webhook mungkin terlewat.'; }
+        await admin.from('payment_reconciliation').upsert({source_type:'ORDER',source_id:o.id,provider:'fr3newera',internal_status:o.status,provider_status:provider.status,internal_amount:Number(o.total_amount),provider_amount:Number(provider.amount),wallet_amount:data?.wallet_amount ?? null,state,discrepancy,checked_at:new Date().toISOString(),metadata:{runner:'v73-cron',order_number:o.order_number,gateway_method:o.gateway_method}}, {onConflict:'source_type,source_id'});
       }
       checked.push({type:'ORDER',id:o.id,state});
     }

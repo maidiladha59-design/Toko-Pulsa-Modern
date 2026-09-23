@@ -10,7 +10,7 @@ test('v35 configurable topup fee wiring exists', () => {
   const adminRoute = read('src/app/api/admin/topup-fee/route.ts');
   const adminPage = read('src/app/admin/topups/page.tsx');
   const page = read('src/app/wallet/topup/page.tsx');
-  const webhook = read('src/app/api/payments/pakasir/webhook/route.ts');
+  const webhook = read('src/app/api/payments/fr3newera/webhook/route.ts');
   assert.match(migration, /topup_fee_settings/);
   assert.match(migration, /fee_type text.*FIXED.*PERCENTAGE/s);
   assert.match(migration, /admin_fee bigint/);

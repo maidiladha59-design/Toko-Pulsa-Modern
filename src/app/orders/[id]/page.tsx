@@ -32,7 +32,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
   if (!user) redirect("/login");
 
   const { data: order } = await supabase.from("orders")
-    .select("id, order_number, total_amount, status, created_at, user_id, payment_method, gateway_method, payment_number, qris_payload, qris_expired_at, gateway_fee, gateway_total_payment")
+    .select("id, order_number, total_amount, status, created_at, user_id, payment_method, gateway_method, gateway_txn_id, payment_number, qris_payload, qris_expired_at, gateway_fee, gateway_total_payment")
     .eq("id", params.id).single();
 
   if (!order || order.user_id !== user.id) notFound();
@@ -152,12 +152,16 @@ export default async function OrderDetailPage({ params }: { params: { id: string
         </div>
 
         <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
-          <p className="text-xs font-black uppercase tracking-widest text-slate-400">Ringkasan pembayaran</p>
+          <p className="text-xs font-black uppercase tracking-widest text-slate-400">Rincian Transaksi</p>
           <div className="mt-4 space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-slate-500">Metode</span><b>{order.payment_method === "BANK_VA" ? (bankNames[order.gateway_method || ""] || "Virtual Account") : order.payment_method || "Wallet"}</b></div>
+            <div className="flex justify-between"><span className="text-slate-500">Tanggal</span><b>{formatDate(order.created_at)}</b></div>
+            <div className="flex justify-between gap-3"><span className="shrink-0 text-slate-500">ID Pesanan</span><b className="break-all text-right">{order.order_number}</b></div>
+            {order.gateway_txn_id && <div className="flex justify-between gap-3"><span className="shrink-0 text-slate-500">ID Transaksi Gateway</span><b className="break-all text-right text-xs">{order.gateway_txn_id}</b></div>}
+            <div className="flex justify-between"><span className="text-slate-500">Metode</span><b>{order.payment_method === "BANK_VA" ? (bankNames[order.gateway_method || ""] || "Virtual Account") : order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method || "Wallet"}</b></div>
             <div className="flex justify-between"><span className="text-slate-500">Status</span><StatusBadge status={order.status} /></div>
-            <div className="border-t border-slate-100 pt-4 flex justify-between text-lg"><span className="font-black">Total produk</span><b className="text-gold-600">{formatRupiah(order.total_amount)}</b></div>
-            {order.gateway_total_payment && Number(order.gateway_total_payment) !== Number(order.total_amount) && <div className="flex justify-between text-sm"><span className="text-slate-500">Total dibayar</span><b>{formatRupiah(order.gateway_total_payment)}</b></div>}
+            <div className="border-t border-slate-100 pt-4 flex justify-between"><span className="text-slate-500">Subtotal produk</span><b>{formatRupiah(order.total_amount)}</b></div>
+            {order.gateway_fee ? <div className="flex justify-between"><span className="text-slate-500">Biaya gateway</span><b>{formatRupiah(order.gateway_fee)}</b></div> : null}
+            <div className="flex justify-between text-lg"><span className="font-black">Total dibayar</span><b className="text-gold-600">{formatRupiah(order.gateway_total_payment || order.total_amount)}</b></div>
           </div>
           {order.status === "COMPLETED" && <div className="mt-5 rounded-2xl bg-emerald-50 p-4 text-xs font-bold text-emerald-700">📥 Produk digital yang tersedia sudah bisa diambil dari kartu produk di atas.</div>}
         </aside>

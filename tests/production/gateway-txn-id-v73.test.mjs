@@ -12,7 +12,7 @@ test('v73 migration adds orders.gateway_txn_id and topups.provider_txn_id', () =
   assert.match(sql, /alter table public\.topups[\s\S]*add column if not exists provider_txn_id text/i);
 });
 
-test('v73 every order-creating gateway route stores Pakasir txn_id', () => {
+test('v73 every order-creating gateway route stores FR3 NEWERA txn_id', () => {
   for (const f of [
     'src/app/api/checkout/gateway/route.ts',
     'src/app/api/checkout/qris/route.ts',
@@ -26,12 +26,12 @@ test('v73 every order-creating gateway route stores Pakasir txn_id', () => {
 
 test('v73 status polling, webhook and reconciliation use gateway_txn_id (never order_number)', () => {
   const status = read('src/app/api/orders/[id]/status/route.ts');
-  assert.match(status, /getPakasirTransactionDetail\(order\.gateway_txn_id\)/);
-  assert.doesNotMatch(status, /getPakasirTransactionDetail\(order\.gateway_reference/);
-  const webhook = read('src/app/api/payments/pakasir/webhook/route.ts');
+  assert.match(status, /getGatewayTransactionDetail\(order\.gateway_txn_id\)/);
+  assert.doesNotMatch(status, /getGatewayTransactionDetail\(order\.gateway_reference/);
+  const webhook = read('src/app/api/payments/fr3newera/webhook/route.ts');
   assert.match(webhook, /order\.gateway_txn_id/);
   const cron = read('src/app/api/reconciliation/cron/route.ts');
-  assert.match(cron, /getPakasirTransactionDetail\(t\.provider_txn_id\)/);
-  assert.match(cron, /getPakasirTransactionDetail\(o\.gateway_txn_id\)/);
-  assert.doesNotMatch(cron, /getPakasirTransactionDetail\(t\.provider_order_id/);
+  assert.match(cron, /getGatewayTransactionDetail\(t\.provider_txn_id\)/);
+  assert.match(cron, /getGatewayTransactionDetail\(o\.gateway_txn_id\)/);
+  assert.doesNotMatch(cron, /getGatewayTransactionDetail\(t\.provider_order_id/);
 });

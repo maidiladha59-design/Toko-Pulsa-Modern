@@ -17,7 +17,7 @@ const forbidden = [
 // Only flag credentials when an actual assignment embeds a non-placeholder value.
 // References to service-role grants or environment variable names in source/docs are expected.
 const secretAssignmentPatterns = [
-  /(?:DIGIFLAZZ_API_KEY|PAKASIR_API_KEY)\s*[:=]\s*['\"]?([^$\s'\"]+)['\"]?/i,
+  /(?:DIGIFLAZZ_API_KEY|FR3NEWERA_API_KEY)\s*[:=]\s*['\"]?([^$\s'\"]+)['\"]?/i,
 ];
 let errors = [];
 for (const file of required) if (!fs.existsSync(path.join(root, file))) errors.push(`missing required file: ${file}`);

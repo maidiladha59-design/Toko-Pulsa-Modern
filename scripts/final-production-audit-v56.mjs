@@ -16,7 +16,7 @@ const requiredFiles = [
   'supabase/migrations_v39_transaction_security.sql','supabase/migrations_v40_reconciliation_refund.sql',
   'supabase/migrations_v49_fraud_rate_limit.sql','supabase/migrations_v50_reconciliation_refund_operational.sql',
   'supabase/migrations_v54_pwa_realtime_push.sql','supabase/migrations_v55_monitoring_provider_alerts.sql',
-  'src/app/api/ppob/webhook/route.ts','src/app/api/payments/pakasir/webhook/route.ts',
+  'src/app/api/ppob/webhook/route.ts','src/app/api/payments/fr3newera/webhook/route.ts',
   'src/app/api/ppob/cron/route.ts','src/app/api/reconciliation/cron/route.ts','src/app/api/monitoring/cron/route.ts',
   'src/lib/security/transaction-pin.ts','public/manifest.webmanifest','public/sw.js'
 ];
@@ -28,7 +28,7 @@ const pkg=exists('package.json')?JSON.parse(read('package.json')):{};
 if (pkg.version === '1.0.56') ok('version','1.0.56'); else warn('version',`expected 1.0.56, found ${pkg.version||'unknown'}`);
 
 const env=exists('.env.example')?read('.env.example'):'';
-for (const k of ['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_ANON_KEY','SUPABASE_SERVICE_ROLE_KEY','NEXT_PUBLIC_SITE_URL','PAKASIR_PROJECT','PAKASIR_API_KEY','DIGIFLAZZ_USERNAME','DIGIFLAZZ_API_KEY','DIGIFLAZZ_WEBHOOK_SECRET','CRON_SECRET'])
+for (const k of ['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_ANON_KEY','SUPABASE_SERVICE_ROLE_KEY','NEXT_PUBLIC_SITE_URL','FR3NEWERA_API_KEY','DIGIFLAZZ_USERNAME','DIGIFLAZZ_API_KEY','DIGIFLAZZ_WEBHOOK_SECRET','CRON_SECRET'])
   env.includes(`${k}=`)?ok(`env:${k}`,'documented'):fail(`env:${k}`,'not documented');
 const gi=exists('.gitignore')?read('.gitignore').split(/\r?\n/).map(x=>x.trim()):[];
 for(const x of ['.env.local','.env','node_modules','.next','.vercel']) gi.includes(x)?ok(`gitignore:${x}`,'excluded'):fail(`gitignore:${x}`,'not explicitly excluded');

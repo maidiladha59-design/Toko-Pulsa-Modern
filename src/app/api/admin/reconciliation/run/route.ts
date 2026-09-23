@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPakasirTransactionDetail, isPakasirConfigured } from "@/lib/pakasir";
+import { getGatewayTransactionDetail, isGatewayConfigured } from "@/lib/fr3newera";
 
 async function isAdmin() {
   const supabase = createClient();
@@ -18,18 +18,18 @@ export async function POST() {
   const checked: any[] = [];
   const errors: any[] = [];
 
-  const { data: topups } = await admin.from("topups").select("id,amount,payment_amount,status,provider,provider_order_id,provider_txn_id,payment_method").eq("provider","pakasir").order("created_at", { ascending: false }).limit(100);
+  const { data: topups } = await admin.from("topups").select("id,amount,payment_amount,status,provider,provider_order_id,provider_txn_id,payment_method").eq("provider","fr3newera").order("created_at", { ascending: false }).limit(100);
   for (const t of topups || []) {
     try {
       let provider: any = null;
-      if (isPakasirConfigured() && ["PENDING","VERIFYING"].includes(t.status) && t.provider_txn_id && t.payment_amount) {
-        provider = await getPakasirTransactionDetail(t.provider_txn_id);
+      if (isGatewayConfigured() && ["PENDING","VERIFYING"].includes(t.status) && t.provider_txn_id && t.payment_amount) {
+        provider = await getGatewayTransactionDetail(t.provider_txn_id);
         const { data: internal } = await admin.rpc("reconcile_internal_financial_record", { p_source_type: "TOPUP", p_source_id: t.id });
         await admin.from("payment_reconciliation").upsert({
-          source_type: "TOPUP", source_id: t.id, provider: "pakasir", internal_status: t.status,
+          source_type: "TOPUP", source_id: t.id, provider: "fr3newera", internal_status: t.status,
           provider_status: provider.status, internal_amount: Number(t.payment_amount), provider_amount: Number(provider.amount),
           state: internal?.state || "REVIEW",
-          discrepancy: internal?.discrepancy || (provider.status === "completed" && t.status !== "APPROVED" ? "Pakasir completed tetapi Top Up belum APPROVED" : null),
+          discrepancy: internal?.discrepancy || (provider.status === "completed" && t.status !== "APPROVED" ? "FR3 NEWERA completed tetapi Top Up belum APPROVED" : null),
           wallet_amount: internal?.wallet_amount ?? null,
           checked_at: new Date().toISOString(), metadata: { runner: "v41", payment_method: t.payment_method }
         }, { onConflict: "source_type,source_id" });
@@ -44,14 +44,14 @@ export async function POST() {
   const { data: orders } = await admin.from("orders").select("id,order_number,total_amount,status,payment_method,gateway_method,gateway_reference,gateway_txn_id,paid_at").in("payment_method", ["QRIS","BANK_VA"]).order("created_at", { ascending: false }).limit(100);
   for (const o of orders || []) {
     try {
-      if (isPakasirConfigured() && ["PENDING","PROCESSING"].includes(o.status) && o.gateway_txn_id) {
-        const provider = await getPakasirTransactionDetail(o.gateway_txn_id);
+      if (isGatewayConfigured() && ["PENDING","PROCESSING"].includes(o.status) && o.gateway_txn_id) {
+        const provider = await getGatewayTransactionDetail(o.gateway_txn_id);
         const { data: internal } = await admin.rpc("reconcile_internal_financial_record", { p_source_type: "ORDER", p_source_id: o.id });
         await admin.from("payment_reconciliation").upsert({
-          source_type: "ORDER", source_id: o.id, provider: "pakasir", internal_status: o.status, provider_status: provider.status,
+          source_type: "ORDER", source_id: o.id, provider: "fr3newera", internal_status: o.status, provider_status: provider.status,
           internal_amount: Number(o.total_amount), provider_amount: Number(provider.amount), state: internal?.state || "REVIEW",
           wallet_amount: internal?.wallet_amount ?? null,
-          discrepancy: internal?.discrepancy || (provider.status === "completed" && o.status === "FAILED" ? "Pakasir completed tetapi order FAILED" : null),
+          discrepancy: internal?.discrepancy || (provider.status === "completed" && o.status === "FAILED" ? "FR3 NEWERA completed tetapi order FAILED" : null),
           checked_at: new Date().toISOString(), metadata: { runner: "v41", order_number: o.order_number, gateway_method: o.gateway_method }
         }, { onConflict: "source_type,source_id" });
       } else await admin.rpc("reconcile_internal_financial_record", { p_source_type: "ORDER", p_source_id: o.id });

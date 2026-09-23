@@ -30,7 +30,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
   if (!user) redirect("/login");
 
   const { data: order } = await supabase.from("orders")
-    .select("id,order_number,total_amount,status,created_at,payment_method")
+    .select("id,order_number,total_amount,status,created_at,payment_method,gateway_txn_id,gateway_total_payment,gateway_fee")
     .eq("id", params.id).eq("user_id", user.id).maybeSingle();
   if (!order) notFound();
 
@@ -68,6 +68,8 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
       <div className="mt-5 space-y-3 border-b border-dashed border-slate-300 pb-5">
         <Row label="Tanggal" value={formatDate(order.created_at)} />
         <Row label="ID Transaksi" value={order.order_number} />
+        {order.gateway_txn_id && <Row label="ID Transaksi Gateway" value={order.gateway_txn_id} />}
+        {order.payment_method && <Row label="Metode Bayar" value={order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method} />}
       </div>
 
       <div className="mt-5 space-y-5">
@@ -112,7 +114,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
       </p>
 
       <PrintButton
-        receiptText={`AIDIL STORE\nRincian Transaksi\nTanggal: ${formatDate(order.created_at)}\nID Transaksi: ${order.order_number}\n${(items || [])
+        receiptText={`AIDIL STORE\nRincian Transaksi\nTanggal: ${formatDate(order.created_at)}\nID Transaksi: ${order.order_number}\n${order.gateway_txn_id ? `ID Transaksi Gateway: ${order.gateway_txn_id}\n` : ""}${order.payment_method ? `Metode Bayar: ${order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method}\n` : ""}${(items || [])
           .map((item) => {
             const target = targetMap.get(item.id);
             const tx = txMap.get(item.id);

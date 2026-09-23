@@ -40,7 +40,7 @@ if (exists('vercel.json')) {
 }
 
 const env=exists('.env.example')?read('.env.example'):'';
-for (const k of ['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_ANON_KEY','SUPABASE_SERVICE_ROLE_KEY','NEXT_PUBLIC_SITE_URL','PAKASIR_PROJECT','PAKASIR_API_KEY','DIGIFLAZZ_USERNAME','DIGIFLAZZ_API_KEY','DIGIFLAZZ_WEBHOOK_SECRET','INTERNAL_CRON_SECRET','CRON_SECRET']) {
+for (const k of ['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_ANON_KEY','SUPABASE_SERVICE_ROLE_KEY','NEXT_PUBLIC_SITE_URL','FR3NEWERA_API_KEY','DIGIFLAZZ_USERNAME','DIGIFLAZZ_API_KEY','DIGIFLAZZ_WEBHOOK_SECRET','INTERNAL_CRON_SECRET','CRON_SECRET']) {
   if(!new RegExp(`^${k}=`, 'm').test(env)) fail('env-template',`${k} not documented`);
 }
 if (!errors.some(e=>e.startsWith('env-template'))) ok('env-template','required production variables documented');
@@ -54,7 +54,7 @@ for(const f of source){ const s=read(f); for(const r of secretPatterns) if(r.tes
 if(!errors.some(e=>e.startsWith('secret-scan'))) ok('secret-scan','no obvious hard-coded production secret patterns in src');
 
 const routes=source.filter(f=>f.includes(`${path.sep}src${path.sep}app${path.sep}api${path.sep}`));
-for(const required of ['ppob/cron/route.ts','ppob/webhook/route.ts','payments/pakasir/webhook/route.ts','ppob/status/route.ts']) {
+for(const required of ['ppob/cron/route.ts','ppob/webhook/route.ts','payments/fr3newera/webhook/route.ts','ppob/status/route.ts']) {
   if(!routes.some(f=>f.endsWith(required))) fail('critical-route',`missing ${required}`); else ok(`route:${required}`,'present');
 }
 

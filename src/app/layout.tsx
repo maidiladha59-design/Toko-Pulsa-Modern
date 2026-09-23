@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import ToastProvider from "@/components/ToastProvider";
+import WelcomeExperience from "@/components/WelcomeExperience";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aidil-store.example.com";
 const title = "AIDIL STORE — Digital Marketplace";
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="id">
       <body>
         <ToastProvider>
+          <WelcomeExperience />
           <Navbar />
           <main className="mx-auto min-h-[calc(100vh-80px)] max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
         </ToastProvider>

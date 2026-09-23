@@ -3,9 +3,10 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createPakasirTransaction, isPakasirConfigured, type PakasirMethod } from "@/lib/pakasir";
+import { createGatewayTransaction, isGatewayConfigured, type GatewayMethod } from "@/lib/fr3newera";
 
-const METHODS = ["qris", "bri_va", "bni_va", "cimb_niaga_va", "sampoerna_va", "bnc_va", "maybank_va", "permata_va", "atm_bersama_va", "artha_graha_va"] as const;
+// FR3 NEWERA hanya menyediakan QRIS (tidak ada Virtual Account seperti Pakasir).
+const METHODS = ["qris"] as const;
 const bodySchema = z.object({ amount: z.number().int().positive(), method: z.enum(METHODS).default("qris"), idempotency_key: z.string().min(10).max(120) });
 
 type FeeConfig = { enabled: boolean; fee_type: "FIXED" | "PERCENTAGE"; fee_value: number; min_topup: number; max_topup: number };
@@ -31,15 +32,13 @@ function feeGroup(method: string) {
   return "bank";
 }
 
-// v2: nomor pembayaran ada di field berbeda tergantung metode.
-function extractPaymentNumber(payment: { payment_method: string; qr_string?: string; va_number?: string; payment_link?: string }) {
-  if (payment.payment_method === "qris") return payment.qr_string || "";
-  if (payment.payment_method === "payment_link") return payment.payment_link || "";
-  return payment.va_number || "";
+// FR3 NEWERA hanya QRIS — nomor pembayaran selalu dari qr_string.
+function extractPaymentNumber(payment: { payment_method: string; qr_string?: string }) {
+  return payment.qr_string || "";
 }
 
 export async function GET(request: Request) {
-  if (!isPakasirConfigured()) return NextResponse.json({ message: "Top Up otomatis belum dikonfigurasi." }, { status: 503 });
+  if (!isGatewayConfigured()) return NextResponse.json({ message: "Top Up otomatis belum dikonfigurasi." }, { status: 503 });
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ message: "Silakan login terlebih dahulu." }, { status: 401 });
@@ -55,7 +54,7 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!isPakasirConfigured()) return NextResponse.json({ message: "Top Up otomatis belum dikonfigurasi. Tambahkan PAKASIR_PROJECT dan PAKASIR_API_KEY di environment server." }, { status: 503 });
+  if (!isGatewayConfigured()) return NextResponse.json({ message: "Top Up otomatis belum dikonfigurasi. Tambahkan FR3NEWERA_API_KEY di environment server." }, { status: 503 });
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ message: "Silakan login terlebih dahulu." }, { status: 401 });
@@ -84,7 +83,7 @@ export async function POST(request: Request) {
   }
 
   const providerOrderId = `TOPUP-${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}-${crypto.randomUUID().replaceAll("-", "").slice(0, 10)}`;
-  const { data: topup, error: insertError } = await admin.from("topups").insert({ user_id: user.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, fee_group: feeGroup(method), fee_type: cfg.fee_type, fee_rate: cfg.fee_type === "PERCENTAGE" ? cfg.fee_value : null, status: "PENDING", idempotency_key, provider: "pakasir", provider_order_id: providerOrderId, payment_method: method }).select("id").single();
+  const { data: topup, error: insertError } = await admin.from("topups").insert({ user_id: user.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, fee_group: feeGroup(method), fee_type: cfg.fee_type, fee_rate: cfg.fee_type === "PERCENTAGE" ? cfg.fee_value : null, status: "PENDING", idempotency_key, provider: "fr3newera", provider_order_id: providerOrderId, payment_method: method }).select("id").single();
   if (insertError || !topup) {
     const { data: raced } = await admin.from("topups").select("id, amount, admin_fee, payment_amount, status, provider_order_id, payment_method, payment_number, gateway_fee, gateway_total_payment, expires_at").eq("idempotency_key", idempotency_key).eq("user_id", user.id).maybeSingle();
     if (raced?.provider_order_id) return NextResponse.json({ id: raced.id, amount: raced.amount, admin_fee: raced.admin_fee ?? 0, payment_amount: raced.payment_amount ?? raced.amount + (raced.admin_fee ?? 0), status: raced.status, order_id: raced.provider_order_id, payment_method: raced.payment_method, payment_number: raced.payment_number, fee: raced.gateway_fee ?? 0, total_payment: raced.gateway_total_payment, expired_at: raced.expires_at }, { status: 200 });
@@ -92,7 +91,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const payment = await createPakasirTransaction(providerOrderId, paymentAmount, method as PakasirMethod);
+    const payment = await createGatewayTransaction(providerOrderId, paymentAmount, method as GatewayMethod);
     const paymentNumber = extractPaymentNumber(payment);
     const providerExpiry = new Date(payment.expired_at).getTime();
     const adminExpiry = Date.now() + deadlineMinutes * 60 * 1000;
@@ -109,7 +108,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ id: topup.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, status: "PENDING", order_id: providerOrderId, payment_method: payment.payment_method, payment_number: paymentNumber, fee: payment.fee ?? 0, total_payment: payment.total_payment ?? paymentAmount, expired_at: effectiveExpiry }, { status: 201 });
   } catch (error) {
     await admin.from("topups").update({ status: "CANCELLED", updated_at: new Date().toISOString() }).eq("id", topup.id).eq("status", "PENDING");
-    if (process.env.NODE_ENV !== "production") console.error("TOPUP PAKASIR CREATE ERROR:", error);
+    if (process.env.NODE_ENV !== "production") console.error("TOPUP FR3NEWERA CREATE ERROR:", error);
     return NextResponse.json({ message: "Gagal membuat instruksi pembayaran Top Up." }, { status: 502 });
   }
 }

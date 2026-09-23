@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getPakasirTransactionDetail, isPakasirConfigured, isPakasirFailedStatus } from "@/lib/pakasir";
+import { getGatewayTransactionDetail, isGatewayConfigured, isGatewayFailedStatus } from "@/lib/fr3newera";
 import { fulfillPpobOrder } from "@/lib/ppob/fulfill";
 
 export async function GET(_request: Request, { params }: { params: { id: string } }) {
@@ -25,16 +25,17 @@ export async function GET(_request: Request, { params }: { params: { id: string 
 
   const admin = createAdminClient();
 
-  // API v2 memeriksa status lewat txn_id milik Pakasir (orders.gateway_txn_id),
-  // BUKAN order_number buatan sendiri. Order lama tanpa gateway_txn_id tidak bisa
-  // dicek ke Pakasir; statusnya diselesaikan oleh webhook atau kedaluwarsa.
-  if (isPakasirConfigured() && order.gateway_txn_id) {
+  // FR3 NEWERA memeriksa status lewat trxId (orders.gateway_txn_id) — FR3 tidak
+  // mengenal konsep order_id, jadi pencocokannya hanya trxId + nominal. Order
+  // lama tanpa gateway_txn_id tidak bisa dicek; statusnya diselesaikan oleh
+  // webhook atau kedaluwarsa.
+  if (isGatewayConfigured() && order.gateway_txn_id) {
   try {
-    const detail = await getPakasirTransactionDetail(order.gateway_txn_id);
+    const detail = await getGatewayTransactionDetail(order.gateway_txn_id);
 
     if (
       detail.status === "completed" &&
-      detail.order_id === order.gateway_reference &&
+      detail.txn_id === order.gateway_txn_id &&
       Number(detail.amount) === Number(order.total_amount)
     ) {
       const { error } = await admin.rpc("confirm_gateway_payment", { p_order_id: order.id });
@@ -54,7 +55,7 @@ export async function GET(_request: Request, { params }: { params: { id: string 
       return NextResponse.json({ status: refreshed?.status || "PROCESSING" });
     }
 
-    if (isPakasirFailedStatus(detail.status)) {
+    if (isGatewayFailedStatus(detail.status)) {
       await admin.from("orders")
         .update({ status: "FAILED", updated_at: new Date().toISOString() })
         .eq("id", order.id)

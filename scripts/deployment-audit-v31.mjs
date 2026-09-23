@@ -40,7 +40,7 @@ if (exists('vercel.json')) {
 
 // Environment template sanity: production-only secrets must be documented.
 const envExample = exists('.env.example') ? text(path.join(root, '.env.example')) : '';
-const requiredEnv = ['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_ANON_KEY','SUPABASE_SERVICE_ROLE_KEY','NEXT_PUBLIC_SITE_URL','PAKASIR_PROJECT','PAKASIR_API_KEY','DIGIFLAZZ_USERNAME','DIGIFLAZZ_API_KEY','DIGIFLAZZ_WEBHOOK_SECRET','INTERNAL_CRON_SECRET','CRON_SECRET'];
+const requiredEnv = ['NEXT_PUBLIC_SUPABASE_URL','NEXT_PUBLIC_SUPABASE_ANON_KEY','SUPABASE_SERVICE_ROLE_KEY','NEXT_PUBLIC_SITE_URL','FR3NEWERA_API_KEY','DIGIFLAZZ_USERNAME','DIGIFLAZZ_API_KEY','DIGIFLAZZ_WEBHOOK_SECRET','INTERNAL_CRON_SECRET','CRON_SECRET'];
 for (const key of requiredEnv) {
   if (!new RegExp(`^${key}=`, 'm').test(envExample)) errors.push(`.env.example does not document ${key}`);
 }
@@ -69,11 +69,11 @@ if (webhook) {
   if (!s.includes('verifyWebhookSignature')) errors.push('Digiflazz webhook route does not verify provider signature');
   else add('api:digiflazz-webhook-auth', 'PASS', 'signature verification found');
 }
-const pakasir = routeFiles.find(f => f.endsWith('/api/payments/pakasir/webhook/route.ts'));
+const pakasir = routeFiles.find(f => f.endsWith('/api/payments/fr3newera/webhook/route.ts'));
 if (pakasir) {
   const s = text(pakasir);
-  if (!s.includes('getPakasirTransactionDetail')) errors.push('Pakasir webhook does not re-verify payment status through transaction detail API');
-  else add('api:pakasir-webhook', 'PASS', 'webhook payload is re-verified through Pakasir transaction detail');
+  if (!s.includes('getGatewayTransactionDetail')) errors.push('FR3 NEWERA webhook does not re-verify payment status through transaction detail API');
+  else add('api:pakasir-webhook', 'PASS', 'webhook payload is re-verified through FR3 NEWERA transaction detail');
 }
 
 // Dangerous production secrets must never be committed as local env files.
