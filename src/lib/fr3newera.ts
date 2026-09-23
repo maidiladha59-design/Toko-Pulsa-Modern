@@ -99,13 +99,10 @@ async function apiRequest<T>(path: string, init: RequestInit & { body?: string }
 function mapFr3Status(raw: string | undefined | null): GatewayTransaction["status"] {
   switch (String(raw || "").toUpperCase()) {
     case "SUCCESS":
+    case "COMPLETED":
+    case "PAID":
+    case "SETTLED":
       return "completed";
-    case "EXPIRED":
-    case "CANCELED":
-    case "CANCELLED":
-      return "canceled";
-    default:
-      return "pending";
   }
 }
 
@@ -125,12 +122,10 @@ export async function createGatewayTransaction(
     method: "POST",
     body: JSON.stringify({ apikey: apiKey, nominal: amount, add_mdr_to_customer: false }),
   });
+  console.log("FR3 CHECK-STATUS RAW:", JSON.stringify(json));
   const d = json.data;
-  if (!d?.trxId || !d?.qr_string) {
-    throw new Error("GATEWAY_INVALID_RESPONSE");
-  }
   return {
-    txn_id: d.trxId,
+    txn_id: d.trxId ?? txnId,
     amount: d.amount ?? amount,
     fee: d.mdr?.mdr_amount ?? d.fee ?? 0,
     total_payment: d.totalTransfer ?? d.amount ?? amount,

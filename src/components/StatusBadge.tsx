@@ -12,8 +12,8 @@ const STATUS_STYLES: Record<string, string> = {
 };
 
 const STATUS_LABEL: Record<string, string> = {
-  PENDING: "Menunggu verifikasi admin",
-  VERIFYING: "Sedang diperiksa admin",
+  PENDING: "Menunggu pembayaran",
+  VERIFYING: "Sedang diproses",
   APPROVED: "Berhasil",
   COMPLETED: "Selesai",
   PROCESSING: "Sedang diproses",

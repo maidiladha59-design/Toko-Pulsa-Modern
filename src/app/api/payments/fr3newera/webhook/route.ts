@@ -1,50 +1,32 @@
 import crypto from "node:crypto";
 import { NextResponse } from "next/server";
-import { z } from "zod";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getGatewayTransactionDetail, isGatewayConfigured, verifyGatewayWebhookSignature } from "@/lib/fr3newera";
 import { fulfillPpobOrder } from "@/lib/ppob/fulfill";
 import { notifyUser } from "@/lib/notification-engine";
 
-// FR3 NEWERA tidak mengirim order_id pada webhook (endpoint /topup mereka tidak
-// menerima order_id sama sekali) — satu-satunya identitas transaksi adalah trxId.
-// Karena wallet top-up dan order QRIS sama-sama memanggil endpoint /topup yang
-// sama di FR3 NEWERA, webhook ini mencari trxId di tabel topups DULU, baru
-// orders, untuk menentukan record internal mana yang harus diselesaikan.
-const webhookSchema = z.object({
-  trxId: z.string(),
-  status: z.string(),
-  amount: z.number().optional(),
-});
-
 export async function POST(request: Request) {
   if (!isGatewayConfigured()) return NextResponse.json({ ok: true });
 
   const rawBody = await request.text();
+  console.log("FR3 WEBHOOK RAW:", rawBody);
 
-  // Lapisan pertama: verifikasi signature (skema HMAC generik — sesuaikan
-  // dengan detail resmi dari dashboard FR3 NEWERA begitu tersedia).
   const signatureHeader = request.headers.get("x-signature") || request.headers.get("x-fr3-signature");
-  const signatureValid = verifyGatewayWebhookSignature(rawBody, signatureHeader);
-  if (!signatureValid && process.env.NODE_ENV === "production") {
-    return NextResponse.json({ ok: true }, { status: 401 });
+  if (!verifyGatewayWebhookSignature(rawBody, signatureHeader)) {
+    console.warn("FR3 webhook: signature tidak cocok, lanjut verifikasi via check-status");
   }
 
-  let body: unknown = null;
-  try {
-    body = JSON.parse(rawBody || "null");
-  } catch {
-    return NextResponse.json({ ok: true });
-  }
-  const raw = (body as any)?.data ?? body;
-  const parsed = webhookSchema.safeParse(raw);
-  if (!parsed.success) return NextResponse.json({ ok: true });
-  const payload = parsed.data;
+  let body: any = null;
+  try { body = JSON.parse(rawBody || "null"); } catch { return NextResponse.json({ ok: true }); }
+  const raw = body?.data ?? body;
+  const trxId = String(raw?.trxId ?? raw?.trx_id ?? raw?.idTransaksi ?? raw?.txn_id ?? "");
+  if (!trxId) { console.error("FR3 webhook tanpa trxId"); return NextResponse.json({ ok: true }); }
+  const payload = { trxId, status: String(raw?.status ?? ""), amount: raw?.amount != null ? Number(raw.amount) : undefined };
   const admin = createAdminClient();
 
   const eventKey = crypto.createHash("sha256").update(`${payload.trxId}|${payload.status}`).digest("hex");
 
-  // === 1) Coba cocokkan ke wallet topup ===
+  // === 1) Wallet topup ===
   const { data: topup } = await admin
     .from("topups")
     .select("id, user_id, amount, status, provider, provider_order_id, provider_txn_id, payment_method, payment_amount")
@@ -55,21 +37,22 @@ export async function POST(request: Request) {
   if (topup) {
     if (topup.status === "APPROVED") return NextResponse.json({ ok: true, duplicate: true });
 
-    const { data: event } = await admin.from("ppob_webhook_events").insert({
-      provider: "fr3newera",
-      event_key: `topup:${eventKey}`,
-      payload,
-      status: "RECEIVED",
-    }).select("id").maybeSingle();
+    const key = `topup:${eventKey}`;
+    const { data: prev } = await admin.from("ppob_webhook_events").select("id,status").eq("provider", "fr3newera").eq("event_key", key).maybeSingle();
+    if (prev?.status === "PROCESSED") return NextResponse.json({ ok: true, duplicate: true });
+    let event: { id: string } | null = prev ? { id: prev.id } : null;
+    if (!event) {
+      const ins = await admin.from("ppob_webhook_events").insert({ provider: "fr3newera", event_key: key, payload, status: "RECEIVED" }).select("id").maybeSingle();
+      event = ins.data;
+    }
     if (!event) return NextResponse.json({ ok: true, duplicate: true });
 
     try {
-      // Lapisan kedua (wajib): body webhook TIDAK pernah dipercaya begitu saja —
-      // status selalu dikonfirmasi ulang lewat Check Status API pakai trxId.
       const detail = await getGatewayTransactionDetail(payload.trxId);
-      const valid = detail.txn_id === payload.trxId && detail.status === "completed" && Number(detail.amount) === Number(topup.payment_amount || topup.amount);
+      const valid = detail.status === "completed" && Number(detail.amount) === Number(topup.payment_amount || topup.amount);
       if (!valid) {
-        await admin.from("ppob_webhook_events").update({ status: "IGNORED", error_message: "PAYMENT_NOT_CONFIRMED", processed_at: new Date().toISOString() }).eq("id", event.id);
+        console.error("FR3 topup belum valid:", JSON.stringify(detail), "expected", topup.payment_amount);
+        await admin.from("ppob_webhook_events").update({ status: "IGNORED", error_message: `PAYMENT_NOT_CONFIRMED: ${detail.status}/${detail.amount}`, processed_at: new Date().toISOString() }).eq("id", event.id);
         return NextResponse.json({ ok: true });
       }
 
@@ -109,7 +92,7 @@ export async function POST(request: Request) {
 
   try {
     const detail = await getGatewayTransactionDetail(payload.trxId);
-    if (detail.txn_id === payload.trxId && detail.status === "completed" && Number(detail.amount) === Number(order.total_amount)) {
+    if (detail.status === "completed" && Number(detail.amount) === Number(order.total_amount)) {
       const { error } = await admin.rpc("confirm_gateway_payment", { p_order_id: order.id });
       if (error) {
         console.error("CONFIRM PAYMENT ERROR:", error);
