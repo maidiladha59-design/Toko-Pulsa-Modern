@@ -45,4 +45,12 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 @media print { body { background:#fff !important; } .no-print { display:none !important; } }
 .nav-link { border-radius:.75rem; padding:.5rem .75rem; font-size:.875rem; font-weight:700; color:#3f3f46; }
 .nav-link:hover { background:#FFFBEA; color:#09090b; }
-.mobile-link { display:flex; flex-direction:column; align-items:center; gap:.2rem; padding:.65rem .5rem; font-size:10px; font-weight:800; color:#71717a; }
+.mobile-link {
+  display:flex; flex-direction:column; align-items:center; gap:.2rem;
+  padding:.65rem .5rem; font-size:10px; font-weight:800; color:#71717a;
+  border-radius:.9rem; position:relative;
+  transition: color .18s ease, background-color .18s ease, transform .12s ease;
+}
+.mobile-link:active { transform: scale(.88); background-color:#FFF6D6; color:#B45309; }
+.mobile-link-active { color:#B45309; background-color:#FFFBEA; }
+.mobile-link span { transition: color .18s ease; }

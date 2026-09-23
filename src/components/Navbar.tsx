@@ -13,6 +13,7 @@ export default function Navbar(){
   return <NavbarContent/>;
 }
 function NavbarContent(){
+ const pathname=usePathname();
  const supabase=createClient(),router=useRouter(),toast=useToast();
  const[profile,setProfile]=useState<Profile|null>(null),[loading,setLoading]=useState(true),[menuOpen,setMenuOpen]=useState(false),[accountOpen,setAccountOpen]=useState(false);
  useEffect(()=>{let mounted=true;async function load(){const{data:{user}}=await supabase.auth.getUser();if(!user){if(mounted){setProfile(null);setLoading(false)}return}const{data}=await supabase.from("profiles").select("full_name,email,role").eq("id",user.id).single();if(mounted){setProfile(data as Profile);setLoading(false)}}load();const{data:listener}=supabase.auth.onAuthStateChange(()=>{load()});return()=>{mounted=false;listener.subscription.unsubscribe()}},[supabase]);
@@ -26,7 +27,15 @@ function NavbarContent(){
    <button className="rounded-xl border border-gold-100 p-2.5 text-slate-600 hover:bg-gold-50 lg:hidden" onClick={()=>setMenuOpen(v=>!v)} aria-label="Buka menu">☰</button></div></div>
   </header>
 
-  <nav className="fixed inset-x-0 bottom-0 z-[60] border-t border-gold-100 bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_25px_rgba(76,29,149,.08)] backdrop-blur-xl md:hidden"><div className="mx-auto grid max-w-lg grid-cols-5"><Link href="/" className="mobile-link">⌂<span>Beranda</span></Link>{profile&&<Link href="/transactions" className="mobile-link">▤<span>Transaksi</span></Link>}{profile&&<Link href="/wallet" className="mobile-link">▣<span>Saldo</span></Link>}<Link href="/calculator" className="mobile-link">🧮<span>Kalkulator</span></Link><button onClick={()=>setMenuOpen(v=>!v)} className="mobile-link">☰<span>Lainnya</span></button></div></nav>
+  <nav className="fixed inset-x-0 bottom-0 z-[60] border-t border-gold-100 bg-white/95 px-2 pb-[env(safe-area-inset-bottom)] shadow-[0_-8px_25px_rgba(76,29,149,.08)] backdrop-blur-xl md:hidden">
+    <div className="mx-auto grid max-w-lg grid-cols-5">
+      <Link href="/" className={`mobile-link ${pathname==="/"?"mobile-link-active":""}`}>⌂<span>Beranda</span></Link>
+      {profile&&<Link href="/transactions" className={`mobile-link ${pathname==="/transactions"?"mobile-link-active":""}`}>▤<span>Transaksi</span></Link>}
+      {profile&&<Link href="/wallet" className={`mobile-link ${pathname.startsWith("/wallet")?"mobile-link-active":""}`}>▣<span>Saldo</span></Link>}
+      <Link href="/calculator" className={`mobile-link ${pathname==="/calculator"?"mobile-link-active":""}`}>🧮<span>Kalkulator</span></Link>
+      <button onClick={()=>setMenuOpen(v=>!v)} className={`mobile-link ${menuOpen?"mobile-link-active":""}`}>☰<span>Lainnya</span></button>
+    </div>
+  </nav>
 
   {menuOpen&&<div className="fixed inset-x-0 bottom-[64px] z-[60] border-t border-gold-100 bg-white px-4 py-3 shadow-lg lg:hidden"><div className="grid grid-cols-2 gap-2 text-sm">{[["/","🏠 Beranda"],["/layanan","🛍️ Layanan"],["/scan-qris","▣ Scan QRIS"],["/kyc","🪪 Verifikasi Akun"],["/notifications","🔔 Pemberitahuan"],["/referral","🎁 Undang Teman"],["/settings","⚙️ Pengaturan"],["/bantuan","💬 Bantuan"]].map(([href,label])=><Link key={href} href={href} onClick={()=>setMenuOpen(false)} className="rounded-xl bg-gold-50 px-3 py-3 font-bold text-zinc-950">{label}</Link>)}{profile&&<Link href="/orders" onClick={()=>setMenuOpen(false)} className="rounded-xl bg-gold-50 px-3 py-3 font-bold">📦 Pesanan</Link>}{isAdmin&&<Link href="/admin" onClick={()=>setMenuOpen(false)} className="rounded-xl bg-yellow-50 px-3 py-3 font-black text-yellow-900">🛠️ Panel Admin</Link>}{profile?<button onClick={logout} className="rounded-xl bg-red-50 px-3 py-3 text-left font-black text-red-600">🚪 Keluar</button>:<><Link href="/login" className="rounded-xl bg-zinc-900 px-3 py-3 text-center font-black text-white">Masuk</Link><Link href="/register" className="rounded-xl bg-yellow-400 px-3 py-3 text-center font-black text-black">Daftar</Link></>}</div></div>}
  </>
