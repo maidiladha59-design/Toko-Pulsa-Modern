@@ -50,7 +50,7 @@ export default function NotificationBell() {
   );
 
   return (
-    <div className="relative">
+    <div className="sm:relative">
       <button
         onClick={() => setOpen(!open)}
         className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-slate-200 bg-white text-lg text-slate-600 hover:bg-slate-50"
@@ -63,7 +63,7 @@ export default function NotificationBell() {
         )}
       </button>
       {open && (
-        <div className="absolute right-0 z-[80] mt-2 w-[min(92vw,360px)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl">
+        <div className="absolute inset-x-3 top-full z-[80] mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:inset-x-auto sm:right-0 sm:w-[360px]">
           <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
             <p className="font-black">Notifikasi</p>
             <button onClick={readAll} className="text-xs font-bold text-gold-600">Tandai dibaca</button>
