@@ -50,7 +50,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
       <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
         <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-3xl">📡</div>
         <h2 className="mt-4 text-lg font-black text-slate-900">Layanan belum tersedia</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">Admin perlu melakukan sinkronisasi SKU PPOB dan mengaktifkan produk terlebih dahulu.</p>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">Produk untuk layanan ini belum tersedia saat ini. Silakan cek kembali nanti.</p>
         <Link href="/" className="mt-5 inline-flex rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white">Kembali ke Beranda</Link>
       </div>
     );

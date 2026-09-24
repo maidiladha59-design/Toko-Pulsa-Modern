@@ -99,7 +99,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
 
           {ppobTransactions && ppobTransactions.length > 0 && (
             <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold-100 bg-gold-50 p-4">
-              <div><p className="font-black text-zinc-950">🧾 Transaksi PPOB</p><p className="mt-1 text-xs text-gold-700">Nomor tujuan, status provider, dan SN tersedia di struk.</p></div>
+              <div><p className="font-black text-zinc-950">🧾 Struk Transaksi</p><p className="mt-1 text-xs text-gold-700">Nomor tujuan, status, dan kode SN tersedia di struk.</p></div>
               <div><PPOBReceiptButton orderId={order.id} />{ppobTransactions.some((tx) => ["WAITING", "PROCESSING"].includes(tx.status)) && <PPOBStatusPoller active />}</div>
             </div>
           )}
@@ -125,12 +125,12 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                   const untung = cost !== undefined ? Math.max(0, hargaJual - cost * item.quantity) : null;
                   return (
                     <div className="mt-4 rounded-2xl bg-gold-50 p-4 text-zinc-950">
-                      <div className="flex items-center justify-between gap-3"><p className="font-black">⚡ Rincian Transaksi</p><span className="text-xs font-bold">RC {tx?.response_code || "-"}</span></div>
+                      <div className="flex items-center justify-between gap-3"><p className="font-black">⚡ Rincian Transaksi</p></div>
                       <div className="mt-3 space-y-1.5 text-sm">
                         <div className="flex justify-between"><span className="text-slate-500">Nomor Pelanggan</span><b>{target?.customer_no || tx?.customer_no || "-"}</b></div>
                         <div className="flex justify-between"><span className="text-slate-500">Status</span><b>{tx?.status}</b></div>
                         <div className="flex justify-between"><span className="text-slate-500">Harga Jual</span><b>{formatRupiah(hargaJual)}</b></div>
-                        {untung !== null && <div className="flex justify-between"><span className="text-slate-500">Untung</span><b>{formatRupiah(untung)}</b></div>}
+                    
                       </div>
                       {tx?.serial_number && <div className="mt-3 rounded-xl bg-white p-3"><p className="text-[10px] font-black uppercase tracking-wider text-slate-400">SN/Ref</p><p className="mt-1 break-all font-black">{tx.serial_number}</p></div>}
                       {tx?.provider_message && tx.status !== "SUCCESS" && <p className="mt-2 text-xs text-slate-600">{tx.provider_message}</p>}

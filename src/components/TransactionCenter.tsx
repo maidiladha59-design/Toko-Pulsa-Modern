@@ -11,7 +11,7 @@ type Entry = {
 };
 
 const tabs = [
-  ["ALL", "Semua"], ["PPOB", "PPOB"], ["ORDER", "Pesanan"], ["WALLET", "Wallet"], ["PROCESSING", "Diproses"], ["SUCCESS", "Berhasil"], ["FAILED", "Gagal"],
+  ["ALL", "Semua"], ["PPOB", "Digital"], ["ORDER", "Pesanan"], ["WALLET", "Wallet"], ["PROCESSING", "Diproses"], ["SUCCESS", "Berhasil"], ["FAILED", "Gagal"],
 ] as const;
 
 export default function TransactionCenter({ entries }: { entries: Entry[] }) {
@@ -39,7 +39,7 @@ export default function TransactionCenter({ entries }: { entries: Entry[] }) {
     <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
       {filtered.length ? <div className="divide-y divide-slate-100">{filtered.map(e => <Link key={`${e.kind}-${e.id}`} href={e.href || "/transactions"} className="group flex gap-3 p-4 transition hover:bg-slate-50 sm:items-center">
         <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-lg ${e.kind === "wallet" ? "bg-gold-50" : e.target ? "bg-emerald-50" : "bg-gold-50"}`}>{e.kind === "wallet" ? "💰" : e.target ? "⚡" : "📦"}</span>
-        <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="truncate font-black text-slate-800 group-hover:text-gold-600">{e.title}</p>{e.target && <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-black text-emerald-700">PPOB</span>}</div><p className="mt-1 truncate text-xs text-slate-500">{e.subtitle}{e.target ? ` · ${e.target}` : ""}</p><p className="mt-1 text-[11px] text-slate-400">{formatDate(e.date)}</p></div>
+        <div className="min-w-0 flex-1"><div className="flex flex-wrap items-center gap-2"><p className="truncate font-black text-slate-800 group-hover:text-gold-600">{e.title}</p>{e.target && <span className="rounded-full bg-emerald-50 px-2 py-0.5 text-[9px] font-black text-emerald-700">Digital</span>}</div><p className="mt-1 truncate text-xs text-slate-500">{e.subtitle}{e.target ? ` · ${e.target}` : ""}</p><p className="mt-1 text-[11px] text-slate-400">{formatDate(e.date)}</p></div>
         <div className="ml-auto flex shrink-0 flex-col items-end gap-1"><p className={`font-black ${e.amount < 0 ? "text-red-600" : "text-emerald-600"}`}>{e.amount < 0 ? "−" : "+"}{formatRupiah(Math.abs(e.amount))}</p>{e.kind === "order" && <StatusBadge status={e.status} />}</div>
       </Link>)}</div> : <div className="p-10 text-center"><div className="text-4xl">🔎</div><p className="mt-3 font-black text-slate-800">Transaksi tidak ditemukan</p><p className="mt-1 text-sm text-slate-500">Coba ubah kata kunci atau filter.</p></div>}
     </div>

@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import Button from "@/components/Button";
 import { formatRupiah } from "@/lib/utils";
+import { guideFor } from "@/lib/ppob/target-guide";
 
 type Product = { id: string; name: string; price: number; thumbnail_url: string | null; product_type?: string };
 type PPOBService = { id: string; provider: string; provider_sku: string; service_kind: "prepaid" | "postpaid"; category: string; brand: string | null; target_schema: { fields?: Array<{ name: string; label: string; type?: string; required?: boolean; placeholder?: string }> } | null };
@@ -31,12 +32,31 @@ function CheckoutForm() {
   const [confirming, setConfirming] = useState(false);
   const [targetText, setTargetText] = useState("");
   const [targetFile, setTargetFile] = useState<File | null>(null);
+  const [pin, setPin] = useState("");
 
   const idempotencyKey = useMemo(
     () => `${productId}-${qty}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
     [productId, qty]
   );
   const isJasa = product?.product_type === "jasa";
+  const guide = useMemo(
+    () => (ppob && product ? guideFor({ category: ppob.category, brand: ppob.brand, productName: product.name, serviceKind: ppob.service_kind, schemaFields: ppob.target_schema?.fields || null }) : null),
+    [ppob, product]
+  );
+  const customerNo = guide ? guide.compose(ppobTargets) : "";
+  const targetError = guide ? guide.validate(ppobTargets) : null;
+  const targetDetected = guide?.detect ? guide.detect(ppobTargets) : null;
+  const hasTargetInput = Object.values(ppobTargets).some((v) => String(v || "").trim());
+
+  // isi ulang kolom sesuai panduan produk
+  useEffect(() => {
+    if (!guide) return;
+    setPpobTargets((prev) => {
+      const next: Record<string, string> = {};
+      for (const f of guide.fields) next[f.name] = prev[f.name] || "";
+      return next;
+    });
+  }, [guide]);
 
   useEffect(() => {
     async function load() {
@@ -54,11 +74,6 @@ function CheckoutForm() {
       ]);
       setProduct(p as Product);
       setPpob((ppobService as PPOBService | null) || null);
-      if (ppobService?.target_schema?.fields) {
-        const initial: Record<string, string> = {};
-        for (const field of ppobService.target_schema.fields) initial[field.name] = "";
-        setPpobTargets(initial);
-      }
       setBalance(Number(wallet?.balance || 0));
       setLoading(false);
     }
@@ -76,12 +91,10 @@ function CheckoutForm() {
 
   function validatePpobInput() {
     if (!ppob) return true;
-    const fields = ppob.target_schema?.fields || [{ name: "customer_no", label: "Nomor Tujuan", required: true }];
-    for (const field of fields) {
-      if (field.required !== false && !String(ppobTargets[field.name] || "").trim()) {
-        toast.show(`${field.label} wajib diisi.`, "error");
-        return false;
-      }
+    const problem = guide?.validate(ppobTargets);
+    if (problem) {
+      toast.show(problem, "error");
+      return false;
     }
     if (ppob.service_kind === "postpaid" && !inquiryId) {
       toast.show("Cek tagihan terlebih dahulu sebelum pembayaran.", "error");
@@ -92,16 +105,16 @@ function CheckoutForm() {
 
   async function runInquiry() {
     if (!ppob || ppob.service_kind !== "postpaid") return;
-    const customerNo = String(ppobTargets.customer_no || "").trim();
-    if (!customerNo) { toast.show("Nomor pelanggan wajib diisi.", "error"); return; }
+    const problem = guide?.validate(ppobTargets);
+    if (problem || !customerNo) { toast.show(problem || "Nomor pelanggan wajib diisi.", "error"); return; }
     setInquiring(true);
     try {
       const res = await fetch("/api/ppob/inquiry", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ service_id: ppob.id, customer_no: customerNo }) });
       const json = await res.json();
-      if (!res.ok) { toast.show(json.message || "Inquiry gagal.", "error"); return; }
+      if (!res.ok) { toast.show(json.message || "Cek tagihan gagal.", "error"); return; }
       setInquiryId(json.inquiry_id);
       setInquiry({ ...(json.data || {}), ...(json.breakdown || {}), quote_amount: json.amount, expires_at: json.expires_at });
-    } catch { toast.show("Inquiry gagal karena koneksi.", "error"); } finally { setInquiring(false); }
+    } catch { toast.show("Cek tagihan gagal karena koneksi bermasalah.", "error"); } finally { setInquiring(false); }
   }
 
   function validateJasaInput() {
@@ -138,6 +151,10 @@ function CheckoutForm() {
 
   async function payWallet() {
     if (!product || confirming || !validateJasaInput() || !validatePpobInput()) return;
+    if (!/^\d{6}$/.test(pin)) {
+      toast.show("Masukkan PIN transaksi 6 digit untuk melanjutkan.", "error");
+      return;
+    }
     const total = ppob?.service_kind === "postpaid" ? Number(inquiry?.selling_price || inquiry?.quote_amount || 0) : product.price * qty;
     if (balance < total) {
       toast.show("Saldo tidak mencukupi. Pilih QRIS/Bank atau Top Up saldo.", "error");
@@ -148,7 +165,7 @@ function CheckoutForm() {
       if (ppob?.service_kind === "postpaid" && inquiryId) {
         const res = await fetch("/api/ppob/postpaid/pay", {
           method: "POST", headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ inquiry_id: inquiryId, idempotency_key: idempotencyKey, method: "WALLET" }),
+          body: JSON.stringify({ inquiry_id: inquiryId, idempotency_key: idempotencyKey, method: "WALLET", pin }),
         });
         const json = await res.json();
         if (!res.ok) { toast.show(json.message || "Pembayaran tagihan gagal.", "error"); return; }
@@ -158,8 +175,8 @@ function CheckoutForm() {
       }
       const endpoint = ppob?.service_kind === "prepaid" ? "/api/ppob/prepaid/pay" : "/api/checkout";
       const body = ppob?.service_kind === "prepaid"
-        ? { product_id: product.id, customer_no: ppobTargets.customer_no || "", target_data: ppobTargets, idempotency_key: idempotencyKey }
-        : { items: [{ product_id: product.id, quantity: qty }], idempotency_key: idempotencyKey, targets: ppob ? { [product.id]: { customer_no: ppobTargets.customer_no || "", target_data: ppobTargets } } : undefined };
+        ? { product_id: product.id, customer_no: customerNo, target_data: { ...ppobTargets, customer_no: customerNo }, idempotency_key: idempotencyKey, pin }
+        : { items: [{ product_id: product.id, quantity: qty }], idempotency_key: idempotencyKey, pin, targets: ppob ? { [product.id]: { customer_no: customerNo, target_data: { ...ppobTargets, customer_no: customerNo } } } : undefined };
       const res = await fetch(endpoint, {
         method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
       });
@@ -215,20 +232,37 @@ function CheckoutForm() {
             </div>
           )}
 
-          {ppob && (
+          {ppob && guide && (
             <div className="rounded-[2rem] border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
-              <div className="flex items-center justify-between gap-3">
-                <div><p className="font-black text-emerald-950">Data tujuan PPOB</p><p className="mt-1 text-xs leading-5 text-emerald-800">Masukkan data pelanggan sebelum membuat pembayaran.</p></div>
-                <span className="rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase text-emerald-700">{ppob.service_kind === "postpaid" ? "Pascabayar" : "Prabayar"}</span>
+              <div className="flex items-start justify-between gap-3">
+                <div><p className="font-black text-emerald-950">{guide.heading}</p><p className="mt-1 text-xs leading-5 text-emerald-800">{guide.intro}</p></div>
+                <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase text-emerald-700">{ppob.service_kind === "postpaid" ? "Cek tagihan dulu" : "Proses otomatis"}</span>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
-                {(ppob.target_schema?.fields || [{ name: "customer_no", label: "Nomor Tujuan", type: "text", required: true }]).map((field) => (
-                  <label key={field.name} className={field.name === "customer_no" ? "sm:col-span-2" : ""}>
+                {guide.fields.map((field) => (
+                  <label key={field.name} className={guide.fields.length === 1 ? "sm:col-span-2" : ""}>
                     <span className="text-xs font-black text-emerald-950">{field.label}{field.required !== false ? " *" : ""}</span>
-                    <input value={ppobTargets[field.name] || ""} onChange={(e) => setPpobTargets((v) => ({ ...v, [field.name]: e.target.value }))} placeholder={field.placeholder || `Masukkan ${field.label.toLowerCase()}`} inputMode={field.type === "number" ? "numeric" : "text"} className="mt-2 w-full rounded-xl border border-emerald-200 bg-white px-4 py-3 text-sm outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100" />
+                    <input
+                      value={ppobTargets[field.name] || ""}
+                      onChange={(e) => {
+                        const value = field.numeric ? e.target.value.replace(/\D/g, "") : e.target.value;
+                        setPpobTargets((v) => ({ ...v, [field.name]: value }));
+                        if (ppob.service_kind === "postpaid") { setInquiry(null); setInquiryId(null); }
+                      }}
+                      placeholder={field.placeholder}
+                      inputMode={field.inputMode}
+                      maxLength={field.maxLength}
+                      autoComplete="off"
+                      className="mt-2 w-full rounded-xl border border-emerald-200 bg-white px-4 py-3 text-sm outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100"
+                    />
                   </label>
                 ))}
               </div>
+              {targetDetected && !targetError && <p className="mt-3 text-xs font-black text-emerald-700">✓ {targetDetected}</p>}
+              {hasTargetInput && targetError && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold leading-5 text-red-600">{targetError}</p>}
+              <ul className="mt-4 space-y-1.5 rounded-2xl bg-white/70 p-3 text-[11px] leading-5 text-emerald-900">
+                {guide.tips.map((tip) => <li key={tip}>• {tip}</li>)}
+              </ul>
               {ppob.service_kind === "postpaid" && (
                 <div className="mt-4 rounded-2xl bg-white p-4">
                   <button type="button" onClick={runInquiry} disabled={inquiring} className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-black text-white disabled:opacity-60">{inquiring ? "Mengecek..." : "Cek Tagihan"}</button>
@@ -239,11 +273,11 @@ function CheckoutForm() {
                         <div className="text-right"><p className="text-xs font-bold text-emerald-700">Total tagihan</p><p className="text-xl font-black text-emerald-950">{formatRupiah(Number(inquiry.quote_amount || inquiry.selling_price || 0))}</p></div>
                       </div>
                       <div className="mt-3 grid gap-2 text-xs text-emerald-900 sm:grid-cols-3">
-                        <div className="rounded-xl bg-white p-3">Harga provider<br/><b>{formatRupiah(Number(inquiry.price || 0))}</b></div>
-                        <div className="rounded-xl bg-white p-3">Admin provider<br/><b>{formatRupiah(Number(inquiry.admin || 0))}</b></div>
+                        <div className="rounded-xl bg-white p-3">Tagihan pokok<br/><b>{formatRupiah(Number(inquiry.price || 0))}</b></div>
+                        <div className="rounded-xl bg-white p-3">Biaya admin<br/><b>{formatRupiah(Number(inquiry.admin || 0))}</b></div>
                         <div className="rounded-xl bg-white p-3">Jatuh tempo/periode<br/><b>{String(inquiry.periode || "-" )}</b></div>
                       </div>
-                      <p className="mt-3 text-[11px] font-semibold text-emerald-700">Inquiry berlaku 10 menit. Nominal pembayaran dikunci oleh server.</p>
+                      <p className="mt-3 text-[11px] font-semibold text-emerald-700">Tagihan ini berlaku 10 menit. Nominal yang dibayar sudah dikunci dan aman.</p>
                     </div>
                   )}
                 </div>
@@ -263,6 +297,21 @@ function CheckoutForm() {
               <p className="mt-1 text-xs text-slate-500">{formatRupiah(balance)} tersedia</p>
               <p className="mt-3 text-[11px] leading-5 text-slate-500">Untuk saat ini, semua transaksi pembelian produk hanya dapat dibayar menggunakan saldo akun. Jika saldo belum cukup, silakan top up terlebih dahulu.</p>
             </div>
+
+            <label className="mt-4 block">
+              <span className="text-xs font-black text-slate-700">PIN Transaksi *</span>
+              <input
+                type="password"
+                value={pin}
+                onChange={(e) => setPin(e.target.value.replace(/\D/g, "").slice(0, 6))}
+                inputMode="numeric"
+                autoComplete="off"
+                maxLength={6}
+                placeholder="6 digit PIN"
+                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm tracking-[.4em] outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100"
+              />
+              <span className="mt-1 block text-[11px] text-slate-500">Belum punya PIN? <a href="/settings" className="font-bold text-gold-700 underline">Buat di Pengaturan</a>.</span>
+            </label>
           </div>
         </div>
 

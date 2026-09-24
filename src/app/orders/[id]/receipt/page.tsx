@@ -1,36 +1,18 @@
 import { notFound, redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { formatRupiah, formatDate } from "@/lib/utils";
-import PrintButton from "@/components/PrintButton";
+import ReceiptView from "@/components/ReceiptView";
+import { formatReceiptDate, plainNumber, receiptStatusLabel, type ReceiptRow } from "@/lib/receipt-print";
 
-const labels: Record<string, string> = {
-  SUCCESS: "OK", PROCESSING: "DIPROSES", FAILED: "GAGAL",
-  REFUNDED: "DIKEMBALIKAN", WAITING: "MENUNGGU",
-  COMPLETED: "OK", PENDING: "MENUNGGU", CANCELLED: "DIBATALKAN",
-};
+const PAYMENT_LABEL: Record<string, string> = { QRIS: "QRIS", BANK_VA: "Virtual Account", WALLET: "Saldo AIDIL STORE" };
 
-/** Angka polos ala struk PPOB (tanpa "Rp"), contoh: 18.766 */
-function plainNumber(n: number): string {
-  return new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(Math.max(0, Math.round(n)));
-}
-
-function Row({ label, value, bold }: { label: string; value: React.ReactNode; bold?: boolean }) {
-  return (
-    <div className="flex justify-between gap-4 text-sm">
-      <span className="text-slate-500">{label}</span>
-      <span className={`break-all text-right ${bold ? "font-black" : "font-bold text-slate-900"}`}>{value}</span>
-    </div>
-  );
-}
-
-export default async function PPOBReceiptPage({ params }: { params: { id: string } }) {
+export default async function OrderReceiptPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
   const { data: order } = await supabase.from("orders")
-    .select("id,order_number,total_amount,status,created_at,payment_method,gateway_txn_id,gateway_total_payment,gateway_fee")
+    .select("id,order_number,total_amount,status,created_at,payment_method,gateway_txn_id")
     .eq("id", params.id).eq("user_id", user.id).maybeSingle();
   if (!order) notFound();
 
@@ -42,87 +24,46 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
   const productIds = (items || []).map((i) => i.product_id).filter(Boolean) as string[];
 
   const { data: targets } = itemIds.length
-    ? await supabase.from("ppob_order_targets").select("order_item_id,customer_no,target_data").in("order_item_id", itemIds)
-    : { data: [] };
+    ? await supabase.from("ppob_order_targets").select("order_item_id,customer_no").in("order_item_id", itemIds)
+    : { data: [] as any[] };
   const { data: txs } = await supabase.from("ppob_transactions")
-    .select("order_item_id,customer_no,status,response_code,serial_number,provider_message,completed_at")
+    .select("order_item_id,customer_no,status,serial_number,provider_message")
     .eq("order_id", order.id);
-  // cost_price (modal) hanya bisa dibaca lewat service role, bukan lewat client
-  // yang tunduk RLS/hak akses kolom milik user biasa — lihat migrations_v70.
-  const { data: services } = productIds.length
+
+  // "Untung" hanya untuk admin. Pelanggan tidak boleh melihat modal/keuntungan toko.
+  const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).maybeSingle();
+  const isAdmin = profile?.role === "ADMIN" || profile?.role === "SUPER_ADMIN";
+  const { data: services } = isAdmin && productIds.length
     ? await createAdminClient().from("ppob_services").select("product_id,cost_price").in("product_id", productIds)
-    : { data: [] };
+    : { data: [] as any[] };
 
-  const targetMap = new Map((targets || []).map((t) => [t.order_item_id, t]));
-  const txMap = new Map((txs || []).map((t) => [t.order_item_id, t]));
-  const costMap = new Map((services || []).map((s) => [s.product_id, Number(s.cost_price || 0)]));
+  const targetMap = new Map((targets || []).map((t: any) => [t.order_item_id, t]));
+  const txMap = new Map((txs || []).map((t: any) => [t.order_item_id, t]));
+  const costMap = new Map<string, number>((services || []).map((s: any) => [String(s.product_id), Number(s.cost_price || 0)] as [string, number]));
 
-  return (
-    <main className="mx-auto max-w-md animate-page-in bg-white px-5 py-6 text-slate-900 print:max-w-none print:px-0">
-      <div className="border-b-2 border-zinc-950 pb-5 text-center">
-        <img src="/aidil-logo.png" alt="AIDIL STORE" className="mx-auto h-20 w-20 rounded-2xl object-cover" />
-        <p className="mt-3 text-xs font-black tracking-[.25em] text-gold-700">AIDIL STORE</p>
-        <h1 className="mt-1 text-2xl font-black">Rincian Transaksi</h1>
-      </div>
+  const rows: ReceiptRow[] = [
+    { label: "Tanggal", value: formatReceiptDate(order.created_at) },
+    { label: "ID Transaksi", value: order.order_number },
+  ];
+  if (order.gateway_txn_id) rows.push({ label: "ID Pembayaran", value: order.gateway_txn_id });
+  if (order.payment_method) rows.push({ label: "Metode Bayar", value: PAYMENT_LABEL[order.payment_method] || order.payment_method });
 
-      <div className="mt-5 space-y-3 border-b border-dashed border-slate-300 pb-5">
-        <Row label="Tanggal" value={formatDate(order.created_at)} />
-        <Row label="ID Transaksi" value={order.order_number} />
-        {order.gateway_txn_id && <Row label="ID Transaksi Gateway" value={order.gateway_txn_id} />}
-        {order.payment_method && <Row label="Metode Bayar" value={order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method} />}
-      </div>
+  for (const item of items || []) {
+    const target: any = targetMap.get(item.id);
+    const tx: any = txMap.get(item.id);
+    const statusKey = tx?.status || order.status;
+    rows.push({ label: "Produk", value: item.quantity > 1 ? `${item.product_name} x${item.quantity}` : item.product_name });
+    const customerNo = target?.customer_no || tx?.customer_no;
+    if (customerNo) rows.push({ label: "Nomor Pelanggan", value: customerNo });
+    rows.push({ label: "Status", value: receiptStatusLabel(statusKey) });
+    if (tx?.serial_number) rows.push({ label: "SN/Ref", value: tx.serial_number });
+    if (tx?.provider_message && tx.status !== "SUCCESS") rows.push({ label: "Keterangan", value: tx.provider_message });
+    if (isAdmin) {
+      const cost: number | undefined = item.product_id ? costMap.get(String(item.product_id)) : undefined;
+      rows.push({ label: "Harga Jual", value: plainNumber(Number(item.subtotal)) });
+      if (cost !== undefined) rows.push({ label: "Untung", value: plainNumber(Math.max(0, Number(item.subtotal) - Number(cost) * Number(item.quantity))) });
+    }
+  }
 
-      <div className="mt-5 space-y-5">
-        {(items || []).map((item) => {
-          const target = targetMap.get(item.id);
-          const tx = txMap.get(item.id);
-          const statusKey = tx?.status || order.status;
-          const costPrice = item.product_id ? costMap.get(item.product_id) : undefined;
-          const hargaJual = Number(item.subtotal);
-          const untung = costPrice !== undefined ? Math.max(0, hargaJual - costPrice * item.quantity) : null;
-
-          return (
-            <section key={item.id} className="space-y-3">
-              <Row label="Produk" value={item.product_name} />
-              {(target?.customer_no || tx?.customer_no) && (
-                <Row label="Nomor Pelanggan" value={target?.customer_no || tx?.customer_no} />
-              )}
-              <Row label="Status" value={labels[statusKey] || statusKey} />
-              {tx?.serial_number && <Row label="SN/Ref" value={tx.serial_number} />}
-              {tx?.provider_message && tx.status !== "SUCCESS" && (
-                <p className="text-xs text-slate-500">{tx.provider_message}</p>
-              )}
-              <Row label="Harga Jual" value={plainNumber(hargaJual)} />
-              {untung !== null && <Row label="Untung" value={plainNumber(untung)} />}
-              {item.quantity > 1 && (
-                <p className="text-right text-xs text-slate-400">{item.quantity} × {formatRupiah(item.unit_price)}</p>
-              )}
-            </section>
-          );
-        })}
-      </div>
-
-      <div className="mt-6 border-t-2 border-slate-900 pt-4">
-        <div className="flex justify-between text-xl">
-          <span className="font-black">Harga</span>
-          <b>{plainNumber(order.total_amount)}</b>
-        </div>
-      </div>
-
-      <p className="mt-5 text-center text-[11px] leading-5 text-slate-400">
-        Terima kasih telah menggunakan AIDIL STORE. Simpan struk ini sebagai bukti transaksi.
-      </p>
-
-      <PrintButton
-        receiptText={`AIDIL STORE\nRincian Transaksi\nTanggal: ${formatDate(order.created_at)}\nID Transaksi: ${order.order_number}\n${order.gateway_txn_id ? `ID Transaksi Gateway: ${order.gateway_txn_id}\n` : ""}${order.payment_method ? `Metode Bayar: ${order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method}\n` : ""}${(items || [])
-          .map((item) => {
-            const target = targetMap.get(item.id);
-            const tx = txMap.get(item.id);
-            const statusKey = tx?.status || order.status;
-            return `Produk: ${item.product_name}\n${target?.customer_no ? `Nomor Pelanggan: ${target.customer_no}\n` : ""}Status: ${labels[statusKey] || statusKey}\n${tx?.serial_number ? `SN/Ref: ${tx.serial_number}\n` : ""}Harga Jual: ${plainNumber(Number(item.subtotal))}\n`;
-          })
-          .join("\n")}\nHarga: ${plainNumber(order.total_amount)}\n\nTerima kasih telah menggunakan AIDIL STORE.\n`}
-      />
-    </main>
-  );
+  return <ReceiptView title="Rincian Transaksi" rows={rows} total={{ label: "Harga", value: plainNumber(Number(order.total_amount)) }} backHref="/transactions" />;
 }
