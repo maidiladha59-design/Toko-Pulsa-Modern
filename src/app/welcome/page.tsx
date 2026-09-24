@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -92,15 +91,15 @@ export default function Welcome() {
             )}
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Link onClick={goNext} href="/register" className="rounded-xl bg-amber-300 px-5 py-3 text-sm font-black text-slate-950">
+              <a onClick={goNext} href="/register" className="rounded-xl bg-amber-300 px-5 py-3 text-sm font-black text-slate-950">
                 Lanjutkan · Daftar
-              </Link>
-              <Link onClick={goNext} href="/login" className="rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950">
+              </a>
+              <a onClick={goNext} href="/login" className="rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950">
                 Lanjutkan · Login
-              </Link>
-              <Link onClick={goNext} href="/login" className="rounded-xl border border-white/25 bg-white/5 px-5 py-3 text-sm font-bold text-white">
+              </a>
+              <a onClick={goNext} href="/login" className="rounded-xl border border-white/25 bg-white/5 px-5 py-3 text-sm font-bold text-white">
                 Skip
-              </Link>
+              </a>
             </div>
 
             {banners.length > 1 && (
