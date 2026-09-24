@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import https from 'node:https';
 import { HttpsProxyAgent } from 'https-proxy-agent';
 
 const BASE_URL = 'https://api.digiflazz.com/v1';
@@ -34,18 +35,48 @@ function getProxyAgent() {
   return new HttpsProxyAgent(proxyUrl);
 }
 
-async function post(path: string, body: Record<string, unknown>) {
-  const response = await fetch(`${BASE_URL}${path}`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    cache: 'no-store',
-    // @ts-ignore - agent didukung di Node.js runtime, tidak ada di tipe standar fetch
-    agent: getProxyAgent(),
+// Memakai node:https (bukan fetch) karena fetch bawaan Next.js mengabaikan "agent",
+// sehingga request tidak lewat proxy dan IP yang terlihat provider adalah IP Vercel.
+function post(path: string, body: Record<string, unknown>) {
+  return new Promise<{ data: DigiflazzData | DigiflazzData[] }>((resolve, reject) => {
+    const payload = JSON.stringify(body);
+    const url = new URL(`${BASE_URL}${path}`);
+    const req = https.request(
+      {
+        hostname: url.hostname,
+        path: url.pathname + url.search,
+        method: 'POST',
+        agent: getProxyAgent(),
+        timeout: 25000,
+        headers: {
+          'Content-Type': 'application/json',
+          'Content-Length': Buffer.byteLength(payload),
+        },
+      },
+      (res) => {
+        const chunks: Buffer[] = [];
+        res.on('data', (c) => chunks.push(c));
+        res.on('end', () => {
+          let json: any = null;
+          try {
+            json = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+          } catch {
+            json = null;
+          }
+          const status = res.statusCode || 0;
+          if (status < 200 || status >= 300) {
+            reject(new Error(json?.data?.message || `DIGIFLAZZ_HTTP_${status}`));
+            return;
+          }
+          resolve(json as { data: DigiflazzData | DigiflazzData[] });
+        });
+      },
+    );
+    req.on('timeout', () => req.destroy(new Error('DIGIFLAZZ_TIMEOUT')));
+    req.on('error', reject);
+    req.write(payload);
+    req.end();
   });
-  const json = await response.json().catch(() => null);
-  if (!response.ok) throw new Error(json?.data?.message || `DIGIFLAZZ_HTTP_${response.status}`);
-  return json as { data: DigiflazzData | DigiflazzData[] };
 }
 
 export async function getPrepaidPriceList() {

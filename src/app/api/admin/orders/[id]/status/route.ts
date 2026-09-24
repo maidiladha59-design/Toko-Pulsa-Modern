@@ -19,10 +19,11 @@ export async function POST(request: Request, { params }: { params: { id: string 
     const m = error.message || "";
     if (m.includes("ORDER_NOT_FOUND")) return NextResponse.json({ message: "Order tidak ditemukan." }, { status: 404 });
     if (m.includes("ORDER_ALREADY_REFUNDED")) return NextResponse.json({ message: "Order sudah direfund." }, { status: 409 });
+    if (m.includes("ORDER_NOT_PAID")) return NextResponse.json({ message: "Order ini belum dibayar, tidak bisa direfund." }, { status: 409 });
     if (m.includes("WALLET_NOT_FOUND")) return NextResponse.json({ message: "Wallet pengguna tidak ditemukan." }, { status: 500 });
     if (m.includes("ADMIN_ONLY")) return NextResponse.json({ message: "Akses admin ditolak." }, { status: 403 });
     console.error("ADMIN ORDER STATUS ERROR:", error);
-    return NextResponse.json({ message: "Gagal mengubah status order. Pastikan migration_v5_critical_fixes.sql sudah dijalankan." }, { status: 500 });
+    return NextResponse.json({ message: `Gagal mengubah status order: ${m || "error database"}` }, { status: 500 });
   }
   const admin = createAdminClient();
   const { data: order } = await admin.from("orders").select("user_id,total_amount").eq("id", params.id).maybeSingle();
