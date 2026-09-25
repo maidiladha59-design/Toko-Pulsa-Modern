@@ -54,6 +54,48 @@ export async function updateSession(request: NextRequest) {
     pathname === "/favicon.ico" ||
     pathname.match(/\.(?:svg|png|jpg|jpeg|gif|webp|ico|css|js|map|txt|xml|woff|woff2|ttf)$/i);
 
+  // Mode pemeliharaan: dicek lebih dulu dari semua redirect lain, supaya
+  // pengunjung biasa langsung diarahkan ke /maintenance saat status aktif.
+  // Rute admin, API, aset, dan halaman /maintenance sendiri selalu dikecualikan
+  // agar admin tetap bisa masuk untuk mematikannya kembali.
+  const maintenanceBypassPaths = ["/maintenance", "/admin", "/login", "/register", "/daftar", "/auth"];
+  const isMaintenanceBypassPath = maintenanceBypassPaths.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
+
+  if (!isApiRoute && !isNextAsset && !isMaintenanceBypassPath) {
+    const { data: maintenance } = await supabase
+      .from("maintenance_settings")
+      .select("enabled,starts_at,ends_at,allow_admin_bypass")
+      .eq("id", 1)
+      .maybeSingle();
+
+    if (maintenance?.enabled) {
+      const now = Date.now();
+      const startsOk = !maintenance.starts_at || new Date(maintenance.starts_at).getTime() <= now;
+      const endsOk = !maintenance.ends_at || new Date(maintenance.ends_at).getTime() >= now;
+
+      if (startsOk && endsOk) {
+        let bypass = false;
+        if (user && maintenance.allow_admin_bypass) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", user.id)
+            .maybeSingle();
+          bypass = Boolean(profile && ["ADMIN", "SUPER_ADMIN"].includes(String(profile.role)));
+        }
+
+        if (!bypass) {
+          const url = request.nextUrl.clone();
+          url.pathname = "/maintenance";
+          url.search = "";
+          return NextResponse.redirect(url);
+        }
+      }
+    }
+  }
+
   const publicPaths = [
     "/welcome",
     "/login",
