@@ -7,10 +7,11 @@ import { printReceiptBluetooth, receiptToText, type ReceiptData } from "@/lib/re
 
 type Props = ReceiptData & { backHref?: string };
 
-const GREEN = "#57bb7f";
+const BLACK = "#0a0a0a";
+const GOLD = "#d4af37";
 const PAPER = "#f4f4f4";
 
-const scallopTop = { background: `radial-gradient(circle at 10px 0, ${GREEN} 0 6px, transparent 6.5px) 0 0 / 20px 10px repeat-x, #fff` };
+const scallopTop = { background: `radial-gradient(circle at 10px 0, ${BLACK} 0 6px, transparent 6.5px) 0 0 / 20px 10px repeat-x, #fff` };
 const scallopBottom = { background: `radial-gradient(circle at 10px 100%, ${PAPER} 0 6px, transparent 6.5px) 0 0 / 20px 10px repeat-x, #fff` };
 
 function IconBack() { return <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>; }
@@ -60,13 +61,13 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
 
   return (
     <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#f4f4f4] text-[#222] print:static print:overflow-visible print:bg-white">
-      <div className="bg-[#57bb7f] pb-24 pt-[env(safe-area-inset-top)] print:hidden">
+      <div className="bg-[#0a0a0a] pb-24 pt-[env(safe-area-inset-top)] print:hidden">
         <div className="mx-auto flex h-16 max-w-md items-center justify-between px-3">
-          <button type="button" onClick={goBack} aria-label="Kembali" className={iconBtn}><IconBack /></button>
+          <button type="button" onClick={goBack} aria-label="Kembali" className={`${iconBtn} text-[#d4af37]`}><IconBack /></button>
           <div className="flex items-center gap-1">
-            <button type="button" onClick={printBluetooth} disabled={busy} aria-label="Cetak via Bluetooth" title="Cetak via Bluetooth" className={`${iconBtn} ${busy ? "animate-pulse" : ""}`}><IconBluetooth /></button>
-            <button type="button" onClick={share} aria-label="Bagikan struk" title="Bagikan" className={iconBtn}><IconShare /></button>
-            <button type="button" onClick={() => window.print()} aria-label="Cetak atau simpan PDF" title="Cetak / Simpan PDF" className={iconBtn}><IconPrint /></button>
+            <button type="button" onClick={printBluetooth} disabled={busy} aria-label="Cetak via Bluetooth" title="Cetak via Bluetooth" className={`${iconBtn} text-[#d4af37] ${busy ? "animate-pulse" : ""}`}><IconBluetooth /></button>
+            <button type="button" onClick={share} aria-label="Bagikan struk" title="Bagikan" className={`${iconBtn} text-[#d4af37]`}><IconShare /></button>
+            <button type="button" onClick={() => window.print()} aria-label="Cetak atau simpan PDF" title="Cetak / Simpan PDF" className={`${iconBtn} text-[#d4af37]`}><IconPrint /></button>
           </div>
         </div>
       </div>
@@ -88,11 +89,9 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
               ))}
             </dl>
 
-            <div className="mt-6 border-t border-dashed border-slate-300 pt-5">
-              <div className="flex items-center justify-between gap-4 text-lg font-bold">
-                <span>{total.label}</span>
-                <span>{total.value}</span>
-              </div>
+            <div className="mt-6 flex items-center justify-between gap-4 rounded-2xl bg-[#0a0a0a] px-5 py-4 text-lg">
+              <span className="font-black text-[#d4af37]">{total.label}</span>
+              <span className="font-black text-[#d4af37]">{total.value}</span>
             </div>
             <p className="mt-6 text-center text-[11px] leading-5 text-slate-400">{footer || "Terima kasih telah berbelanja di AIDIL STORE. Simpan struk ini sebagai bukti transaksi."}</p>
           </div>
