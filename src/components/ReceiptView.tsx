@@ -1,25 +1,25 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { printReceiptBluetooth, receiptToText, type ReceiptData } from "@/lib/receipt-print";
 
 type Props = ReceiptData & { backHref?: string };
 
-const BLACK = "#0a0a0a";
-const GOLD = "#d4af37";
-const PAPER = "#f4f4f4";
+const OK_STATUS = ["BERHASIL", "SUKSES", "OK", "COMPLETED", "SUCCESS"];
 
-const scallopTop = { background: `radial-gradient(circle at 10px 0, ${BLACK} 0 6px, transparent 6.5px) 0 0 / 20px 10px repeat-x, #fff` };
-const scallopBottom = { background: `radial-gradient(circle at 10px 100%, ${PAPER} 0 6px, transparent 6.5px) 0 0 / 20px 10px repeat-x, #fff` };
+function isOkStatus(value: string) {
+  return OK_STATUS.includes(String(value).toUpperCase());
+}
 
-function IconBack() { return <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M19 12H5M12 19l-7-7 7-7" /></svg>; }
-function IconBluetooth() { return <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2.5" y="2.5" width="19" height="19" rx="3" /><path d="M8 8l8 8-4 3.5V4.5L16 8l-8 8" /></svg>; }
-function IconShare() { return <svg viewBox="0 0 24 24" className="h-6 w-6" fill="currentColor"><path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92 1.61 0 2.92-1.31 2.92-2.92s-1.31-2.92-2.92-2.92z" /></svg>; }
-function IconPrint() { return <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor"><path d="M19 8H5c-1.66 0-3 1.34-3 3v6h4v4h12v-4h4v-6c0-1.66-1.34-3-3-3zm-3 11H8v-5h8v5zm3-7c-.55 0-1-.45-1-1s.45-1 1-1 1 .45 1 1-.45 1-1 1zm-1-9H6v4h12V3z" /></svg>; }
-function IconHelp() { return <svg viewBox="0 0 24 24" className="h-7 w-7" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><circle cx="12" cy="12" r="10" /><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3M12 17h.01" /></svg>; }
-function IconTestimonial() { return <svg viewBox="0 0 24 24" className="h-7 w-7" fill="currentColor"><path d="M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z" /><path d="M8 13.5V16h2.5l6-6-2.5-2.5z" fill="#fff" /></svg>; }
+function StatusPill({ text }: { text: string }) {
+  const ok = isOkStatus(text);
+  return (
+    <span className={`rounded-full px-3 py-0.5 text-xs font-black tracking-wide ${ok ? "bg-gold-400 text-black" : "bg-zinc-950 text-gold-400"}`}>
+      {text}
+    </span>
+  );
+}
 
 export default function ReceiptView({ title, rows, total, footer, backHref = "/transactions" }: Props) {
   const router = useRouter();
@@ -57,54 +57,72 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
     }
   }
 
-  const iconBtn = "flex h-11 w-11 items-center justify-center rounded-full text-white transition active:bg-white/20 hover:bg-white/10";
-
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#f4f4f4] text-[#222] print:static print:overflow-visible print:bg-white">
-      <div className="bg-[#0a0a0a] pb-24 pt-[env(safe-area-inset-top)] print:hidden">
-        <div className="mx-auto flex h-16 max-w-md items-center justify-between px-3">
-          <button type="button" onClick={goBack} aria-label="Kembali" className={`${iconBtn} text-[#d4af37]`}><IconBack /></button>
-          <div className="flex items-center gap-1">
-            <button type="button" onClick={printBluetooth} disabled={busy} aria-label="Cetak via Bluetooth" title="Cetak via Bluetooth" className={`${iconBtn} text-[#d4af37] ${busy ? "animate-pulse" : ""}`}><IconBluetooth /></button>
-            <button type="button" onClick={share} aria-label="Bagikan struk" title="Bagikan" className={`${iconBtn} text-[#d4af37]`}><IconShare /></button>
-            <button type="button" onClick={() => window.print()} aria-label="Cetak atau simpan PDF" title="Cetak / Simpan PDF" className={`${iconBtn} text-[#d4af37]`}><IconPrint /></button>
-          </div>
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#f4f4f4] print:static print:overflow-visible print:bg-white">
+      <main
+        className="mx-auto max-w-md animate-page-in pb-8 print:max-w-none print:pb-0"
+        style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}
+      >
+        <div className="no-print flex items-center justify-between rounded-t-3xl bg-zinc-950 px-5 pb-5 pt-[calc(env(safe-area-inset-top)+16px)] text-gold-400">
+          <button type="button" onClick={goBack} aria-label="Kembali" className="text-2xl font-black leading-none">←</button>
+          <span className="text-[11px] font-black uppercase tracking-[.25em]">Struk Digital</span>
         </div>
-      </div>
+        <div
+          className="no-print h-3 bg-white"
+          style={{ backgroundImage: "radial-gradient(circle at 10px 0, #09090b 7px, transparent 8px)", backgroundSize: "20px 12px", backgroundRepeat: "repeat-x" }}
+        />
 
-      <main className="mx-auto -mt-[5.25rem] max-w-md px-4 pb-10 print:mt-0 print:max-w-none print:px-0 print:pb-0">
-        <div>
-          <div className="h-[10px] print:hidden" style={scallopTop} />
-          <div className="bg-white px-6 pb-8 pt-6 print:px-2">
-            <p className="text-center text-[10px] font-black tracking-[.3em] text-[#B8941F]">AIDIL STORE</p>
-            <h1 className="mt-1 text-center text-xl font-semibold">{title}</h1>
-
-            <dl className="mt-8 space-y-4 text-[15px] leading-6">
-              {rows.map((row, i) => (
-                <div key={`${row.label}-${i}`} className="flex gap-2">
-                  <dt className="w-[38%] shrink-0 text-[#333]">{row.label}</dt>
-                  <span aria-hidden>:</span>
-                  <dd className="min-w-0 flex-1 break-words text-[#111]">{row.value}</dd>
-                </div>
-              ))}
-            </dl>
-
-            <div className="mt-6 flex items-center justify-between gap-4 rounded-2xl bg-[#0a0a0a] px-5 py-4 text-lg">
-              <span className="font-black text-[#d4af37]">{total.label}</span>
-              <span className="font-black text-[#d4af37]">{total.value}</span>
-            </div>
-            <p className="mt-6 text-center text-[11px] leading-5 text-slate-400">{footer || "Terima kasih telah berbelanja di AIDIL STORE. Simpan struk ini sebagai bukti transaksi."}</p>
+        <div className="print-avoid-break bg-white px-5 pb-6 pt-4 text-zinc-950 shadow-lg print:shadow-none">
+          <div className="border-b-2 border-gold-400 pb-5 text-center">
+            <img src="/aidil-logo.png" alt="AIDIL STORE" className="mx-auto h-20 w-20 rounded-2xl object-cover ring-2 ring-gold-400" />
+            <p className="mt-3 text-xs font-black tracking-[.25em] text-gold-700">AIDIL STORE</p>
+            <h1 className="mt-1 text-2xl font-black text-zinc-950">{title}</h1>
           </div>
-          <div className="h-[10px] print:hidden" style={scallopBottom} />
+
+          <dl className="mt-5 space-y-3 border-b border-dashed border-gold-500 pb-5">
+            {rows.map((row, i) => (
+              <div key={`${row.label}-${i}`} className="flex justify-between gap-4 text-sm">
+                <dt className="text-zinc-500">{row.label}</dt>
+                <dd className="min-w-0 flex-1 break-words text-right font-bold text-zinc-950">
+                  {row.label === "Status" ? <StatusPill text={row.value} /> : row.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          <div className="mt-6 flex items-center justify-between rounded-2xl bg-zinc-950 px-5 py-4 text-xl">
+            <span className="font-black text-gold-400">{total.label}</span>
+            <b className="text-gold-400">{total.value}</b>
+          </div>
+
+          <p className="mt-5 text-center text-[11px] leading-5 text-zinc-500">
+            {footer || "Terima kasih telah berbelanja di AIDIL STORE. Simpan struk ini sebagai bukti transaksi."}
+          </p>
         </div>
+        <div className="h-1.5 rounded-b-3xl bg-gold-400 print:hidden" />
 
-        {message && (
-          <p className={`mt-4 rounded-xl px-4 py-3 text-xs font-bold leading-5 print:hidden ${message.ok ? "bg-emerald-50 text-emerald-700" : "bg-red-50 text-red-700"}`}>{message.text}</p>
-        )}
-
-        <div className="mt-8 flex items-center justify-between px-2 text-[15px] font-medium print:hidden">
-          <Link href="/bantuan" className="flex items-center gap-3 rounded-xl py-2 pr-3"><IconHelp />Butuh bantuan?</Link>
-          <Link href="/#testimoni" className="flex items-center gap-3 rounded-xl py-2 pl-3"><IconTestimonial />Testimonial</Link>
+        <div className="no-print mt-6 space-y-3 px-5">
+          <div className="grid gap-2 sm:grid-cols-2">
+            <button
+              type="button"
+              disabled={busy}
+              onClick={printBluetooth}
+              className={`rounded-xl px-4 py-3 text-sm font-black ${busy ? "animate-pulse bg-gold-100 text-zinc-900" : "bg-zinc-950 text-gold-400"}`}
+            >
+              {busy ? "Menghubungkan..." : "🖨️ Cetak via Bluetooth"}
+            </button>
+            <button type="button" onClick={() => window.print()} className="rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-black hover:bg-gold-300">
+              🖨️ Cetak / Simpan PDF
+            </button>
+          </div>
+          <button type="button" onClick={share} className="w-full rounded-xl border border-gold-300 px-4 py-3 text-sm font-black text-zinc-800 hover:bg-gold-50">
+            📤 Bagikan Struk
+          </button>
+          {message && (
+            <p className={`rounded-xl px-4 py-3 text-xs font-bold leading-5 ${message.ok ? "bg-gold-50 text-zinc-900" : "bg-red-50 text-red-700"}`}>
+              {message.text}
+            </p>
+          )}
         </div>
       </main>
     </div>

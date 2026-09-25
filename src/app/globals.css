@@ -42,7 +42,13 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .brand-button:hover { background:linear-gradient(135deg,#E4B93A,#B8941F); }
 @media (min-width: 640px) { .app-panel { padding: 1.25rem; } .section-title { font-size: 1.5rem; } .app-footer { padding: 1.5rem; } }
 @media (max-width: 767px) { body { padding-bottom: 4.4rem; } }
-@media print { body { background:#fff !important; padding-bottom:0 !important; } .no-print { display:none !important; } header, nav { display:none !important; } }
+@media print {
+  @page { margin: 10mm; }
+  body { background:#fff !important; padding-bottom:0 !important; }
+  .no-print { display:none !important; }
+  header, nav { display:none !important; }
+  .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
+}
 .nav-link { border-radius:.75rem; padding:.5rem .75rem; font-size:.875rem; font-weight:700; color:#3f3f46; }
 .nav-link:hover { background:#FFFBEA; color:#09090b; }
 .mobile-link {
