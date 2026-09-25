@@ -130,7 +130,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
           Terima kasih telah menggunakan AIDIL STORE. Simpan struk ini sebagai bukti transaksi.
         </p>
       </div>
-      <div className="h-1.5 rounded-b-3xl bg-gold-400" />
+      <div className="h-1.5 rounded-b-3xl bg-gold-400 print:hidden" />
 
       <div className="px-5">
         <PrintButton
