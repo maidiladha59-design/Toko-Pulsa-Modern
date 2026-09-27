@@ -18,6 +18,7 @@ const MENU = [
   ["/admin/payment-settings", "💳", "Pembayaran"],
   ["/admin/platform", "⚙️", "Platform & Biaya"],
   ["/admin/maintenance", "🛠️", "Maintenance Mode"],
+  ["/admin/features", "🎚️", "Fitur Aplikasi"],
   ["/admin/pricing", "🧮", "Harga & Biaya Transaksi"],
   ["/admin/analytics", "📈", "Analitik"],
   ["/admin/finance", "💹", "Keuangan"],

@@ -41,9 +41,6 @@ function LoginForm() {
     setLoading(false);
 
     if (error) {
-      // Kalau bukan salah satu pesan spesifik yang dikenali (mis. email/password
-      // salah, email belum diverifikasi), tampilkan pesan default login yang
-      // mengarahkan user mengecek koneksi atau data yang diinput.
       const humanized = humanizeError(error.message);
       const msg =
         humanized === "Terjadi kesalahan. Silakan coba lagi."
@@ -62,12 +59,11 @@ function LoginForm() {
   }
 
   return (
-    <div className="mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-2xl shadow-zinc-950/20 animate-page-in md:grid-cols-2">
+    <div className="mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] border border-gold-400/20 bg-zinc-950 shadow-2xl shadow-black/50 animate-page-in md:grid-cols-2">
 
       {/* LEFT - BRANDING */}
       <div className="relative hidden overflow-hidden bg-gradient-to-br from-black via-zinc-950 to-zinc-950 p-10 text-white md:block">
 
-        {/* Decorative shapes */}
         <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-yellow-400/20 blur-3xl" />
         <div className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-gold-500/25 blur-3xl" />
 
@@ -106,7 +102,6 @@ function LoginForm() {
             </p>
           </div>
 
-          {/* Panduan login */}
           <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
             <p className="text-sm font-black text-yellow-300">
               📖 Panduan Login
@@ -148,7 +143,6 @@ function LoginForm() {
       {/* RIGHT - LOGIN FORM */}
       <div className="p-6 sm:p-9">
 
-        {/* Tab Login / Daftar */}
         <div className="mb-6 flex rounded-2xl bg-black p-1 text-sm font-bold">
           <Link
             href="/login"
@@ -166,24 +160,23 @@ function LoginForm() {
         </div>
 
         <div className="mb-6">
-          <p className="text-xs font-black uppercase tracking-[.18em] text-gold-600">
+          <p className="text-xs font-black uppercase tracking-[.18em] text-gold-400">
             AIDIL STORE
           </p>
 
-          <h2 className="mt-2 text-2xl font-black text-black">
+          <h2 className="mt-2 text-2xl font-black text-white">
             Masuk ke akunmu
           </h2>
 
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="mt-1 text-sm text-white/50">
             Gunakan email dan password yang sudah terdaftar.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
 
-          {/* EMAIL */}
           <label className="block">
-            <span className="text-sm font-bold text-slate-700">
+            <span className="text-sm font-bold text-white/80">
               Email
             </span>
 
@@ -194,13 +187,12 @@ function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
               placeholder="nama@email.com"
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-gold-500 focus:bg-white focus:ring-4 focus:ring-gold-100"
+              className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20"
             />
           </label>
 
-          {/* PASSWORD */}
           <label className="block">
-            <span className="flex items-center justify-between text-sm font-bold text-slate-700">
+            <span className="flex items-center justify-between text-sm font-bold text-white/80">
               <span>Password</span>
 
               <Link
@@ -219,27 +211,25 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 placeholder="Masukkan password"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 pr-20 text-sm outline-none transition focus:border-gold-500 focus:bg-white focus:ring-4 focus:ring-gold-100"
+                className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 pr-20 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20"
               />
 
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs font-bold text-slate-500 transition hover:bg-gold-100 hover:text-gold-700"
+                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs font-bold text-white/50 transition hover:bg-white/10 hover:text-gold-300"
               >
                 {showPassword ? "Sembunyi" : "Lihat"}
               </button>
             </span>
           </label>
 
-          {/* ERROR */}
           {error && (
-            <div className="animate-page-in rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
+            <div className="animate-page-in rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">
               {error}
             </div>
           )}
 
-          {/* LOGIN BUTTON */}
           <Button
             type="submit"
             loading={loading}
@@ -249,13 +239,12 @@ function LoginForm() {
           </Button>
         </form>
 
-        {/* AJAKAN DAFTAR */}
-        <div className="mt-7 rounded-2xl border border-gold-100 bg-gradient-to-r from-yellow-50 to-gold-50 p-5">
-          <p className="text-sm font-black text-black">
+        <div className="mt-7 rounded-2xl border border-gold-400/20 bg-white/5 p-5">
+          <p className="text-sm font-black text-white">
             Belum punya akun?
           </p>
 
-          <p className="mt-1 text-xs leading-5 text-slate-600">
+          <p className="mt-1 text-xs leading-5 text-white/60">
             Yuk buat akun AIDIL STORE dan nikmati pengalaman
             menggunakan layanan digital dengan lebih mudah.
           </p>
@@ -268,7 +257,7 @@ function LoginForm() {
           </Link>
         </div>
 
-        <p className="mt-5 text-center text-xs text-slate-400">
+        <p className="mt-5 text-center text-xs text-white/40">
           Dengan login, kamu dapat mengakses fitur akun dan
           layanan AIDIL STORE.
         </p>
@@ -282,7 +271,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="mx-auto max-w-md animate-pulse rounded-3xl bg-white p-8 shadow-sm">
+        <div className="mx-auto max-w-md animate-pulse rounded-3xl bg-zinc-950 p-8 text-white/60 shadow-sm">
           Memuat halaman login...
         </div>
       }

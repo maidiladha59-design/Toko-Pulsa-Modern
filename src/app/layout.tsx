@@ -3,6 +3,7 @@ import "./globals.css";
 import Navbar from "@/components/Navbar";
 import ToastProvider from "@/components/ToastProvider";
 import WelcomeExperience from "@/components/WelcomeExperience";
+import { isFeatureEnabled } from "@/lib/features";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aidil-store.example.com";
 const title = "AIDIL STORE — Digital Marketplace";
@@ -33,13 +34,14 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const scanQrisEnabled = await isFeatureEnabled("scan_qris");
   return (
     <html lang="id">
       <body>
         <ToastProvider>
           <WelcomeExperience />
-          <Navbar />
+          <Navbar scanQrisEnabled={scanQrisEnabled} />
           <main className="mx-auto min-h-[calc(100vh-80px)] max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
         </ToastProvider>
       </body>

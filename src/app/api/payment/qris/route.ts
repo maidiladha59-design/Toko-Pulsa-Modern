@@ -1,9 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { randomUUID } from "crypto";
+import { isFeatureEnabled } from "@/lib/features";
 
 export async function POST(req: NextRequest) {
   try {
+    if (!(await isFeatureEnabled("scan_qris"))) {
+      return NextResponse.json({ message: "Fitur Scan QRIS sedang dinonaktifkan." }, { status: 403 });
+    }
+    
     const supabase = await createClient();
 
     const {

@@ -7,12 +7,12 @@ import { useToast } from "./ToastProvider";
 import NotificationBell from "./NotificationBell";
 
 type Profile={full_name:string|null;email:string;role:string};
-export default function Navbar(){
+export default function Navbar({scanQrisEnabled=true}:{scanQrisEnabled?:boolean}){
   const pathname=usePathname();
   if(pathname==="/login"||pathname==="/register"||pathname==="/admin-login") return null;
-  return <NavbarContent/>;
+  return <NavbarContent scanQrisEnabled={scanQrisEnabled}/>;
 }
-function NavbarContent(){
+function NavbarContent({scanQrisEnabled}:{scanQrisEnabled:boolean}){
  const pathname=usePathname();
  const supabase=createClient(),router=useRouter(),toast=useToast();
  const[profile,setProfile]=useState<Profile|null>(null),[loading,setLoading]=useState(true),[menuOpen,setMenuOpen]=useState(false),[accountOpen,setAccountOpen]=useState(false);
@@ -37,6 +37,6 @@ function NavbarContent(){
     </div>
   </nav>
 
-  {menuOpen&&<div className="fixed inset-x-0 bottom-0 top-[69px] z-[56] bg-black/30 lg:hidden" onClick={()=>setMenuOpen(false)}><div onClick={e=>e.stopPropagation()} className="max-h-[calc(100dvh-69px-80px)] overflow-y-auto rounded-b-3xl border-b border-gold-100 bg-white px-4 py-4 shadow-xl"><div className="grid grid-cols-2 gap-2 text-sm">{[["/","🏠 Beranda"],["/layanan","🛍️ Layanan"],["/scan-qris","▣ Scan QRIS"],["/kyc","🪪 Verifikasi Akun"],["/notifications","🔔 Pemberitahuan"],["/referral","🎁 Undang Teman"],["/settings","⚙️ Pengaturan"],["/bantuan","💬 Bantuan"]].map(([href,label])=><Link key={href} href={href} onClick={()=>setMenuOpen(false)} className="rounded-xl bg-gold-50 px-3 py-3 font-bold text-zinc-950">{label}</Link>)}{profile&&<Link href="/orders" onClick={()=>setMenuOpen(false)} className="rounded-xl bg-gold-50 px-3 py-3 font-bold">📦 Pesanan</Link>}{isAdmin&&<Link href="/admin" onClick={()=>setMenuOpen(false)} className="rounded-xl bg-yellow-50 px-3 py-3 font-black text-yellow-900">🛠️ Panel Admin</Link>}{profile?<button onClick={logout} className="rounded-xl bg-red-50 px-3 py-3 text-left font-black text-red-600">🚪 Keluar</button>:<><Link href="/login" className="rounded-xl bg-zinc-900 px-3 py-3 text-center font-black text-white">Masuk</Link><Link href="/register" className="rounded-xl bg-yellow-400 px-3 py-3 text-center font-black text-black">Daftar</Link></>}</div></div></div>}
+  {menuOpen&&<div className="fixed inset-x-0 bottom-0 top-[69px] z-[56] bg-black/30 lg:hidden" onClick={()=>setMenuOpen(false)}><div onClick={e=>e.stopPropagation()} className="max-h-[calc(100dvh-69px-80px)] overflow-y-auto rounded-b-3xl border-b border-gold-100 bg-white px-4 py-4 shadow-xl"><div className="grid grid-cols-2 gap-2 text-sm">{[["/","🏠 Beranda"],["/layanan","🛍️ Layanan"],...(scanQrisEnabled?[["/scan-qris","▣ Scan QRIS"]]:[]),["/kyc","🪪 Verifikasi Akun"],["/notifications","🔔 Pemberitahuan"],["/referral","🎁 Undang Teman"],["/settings","⚙️ Pengaturan"],["/bantuan","💬 Bantuan"]].map(([href,label])=><Link key={href} href={href} onClick={()=>setMenuOpen(false)} className="rounded-xl bg-gold-50 px-3 py-3 font-bold text-zinc-950">{label}</Link>)}{profile&&<Link href="/orders" onClick={()=>setMenuOpen(false)} className="rounded-xl bg-gold-50 px-3 py-3 font-bold">📦 Pesanan</Link>}{isAdmin&&<Link href="/admin" onClick={()=>setMenuOpen(false)} className="rounded-xl bg-yellow-50 px-3 py-3 font-black text-yellow-900">🛠️ Panel Admin</Link>}{profile?<button onClick={logout} className="rounded-xl bg-red-50 px-3 py-3 text-left font-black text-red-600">🚪 Keluar</button>:<><Link href="/login" className="rounded-xl bg-zinc-900 px-3 py-3 text-center font-black text-white">Masuk</Link><Link href="/register" className="rounded-xl bg-yellow-400 px-3 py-3 text-center font-black text-black">Daftar</Link></>}</div></div></div>}
  </>
 }

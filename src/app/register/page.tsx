@@ -13,7 +13,6 @@ const TERMS_SHORT =
 const PRIV_SHORT =
   "Data akun, transaksi, kontak dan data yang diperlukan untuk keamanan diproses untuk menyediakan layanan. Dokumen KYC disimpan privat dan digunakan untuk verifikasi.";
 
-// Ganti/lengkapi teks ini dengan isi lengkap Ketentuan Layanan & Kebijakan Privasi kamu
 const TERMS_FULL = `${TERMS_SHORT}
 
 Dengan menggunakan layanan AIDIL STORE, pengguna dianggap telah membaca dan menyetujui seluruh ketentuan ini, termasuk namun tidak terbatas pada: kewajiban menjaga kerahasiaan akun, larangan penyalahgunaan layanan, serta mengikuti seluruh kebijakan yang berlaku dari penyedia layanan pihak ketiga (provider).`;
@@ -52,21 +51,21 @@ function InfoModal({
       onClick={onClose}
     >
       <div
-        className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-white p-6 shadow-2xl"
+        className="max-h-[80vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-zinc-950 p-6 text-white shadow-2xl"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-4">
-          <h3 className="text-lg font-black text-black">{title}</h3>
+          <h3 className="text-lg font-black text-white">{title}</h3>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-2 py-1 text-sm font-bold text-slate-500 hover:bg-slate-100"
+            className="rounded-lg px-2 py-1 text-sm font-bold text-white/50 hover:bg-white/10"
             aria-label="Tutup"
           >
             ✕
           </button>
         </div>
-        <p className="mt-4 whitespace-pre-line text-sm leading-6 text-slate-600">
+        <p className="mt-4 whitespace-pre-line text-sm leading-6 text-white/70">
           {content}
         </p>
         <button
@@ -280,7 +279,7 @@ function RegisterForm() {
   }
 
   return (
-    <div className="mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] border border-black/10 bg-white shadow-2xl shadow-zinc-950/20 animate-page-in md:grid-cols-2">
+    <div className="mx-auto grid max-w-5xl overflow-hidden rounded-[2rem] border border-gold-400/20 bg-zinc-950 shadow-2xl shadow-black/50 animate-page-in md:grid-cols-2">
       <div className="order-2 p-6 sm:p-9 md:order-1">
         <div className="mb-6 flex rounded-2xl bg-black p-1 text-sm font-bold">
           <Link href="/login" className="flex-1 rounded-xl px-4 py-2.5 text-center text-white transition hover:bg-zinc-950">
@@ -292,43 +291,43 @@ function RegisterForm() {
         </div>
 
         <div className="mb-6">
-          <p className="text-xs font-black uppercase tracking-[.18em] text-gold-600">AIDIL STORE</p>
-          <h1 className="mt-2 text-2xl font-black text-black sm:text-3xl">Buat akun baru ✨</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-500">
+          <p className="text-xs font-black uppercase tracking-[.18em] text-gold-400">AIDIL STORE</p>
+          <h1 className="mt-2 text-2xl font-black text-white sm:text-3xl">Buat akun baru ✨</h1>
+          <p className="mt-2 text-sm leading-6 text-white/50">
             Yuk buat akun AIDIL STORE dan mulai gunakan berbagai layanan digital dengan mudah.
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block">
-            <span className="text-sm font-bold text-slate-700">Nama Lengkap</span>
-            <input required value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" placeholder="Masukkan nama lengkap" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-gold-500 focus:bg-white focus:ring-4 focus:ring-gold-100" />
+            <span className="text-sm font-bold text-white/80">Nama Lengkap</span>
+            <input required value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" placeholder="Masukkan nama lengkap" className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20" />
           </label>
 
           <label className="block">
-            <span className="text-sm font-bold text-slate-700">Email</span>
+            <span className="text-sm font-bold text-white/80">Email</span>
             <div className="mt-2 flex gap-2">
-              <input type="email" required value={email} onChange={(e) => handleEmailChange(e.target.value)} disabled={emailVerified} autoComplete="email" placeholder="nama@email.com" className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-gold-500 focus:bg-white focus:ring-4 focus:ring-gold-100 disabled:bg-emerald-50" />
+              <input type="email" required value={email} onChange={(e) => handleEmailChange(e.target.value)} disabled={emailVerified} autoComplete="email" placeholder="nama@email.com" className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20 disabled:bg-emerald-500/10" />
               {!emailVerified && (
                 <button type="button" onClick={sendOtp} disabled={sendingOtp || resendRemaining > 0 || !email.trim()} className="shrink-0 rounded-xl bg-gold-700 px-3 py-3 text-xs font-black text-white transition hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4">
                   {sendingOtp ? "Mengirim..." : resendRemaining > 0 ? `${resendRemaining}s` : otpSent ? "Kirim Lagi" : "Kirim OTP"}
                 </button>
               )}
             </div>
-            <p className="mt-1.5 text-xs text-slate-400">OTP 6 digit berlaku 5 menit.</p>
+            <p className="mt-1.5 text-xs text-white/40">OTP 6 digit berlaku 5 menit.</p>
           </label>
 
           {otpSent && !emailVerified && (
-            <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4">
+            <div className="rounded-2xl border border-gold-400/25 bg-white/5 p-4">
               <div className="flex items-center justify-between gap-3">
-                <span className="text-sm font-black text-slate-800">Kode OTP</span>
-                <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-gold-700">{formatTime(otpRemaining)}</span>
+                <span className="text-sm font-black text-white">Kode OTP</span>
+                <span className="rounded-full bg-black/40 px-3 py-1 text-xs font-black text-gold-300">{formatTime(otpRemaining)}</span>
               </div>
-              <input inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" className="mt-3 w-full rounded-xl border border-gold-200 bg-white px-4 py-3 text-center text-2xl font-black tracking-[.45em] outline-none focus:border-gold-500 focus:ring-4 focus:ring-gold-100" />
+              <input inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" className="mt-3 w-full rounded-xl border border-gold-400/30 bg-white/5 px-4 py-3 text-center text-2xl font-black text-white tracking-[.45em] outline-none focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20" />
               <button type="button" onClick={verifyOtp} disabled={verifyingOtp || otp.length !== 6} className="mt-3 w-full rounded-xl bg-gold-700 px-4 py-3 text-sm font-black text-white transition hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50">
                 {verifyingOtp ? "Memverifikasi..." : "Verifikasi OTP"}
               </button>
-              <p className="mt-2 text-center text-xs text-slate-500">Resend tersedia {resendRemaining > 0 ? `dalam ${resendRemaining} detik` : "sekarang"}.</p>
+              <p className="mt-2 text-center text-xs text-white/50">Resend tersedia {resendRemaining > 0 ? `dalam ${resendRemaining} detik` : "sekarang"}.</p>
             </div>
           )}
 
@@ -343,21 +342,21 @@ function RegisterForm() {
           )}
 
           <label className="block">
-            <span className="text-sm font-bold text-slate-700">Nomor WhatsApp</span>
-            <input required value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" placeholder="08xxxxxxxxxx" className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm outline-none transition focus:border-gold-500 focus:bg-white focus:ring-4 focus:ring-gold-100" />
+            <span className="text-sm font-bold text-white/80">Nomor WhatsApp</span>
+            <input required value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" placeholder="08xxxxxxxxxx" className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20" />
           </label>
 
           <label className="block">
-            <span className="text-sm font-bold text-slate-700">Password</span>
+            <span className="text-sm font-bold text-white/80">Password</span>
             <span className="relative mt-2 block">
-              <input type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="Minimal 6 karakter" className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 pr-20 text-sm outline-none transition focus:border-gold-500 focus:bg-white focus:ring-4 focus:ring-gold-100" />
-              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs font-bold text-slate-500 transition hover:bg-gold-100 hover:text-gold-700">{showPassword ? "Sembunyi" : "Lihat"}</button>
+              <input type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="Minimal 6 karakter" className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 pr-20 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20" />
+              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs font-bold text-white/50 transition hover:bg-white/10 hover:text-gold-300">{showPassword ? "Sembunyi" : "Lihat"}</button>
             </span>
           </label>
 
-          <div className="rounded-2xl border border-yellow-200 bg-yellow-50 p-4">
+          <div className="rounded-2xl border border-gold-400/25 bg-white/5 p-4">
             <div className="flex items-center justify-between gap-3">
-              <b className="text-sm text-black">📋 Ketentuan Layanan</b>
+              <b className="text-sm text-white">📋 Ketentuan Layanan</b>
               <button
                 type="button"
                 onClick={() => setActiveModal("terms")}
@@ -366,12 +365,12 @@ function RegisterForm() {
                 Baca selengkapnya
               </button>
             </div>
-            <p className="mt-2 text-xs leading-5 text-slate-600">{TERMS_SHORT}</p>
+            <p className="mt-2 text-xs leading-5 text-white/60">{TERMS_SHORT}</p>
           </div>
 
-          <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4">
+          <div className="rounded-2xl border border-gold-400/25 bg-white/5 p-4">
             <div className="flex items-center justify-between gap-3">
-              <b className="text-sm text-black">🔐 Kebijakan Privasi</b>
+              <b className="text-sm text-white">🔐 Kebijakan Privasi</b>
               <button
                 type="button"
                 onClick={() => setActiveModal("privacy")}
@@ -380,22 +379,22 @@ function RegisterForm() {
                 Baca selengkapnya
               </button>
             </div>
-            <p className="mt-2 text-xs leading-5 text-slate-600">{PRIV_SHORT}</p>
+            <p className="mt-2 text-xs leading-5 text-white/60">{PRIV_SHORT}</p>
           </div>
 
-          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-slate-200 bg-white p-3 text-xs text-slate-600 transition hover:border-gold-300">
-            <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-0.5 h-4 w-4 accent-gold-600" />
+          <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-white/15 bg-white/5 p-3 text-xs text-white/70 transition hover:border-gold-400/50">
+            <input type="checkbox" checked={terms} onChange={(e) => setTerms(e.target.checked)} className="mt-0.5 h-4 w-4 accent-gold-500" />
             <span className="leading-5">Saya menyetujui ringkasan Ketentuan Layanan dan Kebijakan Privasi AIDIL STORE.</span>
           </label>
 
-          {error && <div className="animate-page-in rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div>}
+          {error && <div className="animate-page-in rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">{error}</div>}
 
           <Button type="submit" loading={loading} disabled={!emailVerified || loading} className="w-full !bg-yellow-400 !text-black hover:!bg-yellow-300 disabled:!bg-slate-200 disabled:!text-slate-400">Daftar Sekarang</Button>
         </form>
 
-        <div className="mt-7 rounded-2xl border border-gold-100 bg-gradient-to-r from-yellow-50 to-gold-50 p-5">
-          <p className="text-sm font-black text-black">Sudah punya akun?</p>
-          <p className="mt-1 text-xs leading-5 text-slate-600">Tidak perlu membuat akun baru. Silakan login menggunakan email dan password yang sudah terdaftar.</p>
+        <div className="mt-7 rounded-2xl border border-gold-400/20 bg-white/5 p-5">
+          <p className="text-sm font-black text-white">Sudah punya akun?</p>
+          <p className="mt-1 text-xs leading-5 text-white/60">Tidak perlu membuat akun baru. Silakan login menggunakan email dan password yang sudah terdaftar.</p>
           <Link href="/login" className="mt-4 flex w-full items-center justify-center rounded-xl bg-gold-700 px-4 py-3 text-sm font-black text-white transition hover:bg-zinc-900">🔐 Login ke AIDIL STORE</Link>
         </div>
       </div>

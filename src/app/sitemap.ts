@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 import { createClient } from "@/lib/supabase/server";
+import { isFeatureEnabled } from "@/lib/features";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aidil-store.example.com";
 
@@ -28,7 +29,6 @@ const staticRoutes = [
   "/identitas-usaha",
   "/pengaduan-konsumen",
   "/ranking",
-  "/scan-qris",
   "/transfer-uang",
 ];
 
@@ -39,6 +39,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     changeFrequency: path === "" ? "daily" : "weekly",
     priority: path === "" ? 1 : 0.6,
   }));
+
+  if (await isFeatureEnabled("scan_qris")) {
+    entries.push({ url: `${siteUrl}/scan-qris`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.6 });
+  }
 
   for (const slug of ppobCategories) {
     entries.push({
