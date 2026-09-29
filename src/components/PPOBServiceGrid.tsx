@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useMemo, useState } from "react";
 
 type Service = {
   id: string;
@@ -44,51 +45,114 @@ function groupByBrand(services: Service[]) {
   return Array.from(groups.entries()).sort((a, b) => a[0].localeCompare(b[0], "id"));
 }
 
+/** Ambil angka pertama dari nama produk untuk sortir nominal/kuota, mis. "Telkomsel 5GB 30 Hari" -> 5 */
+function firstNumber(name: string): number {
+  const match = name.replace(/[.,](?=\d{3}\b)/g, "").match(/(\d+(?:[.,]\d+)?)/);
+  if (!match) return Number.POSITIVE_INFINITY;
+  return parseFloat(match[1].replace(",", "."));
+}
+
+type SortMode = "default" | "price-asc" | "price-desc" | "size-asc" | "size-desc";
+
 export default function PPOBServiceGrid({ services, category }: { services: Service[]; category: string }) {
+  const [query, setQuery] = useState("");
+  const [sort, setSort] = useState<SortMode>("default");
+
+  const showSizeSort = category === "paket-data" || category === "top-up-game" || category === "sms-telpon";
+
+  const filtered = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    let list = services.filter((s) => (q ? (s.product?.name || "").toLowerCase().includes(q) || (s.brand || "").toLowerCase().includes(q) : true));
+    if (sort === "price-asc") list = [...list].sort((a, b) => (a.product?.price ?? 0) - (b.product?.price ?? 0));
+    else if (sort === "price-desc") list = [...list].sort((a, b) => (b.product?.price ?? 0) - (a.product?.price ?? 0));
+    else if (sort === "size-asc") list = [...list].sort((a, b) => firstNumber(a.product?.name || "") - firstNumber(b.product?.name || ""));
+    else if (sort === "size-desc") list = [...list].sort((a, b) => firstNumber(b.product?.name || "") - firstNumber(a.product?.name || ""));
+    return list;
+  }, [services, query, sort]);
+
   if (!services.length) {
     return (
-      <div className="rounded-3xl border border-dashed border-slate-300 bg-white p-8 text-center shadow-sm">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-50 text-3xl">📡</div>
-        <h2 className="mt-4 text-lg font-black text-slate-900">Layanan belum tersedia</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">Produk untuk layanan ini belum tersedia saat ini. Silakan cek kembali nanti.</p>
-        <Link href="/" className="mt-5 inline-flex rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white">Kembali ke Beranda</Link>
+      <div className="rounded-3xl border border-dashed border-gold-300 bg-white p-8 text-center shadow-sm">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gold-50 text-3xl">📡</div>
+        <h2 className="mt-4 text-lg font-black text-zinc-950">Layanan belum tersedia</h2>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-slate-500">Admin perlu melakukan sinkronisasi SKU PPOB dan mengaktifkan produk terlebih dahulu.</p>
+        <Link href="/" className="mt-5 inline-flex rounded-xl bg-zinc-950 px-4 py-2.5 text-sm font-black text-gold-400">Kembali ke Beranda</Link>
       </div>
     );
   }
 
   const fallbackIcon = CATEGORY_ICON[category] || "📦";
-  const grouped = groupByBrand(services);
+  const grouped = groupByBrand(filtered);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      <div className="flex flex-col gap-2 rounded-2xl border border-gold-200 bg-white p-3 shadow-sm sm:flex-row sm:items-center">
+        <div className="relative flex-1">
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-slate-400">🔍</span>
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Cari produk..."
+            className="w-full rounded-xl border border-slate-200 bg-slate-50 py-2.5 pl-9 pr-3 text-sm outline-none transition focus:border-gold-400 focus:bg-white focus:ring-4 focus:ring-gold-100"
+          />
+        </div>
+        <select
+          value={sort}
+          onChange={(e) => setSort(e.target.value as SortMode)}
+          className="rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm font-bold text-zinc-800 outline-none transition focus:border-gold-400 focus:bg-white focus:ring-4 focus:ring-gold-100"
+        >
+          <option value="default">Urutkan: Default</option>
+          <option value="price-asc">Harga: Termurah</option>
+          <option value="price-desc">Harga: Termahal</option>
+          {showSizeSort && <option value="size-asc">Kuota/Nominal: Kecil ke Besar</option>}
+          {showSizeSort && <option value="size-desc">Kuota/Nominal: Besar ke Kecil</option>}
+        </select>
+      </div>
+
+      {grouped.length === 0 && (
+        <p className="rounded-2xl border border-dashed border-gold-300 bg-white p-6 text-center text-sm text-slate-500">Tidak ada produk yang cocok dengan pencarian.</p>
+      )}
+
       {grouped.map(([brand, items]) => (
-        <section key={brand}>
-          <div className="mb-3 flex items-center gap-3">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-slate-950 text-lg text-white">
+        <section key={brand} className="overflow-hidden rounded-2xl border border-gold-200 bg-white shadow-sm">
+          <div className="flex items-center gap-3 border-b border-gold-100 bg-zinc-950 px-4 py-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gold-400 text-base text-black">
               {brandIcon(brand)}
             </div>
             <div className="min-w-0">
-              <h3 className="truncate text-base font-black text-slate-900">{brand}</h3>
-              <p className="text-[11px] font-bold uppercase tracking-wide text-slate-400">{items.length} produk tersedia</p>
+              <h3 className="truncate text-sm font-black text-white">{brand}</h3>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-gold-400/80">{items.length} produk tersedia</p>
             </div>
-            <span className="ml-auto hidden shrink-0 rounded-full bg-slate-100 px-3 py-1 text-[10px] font-black uppercase text-slate-500 sm:inline-flex">{brand}</span>
           </div>
 
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+          <div className="divide-y divide-gold-100">
             {items.map((service) => {
               const p = service.product;
               if (!p) return null;
               return (
-                <Link key={service.id} href={`/checkout?product=${encodeURIComponent(p.id)}&qty=1`} className="group overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-amber-300 hover:shadow-lg">
-                  <div className="aspect-square overflow-hidden bg-slate-100">
-                    {p.thumbnail_url ? <img src={p.thumbnail_url} alt={p.name} className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <div className="flex h-full items-center justify-center text-5xl">{fallbackIcon}</div>}
+                <Link
+                  key={service.id}
+                  href={`/checkout?product=${encodeURIComponent(p.id)}&qty=1`}
+                  className="group flex items-center gap-3 px-4 py-3.5 transition hover:bg-gold-50 active:bg-gold-100"
+                >
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-zinc-950 text-lg">
+                    {p.thumbnail_url ? (
+                      <img src={p.thumbnail_url} alt={p.name} className="h-full w-full object-cover" />
+                    ) : (
+                      <span className="text-gold-400">{fallbackIcon}</span>
+                    )}
                   </div>
-                  <div className="p-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <p className="truncate text-sm font-black text-slate-900">{p.name}</p>
-                      <span className="shrink-0 rounded-full bg-emerald-50 px-2 py-1 text-[9px] font-black uppercase text-emerald-700">{service.service_kind === "postpaid" ? "Pascabayar" : "Prabayar"}</span>
-                    </div>
-                    <p className="mt-2 text-sm font-black text-amber-700">Mulai transaksi →</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-sm font-bold text-zinc-950">{p.name}</p>
+                    <p className="mt-0.5 text-[11px] font-bold uppercase tracking-wide text-slate-400">
+                      {service.service_kind === "postpaid" ? "Pascabayar" : "Prabayar"}
+                    </p>
+                  </div>
+                  <div className="flex shrink-0 items-center gap-2">
+                    <span className="text-sm font-black text-gold-700">
+                      {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(p.price)}
+                    </span>
+                    <span className="text-gold-400 transition group-hover:translate-x-0.5">›</span>
                   </div>
                 </Link>
               );
