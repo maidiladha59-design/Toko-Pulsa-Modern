@@ -5,8 +5,8 @@ self.addEventListener("push", (event) => {
   const title = data.title || "AIDIL STORE";
   const options = {
     body: data.subtitle || data.message || "Ada informasi baru dari AIDIL STORE.",
-    icon: data.icon || "/icon-192.png",
-    badge: data.badge || "/icon-192.png",
+    icon: data.icon || "/aidil-logo.png",
+    badge: data.badge || "/aidil-logo.png",
     tag: data.tag || "aidil-store-notification",
     renotify: true,
     data: { url: data.url || "/" },

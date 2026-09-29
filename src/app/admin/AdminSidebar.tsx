@@ -19,6 +19,7 @@ const MENU = [
   ["/admin/platform", "⚙️", "Platform & Biaya"],
   ["/admin/maintenance", "🛠️", "Maintenance Mode"],
   ["/admin/features", "🎚️", "Fitur Aplikasi"],
+  ["/admin/campaigns", "📣", "Kampanye Push"],
   ["/admin/pricing", "🧮", "Harga & Biaya Transaksi"],
   ["/admin/analytics", "📈", "Analitik"],
   ["/admin/finance", "💹", "Keuangan"],
