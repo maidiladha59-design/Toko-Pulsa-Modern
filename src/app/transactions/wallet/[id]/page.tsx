@@ -4,7 +4,7 @@ import ReceiptView from "@/components/ReceiptView";
 import { formatReceiptDate, plainNumber, type ReceiptRow } from "@/lib/receipt-print";
 
 const TYPE_LABEL: Record<string, string> = {
-  TOPUP: "Top Up Saldo", PURCHASE: "Pembelian dengan Saldo", REFUND: "Pengembalian Dana", ADJUSTMENT: "Penyesuaian Saldo",
+  TOPUP: "Top Up Saldo", PURCHASE: "Pembelian dengan Saldo", REFUND: "Pengembalian Dana", ADJUSTMENT: "Penyesuaian Saldo", TRANSFER: "Transfer Saldo",
 };
 
 export default async function WalletReceiptPage({ params }: { params: { id: string } }) {

@@ -12,7 +12,7 @@ for (const file of files) {
   if (!byVersion.has(v)) byVersion.set(v, []);
   byVersion.get(v).push(file);
 }
-const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73];
+const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75];
 const missing = required.filter(v => !byVersion.has(v));
 const duplicateVersions = [...byVersion.entries()].filter(([, list]) => list.length > 1);
 const errors = [];
@@ -45,6 +45,7 @@ const checks = [
   ['v54', 'migrations_v54_pwa_realtime_push.sql', ['push_subscriptions', 'replica identity full']],
   ['v55', 'migrations_v55_monitoring_provider_alerts.sql', ['provider_health_checks']],
   ['v73', 'migrations_v73_gateway_txn_id.sql', ['gateway_txn_id', 'provider_txn_id']],
+  ['v75', 'migrations_v75_wallet_transfer_qr.sql', ['transfer_settings', 'wallet_transfers', 'transfer_contacts', 'user_qr_tokens', 'create_wallet_transfer', 'resolve_qr_token', 'transfer.sent']],
 ];
 for (const [label, file, needles] of checks) {
   const p = path.join(dir, file);

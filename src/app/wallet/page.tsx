@@ -10,6 +10,7 @@ const TX_LABEL: Record<string, string> = {
   PURCHASE: "Pembelian",
   REFUND: "Refund",
   ADJUSTMENT: "Penyesuaian",
+  TRANSFER: "Transfer",
 };
 
 export default async function WalletPage() {
@@ -40,12 +41,26 @@ export default async function WalletPage() {
       <div className="rounded-2xl bg-navy p-6 text-white">
         <p className="text-sm text-white/70">Saldo Anda saat ini</p>
         <p className="mt-1 text-3xl font-bold">{formatRupiah(wallet?.balance || 0)}</p>
-        <Link
-          href="/wallet/topup"
-          className="mt-4 inline-block rounded-lg bg-brand px-4 py-2.5 text-sm font-medium hover:bg-brand-dark"
-        >
-          + Top Up Saldo
-        </Link>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <Link
+            href="/wallet/topup"
+            className="rounded-lg bg-brand px-4 py-2.5 text-sm font-medium hover:bg-brand-dark"
+          >
+            + Top Up Saldo
+          </Link>
+          <Link
+            href="/transfer-uang"
+            className="rounded-lg bg-white/10 px-4 py-2.5 text-sm font-medium hover:bg-white/20"
+          >
+            📤 Transfer
+          </Link>
+          <Link
+            href="/transfer-uang/qr"
+            className="rounded-lg bg-white/10 px-4 py-2.5 text-sm font-medium hover:bg-white/20"
+          >
+            📥 Terima Saldo
+          </Link>
+        </div>
       </div>
 
       {pendingTopups && pendingTopups.length > 0 && (

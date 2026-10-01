@@ -4,6 +4,7 @@ import { sendWebPush } from '@/lib/push';
 export type NotificationEventKey =
   | 'TOPUP_SUCCESS' | 'TOPUP_EXPIRING' | 'TOPUP_EXPIRED' | 'TOPUP_FAILED'
   | 'TRANSACTION_SUCCESS' | 'TRANSACTION_FAILED'
+  | 'TRANSFER_SENT' | 'TRANSFER_RECEIVED'
   | 'KYC_SUBMITTED' | 'KYC_APPROVED' | 'KYC_REJECTED'
   | 'SECURITY_LOGIN' | 'PROMOTION' | 'ANNOUNCEMENT'
   | 'RANKING_POSITION' | 'RANKING_UP_ONE' | 'RANKING_CHANGED';
@@ -23,7 +24,7 @@ function render(template: string, vars: Record<string, unknown>) {
 
 function category(eventKey: NotificationEventKey) {
   if (eventKey.startsWith('TOPUP_')) return 'topup';
-  if (eventKey.startsWith('TRANSACTION_') || eventKey.startsWith('RANKING_')) return 'transactions';
+  if (eventKey.startsWith('TRANSACTION_') || eventKey.startsWith('RANKING_') || eventKey.startsWith('TRANSFER_')) return 'transactions';
   if (eventKey.startsWith('KYC_')) return 'kyc';
   if (eventKey === 'SECURITY_LOGIN') return 'security';
   if (eventKey === 'PROMOTION') return 'promotions';

@@ -1,6 +1,6 @@
 # AIDIL STORE — v33 Production Integration Verification
 
-Generated: 2026-09-23T08:28:12.754Z
+Generated: 2026-10-01T18:25:28.358Z
 
 ## Scope
 Static verification of the Supabase/Vercel/FR3 NEWERA/Digiflazz/OAuth/cron integration contract. Live external verification is only performed when the --live flag is explicitly used in a real deployment environment.
@@ -39,12 +39,12 @@ Static verification of the Supabase/Vercel/FR3 NEWERA/Digiflazz/OAuth/cron integ
 - PASS — oauth-exchange — OAuth callback exchanges code for session.
 - PASS — oauth-error-path — OAuth callback contains an error/redirect path.
 - FAIL — vercel-cron-route — PPOB cron route not found in vercel.json.
-- FAIL — vercel-cron-schedule — No cron schedule declaration.
+- PASS — vercel-cron-schedule — Cron schedule declaration present.
 - PASS — digiflazz-transaction-endpoint
 - PASS — digiflazz-pricelist-endpoint
 - WARN — pakasir-client — FR3 NEWERA hostname not found statically.
 - WARN — live-verification — Not run: use npm run verify:integration:live only inside the production environment with real credentials.
-- PASS — production-tests — Production test suite completed successfully.
+- FAIL — production-tests — Production tests failed.
 
 ## Warnings
 - local-env-present: Do not commit .env.local; values are intentionally not inspected.

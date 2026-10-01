@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
+import { parsePersonalQrPayload } from '@/lib/transfer/qr';
 
 type QRISData = {
   raw: string;
@@ -174,6 +175,20 @@ export default function ScanQRIS() {
         (result, error) => {
           if (result) {
             const raw = result.getText();
+
+            // QR Pribadi AIDIL STORE terdeteksi -> langsung ke form transfer
+            // dengan penerima (dan nominal, jika ada) terisi otomatis.
+            const personal = parsePersonalQrPayload(raw);
+
+            if (personal) {
+              stopScanner();
+
+              router.push(
+                `/transfer-uang?qr=${personal.token}${personal.amount ? `&amount=${personal.amount}` : ''}`
+              );
+
+              return;
+            }
 
             setCode(raw);
             setQris(parseQris(raw));
