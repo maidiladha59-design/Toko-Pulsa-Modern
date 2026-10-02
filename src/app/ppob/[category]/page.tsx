@@ -68,7 +68,7 @@ export default async function PPOBCategoryPage({ params }: { params: { category:
 
   return (
     <div className="customer-shell"><div className="mx-auto w-full max-w-3xl animate-page-in">
-      <Link href="/#layanan" className="inline-flex rounded-xl px-2 py-2 text-sm font-bold text-zinc-400 transition hover:bg-white/5 hover:text-white">← Semua layanan</Link>
+      <Link href="/#layanan" className="inline-flex rounded-xl px-2 py-2 text-sm font-bold text-app-muted transition hover:bg-app-inset hover:text-app-text">← Semua layanan</Link>
       <section className="app-hero mt-3 overflow-hidden rounded-[2rem] p-6 text-white sm:p-8">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gold-400 text-3xl text-zinc-950">{config.icon}</div>
@@ -78,7 +78,7 @@ export default async function PPOBCategoryPage({ params }: { params: { category:
           <div className="rounded-xl bg-white/5 p-3">🔒 Aman</div><div className="rounded-xl bg-white/5 p-3">⚡ Otomatis</div><div className="rounded-xl bg-white/5 p-3">🧾 Ada riwayat</div>
         </div>
       </section>
-      <div className="mb-4 mt-7 flex items-end justify-between gap-3"><div><p className="text-[10px] font-black uppercase tracking-[.18em] text-gold-600">Pilihan layanan</p><h2 className="mt-1 text-xl font-black text-white">Pilih produk</h2></div><span className="text-xs font-bold text-zinc-500">{services.length} produk tersedia</span></div>
+      <div className="mb-4 mt-7 flex items-end justify-between gap-3"><div><p className="text-[10px] font-black uppercase tracking-[.18em] text-app-kicker">Pilihan layanan</p><h2 className="mt-1 text-xl font-black text-app-text">Pilih produk</h2></div><span className="text-xs font-bold text-app-subtle">{services.length} produk tersedia</span></div>
       <PPOBServiceGrid services={services} category={params.category} />
     </div>
     </div>

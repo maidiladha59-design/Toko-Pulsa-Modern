@@ -8,7 +8,7 @@ export default function PPOBReceiptButton({ orderId }: { orderId: string }) {
     <button
       type="button"
       onClick={() => router.push(`/orders/${orderId}/receipt`)}
-      className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-black text-slate-700 shadow-sm transition hover:bg-slate-50"
+      className="rounded-xl border border-app-border bg-app-surface px-4 py-2.5 text-sm font-black text-app-text shadow-sm transition hover:bg-app-inset"
     >
       🧾 Lihat / Cetak Struk
     </button>

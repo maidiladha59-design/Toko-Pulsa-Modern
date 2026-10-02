@@ -14,10 +14,10 @@ const MAX_TARGET_FILE_SIZE = 100 * 1024 * 1024;
 function CheckoutSkeleton() {
   return (
     <div className="mx-auto w-full max-w-[480px] animate-pulse space-y-4 px-4 py-6" aria-busy="true">
-      <div className="h-14 w-2/3 rounded-xl bg-zinc-900" />
-      <div className="h-32 rounded-[2rem] bg-zinc-900" />
-      <div className="h-64 rounded-[2rem] bg-zinc-900" />
-      <div className="h-40 rounded-[2rem] bg-zinc-900" />
+      <div className="h-14 w-2/3 rounded-xl bg-app-surface" />
+      <div className="h-32 rounded-[2rem] bg-app-surface" />
+      <div className="h-64 rounded-[2rem] bg-app-surface" />
+      <div className="h-40 rounded-[2rem] bg-app-surface" />
     </div>
   );
 }
@@ -203,9 +203,9 @@ function CheckoutForm() {
     }
   }
 
-  if (!productId || qty < 1) return <div className="mx-auto w-full max-w-[480px] px-4 py-10"><p className="text-sm text-zinc-400">Parameter produk atau jumlah tidak valid.</p></div>;
+  if (!productId || qty < 1) return <div className="mx-auto w-full max-w-[480px] px-4 py-10"><p className="text-sm text-app-muted">Parameter produk atau jumlah tidak valid.</p></div>;
   if (loading) return <CheckoutSkeleton />;
-  if (!product) return <div className="mx-auto w-full max-w-[480px] px-4 py-10"><p className="text-sm text-zinc-400">Produk tidak ditemukan.</p></div>;
+  if (!product) return <div className="mx-auto w-full max-w-[480px] px-4 py-10"><p className="text-sm text-app-muted">Produk tidak ditemukan.</p></div>;
 
   const subtotal = ppob?.service_kind === "postpaid" && inquiry ? Number(inquiry.quote_amount || inquiry.selling_price || 0) : product.price * qty;
   const enoughBalance = balance >= subtotal;
@@ -213,46 +213,46 @@ function CheckoutForm() {
   return (
     <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] animate-page-in pb-28 lg:max-w-5xl lg:pb-0">
       <div className="mb-6 flex items-start gap-3">
-        <button type="button" onClick={() => router.back()} aria-label="Kembali" className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 text-lg text-zinc-300 transition hover:border-gold-400/50 hover:text-gold-400">←</button>
+        <button type="button" onClick={() => router.back()} aria-label="Kembali" className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-surface text-lg text-app-text transition hover:border-gold-400/50 hover:text-app-kicker">←</button>
         <img src="/aidil-logo.png" alt="Aidil Store" className="h-11 w-11 rounded-2xl object-cover" />
-        <div><p className="text-xs font-black uppercase tracking-[.2em] text-gold-400">AIDIL STORE</p><h1 className="text-xl font-black text-white sm:text-2xl">Checkout Aman & Otomatis</h1><p className="text-sm text-zinc-400">Bayar tanpa approve manual, lalu akses produk digital dari pesanan.</p></div>
+        <div><p className="text-xs font-black uppercase tracking-[.2em] text-app-kicker">AIDIL STORE</p><h1 className="text-xl font-black text-app-text sm:text-2xl">Checkout Aman & Otomatis</h1><p className="text-sm text-app-muted">Bayar tanpa approve manual, lalu akses produk digital dari pesanan.</p></div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-5">
-          <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900 p-5">
+          <div className="rounded-[2rem] border border-app-border bg-app-surface p-5">
             <div className="flex gap-4">
-              <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-zinc-950">
+              <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-app-inset">
                 {product.thumbnail_url ? <img src={product.thumbnail_url} alt={product.name} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-3xl">🛍️</div>}
               </div>
               <div className="min-w-0">
-                <p className="font-black text-white">{product.name}</p>
-                <p className="mt-1 text-sm text-zinc-400">Jumlah: <span className="tabular-nums">{qty}</span></p>
-                <p className="mt-3 text-lg font-black tabular-nums text-gold-400">{formatRupiah(product.price)} / item</p>
+                <p className="font-black text-app-text">{product.name}</p>
+                <p className="mt-1 text-sm text-app-muted">Jumlah: <span className="tabular-nums">{qty}</span></p>
+                <p className="mt-3 text-lg font-black tabular-nums text-app-kicker">{formatRupiah(product.price)} / item</p>
               </div>
             </div>
           </div>
 
           {isJasa && (
-            <div className="rounded-[2rem] border border-gold-400/30 bg-gold-400/5 p-5">
-              <p className="font-black text-white">Target pesanan jasa</p>
-              <p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan link/catatan atau file yang dibutuhkan agar pesanan dapat diproses.</p>
-              <textarea value={targetText} onChange={(e) => setTargetText(e.target.value)} rows={4} placeholder="Link, username, catatan, atau detail pesanan..." className="mt-3 w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20" />
-              <input type="file" onChange={(e) => chooseTargetFile(e.target.files?.[0])} className="mt-3 block w-full text-sm text-zinc-300 file:mr-3 file:rounded-xl file:border-0 file:bg-zinc-800 file:px-3 file:py-2 file:text-xs file:font-black file:text-zinc-200" />
-              {targetFile && <p className="mt-2 text-xs font-bold text-emerald-400">✓ {targetFile.name}</p>}
+            <div className="rounded-[2rem] border border-gold-400/30 bg-app-accent-soft p-5">
+              <p className="font-black text-app-text">Target pesanan jasa</p>
+              <p className="mt-1 text-xs leading-5 text-app-muted">Masukkan link/catatan atau file yang dibutuhkan agar pesanan dapat diproses.</p>
+              <textarea value={targetText} onChange={(e) => setTargetText(e.target.value)} rows={4} placeholder="Link, username, catatan, atau detail pesanan..." className="mt-3 w-full rounded-2xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20" />
+              <input type="file" onChange={(e) => chooseTargetFile(e.target.files?.[0])} className="mt-3 block w-full text-sm text-app-text file:mr-3 file:rounded-xl file:border-0 file:bg-app-inset file:px-3 file:py-2 file:text-xs file:font-black file:text-app-text" />
+              {targetFile && <p className="mt-2 text-xs font-bold text-emerald-600 dark:text-emerald-400">✓ {targetFile.name}</p>}
             </div>
           )}
 
           {ppob && guide && (
-            <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900 p-5">
+            <div className="rounded-[2rem] border border-app-border bg-app-surface p-5">
               <div className="flex items-start justify-between gap-3">
-                <div><p className="font-black text-white">{guide.heading}</p><p className="mt-1 text-xs leading-5 text-zinc-400">{guide.intro}</p></div>
-                <span className="shrink-0 rounded-full bg-zinc-950 px-3 py-1 text-[10px] font-black uppercase text-gold-400 ring-1 ring-gold-400/30">{ppob.service_kind === "postpaid" ? "Cek tagihan dulu" : "Proses otomatis"}</span>
+                <div><p className="font-black text-app-text">{guide.heading}</p><p className="mt-1 text-xs leading-5 text-app-muted">{guide.intro}</p></div>
+                <span className="shrink-0 rounded-full bg-app-inset px-3 py-1 text-[10px] font-black uppercase text-app-kicker ring-1 ring-gold-400/30">{ppob.service_kind === "postpaid" ? "Cek tagihan dulu" : "Proses otomatis"}</span>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {guide.fields.map((field) => (
                   <label key={field.name} className={guide.fields.length === 1 ? "sm:col-span-2" : ""}>
-                    <span className="text-xs font-black text-zinc-300">{field.label}{field.required !== false ? " *" : ""}</span>
+                    <span className="text-xs font-black text-app-text">{field.label}{field.required !== false ? " *" : ""}</span>
                     <input
                       value={ppobTargets[field.name] || ""}
                       onChange={(e) => {
@@ -264,31 +264,31 @@ function CheckoutForm() {
                       inputMode={field.inputMode}
                       maxLength={field.maxLength}
                       autoComplete="off"
-                      className="mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
+                      className="mt-2 w-full rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
                     />
                   </label>
                 ))}
               </div>
-              {targetDetected && !targetError && <p className="mt-3 text-xs font-black text-emerald-400">✓ {targetDetected}</p>}
-              {hasTargetInput && targetError && <p className="mt-3 rounded-xl bg-red-500/10 px-3 py-2 text-xs font-bold leading-5 text-red-400">{targetError}</p>}
-              <ul className="mt-4 space-y-1.5 rounded-2xl bg-zinc-950/60 p-3 text-[11px] leading-5 text-zinc-400">
+              {targetDetected && !targetError && <p className="mt-3 text-xs font-black text-emerald-600 dark:text-emerald-400">✓ {targetDetected}</p>}
+              {hasTargetInput && targetError && <p className="mt-3 rounded-xl bg-red-500/10 px-3 py-2 text-xs font-bold leading-5 text-red-600 dark:text-red-400">{targetError}</p>}
+              <ul className="mt-4 space-y-1.5 rounded-2xl bg-app-inset/60 p-3 text-[11px] leading-5 text-app-muted">
                 {guide.tips.map((tip) => <li key={tip}>• {tip}</li>)}
               </ul>
               {ppob.service_kind === "postpaid" && (
-                <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-950/60 p-4">
+                <div className="mt-4 rounded-2xl border border-app-border bg-app-inset/60 p-4">
                   <button type="button" onClick={runInquiry} disabled={inquiring} className="min-h-[44px] rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-gold-300 disabled:opacity-60">{inquiring ? "Mengecek..." : "Cek Tagihan"}</button>
                   {inquiry && (
-                    <div className="mt-3 rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
+                    <div className="mt-3 rounded-2xl border border-app-border bg-app-surface p-4">
                       <div className="flex items-center justify-between gap-3">
-                        <div><p className="text-xs font-bold text-zinc-400">Pelanggan</p><p className="font-black text-white">{inquiry.customer_name || inquiry.customer_no || ppobTargets.customer_no}</p></div>
-                        <div className="text-right"><p className="text-xs font-bold text-zinc-400">Total tagihan</p><p className="text-xl font-black tabular-nums text-gold-400">{formatRupiah(Number(inquiry.quote_amount || inquiry.selling_price || 0))}</p></div>
+                        <div><p className="text-xs font-bold text-app-muted">Pelanggan</p><p className="font-black text-app-text">{inquiry.customer_name || inquiry.customer_no || ppobTargets.customer_no}</p></div>
+                        <div className="text-right"><p className="text-xs font-bold text-app-muted">Total tagihan</p><p className="text-xl font-black tabular-nums text-app-kicker">{formatRupiah(Number(inquiry.quote_amount || inquiry.selling_price || 0))}</p></div>
                       </div>
-                      <div className="mt-3 grid gap-2 text-xs text-zinc-400 sm:grid-cols-3">
-                        <div className="rounded-xl bg-zinc-950 p-3">Tagihan pokok<br/><b className="tabular-nums text-white">{formatRupiah(Number(inquiry.price || 0))}</b></div>
-                        <div className="rounded-xl bg-zinc-950 p-3">Biaya admin<br/><b className="tabular-nums text-white">{formatRupiah(Number(inquiry.admin || 0))}</b></div>
-                        <div className="rounded-xl bg-zinc-950 p-3">Jatuh tempo/periode<br/><b className="text-white">{String(inquiry.periode || "-" )}</b></div>
+                      <div className="mt-3 grid gap-2 text-xs text-app-muted sm:grid-cols-3">
+                        <div className="rounded-xl bg-app-inset p-3">Tagihan pokok<br/><b className="tabular-nums text-app-text">{formatRupiah(Number(inquiry.price || 0))}</b></div>
+                        <div className="rounded-xl bg-app-inset p-3">Biaya admin<br/><b className="tabular-nums text-app-text">{formatRupiah(Number(inquiry.admin || 0))}</b></div>
+                        <div className="rounded-xl bg-app-inset p-3">Jatuh tempo/periode<br/><b className="text-app-text">{String(inquiry.periode || "-" )}</b></div>
                       </div>
-                      <p className="mt-3 text-[11px] font-semibold text-zinc-400">Tagihan ini berlaku 10 menit. Nominal yang dibayar sudah dikunci dan aman.</p>
+                      <p className="mt-3 text-[11px] font-semibold text-app-muted">Tagihan ini berlaku 10 menit. Nominal yang dibayar sudah dikunci dan aman.</p>
                     </div>
                   )}
                 </div>
@@ -296,21 +296,21 @@ function CheckoutForm() {
             </div>
           )}
 
-          <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900 p-5">
+          <div className="rounded-[2rem] border border-app-border bg-app-surface p-5">
             <div className="flex items-end justify-between">
-              <div><p className="text-xs font-black uppercase tracking-widest text-gold-400">Metode</p><h2 className="mt-1 text-xl font-black text-white">Cara bayar</h2></div>
-              <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">Otomatis</span>
+              <div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">Metode</p><h2 className="mt-1 text-xl font-black text-app-text">Cara bayar</h2></div>
+              <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-600 dark:text-emerald-400">Otomatis</span>
             </div>
 
-            <div className="mt-4 rounded-2xl border border-gold-400/60 bg-gold-400/10 p-4">
+            <div className="mt-4 rounded-2xl border border-gold-400/60 bg-app-accent-soft p-4">
               <span className="text-2xl">💰</span>
-              <p className="mt-2 font-black text-white">Saldo Wallet AIDIL STORE</p>
-              <p className="mt-1 text-xs text-zinc-400"><span className="font-bold tabular-nums text-gold-400">{formatRupiah(balance)}</span> tersedia</p>
-              <p className="mt-3 text-[11px] leading-5 text-zinc-400">Untuk saat ini, semua transaksi pembelian produk hanya dapat dibayar menggunakan saldo akun. Jika saldo belum cukup, silakan top up terlebih dahulu.</p>
+              <p className="mt-2 font-black text-app-text">Saldo Wallet AIDIL STORE</p>
+              <p className="mt-1 text-xs text-app-muted"><span className="font-bold tabular-nums text-app-kicker">{formatRupiah(balance)}</span> tersedia</p>
+              <p className="mt-3 text-[11px] leading-5 text-app-muted">Untuk saat ini, semua transaksi pembelian produk hanya dapat dibayar menggunakan saldo akun. Jika saldo belum cukup, silakan top up terlebih dahulu.</p>
             </div>
 
             <label className="mt-4 block">
-              <span className="text-xs font-black text-zinc-300">PIN Transaksi *</span>
+              <span className="text-xs font-black text-app-text">PIN Transaksi *</span>
               <input
                 type="password"
                 value={pin}
@@ -319,31 +319,31 @@ function CheckoutForm() {
                 autoComplete="off"
                 maxLength={6}
                 placeholder="6 digit PIN"
-                className="mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm tracking-[.4em] text-white outline-none transition placeholder:tracking-normal placeholder:text-zinc-500 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
+                className="mt-2 w-full rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm tracking-[.4em] text-app-text outline-none transition placeholder:tracking-normal placeholder:text-app-subtle focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
               />
-              <span className="mt-1 block text-[11px] text-zinc-500">Belum punya PIN? <a href="/settings" className="font-bold text-gold-400 underline">Buat di Pengaturan</a>.</span>
+              <span className="mt-1 block text-[11px] text-app-subtle">Belum punya PIN? <a href="/settings" className="font-bold text-app-kicker underline">Buat di Pengaturan</a>.</span>
             </label>
           </div>
         </div>
 
-        <aside className="h-fit rounded-[2rem] border border-zinc-800 bg-zinc-900 p-6 lg:sticky lg:top-24">
-          <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Ringkasan</p>
-          <p className="mt-3 truncate font-bold text-white">{product.name}</p>
+        <aside className="h-fit rounded-[2rem] border border-app-border bg-app-surface p-6 lg:sticky lg:top-24">
+          <p className="text-xs font-black uppercase tracking-widest text-app-subtle">Ringkasan</p>
+          <p className="mt-3 truncate font-bold text-app-text">{product.name}</p>
           <div className="mt-5 space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-zinc-400">Harga</span><b className="tabular-nums text-white">{formatRupiah(product.price)}</b></div>
-            <div className="flex justify-between"><span className="text-zinc-400">Jumlah</span><b className="tabular-nums text-white">{qty}</b></div>
-            <div className="flex justify-between border-t border-zinc-800 pt-3 text-lg"><span className="font-black text-white">Total</span><b className="tabular-nums text-gold-400">{formatRupiah(subtotal)}</b></div>
+            <div className="flex justify-between"><span className="text-app-muted">Harga</span><b className="tabular-nums text-app-text">{formatRupiah(product.price)}</b></div>
+            <div className="flex justify-between"><span className="text-app-muted">Jumlah</span><b className="tabular-nums text-app-text">{qty}</b></div>
+            <div className="flex justify-between border-t border-app-border pt-3 text-lg"><span className="font-black text-app-text">Total</span><b className="tabular-nums text-app-kicker">{formatRupiah(subtotal)}</b></div>
           </div>
 
-          <div className={`sticky bottom-[76px] z-30 -mx-6 -mb-6 mt-5 space-y-2 border-t border-zinc-800 bg-zinc-900/95 px-6 pb-5 pt-4 backdrop-blur lg:static lg:border-0 lg:bg-transparent lg:px-0 lg:pb-0 lg:pt-0 lg:backdrop-blur-none`}>
-            <div className={`rounded-2xl p-3 text-xs font-bold ${enoughBalance ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}>{enoughBalance ? "✓ Saldo mencukupi." : "Saldo kurang, silakan top up terlebih dahulu."}</div>
+          <div className={`sticky bottom-[76px] z-30 -mx-6 -mb-6 mt-5 space-y-2 border-t border-app-border bg-app-surface/95 px-6 pb-5 pt-4 backdrop-blur lg:static lg:border-0 lg:bg-transparent lg:px-0 lg:pb-0 lg:pt-0 lg:backdrop-blur-none`}>
+            <div className={`rounded-2xl p-3 text-xs font-bold ${enoughBalance ? "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400" : "bg-red-500/10 text-red-600 dark:text-red-400"}`}>{enoughBalance ? "✓ Saldo mencukupi." : "Saldo kurang, silakan top up terlebih dahulu."}</div>
             <button type="button" onClick={payWallet} disabled={confirming || !enoughBalance || (ppob?.service_kind === "postpaid" && !inquiryId)} className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-gold-300 disabled:cursor-not-allowed disabled:opacity-50">
               {confirming && <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" />}Bayar dengan Saldo
             </button>
-            {!enoughBalance && <button type="button" onClick={() => router.push(`/wallet/topup?amount=${encodeURIComponent(String(subtotal - balance))}`)} className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-zinc-700 px-4 py-3 text-sm font-black text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400">Top Up Saldo</button>}
+            {!enoughBalance && <button type="button" onClick={() => router.push(`/wallet/topup?amount=${encodeURIComponent(String(subtotal - balance))}`)} className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-app-border px-4 py-3 text-sm font-black text-app-text transition hover:border-gold-400/60 hover:text-app-kicker">Top Up Saldo</button>}
           </div>
 
-          <div className="mt-5 space-y-2 text-xs leading-5 text-zinc-500">
+          <div className="mt-5 space-y-2 text-xs leading-5 text-app-subtle">
             <p>🔒 Pembayaran saldo diproses instan & aman.</p>
             <p>📥 Produk digital yang lunas langsung tersedia di Pesanan.</p>
             <p>🚫 Tidak perlu upload bukti transfer atau menunggu approve admin.</p>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { ThemeProvider } from "next-themes";
 import Navbar from "@/components/Navbar";
 import ToastProvider from "@/components/ToastProvider";
 import WelcomeExperience from "@/components/WelcomeExperience";
@@ -37,13 +38,15 @@ export const metadata: Metadata = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const scanQrisEnabled = await isFeatureEnabled("scan_qris");
   return (
-    <html lang="id">
+    <html lang="id" suppressHydrationWarning>
       <body>
-        <ToastProvider>
-          <WelcomeExperience />
-          <Navbar scanQrisEnabled={scanQrisEnabled} />
-          <main className="mx-auto min-h-[calc(100vh-80px)] max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
-        </ToastProvider>
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <ToastProvider>
+            <WelcomeExperience />
+            <Navbar scanQrisEnabled={scanQrisEnabled} />
+            <main className="mx-auto min-h-[calc(100vh-80px)] max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -73,10 +73,10 @@ export default function PrintButton({ receiptText = "AIDIL STORE\nStruk Transaks
       <button type="button" onClick={() => window.print()} className="w-full rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-zinc-950 hover:bg-gold-300">
         🖨️ Cetak / Simpan PDF
       </button>
-      <button type="button" onClick={share} className="w-full rounded-xl border border-zinc-700 px-4 py-3 text-sm font-black text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400">
+      <button type="button" onClick={share} className="w-full rounded-xl border border-app-border px-4 py-3 text-sm font-black text-app-text transition hover:border-gold-400/60 hover:text-app-kicker">
         📤 Bagikan Struk
       </button>
-      {message && <p className="rounded-xl bg-gold-400/10 p-3 text-xs leading-5 text-gold-400">{message}</p>}
+      {message && <p className="rounded-xl bg-app-accent-soft p-3 text-xs leading-5 text-app-kicker">{message}</p>}
     </div>
   );
 }

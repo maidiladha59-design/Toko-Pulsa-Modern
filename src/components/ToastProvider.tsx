@@ -20,15 +20,15 @@ const ICONS: Record<ToastKind, string> = {
 };
 
 const ICON_STYLES: Record<ToastKind, string> = {
-  success: "bg-emerald-100 text-emerald-600",
-  error: "bg-red-100 text-red-600",
-  info: "bg-gold-100 text-gold-700",
+  success: "bg-emerald-100 text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300",
+  error: "bg-red-100 text-red-600 dark:bg-red-500/15 dark:text-red-300",
+  info: "bg-gold-100 text-gold-700 dark:bg-gold-400/15 dark:text-gold-300",
 };
 
 const BORDER_STYLES: Record<ToastKind, string> = {
-  success: "border-emerald-200",
-  error: "border-red-200",
-  info: "border-gold-200",
+  success: "border-emerald-200 dark:border-emerald-500/30",
+  error: "border-red-200 dark:border-red-500/30",
+  info: "border-gold-200 dark:border-gold-400/30",
 };
 
 export default function ToastProvider({ children }: { children: React.ReactNode }) {
@@ -63,7 +63,7 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
           <div
             key={t.id}
             role="status"
-            className={`toast-pop pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl border bg-white p-4 shadow-2xl shadow-zinc-950/15 ${
+            className={`toast-pop pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl border bg-app-surface p-4 shadow-2xl shadow-zinc-950/15 ${
               BORDER_STYLES[t.kind]
             } ${t.leaving ? "toast-pop-out" : ""}`}
           >
@@ -74,12 +74,12 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
             >
               {ICONS[t.kind]}
             </span>
-            <p className="flex-1 pt-1 text-sm font-bold leading-5 text-zinc-800">{t.message}</p>
+            <p className="flex-1 pt-1 text-sm font-bold leading-5 text-app-text">{t.message}</p>
             <button
               type="button"
               onClick={() => dismiss(t.id)}
               aria-label="Tutup notifikasi"
-              className="shrink-0 rounded-lg p-1 text-sm font-bold text-zinc-400 transition hover:bg-zinc-100 hover:text-zinc-700"
+              className="shrink-0 rounded-lg p-1 text-sm font-bold text-app-muted transition hover:bg-app-inset hover:text-app-text"
             >
               ✕
             </button>

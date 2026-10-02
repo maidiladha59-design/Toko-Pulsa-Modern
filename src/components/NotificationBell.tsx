@@ -43,9 +43,9 @@ export default function NotificationBell() {
 
   const body = (n: Notice) => (
     <>
-      <p className="text-sm font-black text-white">{n.title}</p>
-      {n.subtitle && <p className="mt-1 text-xs font-semibold text-zinc-400">{n.subtitle}</p>}
-      <p className="mt-1 text-xs leading-5 text-zinc-500">{n.message}</p>
+      <p className="text-sm font-black text-app-text">{n.title}</p>
+      {n.subtitle && <p className="mt-1 text-xs font-semibold text-app-muted">{n.subtitle}</p>}
+      <p className="mt-1 text-xs leading-5 text-app-subtle">{n.message}</p>
     </>
   );
 
@@ -53,7 +53,7 @@ export default function NotificationBell() {
     <div className="sm:relative">
       <button
         onClick={() => setOpen(!open)}
-        className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 text-lg text-zinc-300 transition hover:bg-zinc-800"
+        className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-surface text-lg text-app-muted transition hover:bg-app-inset"
       >
         🔔
         {unread > 0 && (
@@ -63,23 +63,23 @@ export default function NotificationBell() {
         )}
       </button>
       {open && (
-        <div className="absolute inset-x-3 top-full z-[80] mt-2 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-2xl shadow-black/50 sm:inset-x-auto sm:right-0 sm:w-[360px]">
-          <div className="flex items-center justify-between border-b border-zinc-800 px-4 py-3">
-            <p className="font-black text-white">Notifikasi</p>
-            <button onClick={readAll} className="text-xs font-bold text-gold-400">Tandai dibaca</button>
+        <div className="absolute inset-x-3 top-full z-[80] mt-2 overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-2xl sm:inset-x-auto sm:right-0 sm:w-[360px]">
+          <div className="flex items-center justify-between border-b border-app-border px-4 py-3">
+            <p className="font-black text-app-text">Notifikasi</p>
+            <button onClick={readAll} className="text-xs font-bold text-app-kicker">Tandai dibaca</button>
           </div>
           <div className="max-h-96 overflow-y-auto">
             {items.length === 0 ? (
-              <p className="p-5 text-sm text-zinc-400">Belum ada notifikasi.</p>
+              <p className="p-5 text-sm text-app-muted">Belum ada notifikasi.</p>
             ) : (
               items.slice(0, 12).map(n => (
-                <div key={n.id} className={`border-b border-zinc-800/60 px-4 py-3 ${n.is_read ? "" : "bg-gold-400/10"}`}>
+                <div key={n.id} className={`border-b border-app-border/60 px-4 py-3 ${n.is_read ? "" : "bg-gold-400/10"}`}>
                   {n.order_id ? (
                     <Link href={`/orders/${n.order_id}`} onClick={() => setOpen(false)} className="block">
                       {body(n)}
                     </Link>
                   ) : body(n)}
-                  <p className="mt-1 text-[10px] text-zinc-500">
+                  <p className="mt-1 text-[10px] text-app-subtle">
                     {new Date(n.created_at).toLocaleString("id-ID")}
                   </p>
                 </div>

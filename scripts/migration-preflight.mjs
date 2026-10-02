@@ -12,7 +12,7 @@ for (const file of files) {
   if (!byVersion.has(v)) byVersion.set(v, []);
   byVersion.get(v).push(file);
 }
-const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77];
+const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78];
 const missing = required.filter(v => !byVersion.has(v));
 const duplicateVersions = [...byVersion.entries()].filter(([, list]) => list.length > 1);
 const errors = [];
@@ -48,6 +48,7 @@ const checks = [
   ['v75', 'migrations_v75_wallet_transfer_qr.sql', ['transfer_settings', 'wallet_transfers', 'transfer_contacts', 'user_qr_tokens', 'create_wallet_transfer', 'resolve_qr_token', 'transfer.sent']],
   ['v76', 'migrations_v76_split_bill.sql', ['payment_requests', 'split_bills', 'split_bill_participants', 'create_split_bill', 'pay_split_bill_share', 'send_split_bill_reminder', 'splitbill.paid', 'splitbill.completed']],
   ['v77', 'migrations_v77_brand_media.sql', ['brand_media', 'brand_media_select_all', 'brand_media_admin_write', 'is_admin()']],
+  ['v78', 'migrations_v78_theme_preference.sql', ['user_app_settings', 'theme_preference', 'user_app_settings_theme_preference_check']],
 ];
 for (const [label, file, needles] of checks) {
   const p = path.join(dir, file);

@@ -92,10 +92,10 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
 
   if (!services.length) {
     return (
-      <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gold-400/10 text-3xl">📡</div>
-        <h2 className="mt-4 text-lg font-black text-white">Layanan belum tersedia</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-400">Admin perlu melakukan sinkronisasi SKU PPOB dan mengaktifkan produk terlebih dahulu.</p>
+      <div className="rounded-3xl border border-app-border bg-app-surface p-8 text-center">
+        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-app-accent-soft text-3xl">📡</div>
+        <h2 className="mt-4 text-lg font-black text-app-text">Layanan belum tersedia</h2>
+        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-app-muted">Admin perlu melakukan sinkronisasi SKU PPOB dan mengaktifkan produk terlebih dahulu.</p>
         <Link href="/" className="mt-5 inline-flex min-h-[44px] items-center rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-gold-300">Kembali ke Beranda</Link>
       </div>
     );
@@ -106,20 +106,20 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-2 rounded-2xl border border-zinc-800 bg-zinc-900 p-3 sm:flex-row sm:items-center">
+      <div className="flex flex-col gap-2 rounded-2xl border border-app-border bg-app-surface p-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-zinc-500">🔍</span>
+          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-app-subtle">🔍</span>
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Cari produk..."
-            className="w-full rounded-xl border border-zinc-800 bg-zinc-950 py-2.5 pl-9 pr-3 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
+            className="w-full rounded-xl border border-app-border bg-app-inset py-2.5 pl-9 pr-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
           />
         </div>
         <select
           value={sort}
           onChange={(e) => setSort(e.target.value as SortMode)}
-          className="rounded-xl border border-zinc-800 bg-zinc-950 px-3 py-2.5 text-sm font-bold text-zinc-100 outline-none transition focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
+          className="rounded-xl border border-app-border bg-app-inset px-3 py-2.5 text-sm font-bold text-app-text outline-none transition focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
         >
           <option value="default">Urutkan: Default</option>
           <option value="price-asc">Harga: Termurah</option>
@@ -134,8 +134,8 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
       )}
 
       {grouped.map(([brand, items]) => (
-        <section key={brand} className="overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
-          <div className="flex items-center gap-3 border-b border-zinc-800 bg-zinc-950 px-4 py-3">
+        <section key={brand} className="overflow-hidden rounded-2xl border border-app-border bg-app-surface">
+          <div className="flex items-center gap-3 border-b border-app-border bg-app-inset px-4 py-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gold-400 text-base text-zinc-950">
               {logoMap[brand.trim().toLowerCase()] ? (
                 <img src={logoMap[brand.trim().toLowerCase()]} alt={`Logo ${brand}`} className="h-full w-full object-cover" />
@@ -144,12 +144,12 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
               )}
             </div>
             <div className="min-w-0">
-              <h3 className="truncate text-sm font-black text-white">{brand}</h3>
-              <p className="text-[10px] font-bold uppercase tracking-wide text-gold-400/80">{items.length} produk tersedia</p>
+              <h3 className="truncate text-sm font-black text-app-text">{brand}</h3>
+              <p className="text-[10px] font-bold uppercase tracking-wide text-app-kicker/80">{items.length} produk tersedia</p>
             </div>
           </div>
 
-          <div className="divide-y divide-zinc-800">
+          <div className="divide-y divide-app-border">
             {items.map((service) => {
               const p = service.product;
               if (!p) return null;
@@ -157,26 +157,26 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
                 <Link
                   key={service.id}
                   href={`/checkout?product=${encodeURIComponent(p.id)}&qty=1`}
-                  className="group flex items-center gap-3 px-4 py-3.5 transition hover:bg-white/5 active:bg-white/10"
+                  className="group flex items-center gap-3 px-4 py-3.5 transition hover:bg-app-inset active:bg-app-accent-soft"
                 >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-zinc-950 text-lg">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-app-inset text-lg">
                     {p.thumbnail_url ? (
                       <img src={p.thumbnail_url} alt={p.name} className="h-full w-full object-cover" />
                     ) : (
-                      <span className="text-gold-400">{fallbackIcon}</span>
+                      <span className="text-app-kicker">{fallbackIcon}</span>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-white">{p.name}</p>
-                    <p className="mt-0.5 text-[11px] font-bold uppercase tracking-wide text-zinc-500">
+                    <p className="truncate text-sm font-bold text-app-text">{p.name}</p>
+                    <p className="mt-0.5 text-[11px] font-bold uppercase tracking-wide text-app-subtle">
                       {service.service_kind === "postpaid" ? "Pascabayar" : "Prabayar"}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
-                    <span className="text-sm font-black tabular-nums text-gold-400">
+                    <span className="text-sm font-black tabular-nums text-app-kicker">
                       {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(p.price)}
                     </span>
-                    <span className="text-gold-400 transition group-hover:translate-x-0.5">›</span>
+                    <span className="text-app-kicker transition group-hover:translate-x-0.5">›</span>
                   </div>
                 </Link>
               );

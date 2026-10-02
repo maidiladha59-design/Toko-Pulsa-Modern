@@ -71,12 +71,12 @@ export default async function WalletPage() {
       </section>
 
       {pendingTopups && pendingTopups.length > 0 && (
-        <section className="mt-4 rounded-2xl border border-gold-400/25 bg-gold-400/10 p-4">
-          <p className="text-sm font-black text-gold-400">Top Up dalam proses</p>
+        <section className="mt-4 rounded-2xl border border-gold-400/25 bg-app-accent-soft p-4">
+          <p className="text-sm font-black text-app-kicker">Top Up dalam proses</p>
           <ul className="mt-2 space-y-2">
             {pendingTopups.map((t) => (
               <li key={t.id} className="flex items-center justify-between gap-3 text-sm">
-                <span className="tabular-nums text-zinc-200">{formatRupiah(t.amount)} — {formatDate(t.created_at)}</span>
+                <span className="tabular-nums text-app-text">{formatRupiah(t.amount)} — {formatDate(t.created_at)}</span>
                 <StatusBadge status={t.status} />
               </li>
             ))}
@@ -85,26 +85,26 @@ export default async function WalletPage() {
       )}
 
       <section className="mt-8">
-        <p className="text-[10px] font-black uppercase tracking-[.18em] text-gold-600">Aktivitas</p>
-        <h2 className="mt-1 text-base font-black text-white">Riwayat Saldo</h2>
+        <p className="text-[10px] font-black uppercase tracking-[.18em] text-app-kicker">Aktivitas</p>
+        <h2 className="mt-1 text-base font-black text-app-text">Riwayat Saldo</h2>
       </section>
-      <div className="mt-3 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
+      <div className="mt-3 overflow-hidden rounded-2xl border border-app-border bg-app-surface">
         {history && history.length > 0 ? (
-          <ul className="divide-y divide-zinc-800">
+          <ul className="divide-y divide-app-border">
             {history.map((h) => (
               <li key={h.id} className="flex items-center gap-3 px-4 py-3.5">
-                <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950 text-base">
+                <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-inset text-base">
                   {TX_ICON[h.type] || "💳"}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-bold text-white">{TX_LABEL[h.type] || h.type}</p>
-                  <p className="mt-0.5 truncate text-xs text-zinc-500">{h.description || "-"} · {formatDate(h.created_at)}</p>
+                  <p className="truncate text-sm font-bold text-app-text">{TX_LABEL[h.type] || h.type}</p>
+                  <p className="mt-0.5 truncate text-xs text-app-subtle">{h.description || "-"} · {formatDate(h.created_at)}</p>
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className={`text-sm font-black tabular-nums ${h.amount >= 0 ? "text-emerald-400" : "text-red-400"}`}>
+                  <p className={`text-sm font-black tabular-nums ${h.amount >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
                     {h.amount >= 0 ? "+" : ""}{formatRupiah(h.amount)}
                   </p>
-                  <p className="mt-0.5 text-xs tabular-nums text-zinc-500">Saldo: {formatRupiah(h.balance_after)}</p>
+                  <p className="mt-0.5 text-xs tabular-nums text-app-subtle">Saldo: {formatRupiah(h.balance_after)}</p>
                 </div>
               </li>
             ))}
@@ -112,8 +112,8 @@ export default async function WalletPage() {
         ) : (
           <div className="px-4 py-12 text-center">
             <p aria-hidden className="text-3xl">🪙</p>
-            <p className="mt-2 text-sm font-bold text-zinc-300">Belum ada riwayat</p>
-            <p className="mt-1 text-xs text-zinc-500">Riwayat saldo Anda akan muncul di sini.</p>
+            <p className="mt-2 text-sm font-bold text-app-text">Belum ada riwayat</p>
+            <p className="mt-1 text-xs text-app-subtle">Riwayat saldo Anda akan muncul di sini.</p>
           </div>
         )}
       </div>

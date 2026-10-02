@@ -58,7 +58,7 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
   }
 
   return (
-    <div className="fixed inset-0 z-[100] overflow-y-auto bg-[#f4f4f4] print:static print:overflow-visible print:bg-white">
+    <div className="fixed inset-0 z-[100] overflow-y-auto bg-app-bg print:static print:overflow-visible print:bg-white">
       <main
         className="mx-auto max-w-md animate-page-in pb-8 print:max-w-none print:pb-0"
         style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}
@@ -115,11 +115,11 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
               🖨️ Cetak / Simpan PDF
             </button>
           </div>
-          <button type="button" onClick={share} className="w-full rounded-xl border border-gold-300 px-4 py-3 text-sm font-black text-zinc-800 hover:bg-gold-50">
+          <button type="button" onClick={share} className="w-full rounded-xl border border-app-border px-4 py-3 text-sm font-black text-app-text transition hover:border-gold-400/60 hover:bg-app-accent-soft">
             📤 Bagikan Struk
           </button>
           {message && (
-            <p className={`rounded-xl px-4 py-3 text-xs font-bold leading-5 ${message.ok ? "bg-gold-50 text-zinc-900" : "bg-red-50 text-red-700"}`}>
+            <p className={`rounded-xl px-4 py-3 text-xs font-bold leading-5 ${message.ok ? "bg-app-accent-soft text-app-text" : "bg-red-500/10 text-red-600 dark:text-red-400"}`}>
               {message.text}
             </p>
           )}

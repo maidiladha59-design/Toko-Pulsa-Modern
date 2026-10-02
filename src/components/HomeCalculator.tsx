@@ -72,7 +72,7 @@ export default function HomeCalculator() {
   }
 
   return <section className="brand-card p-5 sm:p-7">
-    <div className="mb-4"><p className="section-kicker">Alat Praktis</p><h2 className="section-title">🧮 Kalkulator</h2><p className="mt-1 text-xs text-slate-500">Hitung nominal top up, transaksi, atau kebutuhan sehari-hari.</p></div>
+    <div className="mb-4"><p className="section-kicker">Alat Praktis</p><h2 className="section-title">🧮 Kalkulator</h2><p className="mt-1 text-xs text-app-subtle">Hitung nominal top up, transaksi, atau kebutuhan sehari-hari.</p></div>
     <div className="mx-auto max-w-sm overflow-hidden rounded-3xl border bg-black p-3 shadow-lg">
       <div className="min-h-24 rounded-2xl bg-zinc-950 p-4 text-right"><p className="min-h-7 break-all text-sm text-white/50">{display || '0'}</p><p className="mt-2 min-h-9 break-all text-2xl font-black text-white">{result || ''}</p></div>
       <div className="mt-3 grid grid-cols-4 gap-2">{keys.map((key) => <button key={key} onClick={() => press(key)} className={`h-12 rounded-xl font-black transition active:scale-95 ${key === '=' ? 'bg-yellow-400 text-black' : key === 'C' ? 'bg-red-100 text-red-700' : 'bg-white/10 text-white hover:bg-white/20'}`}>{key}</button>)}</div>

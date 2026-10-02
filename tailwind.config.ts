@@ -2,10 +2,23 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
+  darkMode: "class",
   theme: {
     extend: {
       colors: {
         navy: "#09090b",
+        app: {
+          bg: "rgb(var(--app-bg) / <alpha-value>)",
+          surface: "rgb(var(--app-surface) / <alpha-value>)",
+          inset: "rgb(var(--app-inset) / <alpha-value>)",
+          border: "rgb(var(--app-border) / <alpha-value>)",
+          text: "rgb(var(--app-text) / <alpha-value>)",
+          muted: "rgb(var(--app-muted) / <alpha-value>)",
+          subtle: "rgb(var(--app-subtle) / <alpha-value>)",
+          accent: "rgb(var(--app-accent) / <alpha-value>)",
+          "accent-soft": "rgb(var(--app-accent-soft) / <alpha-value>)",
+          kicker: "rgb(var(--app-kicker) / <alpha-value>)",
+        },
         brand: {
           DEFAULT: "#F5C542",
           dark: "#B8941F",

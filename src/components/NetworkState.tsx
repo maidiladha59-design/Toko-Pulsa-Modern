@@ -10,19 +10,19 @@
 export function NetworkSkeleton({ rows = 4, className = "" }: { rows?: number; className?: string }) {
   return (
     <div
-      className={`rounded-2xl border border-zinc-800 bg-zinc-900 p-4 ${className}`}
+      className={`rounded-2xl border border-app-border bg-app-surface p-4 ${className}`}
       aria-busy="true"
       aria-live="polite"
     >
       <div className="space-y-3">
         {Array.from({ length: rows }).map((_, i) => (
           <div key={i} className="flex items-center gap-3">
-            <div className="h-11 w-11 shrink-0 animate-pulse rounded-xl bg-zinc-800" />
+            <div className="h-11 w-11 shrink-0 animate-pulse rounded-xl bg-app-inset" />
             <div className="min-w-0 flex-1 space-y-2">
-              <div className="h-3.5 w-2/5 animate-pulse rounded bg-zinc-800" />
-              <div className="h-3 w-1/4 animate-pulse rounded bg-zinc-800/70" />
+              <div className="h-3.5 w-2/5 animate-pulse rounded bg-app-inset" />
+              <div className="h-3 w-1/4 animate-pulse rounded bg-app-inset/70" />
             </div>
-            <div className="h-3.5 w-20 shrink-0 animate-pulse rounded bg-zinc-800/70" />
+            <div className="h-3.5 w-20 shrink-0 animate-pulse rounded bg-app-inset/70" />
           </div>
         ))}
       </div>
@@ -41,14 +41,14 @@ export function NetworkError({
 }) {
   return (
     <div
-      className="rounded-3xl border border-dashed border-zinc-700 bg-zinc-900 p-8 text-center"
+      className="rounded-3xl border border-dashed border-app-border bg-app-surface p-8 text-center"
       role="alert"
     >
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gold-400/10 text-3xl">
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-app-accent-soft text-3xl">
         📡
       </div>
-      <h2 className="mt-4 text-lg font-black text-white">{title}</h2>
-      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-zinc-400">{description}</p>
+      <h2 className="mt-4 text-lg font-black text-app-text">{title}</h2>
+      <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-app-muted">{description}</p>
       {onRetry && (
         <button
           onClick={onRetry}
@@ -69,9 +69,9 @@ export function NetworkEmpty({
   description?: string;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-zinc-700 bg-zinc-900/50 py-12 text-center">
-      <p className="text-base font-medium text-zinc-300">{title}</p>
-      {description && <p className="mt-1 text-sm text-zinc-500">{description}</p>}
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-app-border bg-app-surface/50 py-12 text-center">
+      <p className="text-base font-medium text-app-text">{title}</p>
+      {description && <p className="mt-1 text-sm text-app-subtle">{description}</p>}
     </div>
   );
 }
