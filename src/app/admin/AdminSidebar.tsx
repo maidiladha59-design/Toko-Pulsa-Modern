@@ -33,6 +33,7 @@ const MENU = [
   ["/admin/ppob", "⚡", "PPOB"],
   ["/admin/ppob/monitoring", "📡", "Monitoring PPOB"],
   ["/admin/ppob/health", "🩺", "Provider Health"],
+  ["/admin/brand-media", "🖼️", "Logo Brand"],
 ] as const;
 
 export default function AdminSidebar() {

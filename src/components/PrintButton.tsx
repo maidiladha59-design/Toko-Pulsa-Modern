@@ -66,17 +66,17 @@ export default function PrintButton({ receiptText = "AIDIL STORE\nStruk Transaks
         type="button"
         disabled={busy}
         onClick={connectAndPrint}
-        className={`w-full rounded-xl px-4 py-3 text-sm font-black ${busy ? "animate-pulse bg-gold-100 text-zinc-900" : "bg-zinc-950 text-gold-400"}`}
+        className={`w-full rounded-xl px-4 py-3 text-sm font-black ${busy ? "animate-pulse bg-gold-400/50 text-zinc-950" : "border border-zinc-700 bg-zinc-950 text-gold-400 hover:border-gold-400/60"}`}
       >
         {busy ? "Menghubungkan..." : bluetooth ? "✓ Cetak Bluetooth Berhasil" : "🖨️ Cetak via Bluetooth"}
       </button>
-      <button type="button" onClick={() => window.print()} className="w-full rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-black hover:bg-gold-300">
+      <button type="button" onClick={() => window.print()} className="w-full rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-zinc-950 hover:bg-gold-300">
         🖨️ Cetak / Simpan PDF
       </button>
-      <button type="button" onClick={share} className="w-full rounded-xl border border-gold-300 px-4 py-3 text-sm font-black text-zinc-800 hover:bg-gold-50">
+      <button type="button" onClick={share} className="w-full rounded-xl border border-zinc-700 px-4 py-3 text-sm font-black text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400">
         📤 Bagikan Struk
       </button>
-      {message && <p className="rounded-xl bg-gold-50 p-3 text-xs leading-5 text-zinc-950">{message}</p>}
+      {message && <p className="rounded-xl bg-gold-400/10 p-3 text-xs leading-5 text-gold-400">{message}</p>}
     </div>
   );
 }

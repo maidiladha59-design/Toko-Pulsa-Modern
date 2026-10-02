@@ -67,6 +67,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
   const costMap = new Map((services || []).map((s) => [s.product_id, Number(s.cost_price || 0)]));
 
   return (
+    <div className="customer-shell">
     <main className="mx-auto max-w-md animate-page-in pb-8 print:max-w-none print:pb-0" style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}>
       <div className="no-print flex items-center justify-between rounded-t-3xl bg-zinc-950 px-5 pb-5 pt-4 text-gold-400">
         <Link href={`/orders/${order.id}`} aria-label="Kembali" className="text-2xl font-black leading-none">←</Link>
@@ -145,5 +146,6 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
         />
       </div>
     </main>
+    </div>
   );
 }

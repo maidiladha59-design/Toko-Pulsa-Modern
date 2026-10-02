@@ -73,98 +73,100 @@ export default async function OrderDetailPage({ params }: { params: { id: string
     : null;
 
   return (
-    <div className="mx-auto max-w-4xl animate-page-in">
-      <div className="mb-6 flex items-center gap-3">
-        <img src="/aidil-logo.png" alt="Aidil Store" className="h-12 w-12 rounded-2xl object-cover shadow-lg" />
-        <div><p className="text-xs font-black uppercase tracking-[.2em] text-amber-600">AIDIL STORE</p><h1 className="text-2xl font-black">Pesanan {order.order_number}</h1><p className="text-sm text-slate-500">{formatDate(order.created_at)}</p></div>
-      </div>
-
-      <div className="grid gap-5 lg:grid-cols-[1fr_330px]">
-        <div className="space-y-4">
-          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <div className="flex flex-wrap items-center justify-between gap-3"><StatusBadge status={order.status} /><p className="text-sm font-medium text-slate-500">{ORDER_MESSAGE[order.status]}</p></div>
-          </div>
-
-          {showGateway && (
-            <GatewayPayment
-              orderId={order.id}
-              paymentMethod={order.payment_method as "QRIS" | "BANK_VA"}
-              gatewayMethod={order.gateway_method || "qris"}
-              paymentNumber={order.payment_number as string}
-              qrisImage={qrisImage}
-              amount={Number(order.gateway_total_payment || order.total_amount)}
-              expiredAt={order.qris_expired_at as string}
-            />
-          )}
-
-          {ppobTransactions && ppobTransactions.length > 0 && (
-            <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold-100 bg-gold-50 p-4">
-              <div><p className="font-black text-zinc-950">🧾 Struk Transaksi</p><p className="mt-1 text-xs text-gold-700">Nomor tujuan, status, dan kode SN tersedia di struk.</p></div>
-              <div><PPOBReceiptButton orderId={order.id} />{ppobTransactions.some((tx) => ["WAITING", "PROCESSING"].includes(tx.status)) && <PPOBStatusPoller active />}</div>
-            </div>
-          )}
-
-          <div className="space-y-3">
-            {items?.map((item) => (
-              <div key={item.id} className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-                <div className="flex justify-between gap-4"><p className="font-black text-slate-900">{item.product_name}</p><p className="font-bold">{formatRupiah(item.subtotal)}</p></div>
-                <p className="mt-1 text-sm text-slate-500">{item.quantity} × {formatRupiah(item.unit_price)}</p>
-
-                {order.status === "COMPLETED" && (item.products as any)?.product_type === "digital" && (
-                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-emerald-50 p-4 text-emerald-800">
-                    <div><p className="font-black">✓ Produk siap diambil</p><p className="text-xs">Link download dibuat aman dan sementara.</p></div>
-                    <DownloadButton productId={item.product_id} />
-                  </div>
-                )}
-
-                {ppobTxMap.has(item.id) && (() => {
-                  const tx = ppobTxMap.get(item.id);
-                  const target = ppobTargetMap.get(item.id);
-                  const cost = item.product_id ? ppobCostMap.get(item.product_id) : undefined;
-                  const hargaJual = Number(item.subtotal);
-                  const untung = cost !== undefined ? Math.max(0, hargaJual - cost * item.quantity) : null;
-                  return (
-                    <div className="mt-4 rounded-2xl bg-gold-50 p-4 text-zinc-950">
-                      <div className="flex items-center justify-between gap-3"><p className="font-black">⚡ Rincian Transaksi</p></div>
-                      <div className="mt-3 space-y-1.5 text-sm">
-                        <div className="flex justify-between"><span className="text-slate-500">Nomor Pelanggan</span><b>{target?.customer_no || tx?.customer_no || "-"}</b></div>
-                        <div className="flex justify-between"><span className="text-slate-500">Status</span><b>{tx?.status}</b></div>
-                        <div className="flex justify-between"><span className="text-slate-500">Harga Jual</span><b>{formatRupiah(hargaJual)}</b></div>
-                    
-                      </div>
-                      {tx?.serial_number && <div className="mt-3 rounded-xl bg-white p-3"><p className="text-[10px] font-black uppercase tracking-wider text-slate-400">SN/Ref</p><p className="mt-1 break-all font-black">{tx.serial_number}</p></div>}
-                      {tx?.provider_message && tx.status !== "SUCCESS" && <p className="mt-2 text-xs text-slate-600">{tx.provider_message}</p>}
-                    </div>
-                  );
-                })()}
-
-                {(item.products as any)?.product_type === "jasa" && (
-                  <div className="mt-4 rounded-2xl bg-amber-50 p-4 text-amber-800">
-                    <p className="font-black">🎯 Status jasa: {order.status === "PROCESSING" ? "sedang dikerjakan" : order.status === "COMPLETED" ? "selesai" : "menunggu diproses"}</p>
-                    {submission?.target_text && <p className="mt-2 text-xs">Target: {submission.target_text}</p>}
-                    {submission?.target_file_path && <p className="mt-1 text-xs">📎 File target sudah dikirim.</p>}
-                    <a href="/bantuan" className="mt-2 inline-block text-xs font-bold underline">Butuh bantuan terkait pesanan ini?</a>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+    <div className="customer-shell">
+      <div className="mx-auto w-full max-w-[480px] animate-page-in lg:max-w-4xl">
+        <div className="mb-6 flex items-center gap-3">
+          <img src="/aidil-logo.png" alt="Aidil Store" className="h-12 w-12 rounded-2xl object-cover shadow-lg" />
+          <div><p className="text-xs font-black uppercase tracking-[.2em] text-gold-600">AIDIL STORE</p><h1 className="text-2xl font-black text-white">Pesanan {order.order_number}</h1><p className="text-sm text-zinc-400">{formatDate(order.created_at)}</p></div>
         </div>
 
-        <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-5 shadow-sm lg:sticky lg:top-24">
-          <p className="text-xs font-black uppercase tracking-widest text-slate-400">Rincian Transaksi</p>
-          <div className="mt-4 space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-slate-500">Tanggal</span><b>{formatDate(order.created_at)}</b></div>
-            <div className="flex justify-between gap-3"><span className="shrink-0 text-slate-500">ID Pesanan</span><b className="break-all text-right">{order.order_number}</b></div>
-            {order.gateway_txn_id && <div className="flex justify-between gap-3"><span className="shrink-0 text-slate-500">ID Transaksi Gateway</span><b className="break-all text-right text-xs">{order.gateway_txn_id}</b></div>}
-            <div className="flex justify-between"><span className="text-slate-500">Metode</span><b>{order.payment_method === "BANK_VA" ? (bankNames[order.gateway_method || ""] || "Virtual Account") : order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method || "Wallet"}</b></div>
-            <div className="flex justify-between"><span className="text-slate-500">Status</span><StatusBadge status={order.status} /></div>
-            <div className="border-t border-slate-100 pt-4 flex justify-between"><span className="text-slate-500">Subtotal produk</span><b>{formatRupiah(order.total_amount)}</b></div>
-            {order.gateway_fee ? <div className="flex justify-between"><span className="text-slate-500">Biaya gateway</span><b>{formatRupiah(order.gateway_fee)}</b></div> : null}
-            <div className="flex justify-between text-lg"><span className="font-black">Total dibayar</span><b className="text-gold-600">{formatRupiah(order.gateway_total_payment || order.total_amount)}</b></div>
+        <div className="grid gap-5 lg:grid-cols-[1fr_330px]">
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3"><StatusBadge status={order.status} /><p className="text-sm font-medium text-zinc-400">{ORDER_MESSAGE[order.status]}</p></div>
+            </div>
+
+            {showGateway && (
+              <GatewayPayment
+                orderId={order.id}
+                paymentMethod={order.payment_method as "QRIS" | "BANK_VA"}
+                gatewayMethod={order.gateway_method || "qris"}
+                paymentNumber={order.payment_number as string}
+                qrisImage={qrisImage}
+                amount={Number(order.gateway_total_payment || order.total_amount)}
+                expiredAt={order.qris_expired_at as string}
+              />
+            )}
+
+            {ppobTransactions && ppobTransactions.length > 0 && (
+              <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold-400/25 bg-gold-400/10 p-4">
+                <div><p className="font-black text-white">🧾 Struk Transaksi</p><p className="mt-1 text-xs text-gold-400/80">Nomor tujuan, status, dan kode SN tersedia di struk.</p></div>
+                <div><PPOBReceiptButton orderId={order.id} />{ppobTransactions.some((tx) => ["WAITING", "PROCESSING"].includes(tx.status)) && <PPOBStatusPoller active />}</div>
+              </div>
+            )}
+
+            <div className="space-y-3">
+              {items?.map((item) => (
+                <div key={item.id} className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
+                  <div className="flex justify-between gap-4"><p className="font-black text-white">{item.product_name}</p><p className="font-bold tabular-nums text-white">{formatRupiah(item.subtotal)}</p></div>
+                  <p className="mt-1 text-sm tabular-nums text-zinc-500">{item.quantity} × {formatRupiah(item.unit_price)}</p>
+
+                  {order.status === "COMPLETED" && (item.products as any)?.product_type === "digital" && (
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-emerald-500/10 p-4 text-emerald-400">
+                      <div><p className="font-black">✓ Produk siap diambil</p><p className="text-xs text-emerald-400/80">Link download dibuat aman dan sementara.</p></div>
+                      <DownloadButton productId={item.product_id} />
+                    </div>
+                  )}
+
+                  {ppobTxMap.has(item.id) && (() => {
+                    const tx = ppobTxMap.get(item.id);
+                    const target = ppobTargetMap.get(item.id);
+                    const cost = item.product_id ? ppobCostMap.get(item.product_id) : undefined;
+                    const hargaJual = Number(item.subtotal);
+                    const untung = cost !== undefined ? Math.max(0, hargaJual - cost * item.quantity) : null;
+                    return (
+                      <div className="mt-4 rounded-2xl border border-gold-400/25 bg-gold-400/10 p-4">
+                        <div className="flex items-center justify-between gap-3"><p className="font-black text-white">⚡ Rincian Transaksi</p></div>
+                        <div className="mt-3 space-y-1.5 text-sm">
+                          <div className="flex justify-between gap-3"><span className="text-zinc-400">Nomor Pelanggan</span><b className="text-white">{target?.customer_no || tx?.customer_no || "-"}</b></div>
+                          <div className="flex justify-between gap-3"><span className="text-zinc-400">Status</span><b className="text-white">{tx?.status}</b></div>
+                          <div className="flex justify-between gap-3"><span className="text-zinc-400">Harga Jual</span><b className="tabular-nums text-white">{formatRupiah(hargaJual)}</b></div>
+
+                        </div>
+                        {tx?.serial_number && <div className="mt-3 rounded-xl bg-zinc-950 p-3"><p className="text-[10px] font-black uppercase tracking-wider text-zinc-500">SN/Ref</p><p className="mt-1 break-all font-black text-gold-400">{tx.serial_number}</p></div>}
+                        {tx?.provider_message && tx.status !== "SUCCESS" && <p className="mt-2 text-xs text-zinc-400">{tx.provider_message}</p>}
+                      </div>
+                    );
+                  })()}
+
+                  {(item.products as any)?.product_type === "jasa" && (
+                    <div className="mt-4 rounded-2xl border border-gold-400/25 bg-gold-400/10 p-4 text-gold-400">
+                      <p className="font-black">🎯 Status jasa: {order.status === "PROCESSING" ? "sedang dikerjakan" : order.status === "COMPLETED" ? "selesai" : "menunggu diproses"}</p>
+                      {submission?.target_text && <p className="mt-2 text-xs text-gold-400/80">Target: {submission.target_text}</p>}
+                      {submission?.target_file_path && <p className="mt-1 text-xs text-gold-400/80">📎 File target sudah dikirim.</p>}
+                      <a href="/bantuan" className="mt-2 inline-block text-xs font-bold underline">Butuh bantuan terkait pesanan ini?</a>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
-          {order.status === "COMPLETED" && <div className="mt-5 rounded-2xl bg-emerald-50 p-4 text-xs font-bold text-emerald-700">📥 Produk digital yang tersedia sudah bisa diambil dari kartu produk di atas.</div>}
-        </aside>
+
+          <aside className="h-fit rounded-2xl border border-zinc-800 bg-zinc-900 p-5 lg:sticky lg:top-24">
+            <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Rincian Transaksi</p>
+            <div className="mt-4 space-y-3 text-sm">
+              <div className="flex justify-between gap-3"><span className="text-zinc-500">Tanggal</span><b className="text-white">{formatDate(order.created_at)}</b></div>
+              <div className="flex justify-between gap-3"><span className="shrink-0 text-zinc-500">ID Pesanan</span><b className="break-all text-right text-white">{order.order_number}</b></div>
+              {order.gateway_txn_id && <div className="flex justify-between gap-3"><span className="shrink-0 text-zinc-500">ID Transaksi Gateway</span><b className="break-all text-right text-xs text-white">{order.gateway_txn_id}</b></div>}
+              <div className="flex justify-between gap-3"><span className="text-zinc-500">Metode</span><b className="text-right text-white">{order.payment_method === "BANK_VA" ? (bankNames[order.gateway_method || ""] || "Virtual Account") : order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method || "Wallet"}</b></div>
+              <div className="flex justify-between"><span className="text-zinc-500">Status</span><StatusBadge status={order.status} /></div>
+              <div className="flex justify-between border-t border-zinc-800 pt-4"><span className="text-zinc-500">Subtotal produk</span><b className="tabular-nums text-white">{formatRupiah(order.total_amount)}</b></div>
+              {order.gateway_fee ? <div className="flex justify-between"><span className="text-zinc-500">Biaya gateway</span><b className="tabular-nums text-white">{formatRupiah(order.gateway_fee)}</b></div> : null}
+              <div className="flex justify-between text-lg"><span className="font-black text-white">Total dibayar</span><b className="tabular-nums text-gold-400">{formatRupiah(order.gateway_total_payment || order.total_amount)}</b></div>
+            </div>
+            {order.status === "COMPLETED" && <div className="mt-5 rounded-2xl bg-emerald-500/10 p-4 text-xs font-bold text-emerald-400">📥 Produk digital yang tersedia sudah bisa diambil dari kartu produk di atas.</div>}
+          </aside>
+        </div>
       </div>
     </div>
   );

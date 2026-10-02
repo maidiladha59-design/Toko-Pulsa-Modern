@@ -50,58 +50,59 @@ export default function Referral() {
 
   if (err) {
     return (
-      <div className="mx-auto max-w-lg rounded-3xl bg-white p-8">
-        <p className="font-black text-red-700">Gagal memuat referral.</p>
-        <p className="mt-1 text-sm text-slate-500">{err}</p>
-      </div>
+      <div className="customer-shell"><div className="mx-auto w-full max-w-[480px]">
+      <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8">
+        <p className="font-black text-red-400">Gagal memuat referral.</p>
+        <p className="mt-1 text-sm text-zinc-500">{err}</p>
+      </div></div></div>
     );
   }
 
-  if (!d) return <div className="mx-auto max-w-lg rounded-3xl bg-white p-8">Memuat referral...</div>;
+  if (!d) return <div className="customer-shell"><div className="mx-auto w-full max-w-[480px]"><div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8 text-sm text-zinc-400">Memuat referral...</div></div></div>;
 
   const link = typeof window !== "undefined" ? `${window.location.origin}/register?ref=${d.r.code}` : `/register?ref=${d.r.code}`;
 
   return (
-    <div className="mx-auto max-w-2xl space-y-4">
-      <div className="rounded-3xl bg-slate-950 p-6 text-white">
-        <p className="text-xs font-black uppercase tracking-widest text-amber-300">Undang Teman</p>
-        <h1 className="mt-2 text-3xl font-black">Ajak 20 teman, bonus Rp5.000</h1>
-        <p className="mt-2 text-sm text-white/60">Teman harus mendaftar melalui link kamu dan menyelesaikan transaksi agar dihitung.</p>
+    <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] space-y-4 animate-page-in lg:max-w-2xl">
+      <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-6">
+        <p className="text-xs font-black uppercase tracking-[.18em] text-gold-400">Undang Teman</p>
+        <h1 className="mt-2 text-3xl font-black text-white">Ajak 20 teman, bonus Rp5.000</h1>
+        <p className="mt-2 text-sm text-zinc-400">Teman harus mendaftar melalui link kamu dan menyelesaikan transaksi agar dihitung.</p>
       </div>
 
-      <div className="rounded-3xl border bg-white p-5">
-        <p className="text-sm font-bold">Kode referral</p>
+      <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-5">
+        <p className="text-sm font-bold text-white">Kode referral</p>
         <div className="mt-2 flex gap-2">
-          <input readOnly value={d.r.code} className="flex-1 rounded-xl border bg-slate-50 p-3 font-black" />
-          <button onClick={() => navigator.clipboard.writeText(link)} className="rounded-xl bg-slate-950 px-4 text-sm font-black text-white">
+          <input readOnly value={d.r.code} className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 p-3 font-black tracking-widest text-gold-400 outline-none" />
+          <button onClick={() => navigator.clipboard.writeText(link)} className="min-h-[44px] rounded-xl bg-gold-400 px-4 text-sm font-black text-zinc-950 transition hover:bg-gold-300">
             Salin Link
           </button>
         </div>
-        <p className="mt-2 break-all text-xs text-slate-400">{link}</p>
-        <div className="mt-5 h-3 overflow-hidden rounded-full bg-slate-100">
-          <div className="h-full bg-amber-400" style={{ width: `${Math.min(100, ((d.rw?.qualified_count || 0) / 20) * 100)}%` }} />
+        <p className="mt-2 break-all text-xs text-zinc-500">{link}</p>
+        <div className="mt-5 h-3 overflow-hidden rounded-full bg-zinc-800">
+          <div className="h-full bg-gold-400" style={{ width: `${Math.min(100, ((d.rw?.qualified_count || 0) / 20) * 100)}%` }} />
         </div>
-        <p className="mt-2 text-sm font-black">{d.rw?.qualified_count || 0}/20 teman memenuhi syarat</p>
-        <p className="mt-1 text-xs text-slate-500">
-          Hadiah: {formatRupiah(d.rw?.reward_amount || 5000)} {d.rw?.claimed_at ? "• Sudah cair" : ""}
+        <p className="mt-2 text-sm font-black tabular-nums text-white">{d.rw?.qualified_count || 0}/20 teman memenuhi syarat</p>
+        <p className="mt-1 text-xs text-zinc-500">
+          Hadiah: <span className="font-bold tabular-nums text-gold-400">{formatRupiah(d.rw?.reward_amount || 5000)}</span> {d.rw?.claimed_at ? "• Sudah cair" : ""}
         </p>
       </div>
 
-      <div className="rounded-3xl border bg-white p-5">
-        <h2 className="font-black">Riwayat referral</h2>
+      <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-5">
+        <h2 className="font-black text-white">Riwayat referral</h2>
         <div className="mt-3 space-y-2">
           {d.u.length ? (
             d.u.map((x: any) => (
-              <div key={x.referred_user_id} className="rounded-xl bg-slate-50 p-3 text-xs">
-                <b>{x.referred_user_id.slice(0, 8)}…</b>
-                <span className="ml-2 text-slate-500">{x.qualified_at ? "Sudah transaksi" : "Belum memenuhi syarat"}</span>
+              <div key={x.referred_user_id} className="rounded-xl border border-zinc-800 bg-zinc-950 p-3 text-xs">
+                <b className="text-white">{x.referred_user_id.slice(0, 8)}…</b>
+                <span className={`ml-2 ${x.qualified_at ? "text-emerald-400" : "text-zinc-500"}`}>{x.qualified_at ? "Sudah transaksi" : "Belum memenuhi syarat"}</span>
               </div>
             ))
           ) : (
-            <p className="text-sm text-slate-400">Belum ada teman.</p>
+            <p className="text-sm text-zinc-400">Belum ada teman.</p>
           )}
         </div>
       </div>
-    </div>
+    </div></div>
   );
 }

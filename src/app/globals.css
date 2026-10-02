@@ -49,14 +49,33 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
   header, nav { display:none !important; }
   .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
 }
-.nav-link { border-radius:.75rem; padding:.5rem .75rem; font-size:.875rem; font-weight:700; color:#3f3f46; }
-.nav-link:hover { background:#FFFBEA; color:#09090b; }
+.nav-link { border-radius:.75rem; padding:.5rem .75rem; font-size:.875rem; font-weight:700; color:#a1a1aa; }
+.nav-link:hover { background:rgba(245,197,66,.12); color:#F5C542; }
 .mobile-link {
   display:flex; flex-direction:column; align-items:center; gap:.2rem;
   padding:.65rem .5rem; font-size:10px; font-weight:800; color:#71717a;
   border-radius:.9rem; position:relative;
   transition: color .18s ease, background-color .18s ease, transform .12s ease;
 }
-.mobile-link:active { transform: scale(.88); background-color:#FFF6D6; color:#B45309; }
-.mobile-link-active { color:#B45309; background-color:#FFFBEA; }
+.mobile-link:active { transform: scale(.88); background-color:rgba(245,197,66,.14); color:#F5C542; }
+.mobile-link-active { color:#F5C542; background-color:rgba(245,197,66,.10); }
 .mobile-link span { transition: color .18s ease; }
+
+/* Kanvas gelap halaman pelanggan (hitam-emas). Class baru — tidak menimpa class lama.
+   Margin negatif menetralkan padding main (px-4 py-6 / sm:px-6 sm:py-8) agar #09090b full-bleed. */
+.customer-shell {
+  margin: -1.5rem -1rem -8rem;
+  min-height: calc(100vh - 80px);
+  padding: 1.5rem 1rem 8rem;
+  background: #09090b;
+  color: #e4e4e7;
+}
+@media (min-width: 640px) {
+  .customer-shell { margin: -2rem -1.5rem -8rem; padding: 2rem 1.5rem 8rem; }
+}
+@media (min-width: 768px) {
+  .customer-shell { margin-bottom: -2rem; padding-bottom: 2rem; }
+}
+@media print {
+  .customer-shell { margin: 0; padding: 0; min-height: auto; background: #fff; color: #000; }
+}

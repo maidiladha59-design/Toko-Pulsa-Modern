@@ -3,7 +3,6 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import StatusBadge from "@/components/StatusBadge";
-import EmptyState from "@/components/EmptyState";
 
 const TX_LABEL: Record<string, string> = {
   TOPUP: "Top Up",
@@ -11,6 +10,14 @@ const TX_LABEL: Record<string, string> = {
   REFUND: "Refund",
   ADJUSTMENT: "Penyesuaian",
   TRANSFER: "Transfer",
+};
+
+const TX_ICON: Record<string, string> = {
+  TOPUP: "＋",
+  PURCHASE: "🛍️",
+  REFUND: "↩️",
+  ADJUSTMENT: "⚙️",
+  TRANSFER: "🔁",
 };
 
 export default async function WalletPage() {
@@ -37,71 +44,80 @@ export default async function WalletPage() {
     .order("created_at", { ascending: false });
 
   return (
-    <div>
-      <div className="rounded-2xl bg-navy p-6 text-white">
-        <p className="text-sm text-white/70">Saldo Anda saat ini</p>
-        <p className="mt-1 text-3xl font-bold">{formatRupiah(wallet?.balance || 0)}</p>
-        <div className="mt-4 flex flex-wrap gap-2">
+    <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] animate-page-in">
+      <section className="app-hero rounded-[2rem] p-6">
+        <p className="text-xs font-bold uppercase tracking-[.18em] text-zinc-400">Saldo Anda saat ini</p>
+        <p className="mt-2 text-4xl font-black tabular-nums text-gold-400">{formatRupiah(wallet?.balance || 0)}</p>
+        <div className="mt-5 flex flex-wrap gap-2">
           <Link
             href="/wallet/topup"
-            className="rounded-lg bg-brand px-4 py-2.5 text-sm font-medium hover:bg-brand-dark"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-gold-300"
           >
             + Top Up Saldo
           </Link>
           <Link
             href="/transfer-uang"
-            className="rounded-lg bg-white/10 px-4 py-2.5 text-sm font-medium hover:bg-white/20"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-zinc-700 px-4 py-3 text-sm font-bold text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400"
           >
             📤 Transfer
           </Link>
           <Link
             href="/transfer-uang/qr"
-            className="rounded-lg bg-white/10 px-4 py-2.5 text-sm font-medium hover:bg-white/20"
+            className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-zinc-700 px-4 py-3 text-sm font-bold text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400"
           >
             📥 Terima Saldo
           </Link>
         </div>
-      </div>
+      </section>
 
       {pendingTopups && pendingTopups.length > 0 && (
-        <div className="mt-6 rounded-xl border border-yellow-200 bg-yellow-50 p-4">
-          <p className="text-sm font-medium text-yellow-800">Top Up dalam proses</p>
+        <section className="mt-4 rounded-2xl border border-gold-400/25 bg-gold-400/10 p-4">
+          <p className="text-sm font-black text-gold-400">Top Up dalam proses</p>
           <ul className="mt-2 space-y-2">
             {pendingTopups.map((t) => (
-              <li key={t.id} className="flex items-center justify-between text-sm">
-                <span>{formatRupiah(t.amount)} — {formatDate(t.created_at)}</span>
+              <li key={t.id} className="flex items-center justify-between gap-3 text-sm">
+                <span className="tabular-nums text-zinc-200">{formatRupiah(t.amount)} — {formatDate(t.created_at)}</span>
                 <StatusBadge status={t.status} />
               </li>
             ))}
           </ul>
-        </div>
+        </section>
       )}
 
-      <h2 className="mt-8 text-base font-semibold">Riwayat Saldo</h2>
-      <div className="mt-3 overflow-hidden rounded-xl border border-gray-200 bg-white">
+      <section className="mt-8">
+        <p className="text-[10px] font-black uppercase tracking-[.18em] text-gold-600">Aktivitas</p>
+        <h2 className="mt-1 text-base font-black text-white">Riwayat Saldo</h2>
+      </section>
+      <div className="mt-3 overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
         {history && history.length > 0 ? (
-          <table className="w-full text-sm">
-            <tbody>
-              {history.map((h) => (
-                <tr key={h.id} className="border-b border-gray-100 last:border-0">
-                  <td className="px-4 py-3">
-                    <p className="font-medium">{TX_LABEL[h.type] || h.type}</p>
-                    <p className="text-xs text-gray-500">{h.description || "-"} · {formatDate(h.created_at)}</p>
-                  </td>
-                  <td className={`px-4 py-3 text-right font-semibold ${h.amount >= 0 ? "text-emerald-600" : "text-red-600"}`}>
+          <ul className="divide-y divide-zinc-800">
+            {history.map((h) => (
+              <li key={h.id} className="flex items-center gap-3 px-4 py-3.5">
+                <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-950 text-base">
+                  {TX_ICON[h.type] || "💳"}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-bold text-white">{TX_LABEL[h.type] || h.type}</p>
+                  <p className="mt-0.5 truncate text-xs text-zinc-500">{h.description || "-"} · {formatDate(h.created_at)}</p>
+                </div>
+                <div className="shrink-0 text-right">
+                  <p className={`text-sm font-black tabular-nums ${h.amount >= 0 ? "text-emerald-400" : "text-red-400"}`}>
                     {h.amount >= 0 ? "+" : ""}{formatRupiah(h.amount)}
-                  </td>
-                  <td className="px-4 py-3 text-right text-xs text-gray-500">Saldo: {formatRupiah(h.balance_after)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  </p>
+                  <p className="mt-0.5 text-xs tabular-nums text-zinc-500">Saldo: {formatRupiah(h.balance_after)}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         ) : (
-          <div className="p-4">
-            <EmptyState title="Belum ada riwayat" description="Riwayat saldo Anda akan muncul di sini." />
+          <div className="px-4 py-12 text-center">
+            <p aria-hidden className="text-3xl">🪙</p>
+            <p className="mt-2 text-sm font-bold text-zinc-300">Belum ada riwayat</p>
+            <p className="mt-1 text-xs text-zinc-500">Riwayat saldo Anda akan muncul di sini.</p>
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

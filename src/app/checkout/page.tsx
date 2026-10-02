@@ -4,13 +4,23 @@ import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
-import Button from "@/components/Button";
 import { formatRupiah } from "@/lib/utils";
 import { guideFor } from "@/lib/ppob/target-guide";
 
 type Product = { id: string; name: string; price: number; thumbnail_url: string | null; product_type?: string };
 type PPOBService = { id: string; provider: string; provider_sku: string; service_kind: "prepaid" | "postpaid"; category: string; brand: string | null; target_schema: { fields?: Array<{ name: string; label: string; type?: string; required?: boolean; placeholder?: string }> } | null };
 const MAX_TARGET_FILE_SIZE = 100 * 1024 * 1024;
+
+function CheckoutSkeleton() {
+  return (
+    <div className="mx-auto w-full max-w-[480px] animate-pulse space-y-4 px-4 py-6" aria-busy="true">
+      <div className="h-14 w-2/3 rounded-xl bg-zinc-900" />
+      <div className="h-32 rounded-[2rem] bg-zinc-900" />
+      <div className="h-64 rounded-[2rem] bg-zinc-900" />
+      <div className="h-40 rounded-[2rem] bg-zinc-900" />
+    </div>
+  );
+}
 
 function CheckoutForm() {
   const supabase = createClient();
@@ -193,55 +203,56 @@ function CheckoutForm() {
     }
   }
 
-  if (!productId || qty < 1) return <p className="text-sm text-slate-500">Parameter produk atau jumlah tidak valid.</p>;
-  if (loading) return <div className="mx-auto max-w-lg animate-pulse rounded-[2rem] bg-white p-8 shadow-sm">Memuat checkout...</div>;
-  if (!product) return <p className="text-sm text-slate-500">Produk tidak ditemukan.</p>;
+  if (!productId || qty < 1) return <div className="mx-auto w-full max-w-[480px] px-4 py-10"><p className="text-sm text-zinc-400">Parameter produk atau jumlah tidak valid.</p></div>;
+  if (loading) return <CheckoutSkeleton />;
+  if (!product) return <div className="mx-auto w-full max-w-[480px] px-4 py-10"><p className="text-sm text-zinc-400">Produk tidak ditemukan.</p></div>;
 
   const subtotal = ppob?.service_kind === "postpaid" && inquiry ? Number(inquiry.quote_amount || inquiry.selling_price || 0) : product.price * qty;
   const enoughBalance = balance >= subtotal;
 
   return (
-    <div className="mx-auto max-w-6xl animate-page-in">
-      <div className="mb-7 flex items-center gap-3">
-        <img src="/aidil-logo.png" alt="Aidil Store" className="h-14 w-14 rounded-2xl object-cover shadow-xl" />
-        <div><p className="text-xs font-black uppercase tracking-[.2em] text-amber-600">AIDIL STORE</p><h1 className="text-2xl font-black sm:text-3xl">Checkout Aman & Otomatis</h1><p className="text-sm text-slate-500">Bayar tanpa approve manual, lalu akses produk digital dari pesanan.</p></div>
+    <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] animate-page-in pb-28 lg:max-w-5xl lg:pb-0">
+      <div className="mb-6 flex items-start gap-3">
+        <button type="button" onClick={() => router.back()} aria-label="Kembali" className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 text-lg text-zinc-300 transition hover:border-gold-400/50 hover:text-gold-400">←</button>
+        <img src="/aidil-logo.png" alt="Aidil Store" className="h-11 w-11 rounded-2xl object-cover" />
+        <div><p className="text-xs font-black uppercase tracking-[.2em] text-gold-400">AIDIL STORE</p><h1 className="text-xl font-black text-white sm:text-2xl">Checkout Aman & Otomatis</h1><p className="text-sm text-zinc-400">Bayar tanpa approve manual, lalu akses produk digital dari pesanan.</p></div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
         <div className="space-y-5">
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900 p-5">
             <div className="flex gap-4">
-              <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-slate-100">
+              <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-zinc-950">
                 {product.thumbnail_url ? <img src={product.thumbnail_url} alt={product.name} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-3xl">🛍️</div>}
               </div>
               <div className="min-w-0">
-                <p className="font-black text-slate-900">{product.name}</p>
-                <p className="mt-1 text-sm text-slate-500">Jumlah: {qty}</p>
-                <p className="mt-3 text-lg font-black text-gold-600">{formatRupiah(product.price)} / item</p>
+                <p className="font-black text-white">{product.name}</p>
+                <p className="mt-1 text-sm text-zinc-400">Jumlah: <span className="tabular-nums">{qty}</span></p>
+                <p className="mt-3 text-lg font-black tabular-nums text-gold-400">{formatRupiah(product.price)} / item</p>
               </div>
             </div>
           </div>
 
           {isJasa && (
-            <div className="rounded-[2rem] border border-amber-200 bg-amber-50 p-5 sm:p-6">
-              <p className="font-black text-amber-900">Target pesanan jasa</p>
-              <p className="mt-1 text-xs leading-5 text-amber-800">Masukkan link/catatan atau file yang dibutuhkan agar pesanan dapat diproses.</p>
-              <textarea value={targetText} onChange={(e) => setTargetText(e.target.value)} rows={4} placeholder="Link, username, catatan, atau detail pesanan..." className="mt-3 w-full rounded-2xl border border-amber-200 bg-white px-4 py-3 text-sm outline-none focus:ring-4 focus:ring-amber-100" />
-              <input type="file" onChange={(e) => chooseTargetFile(e.target.files?.[0])} className="mt-3 block w-full text-sm" />
-              {targetFile && <p className="mt-2 text-xs font-bold text-emerald-700">✓ {targetFile.name}</p>}
+            <div className="rounded-[2rem] border border-gold-400/30 bg-gold-400/5 p-5">
+              <p className="font-black text-white">Target pesanan jasa</p>
+              <p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan link/catatan atau file yang dibutuhkan agar pesanan dapat diproses.</p>
+              <textarea value={targetText} onChange={(e) => setTargetText(e.target.value)} rows={4} placeholder="Link, username, catatan, atau detail pesanan..." className="mt-3 w-full rounded-2xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20" />
+              <input type="file" onChange={(e) => chooseTargetFile(e.target.files?.[0])} className="mt-3 block w-full text-sm text-zinc-300 file:mr-3 file:rounded-xl file:border-0 file:bg-zinc-800 file:px-3 file:py-2 file:text-xs file:font-black file:text-zinc-200" />
+              {targetFile && <p className="mt-2 text-xs font-bold text-emerald-400">✓ {targetFile.name}</p>}
             </div>
           )}
 
           {ppob && guide && (
-            <div className="rounded-[2rem] border border-emerald-200 bg-emerald-50 p-5 sm:p-6">
+            <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900 p-5">
               <div className="flex items-start justify-between gap-3">
-                <div><p className="font-black text-emerald-950">{guide.heading}</p><p className="mt-1 text-xs leading-5 text-emerald-800">{guide.intro}</p></div>
-                <span className="shrink-0 rounded-full bg-white px-3 py-1 text-[10px] font-black uppercase text-emerald-700">{ppob.service_kind === "postpaid" ? "Cek tagihan dulu" : "Proses otomatis"}</span>
+                <div><p className="font-black text-white">{guide.heading}</p><p className="mt-1 text-xs leading-5 text-zinc-400">{guide.intro}</p></div>
+                <span className="shrink-0 rounded-full bg-zinc-950 px-3 py-1 text-[10px] font-black uppercase text-gold-400 ring-1 ring-gold-400/30">{ppob.service_kind === "postpaid" ? "Cek tagihan dulu" : "Proses otomatis"}</span>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
                 {guide.fields.map((field) => (
                   <label key={field.name} className={guide.fields.length === 1 ? "sm:col-span-2" : ""}>
-                    <span className="text-xs font-black text-emerald-950">{field.label}{field.required !== false ? " *" : ""}</span>
+                    <span className="text-xs font-black text-zinc-300">{field.label}{field.required !== false ? " *" : ""}</span>
                     <input
                       value={ppobTargets[field.name] || ""}
                       onChange={(e) => {
@@ -253,31 +264,31 @@ function CheckoutForm() {
                       inputMode={field.inputMode}
                       maxLength={field.maxLength}
                       autoComplete="off"
-                      className="mt-2 w-full rounded-xl border border-emerald-200 bg-white px-4 py-3 text-sm outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-100"
+                      className="mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm text-white outline-none transition placeholder:text-zinc-500 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
                     />
                   </label>
                 ))}
               </div>
-              {targetDetected && !targetError && <p className="mt-3 text-xs font-black text-emerald-700">✓ {targetDetected}</p>}
-              {hasTargetInput && targetError && <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-xs font-bold leading-5 text-red-600">{targetError}</p>}
-              <ul className="mt-4 space-y-1.5 rounded-2xl bg-white/70 p-3 text-[11px] leading-5 text-emerald-900">
+              {targetDetected && !targetError && <p className="mt-3 text-xs font-black text-emerald-400">✓ {targetDetected}</p>}
+              {hasTargetInput && targetError && <p className="mt-3 rounded-xl bg-red-500/10 px-3 py-2 text-xs font-bold leading-5 text-red-400">{targetError}</p>}
+              <ul className="mt-4 space-y-1.5 rounded-2xl bg-zinc-950/60 p-3 text-[11px] leading-5 text-zinc-400">
                 {guide.tips.map((tip) => <li key={tip}>• {tip}</li>)}
               </ul>
               {ppob.service_kind === "postpaid" && (
-                <div className="mt-4 rounded-2xl bg-white p-4">
-                  <button type="button" onClick={runInquiry} disabled={inquiring} className="rounded-xl bg-emerald-600 px-4 py-2.5 text-sm font-black text-white disabled:opacity-60">{inquiring ? "Mengecek..." : "Cek Tagihan"}</button>
+                <div className="mt-4 rounded-2xl border border-zinc-800 bg-zinc-950/60 p-4">
+                  <button type="button" onClick={runInquiry} disabled={inquiring} className="min-h-[44px] rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-gold-300 disabled:opacity-60">{inquiring ? "Mengecek..." : "Cek Tagihan"}</button>
                   {inquiry && (
-                    <div className="mt-3 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
+                    <div className="mt-3 rounded-2xl border border-zinc-800 bg-zinc-900 p-4">
                       <div className="flex items-center justify-between gap-3">
-                        <div><p className="text-xs font-bold text-emerald-700">Pelanggan</p><p className="font-black text-emerald-950">{inquiry.customer_name || inquiry.customer_no || ppobTargets.customer_no}</p></div>
-                        <div className="text-right"><p className="text-xs font-bold text-emerald-700">Total tagihan</p><p className="text-xl font-black text-emerald-950">{formatRupiah(Number(inquiry.quote_amount || inquiry.selling_price || 0))}</p></div>
+                        <div><p className="text-xs font-bold text-zinc-400">Pelanggan</p><p className="font-black text-white">{inquiry.customer_name || inquiry.customer_no || ppobTargets.customer_no}</p></div>
+                        <div className="text-right"><p className="text-xs font-bold text-zinc-400">Total tagihan</p><p className="text-xl font-black tabular-nums text-gold-400">{formatRupiah(Number(inquiry.quote_amount || inquiry.selling_price || 0))}</p></div>
                       </div>
-                      <div className="mt-3 grid gap-2 text-xs text-emerald-900 sm:grid-cols-3">
-                        <div className="rounded-xl bg-white p-3">Tagihan pokok<br/><b>{formatRupiah(Number(inquiry.price || 0))}</b></div>
-                        <div className="rounded-xl bg-white p-3">Biaya admin<br/><b>{formatRupiah(Number(inquiry.admin || 0))}</b></div>
-                        <div className="rounded-xl bg-white p-3">Jatuh tempo/periode<br/><b>{String(inquiry.periode || "-" )}</b></div>
+                      <div className="mt-3 grid gap-2 text-xs text-zinc-400 sm:grid-cols-3">
+                        <div className="rounded-xl bg-zinc-950 p-3">Tagihan pokok<br/><b className="tabular-nums text-white">{formatRupiah(Number(inquiry.price || 0))}</b></div>
+                        <div className="rounded-xl bg-zinc-950 p-3">Biaya admin<br/><b className="tabular-nums text-white">{formatRupiah(Number(inquiry.admin || 0))}</b></div>
+                        <div className="rounded-xl bg-zinc-950 p-3">Jatuh tempo/periode<br/><b className="text-white">{String(inquiry.periode || "-" )}</b></div>
                       </div>
-                      <p className="mt-3 text-[11px] font-semibold text-emerald-700">Tagihan ini berlaku 10 menit. Nominal yang dibayar sudah dikunci dan aman.</p>
+                      <p className="mt-3 text-[11px] font-semibold text-zinc-400">Tagihan ini berlaku 10 menit. Nominal yang dibayar sudah dikunci dan aman.</p>
                     </div>
                   )}
                 </div>
@@ -285,21 +296,21 @@ function CheckoutForm() {
             </div>
           )}
 
-          <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+          <div className="rounded-[2rem] border border-zinc-800 bg-zinc-900 p-5">
             <div className="flex items-end justify-between">
-              <div><p className="text-xs font-black uppercase tracking-widest text-gold-600">Metode</p><h2 className="mt-1 text-xl font-black">Cara bayar</h2></div>
-              <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-bold text-emerald-700">Otomatis</span>
+              <div><p className="text-xs font-black uppercase tracking-widest text-gold-400">Metode</p><h2 className="mt-1 text-xl font-black text-white">Cara bayar</h2></div>
+              <span className="rounded-full bg-emerald-500/10 px-3 py-1 text-xs font-bold text-emerald-400">Otomatis</span>
             </div>
 
-            <div className="mt-4 rounded-2xl border-2 border-gold-500 bg-gold-50 p-4">
+            <div className="mt-4 rounded-2xl border border-gold-400/60 bg-gold-400/10 p-4">
               <span className="text-2xl">💰</span>
-              <p className="mt-2 font-black">Saldo Wallet AIDIL STORE</p>
-              <p className="mt-1 text-xs text-slate-500">{formatRupiah(balance)} tersedia</p>
-              <p className="mt-3 text-[11px] leading-5 text-slate-500">Untuk saat ini, semua transaksi pembelian produk hanya dapat dibayar menggunakan saldo akun. Jika saldo belum cukup, silakan top up terlebih dahulu.</p>
+              <p className="mt-2 font-black text-white">Saldo Wallet AIDIL STORE</p>
+              <p className="mt-1 text-xs text-zinc-400"><span className="font-bold tabular-nums text-gold-400">{formatRupiah(balance)}</span> tersedia</p>
+              <p className="mt-3 text-[11px] leading-5 text-zinc-400">Untuk saat ini, semua transaksi pembelian produk hanya dapat dibayar menggunakan saldo akun. Jika saldo belum cukup, silakan top up terlebih dahulu.</p>
             </div>
 
             <label className="mt-4 block">
-              <span className="text-xs font-black text-slate-700">PIN Transaksi *</span>
+              <span className="text-xs font-black text-zinc-300">PIN Transaksi *</span>
               <input
                 type="password"
                 value={pin}
@@ -308,27 +319,31 @@ function CheckoutForm() {
                 autoComplete="off"
                 maxLength={6}
                 placeholder="6 digit PIN"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm tracking-[.4em] outline-none focus:border-amber-400 focus:ring-4 focus:ring-amber-100"
+                className="mt-2 w-full rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-3 text-sm tracking-[.4em] text-white outline-none transition placeholder:tracking-normal placeholder:text-zinc-500 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
               />
-              <span className="mt-1 block text-[11px] text-slate-500">Belum punya PIN? <a href="/settings" className="font-bold text-gold-700 underline">Buat di Pengaturan</a>.</span>
+              <span className="mt-1 block text-[11px] text-zinc-500">Belum punya PIN? <a href="/settings" className="font-bold text-gold-400 underline">Buat di Pengaturan</a>.</span>
             </label>
           </div>
         </div>
 
-        <aside className="h-fit rounded-[2rem] border border-slate-200 bg-white p-6 shadow-xl shadow-slate-900/5 lg:sticky lg:top-24">
-          <p className="text-xs font-black uppercase tracking-widest text-slate-400">Ringkasan</p>
-          <p className="mt-3 truncate font-bold">{product.name}</p>
+        <aside className="h-fit rounded-[2rem] border border-zinc-800 bg-zinc-900 p-6 lg:sticky lg:top-24">
+          <p className="text-xs font-black uppercase tracking-widest text-zinc-500">Ringkasan</p>
+          <p className="mt-3 truncate font-bold text-white">{product.name}</p>
           <div className="mt-5 space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-slate-500">Harga</span><b>{formatRupiah(product.price)}</b></div>
-            <div className="flex justify-between"><span className="text-slate-500">Jumlah</span><b>{qty}</b></div>
-            <div className="border-t border-slate-100 pt-3 flex justify-between text-lg"><span className="font-black">Total</span><b className="text-gold-600">{formatRupiah(subtotal)}</b></div>
+            <div className="flex justify-between"><span className="text-zinc-400">Harga</span><b className="tabular-nums text-white">{formatRupiah(product.price)}</b></div>
+            <div className="flex justify-between"><span className="text-zinc-400">Jumlah</span><b className="tabular-nums text-white">{qty}</b></div>
+            <div className="flex justify-between border-t border-zinc-800 pt-3 text-lg"><span className="font-black text-white">Total</span><b className="tabular-nums text-gold-400">{formatRupiah(subtotal)}</b></div>
           </div>
 
-          <div className={`mt-5 rounded-2xl p-3 text-xs font-bold ${enoughBalance ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>{enoughBalance ? "✓ Saldo mencukupi." : "Saldo kurang, silakan top up terlebih dahulu."}</div>
-          <Button className="mt-4 w-full" onClick={payWallet} loading={confirming} disabled={!enoughBalance || (ppob?.service_kind === "postpaid" && !inquiryId)}>Bayar dengan Saldo</Button>
-          {!enoughBalance && <Button variant="secondary" className="mt-2 w-full" onClick={() => router.push(`/wallet/topup?amount=${encodeURIComponent(String(subtotal - balance))}`)}>Top Up Saldo</Button>}
+          <div className={`sticky bottom-[76px] z-30 -mx-6 -mb-6 mt-5 space-y-2 border-t border-zinc-800 bg-zinc-900/95 px-6 pb-5 pt-4 backdrop-blur lg:static lg:border-0 lg:bg-transparent lg:px-0 lg:pb-0 lg:pt-0 lg:backdrop-blur-none`}>
+            <div className={`rounded-2xl p-3 text-xs font-bold ${enoughBalance ? "bg-emerald-500/10 text-emerald-400" : "bg-red-500/10 text-red-400"}`}>{enoughBalance ? "✓ Saldo mencukupi." : "Saldo kurang, silakan top up terlebih dahulu."}</div>
+            <button type="button" onClick={payWallet} disabled={confirming || !enoughBalance || (ppob?.service_kind === "postpaid" && !inquiryId)} className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-gold-300 disabled:cursor-not-allowed disabled:opacity-50">
+              {confirming && <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" />}Bayar dengan Saldo
+            </button>
+            {!enoughBalance && <button type="button" onClick={() => router.push(`/wallet/topup?amount=${encodeURIComponent(String(subtotal - balance))}`)} className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-zinc-700 px-4 py-3 text-sm font-black text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400">Top Up Saldo</button>}
+          </div>
 
-          <div className="mt-5 space-y-2 text-xs text-slate-500">
+          <div className="mt-5 space-y-2 text-xs leading-5 text-zinc-500">
             <p>🔒 Pembayaran saldo diproses instan & aman.</p>
             <p>📥 Produk digital yang lunas langsung tersedia di Pesanan.</p>
             <p>🚫 Tidak perlu upload bukti transfer atau menunggu approve admin.</p>
@@ -336,9 +351,10 @@ function CheckoutForm() {
         </aside>
       </div>
     </div>
+    </div>
   );
 }
 
 export default function CheckoutPage() {
-  return <Suspense fallback={<div className="mx-auto max-w-lg animate-pulse rounded-[2rem] bg-white p-8 shadow-sm">Memuat checkout...</div>}><CheckoutForm /></Suspense>;
+  return <Suspense fallback={<CheckoutSkeleton />}><CheckoutForm /></Suspense>;
 }
