@@ -119,6 +119,6 @@ test('v77 PPOBServiceGrid membaca brand_media (client publik) dan fallback emoji
 
 test('v77 terdaftar di migration preflight', () => {
   const preflight = read('scripts/migration-preflight.mjs');
-  assert.match(preflight, /55,73,75,76,77\]/);
+  assert.match(preflight, /55,73,75,76,77/);
   assert.match(preflight, /migrations_v77_brand_media\.sql/);
 });

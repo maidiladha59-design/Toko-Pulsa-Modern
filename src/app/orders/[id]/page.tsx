@@ -157,11 +157,9 @@ export default async function OrderDetailPage({ params }: { params: { id: string
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between gap-3"><span className="text-app-subtle">Tanggal</span><b className="text-app-text">{formatDate(order.created_at)}</b></div>
               <div className="flex justify-between gap-3"><span className="shrink-0 text-app-subtle">ID Pesanan</span><b className="break-all text-right text-app-text">{order.order_number}</b></div>
-              {order.gateway_txn_id && <div className="flex justify-between gap-3"><span className="shrink-0 text-app-subtle">ID Transaksi Gateway</span><b className="break-all text-right text-xs text-app-text">{order.gateway_txn_id}</b></div>}
               <div className="flex justify-between gap-3"><span className="text-app-subtle">Metode</span><b className="text-right text-app-text">{order.payment_method === "BANK_VA" ? (bankNames[order.gateway_method || ""] || "Virtual Account") : order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method || "Wallet"}</b></div>
               <div className="flex justify-between"><span className="text-app-subtle">Status</span><StatusBadge status={order.status} /></div>
               <div className="flex justify-between border-t border-app-border pt-4"><span className="text-app-subtle">Subtotal produk</span><b className="tabular-nums text-app-text">{formatRupiah(order.total_amount)}</b></div>
-              {order.gateway_fee ? <div className="flex justify-between"><span className="text-app-subtle">Biaya gateway</span><b className="tabular-nums text-app-text">{formatRupiah(order.gateway_fee)}</b></div> : null}
               <div className="flex justify-between text-lg"><span className="font-black text-app-text">Total dibayar</span><b className="tabular-nums text-app-kicker">{formatRupiah(order.gateway_total_payment || order.total_amount)}</b></div>
             </div>
             {order.status === "COMPLETED" && <div className="mt-5 rounded-2xl bg-emerald-500/10 p-4 text-xs font-bold text-emerald-600 dark:text-emerald-400">📥 Produk digital yang tersedia sudah bisa diambil dari kartu produk di atas.</div>}

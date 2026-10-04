@@ -35,6 +35,16 @@ export function humanizeError(rawMessage: string | undefined | null): string {
     return "Transaksi ini sudah diproses sebelumnya.";
   if (msg.includes("product_not_found"))
     return "Produk tidak ditemukan atau sudah tidak tersedia.";
+
+  // ID Order di tiket bantuan: map kode RPC create_support_ticket dan sisa
+  // error tipe uuid mentah Postgres (22P02) agar tidak pernah tampil ke user.
+  if (msg.includes("order_not_found_or_forbidden"))
+    return "ID Order tidak ditemukan di akunmu.";
+  if (msg.includes("invalid_order_id") || msg.includes("invalid input syntax for type uuid"))
+    return "Format ID Order tidak valid. ID Order bisa dilihat di halaman Pesanan Saya.";
+  if (msg.includes("order_required"))
+    return "ID Order wajib diisi. Kamu bisa menyalin ID Order dari halaman Pesanan Saya.";
+
   if (msg.includes("row-level security") || msg.includes("permission denied"))
     return "Anda tidak memiliki akses untuk melakukan ini.";
 

@@ -21,7 +21,7 @@ test('v35 configurable topup fee wiring exists', () => {
   assert.match(adminRoute, /fee_type/);
   assert.match(adminRoute, /fee_value/);
   assert.match(adminPage, /Biaya Top Up/);
-  assert.match(page, /Biaya AIDIL STORE/);
+  assert.match(page, /Biaya Admin/);
   assert.match(webhook, /topup\.payment_amount/);
 });
 

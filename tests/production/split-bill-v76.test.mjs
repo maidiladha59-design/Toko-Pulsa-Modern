@@ -243,7 +243,7 @@ test('v76 navigasi Split Bill terpasang di Navbar (desktop & mobile)', () => {
 
 test('v76 terdaftar di migration preflight', () => {
   const preflight = read('scripts/migration-preflight.mjs');
-  assert.match(preflight, /,55,73,75,76,77\]/);
+  assert.match(preflight, /,55,73,75,76,77/);
   assert.match(preflight, /migrations_v76_split_bill\.sql/);
   assert.match(preflight, /pay_split_bill_share/);
   assert.match(preflight, /splitbill\.completed/);

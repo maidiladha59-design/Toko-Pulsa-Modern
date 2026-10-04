@@ -12,7 +12,7 @@ for (const file of files) {
   if (!byVersion.has(v)) byVersion.set(v, []);
   byVersion.get(v).push(file);
 }
-const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78];
+const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81];
 const missing = required.filter(v => !byVersion.has(v));
 const duplicateVersions = [...byVersion.entries()].filter(([, list]) => list.length > 1);
 const errors = [];
@@ -49,6 +49,9 @@ const checks = [
   ['v76', 'migrations_v76_split_bill.sql', ['payment_requests', 'split_bills', 'split_bill_participants', 'create_split_bill', 'pay_split_bill_share', 'send_split_bill_reminder', 'splitbill.paid', 'splitbill.completed']],
   ['v77', 'migrations_v77_brand_media.sql', ['brand_media', 'brand_media_select_all', 'brand_media_admin_write', 'is_admin()']],
   ['v78', 'migrations_v78_theme_preference.sql', ['user_app_settings', 'theme_preference', 'user_app_settings_theme_preference_check']],
+  ['v79', 'migrations_v79_support_order_id_required.sql', ['create_support_ticket', 'order_required', 'invalid_order_id', 'invalid_text_representation', 'order_not_found_or_forbidden']],
+  ['v80', 'migrations_v80_topup_fee_tiers.sql', ['topup_fee_tiers', 'min_amount', 'max_amount', 'fee_amount', 'topup_fee_tier_overlap', 'topup_fee_tiers_admin_write', '9999', '81']],
+  ['v81', 'migrations_v81_faq_gateway_wording.sql', ['faqs', 'gateway terverifikasi', 'pembayaran terverifikasi']],
 ];
 for (const [label, file, needles] of checks) {
   const p = path.join(dir, file);

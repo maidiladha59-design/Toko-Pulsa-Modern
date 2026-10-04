@@ -21,6 +21,20 @@ function calculateFee(amount: number, cfg: FeeConfig) {
   return cfg.fee_type === "PERCENTAGE" ? Math.max(0, Math.round(amount * cfg.fee_value / 100)) : Math.max(0, Math.round(cfg.fee_value));
 }
 
+type TopupFeeTier = { min_amount: number; max_amount: number | null; fee_amount: number };
+
+// Biaya bertingkat v80. Kalau tabel topup_fee_tiers belum ada / belum diisi,
+// kembalikan array kosong supaya perhitungan lama tetap dipakai sebagai cadangan.
+async function getActiveTiers(admin: ReturnType<typeof createAdminClient>) {
+  const { data, error } = await admin.from("topup_fee_tiers").select("min_amount, max_amount, fee_amount").eq("is_active", true).order("sort_order", { ascending: true }).order("min_amount", { ascending: true });
+  if (error || !data) return [] as TopupFeeTier[];
+  return data.map((t) => ({ min_amount: Number(t.min_amount), max_amount: t.max_amount == null ? null : Number(t.max_amount), fee_amount: Number(t.fee_amount) })) as TopupFeeTier[];
+}
+function findTierFee(amount: number, tiers: TopupFeeTier[]) {
+  const tier = tiers.find((t) => amount >= t.min_amount && (t.max_amount == null || amount <= t.max_amount));
+  return tier ? tier.fee_amount : null;
+}
+
 async function getFeeConfig(admin: ReturnType<typeof createAdminClient>, group: string) {
   const { data, error } = await admin.from("topup_fee_methods").select("enabled, fee_type, fee_value, min_topup, max_topup").eq("payment_group", group).single();
   if (error || !data) throw new Error("TOPUP_FEE_CONFIG_UNAVAILABLE");
@@ -47,7 +61,8 @@ export async function GET(request: Request) {
     const method = new URL(request.url).searchParams.get("method") || "qris";
     const cfg = await getFeeConfig(admin, feeGroup(method));
     const deadline_minutes = await getDeadlineMinutes(admin);
-    return NextResponse.json({ ...cfg, deadline_minutes });
+    const tiers = await getActiveTiers(admin);
+    return NextResponse.json({ ...cfg, deadline_minutes, tiers });
   } catch {
     return NextResponse.json({ message: "Pengaturan biaya Top Up belum tersedia. Jalankan migration v35." }, { status: 503 });
   }
@@ -73,9 +88,15 @@ export async function POST(request: Request) {
   }
   let cfg: FeeConfig;
   try { cfg = await getFeeConfig(admin, feeGroup(method)); } catch { return NextResponse.json({ message: "Pengaturan biaya Top Up belum tersedia. Jalankan migration v35." }, { status: 503 }); }
-  if (amount < cfg.min_topup || amount > cfg.max_topup) return NextResponse.json({ message: `Nominal Top Up harus antara Rp${cfg.min_topup.toLocaleString("id-ID")} dan Rp${cfg.max_topup.toLocaleString("id-ID")}.` }, { status: 400 });
+  // Tier aktif (v80) diprioritaskan; nominal yang cocok tier boleh di luar rentang
+  // lama (mis. Rp1.000 dengan min_topup lama Rp10.000). Kalau tidak cocok tier
+  // manapun, batas & tarif lama tetap berlaku sebagai cadangan.
+  const tiers = await getActiveTiers(admin);
+  const tierFee = findTierFee(amount, tiers);
+  const inLegacyRange = amount >= cfg.min_topup && amount <= cfg.max_topup;
+  if (tierFee === null && !inLegacyRange) return NextResponse.json({ message: tiers.length ? "Nominal Top Up tidak termasuk rentang biaya yang tersedia. Periksa kembali nominal atau hubungi admin." : `Nominal Top Up harus antara Rp${cfg.min_topup.toLocaleString("id-ID")} dan Rp${cfg.max_topup.toLocaleString("id-ID")}.` }, { status: 400 });
 
-  const adminFee = calculateFee(amount, cfg);
+  const adminFee = tierFee !== null ? tierFee : calculateFee(amount, cfg);
   const paymentAmount = amount + adminFee;
   const { data: existing } = await admin.from("topups").select("id, amount, admin_fee, payment_amount, status, provider_order_id, payment_method, payment_number, gateway_fee, gateway_total_payment, expires_at").eq("idempotency_key", idempotency_key).eq("user_id", user.id).maybeSingle();
   if (existing?.provider_order_id && ["PENDING", "VERIFYING"].includes(existing.status)) {
@@ -83,7 +104,7 @@ export async function POST(request: Request) {
   }
 
   const providerOrderId = `TOPUP-${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}-${crypto.randomUUID().replaceAll("-", "").slice(0, 10)}`;
-  const { data: topup, error: insertError } = await admin.from("topups").insert({ user_id: user.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, fee_group: feeGroup(method), fee_type: cfg.fee_type, fee_rate: cfg.fee_type === "PERCENTAGE" ? cfg.fee_value : null, status: "PENDING", idempotency_key, provider: "fr3newera", provider_order_id: providerOrderId, payment_method: method }).select("id").single();
+  const { data: topup, error: insertError } = await admin.from("topups").insert({ user_id: user.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, fee_group: feeGroup(method), fee_type: tierFee !== null ? "FIXED" : cfg.fee_type, fee_rate: tierFee !== null ? null : (cfg.fee_type === "PERCENTAGE" ? cfg.fee_value : null), status: "PENDING", idempotency_key, provider: "fr3newera", provider_order_id: providerOrderId, payment_method: method }).select("id").single();
   if (insertError || !topup) {
     const { data: raced } = await admin.from("topups").select("id, amount, admin_fee, payment_amount, status, provider_order_id, payment_method, payment_number, gateway_fee, gateway_total_payment, expires_at").eq("idempotency_key", idempotency_key).eq("user_id", user.id).maybeSingle();
     if (raced?.provider_order_id) return NextResponse.json({ id: raced.id, amount: raced.amount, admin_fee: raced.admin_fee ?? 0, payment_amount: raced.payment_amount ?? raced.amount + (raced.admin_fee ?? 0), status: raced.status, order_id: raced.provider_order_id, payment_method: raced.payment_method, payment_number: raced.payment_number, fee: raced.gateway_fee ?? 0, total_payment: raced.gateway_total_payment, expired_at: raced.expires_at }, { status: 200 });

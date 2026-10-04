@@ -17,5 +17,5 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const twoFactorToken = cookies().get(ADMIN_2FA_COOKIE)?.value;
   if (!verifyAdmin2FAToken(twoFactorToken, user.id)) redirect("/admin-login");
 
-  return <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-[230px_1fr]"><AdminSidebar /><section className="min-w-0">{children}</section></div>;
+  return <div className="mx-auto grid max-w-7xl grid-cols-1 gap-6 md:grid-cols-[230px_1fr] md:items-start"><div className="md:sticky md:top-[87px] md:max-h-[calc(100dvh-103px)] md:overflow-y-auto"><AdminSidebar /></div><section className="min-w-0">{children}</section></div>;
 }
