@@ -127,14 +127,14 @@ export default function AdminCategoriesPage() {
   return (
     <div className="animate-page-in space-y-5">
       <div>
-        <p className="text-xs font-black uppercase tracking-[.18em] text-gold-600">Katalog</p>
-        <h1 className="mt-1 text-2xl font-black text-slate-900">Kelola Kategori</h1>
-        <p className="mt-1 text-sm text-slate-500">Tambah kategori baru agar produk lebih mudah ditemukan dan dikelompokkan.</p>
+        <p className="text-xs font-black uppercase tracking-[.18em] text-app-kicker">Katalog</p>
+        <h1 className="mt-1 text-2xl font-black text-app-text">Kelola Kategori</h1>
+        <p className="mt-1 text-sm text-app-muted">Tambah kategori baru agar produk lebih mudah ditemukan dan dikelompokkan.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:p-6">
+      <form onSubmit={handleSubmit} className="rounded-2xl border border-app-border bg-app-surface p-4 shadow-sm sm:p-6">
         <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="font-bold text-slate-900">{isEditing ? "Edit Kategori" : "Tambah Kategori Baru"}</h2>
+          <h2 className="font-bold text-app-text">{isEditing ? "Edit Kategori" : "Tambah Kategori Baru"}</h2>
           {isEditing && <Button type="button" variant="secondary" onClick={resetForm}>Batal</Button>}
         </div>
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -145,7 +145,7 @@ export default function AdminCategoriesPage() {
               value={name}
               onChange={(e) => onNameChange(e.target.value)}
               placeholder="Contoh: Jasa Sosial Media"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-gold-400"
+              className="mt-1 w-full rounded-lg border border-app-border px-3 py-2 text-sm outline-none focus:border-gold-400"
             />
           </label>
           <label className="text-sm font-medium">
@@ -155,7 +155,7 @@ export default function AdminCategoriesPage() {
               value={slug}
               onChange={(e) => { setSlugTouched(true); setSlug(slugify(e.target.value)); }}
               placeholder="jasa-sosial-media"
-              className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none focus:border-gold-400"
+              className="mt-1 w-full rounded-lg border border-app-border px-3 py-2 text-sm outline-none focus:border-gold-400"
             />
           </label>
         </div>
@@ -164,22 +164,22 @@ export default function AdminCategoriesPage() {
         </div>
       </form>
 
-      <div className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-        <div className="border-b border-slate-100 p-4">
-          <h2 className="font-bold text-slate-900">Daftar Kategori</h2>
-          <p className="text-xs text-slate-500">{categories.length} kategori tersimpan</p>
+      <div className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-sm">
+        <div className="border-b border-app-border p-4">
+          <h2 className="font-bold text-app-text">Daftar Kategori</h2>
+          <p className="text-xs text-app-muted">{categories.length} kategori tersimpan</p>
         </div>
         {loading ? (
-          <p className="p-6 text-sm text-slate-500">Memuat...</p>
+          <p className="p-6 text-sm text-app-muted">Memuat...</p>
         ) : categories.length === 0 ? (
           <EmptyState title="Belum ada kategori" />
         ) : (
-          <div className="divide-y divide-slate-100">
+          <div className="divide-y divide-app-border">
             {categories.map((c) => (
               <div key={c.id} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="font-semibold text-slate-800">{c.name}</p>
-                  <p className="text-xs text-slate-400">/{c.slug} · {productCounts[c.id] || 0} produk</p>
+                  <p className="font-semibold text-app-text">{c.name}</p>
+                  <p className="text-xs text-app-subtle">/{c.slug} · {productCounts[c.id] || 0} produk</p>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="secondary" onClick={() => startEdit(c)}>Edit</Button>

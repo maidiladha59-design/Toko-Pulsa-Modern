@@ -49,22 +49,22 @@ export default function AdminSidebar() {
   }
 
   return (
-    <aside className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
-      <div className="flex items-center gap-3 border-b border-slate-100 bg-gradient-to-r from-zinc-900 via-gold-700 to-black p-4 text-white">
+    <aside className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-sm">
+      <div className="flex items-center gap-3 border-b border-white/10 bg-gradient-to-r from-zinc-900 via-gold-700 to-black p-4 text-white">
         <img src="/aidil-logo.png" alt="Aidil Store" className="h-11 w-11 rounded-xl bg-white p-1" />
         <div><p className="font-black">AIDIL STORE</p><p className="text-xs text-yellow-200">Panel Admin</p></div>
       </div>
       <nav className="p-3">
-        <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[.18em] text-slate-400">Menu utama</p>
+        <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-[.18em] text-app-subtle">Menu utama</p>
         <div className="space-y-1">
           {MENU.map(([href, icon, label]) => {
             const active = href === "/admin" ? pathname === href : pathname.startsWith(href);
-            return <Link key={href} href={href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition ${active ? "bg-gold-50 text-zinc-900" : "text-slate-600 hover:bg-gold-50"}`}><span>{icon}</span>{label}</Link>;
+            return <Link key={href} href={href} className={`flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-semibold transition ${active ? "bg-app-accent-soft text-app-text" : "text-app-muted hover:bg-app-accent-soft"}`}><span>{icon}</span>{label}</Link>;
           })}
         </div>
-        <div className="mt-4 border-t border-slate-100 pt-3">
-          <Link href="/" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-slate-600 hover:bg-gold-50">🏠 Lihat Toko</Link>
-          <button disabled={loading} onClick={logout} className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-red-600 hover:bg-red-50 disabled:opacity-60">🚪 {loading ? "Keluar..." : "Keluar"}</button>
+        <div className="mt-4 border-t border-app-border pt-3">
+          <Link href="/" className="flex items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium text-app-muted hover:bg-app-accent-soft">🏠 Lihat Toko</Link>
+          <button disabled={loading} onClick={logout} className="mt-1 flex w-full items-center gap-3 rounded-xl px-3 py-3 text-left text-sm font-semibold text-red-600 hover:bg-red-500/10 dark:text-red-400 disabled:opacity-60">🚪 {loading ? "Keluar..." : "Keluar"}</button>
         </div>
       </nav>
     </aside>

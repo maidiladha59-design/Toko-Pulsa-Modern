@@ -318,14 +318,14 @@ export default function AdminProductsPage() {
     <div className="space-y-5">
       <div>
         <h1 className="text-xl font-bold">Kelola Produk</h1>
-        <p className="mt-1 text-sm text-gray-500">Tambah, edit, aktifkan/nonaktifkan, pasang gambar produk, dan upload file digital dari satu tempat.</p>
+        <p className="mt-1 text-sm text-app-muted">Tambah, edit, aktifkan/nonaktifkan, pasang gambar produk, dan upload file digital dari satu tempat.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-gray-200 bg-white p-4 shadow-sm sm:p-6">
+      <form onSubmit={handleSubmit} className="rounded-2xl border border-app-border bg-app-surface p-4 shadow-sm sm:p-6">
         <div className="mb-5 flex items-center justify-between gap-3">
           <div>
             <h2 className="font-bold">{editingId ? "Edit Produk" : "Tambah Produk Baru"}</h2>
-            <p className="text-xs text-gray-500">Gambar JPG/PNG/WEBP maksimal 5 MB. File digital maksimal 100 MB.</p>
+            <p className="text-xs text-app-muted">Gambar JPG/PNG/WEBP maksimal 5 MB. File digital maksimal 100 MB.</p>
           </div>
           {editingId && <Button type="button" variant="secondary" onClick={resetForm}>Batal Edit</Button>}
         </div>
@@ -333,43 +333,43 @@ export default function AdminProductsPage() {
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-[220px_1fr]">
           <div>
             <label className="text-sm font-semibold">Gambar Produk</label>
-            <label className="mt-2 flex aspect-square cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-gray-300 bg-gray-50 text-center hover:border-gold-400">
+            <label className="mt-2 flex aspect-square cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-app-border bg-app-inset text-center hover:border-gold-400">
               {imagePreview ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={imagePreview} alt="Preview produk" className="h-full w-full object-cover" />
               ) : (
-                <><span className="text-4xl">🖼️</span><span className="mt-2 px-4 text-xs text-gray-500">Klik untuk pilih gambar</span></>
+                <><span className="text-4xl">🖼️</span><span className="mt-2 px-4 text-xs text-app-muted">Klik untuk pilih gambar</span></>
               )}
               <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => chooseImage(e.target.files?.[0])} />
             </label>
             <div className="mt-2 flex gap-2">
-              {imageFile && <span className="truncate text-xs text-green-600">✓ {imageFile.name}</span>}
+              {imageFile && <span className="truncate text-xs text-green-600 dark:text-green-400">✓ {imageFile.name}</span>}
               {!imageFile && editingId && products.find((p) => p.id === editingId)?.thumbnail_url && <button type="button" onClick={() => { const p = products.find((x) => x.id === editingId); if (p) removeThumbnail(p); }} className="text-xs font-semibold text-red-600">Hapus gambar</button>}
             </div>
           </div>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className="text-sm font-medium">Nama Produk<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="Contoh: Template Desain Premium" /></label>
-            <label className="text-sm font-medium">Slug<input required value={form.slug} onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="template-desain-premium" /></label>
-            <label className="text-sm font-medium">Harga (Rp)<input required min="0" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="15000" /></label>
-            <label className="text-sm font-medium">Kategori<select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2"><option value="">Tanpa kategori</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
-            <label className="text-sm font-medium">Stok <span className="font-normal text-gray-400">(kosong = unlimited)</span><input min="0" type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="Unlimited" /></label>
+            <label className="text-sm font-medium">Nama Produk<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2" placeholder="Contoh: Template Desain Premium" /></label>
+            <label className="text-sm font-medium">Slug<input required value={form.slug} onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2" placeholder="template-desain-premium" /></label>
+            <label className="text-sm font-medium">Harga (Rp)<input required min="0" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2" placeholder="15000" /></label>
+            <label className="text-sm font-medium">Kategori<select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2"><option value="">Tanpa kategori</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
+            <label className="text-sm font-medium">Stok <span className="font-normal text-app-subtle">(kosong = unlimited)</span><input min="0" type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2" placeholder="Unlimited" /></label>
             <label className="text-sm font-medium">
               Tipe Produk
-              <select value={form.product_type} onChange={(e) => setForm({ ...form, product_type: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2">
+              <select value={form.product_type} onChange={(e) => setForm({ ...form, product_type: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2">
                 <option value="digital">📥 Ambil Produk (Digital) — file langsung diunduh pembeli</option>
                 <option value="jasa">🎯 Upload Target (Jasa) — pembeli kirim link/file, dikerjakan admin</option>
               </select>
-              <span className="mt-1 block text-xs font-normal text-gray-400">Jasa cocok untuk subscribe channel, joki, request custom, dll.</span>
+              <span className="mt-1 block text-xs font-normal text-app-subtle">Jasa cocok untuk subscribe channel, joki, request custom, dll.</span>
             </label>
-            <label className="text-sm font-medium sm:col-span-2">Deskripsi<textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2" placeholder="Jelaskan isi, format file, lisensi, dan informasi penting produk..." /></label>
+            <label className="text-sm font-medium sm:col-span-2">Deskripsi<textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2" placeholder="Jelaskan isi, format file, lisensi, dan informasi penting produk..." /></label>
 
-            <div className="rounded-xl border border-gray-200 bg-gray-50 p-3 sm:col-span-2">
-              <label className="text-sm font-semibold">File Produk Digital {form.product_type === "jasa" && <span className="font-normal text-gray-400">(opsional untuk Jasa)</span>}</label>
-              <p className="mt-1 text-xs text-gray-500">{form.product_type === "jasa" ? "Untuk produk Jasa, file di sini opsional (misal contoh hasil). Target pesanan dikirim pembeli sendiri saat checkout." : "File disimpan privat dan hanya dapat diakses pembeli yang berhak melalui link aman."}</p>
+            <div className="rounded-xl border border-app-border bg-app-inset p-3 sm:col-span-2">
+              <label className="text-sm font-semibold">File Produk Digital {form.product_type === "jasa" && <span className="font-normal text-app-subtle">(opsional untuk Jasa)</span>}</label>
+              <p className="mt-1 text-xs text-app-muted">{form.product_type === "jasa" ? "Untuk produk Jasa, file di sini opsional (misal contoh hasil). Target pesanan dikirim pembeli sendiri saat checkout." : "File disimpan privat dan hanya dapat diakses pembeli yang berhak melalui link aman."}</p>
               <div className="mt-2 flex flex-wrap items-center gap-3">
                 <input type="file" onChange={(e) => chooseDigitalFile(e.target.files?.[0])} className="block w-full text-sm sm:max-w-md" />
-                {digitalFile && <span className="text-xs font-medium text-green-600">✓ {digitalFile.name}</span>}
+                {digitalFile && <span className="text-xs font-medium text-green-600 dark:text-green-400">✓ {digitalFile.name}</span>}
                 {editingId && products.find((p) => p.id === editingId)?.digital_file_path && <button type="button" onClick={() => { const p = products.find((x) => x.id === editingId); if (p) removeDigitalFile(p); }} className="text-xs font-semibold text-red-600">Hapus file tersimpan</button>}
               </div>
             </div>
@@ -382,16 +382,16 @@ export default function AdminProductsPage() {
         </div>
       </form>
 
-      <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm">
-        <div className="flex flex-col gap-3 border-b border-gray-100 p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div><h2 className="font-bold">Daftar Produk</h2><p className="text-xs text-gray-500">{products.length} produk tersimpan</p></div>
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari produk..." className="rounded-lg border border-gray-300 px-3 py-2 text-sm sm:w-64" />
+      <div className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-sm">
+        <div className="flex flex-col gap-3 border-b border-app-border p-4 sm:flex-row sm:items-center sm:justify-between">
+          <div><h2 className="font-bold">Daftar Produk</h2><p className="text-xs text-app-muted">{products.length} produk tersimpan</p></div>
+          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari produk..." className="rounded-lg border border-app-border px-3 py-2 text-sm sm:w-64" />
         </div>
-        {loading ? <p className="p-6 text-sm text-gray-500">Memuat...</p> : filteredProducts.length === 0 ? <p className="p-8 text-center text-sm text-gray-500">Belum ada produk.</p> : (
-          <div className="divide-y divide-gray-100">
+        {loading ? <p className="p-6 text-sm text-app-muted">Memuat...</p> : filteredProducts.length === 0 ? <p className="p-8 text-center text-sm text-app-muted">Belum ada produk.</p> : (
+          <div className="divide-y divide-app-border">
             {filteredProducts.map((p) => (
               <div key={p.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
-                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-gray-100">
+                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-app-inset">
                   {p.thumbnail_url ? <img src={p.thumbnail_url} alt={p.name} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-2xl">🛍️</div>}
                 </div>
                 <div className="min-w-0 flex-1">
@@ -400,7 +400,7 @@ export default function AdminProductsPage() {
                     <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${p.product_type === "jasa" ? "bg-amber-100 text-amber-700" : "bg-gold-100 text-gold-700"}`}>{p.product_type === "jasa" ? "🎯 Jasa" : "📥 Digital"}</span>
                   </div>
                   <p className="text-sm font-bold text-brand">{formatRupiah(p.price)}</p>
-                  <p className="text-xs text-gray-400">/{p.slug} · {p.product_type === "jasa" ? "Target dikirim pembeli saat checkout" : p.digital_file_path ? "✓ File digital" : "Belum ada file"}</p>
+                  <p className="text-xs text-app-subtle">/{p.slug} · {p.product_type === "jasa" ? "Target dikirim pembeli saat checkout" : p.digital_file_path ? "✓ File digital" : "Belum ada file"}</p>
                 </div>
                 <div className="flex flex-wrap gap-2 sm:justify-end">
                   <Button variant="secondary" onClick={() => startEdit(p)}>Edit</Button>

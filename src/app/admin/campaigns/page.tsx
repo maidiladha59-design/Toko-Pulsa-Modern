@@ -51,7 +51,7 @@ export default function AdminCampaignsPage() {
     setBusy("");
   }
 
-  if (loading) return <div className="rounded-2xl border bg-white p-6">Memuat...</div>;
+  if (loading) return <div className="rounded-2xl border border-app-border bg-app-surface p-6">Memuat...</div>;
 
   return (
     <div className="space-y-5">
@@ -62,7 +62,7 @@ export default function AdminCampaignsPage() {
       </div>
 
       {!ready && (
-        <div className="rounded-2xl border border-gold-300 bg-gold-50 p-4 text-sm text-zinc-900">
+        <div className="rounded-2xl border border-gold-300 bg-app-accent-soft p-4 text-sm text-app-text">
           Tabel belum ada. Jalankan <b>supabase/migrations_v76_push_campaigns.sql</b> di Supabase SQL Editor.
         </div>
       )}
@@ -70,15 +70,15 @@ export default function AdminCampaignsPage() {
       {items.map((c) => {
         const info = INFO[c.key] || { name: c.key, desc: "", daysLabel: "Hari" };
         return (
-          <section key={c.key} className="space-y-4 rounded-2xl border border-gold-200 bg-white p-5 shadow-sm">
+          <section key={c.key} className="space-y-4 rounded-2xl border border-gold-200 bg-app-surface p-5 shadow-sm">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <h2 className="font-black">{info.name}</h2>
                   <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-black ${c.enabled ? "bg-gold-400 text-black" : "bg-zinc-950 text-gold-400"}`}>{c.enabled ? "AKTIF" : "NONAKTIF"}</span>
                 </div>
-                <p className="mt-1 text-sm text-slate-500">{info.desc}</p>
-                <p className="mt-1 text-xs font-bold text-zinc-700">Terkirim 7 hari terakhir: {sent7d[c.key] || 0}</p>
+                <p className="mt-1 text-sm text-app-muted">{info.desc}</p>
+                <p className="mt-1 text-xs font-bold text-app-text">Terkirim 7 hari terakhir: {sent7d[c.key] || 0}</p>
               </div>
               <button type="button" role="switch" aria-checked={c.enabled} aria-label={`Ubah status ${info.name}`} onClick={() => edit(c.key, { enabled: !c.enabled })}
                 className={`relative h-8 w-14 shrink-0 rounded-full transition ${c.enabled ? "bg-gold-400" : "bg-zinc-300"}`}>
@@ -87,20 +87,20 @@ export default function AdminCampaignsPage() {
             </div>
 
             <label className="block text-sm font-bold">Judul
-              <input value={c.title} maxLength={120} onChange={(e) => edit(c.key, { title: e.target.value })} className="mt-2 w-full rounded-xl border p-3 font-normal" />
+              <input value={c.title} maxLength={120} onChange={(e) => edit(c.key, { title: e.target.value })} className="mt-2 w-full rounded-xl border border-app-border p-3 font-normal" />
             </label>
             <label className="block text-sm font-bold">Pesan
-              <textarea value={c.message} maxLength={300} rows={3} onChange={(e) => edit(c.key, { message: e.target.value })} className="mt-2 w-full rounded-xl border p-3 font-normal" />
+              <textarea value={c.message} maxLength={300} rows={3} onChange={(e) => edit(c.key, { message: e.target.value })} className="mt-2 w-full rounded-xl border border-app-border p-3 font-normal" />
             </label>
             <div className="grid gap-4 sm:grid-cols-3">
               <label className="block text-sm font-bold">Halaman tujuan
-                <input value={c.url} onChange={(e) => edit(c.key, { url: e.target.value })} placeholder="/layanan" className="mt-2 w-full rounded-xl border p-3 font-normal" />
+                <input value={c.url} onChange={(e) => edit(c.key, { url: e.target.value })} placeholder="/layanan" className="mt-2 w-full rounded-xl border border-app-border p-3 font-normal" />
               </label>
               <label className="block text-sm font-bold">{info.daysLabel}
-                <input type="number" min={1} value={c.min_days} onChange={(e) => edit(c.key, { min_days: Number(e.target.value) })} className="mt-2 w-full rounded-xl border p-3 font-normal" />
+                <input type="number" min={1} value={c.min_days} onChange={(e) => edit(c.key, { min_days: Number(e.target.value) })} className="mt-2 w-full rounded-xl border border-app-border p-3 font-normal" />
               </label>
               <label className="block text-sm font-bold">Jeda kirim ulang (hari)
-                <input type="number" min={1} value={c.cooldown_days} onChange={(e) => edit(c.key, { cooldown_days: Number(e.target.value) })} className="mt-2 w-full rounded-xl border p-3 font-normal" />
+                <input type="number" min={1} value={c.cooldown_days} onChange={(e) => edit(c.key, { cooldown_days: Number(e.target.value) })} className="mt-2 w-full rounded-xl border border-app-border p-3 font-normal" />
               </label>
             </div>
             <button disabled={busy === c.key || !ready} onClick={() => save(c)} className="rounded-xl bg-zinc-950 px-5 py-3 text-sm font-black text-gold-400 disabled:opacity-50">
@@ -110,9 +110,9 @@ export default function AdminCampaignsPage() {
         );
       })}
 
-      <section className="rounded-2xl border border-gold-200 bg-white p-5 shadow-sm">
+      <section className="rounded-2xl border border-gold-200 bg-app-surface p-5 shadow-sm">
         <h2 className="font-black">Kirim sekarang</h2>
-        <p className="mt-1 text-sm text-slate-500">Jadwal otomatis berjalan sekali sehari. Tombol ini menjalankan kampanye aktif saat itu juga (maksimal 200 pengguna per kampanye per proses).</p>
+        <p className="mt-1 text-sm text-app-muted">Jadwal otomatis berjalan sekali sehari. Tombol ini menjalankan kampanye aktif saat itu juga (maksimal 200 pengguna per kampanye per proses).</p>
         <button disabled={busy === "run" || !ready} onClick={runNow} className="mt-4 rounded-xl bg-gold-400 px-5 py-3 text-sm font-black text-black disabled:opacity-50">
           {busy === "run" ? "Mengirim..." : "🚀 Jalankan sekarang"}
         </button>

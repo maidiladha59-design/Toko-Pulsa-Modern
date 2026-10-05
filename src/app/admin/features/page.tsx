@@ -34,7 +34,7 @@ export default function AdminFeaturesPage() {
     setBusyKey("");
   }
 
-  if (loading) return <div className="rounded-2xl border bg-white p-6">Memuat...</div>;
+  if (loading) return <div className="rounded-2xl border border-app-border bg-app-surface p-6">Memuat...</div>;
 
   return (
     <div className="space-y-5">
@@ -45,14 +45,14 @@ export default function AdminFeaturesPage() {
       </div>
 
       {!tableReady && (
-        <div className="rounded-2xl border border-gold-300 bg-gold-50 p-4 text-sm text-zinc-900">
+        <div className="rounded-2xl border border-gold-300 bg-app-accent-soft p-4 text-sm text-app-text">
           Tabel <b>feature_flags</b> belum ada. Jalankan <b>supabase/migrations_v75_feature_flags.sql</b> di Supabase SQL Editor agar pengaturan bisa disimpan.
         </div>
       )}
 
       <section className="space-y-3">
         {features.map((f) => (
-          <div key={f.key} className="flex items-center justify-between gap-4 rounded-2xl border border-gold-200 bg-white p-5 shadow-sm">
+          <div key={f.key} className="flex items-center justify-between gap-4 rounded-2xl border border-gold-200 bg-app-surface p-5 shadow-sm">
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <h2 className="font-black">{f.label}</h2>
@@ -60,7 +60,7 @@ export default function AdminFeaturesPage() {
                   {f.enabled ? "AKTIF" : "NONAKTIF"}
                 </span>
               </div>
-              <p className="mt-1 text-sm text-slate-500">{f.description}</p>
+              <p className="mt-1 text-sm text-app-muted">{f.description}</p>
             </div>
             <button
               type="button"

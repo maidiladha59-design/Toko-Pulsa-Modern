@@ -68,19 +68,19 @@ export default function AdminTransfersPage() {
   return (
     <div className="animate-page-in">
       <div className="mb-5">
-        <p className="text-xs font-black uppercase tracking-[.18em] text-gold-600">Keuangan</p>
-        <h1 className="mt-1 text-2xl font-black text-slate-900">Transfer Saldo & Limit</h1>
-        <p className="mt-1 text-sm text-slate-500">Atur biaya admin, nominal minimum/maksimum, dan limit harian/bulanan transfer antar-pengguna.</p>
+        <p className="text-xs font-black uppercase tracking-[.18em] text-app-kicker">Keuangan</p>
+        <h1 className="mt-1 text-2xl font-black text-app-text">Transfer Saldo & Limit</h1>
+        <p className="mt-1 text-sm text-app-muted">Atur biaya admin, nominal minimum/maksimum, dan limit harian/bulanan transfer antar-pengguna.</p>
       </div>
 
       {loading ? (
-        <div className="animate-pulse rounded-2xl border border-slate-200 bg-white p-6 text-sm text-slate-500">Memuat pengaturan transfer...</div>
+        <div className="animate-pulse rounded-2xl border border-app-border bg-app-surface p-6 text-sm text-app-muted">Memuat pengaturan transfer...</div>
       ) : (
-        <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+        <section className="rounded-3xl border border-app-border bg-app-surface p-5 shadow-sm">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="font-black text-slate-900">Pengaturan Transfer Saldo</h2>
-              <p className="text-xs text-slate-500">Biaya admin dibebankan ke pengirim. Limit dihitung per pengirim (harian & bulanan, zona waktu Jakarta).</p>
+              <h2 className="font-black text-app-text">Pengaturan Transfer Saldo</h2>
+              <p className="text-xs text-app-muted">Biaya admin dibebankan ke pengirim. Limit dihitung per pengirim (harian & bulanan, zona waktu Jakarta).</p>
             </div>
             <label className="flex items-center gap-2 text-sm font-bold">
               <input type="checkbox" checked={config.enabled} onChange={(e) => setConfig({ ...config, enabled: e.target.checked })} /> Aktif
@@ -88,31 +88,31 @@ export default function AdminTransfersPage() {
           </div>
 
           <div className="mt-4 grid gap-3 md:grid-cols-3">
-            <label className="text-sm font-bold text-slate-700">Tipe biaya
-              <select value={config.fee_type} onChange={(e) => setConfig({ ...config, fee_type: e.target.value as TransferConfig["fee_type"] })} className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5">
+            <label className="text-sm font-bold text-app-text">Tipe biaya
+              <select value={config.fee_type} onChange={(e) => setConfig({ ...config, fee_type: e.target.value as TransferConfig["fee_type"] })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5">
                 <option value="FIXED">Nominal tetap</option>
                 <option value="PERCENTAGE">Persentase</option>
               </select>
             </label>
-            <label className="text-sm font-bold text-slate-700">Nilai biaya {config.fee_type === "PERCENTAGE" ? "(%)" : "(Rp)"}
-              <input type="number" min="0" step={config.fee_type === "PERCENTAGE" ? "0.01" : "100"} value={config.fee_value} onChange={(e) => setConfig({ ...config, fee_value: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5" />
+            <label className="text-sm font-bold text-app-text">Nilai biaya {config.fee_type === "PERCENTAGE" ? "(%)" : "(Rp)"}
+              <input type="number" min="0" step={config.fee_type === "PERCENTAGE" ? "0.01" : "100"} value={config.fee_value} onChange={(e) => setConfig({ ...config, fee_value: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5" />
             </label>
-            <label className="text-sm font-bold text-slate-700">Minimal transfer (Rp)
-              <input type="number" min="1000" value={config.min_transfer} onChange={(e) => setConfig({ ...config, min_transfer: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5" />
+            <label className="text-sm font-bold text-app-text">Minimal transfer (Rp)
+              <input type="number" min="1000" value={config.min_transfer} onChange={(e) => setConfig({ ...config, min_transfer: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5" />
             </label>
-            <label className="text-sm font-bold text-slate-700">Maksimal per transfer (Rp)
-              <input type="number" min="1000" value={config.max_transfer} onChange={(e) => setConfig({ ...config, max_transfer: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5" />
+            <label className="text-sm font-bold text-app-text">Maksimal per transfer (Rp)
+              <input type="number" min="1000" value={config.max_transfer} onChange={(e) => setConfig({ ...config, max_transfer: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5" />
             </label>
-            <label className="text-sm font-bold text-slate-700">Limit harian per pengirim (Rp)
-              <input type="number" min="1000" value={config.daily_limit} onChange={(e) => setConfig({ ...config, daily_limit: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5" />
+            <label className="text-sm font-bold text-app-text">Limit harian per pengirim (Rp)
+              <input type="number" min="1000" value={config.daily_limit} onChange={(e) => setConfig({ ...config, daily_limit: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5" />
             </label>
-            <label className="text-sm font-bold text-slate-700">Limit bulanan per pengirim (Rp)
-              <input type="number" min="1000" value={config.monthly_limit} onChange={(e) => setConfig({ ...config, monthly_limit: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5" />
+            <label className="text-sm font-bold text-app-text">Limit bulanan per pengirim (Rp)
+              <input type="number" min="1000" value={config.monthly_limit} onChange={(e) => setConfig({ ...config, monthly_limit: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5" />
             </label>
           </div>
 
-          <div className="mt-4 rounded-2xl bg-slate-50 p-4 text-xs leading-5 text-slate-500">
-            <p className="font-black text-slate-700">Ringkasan saat ini</p>
+          <div className="mt-4 rounded-2xl bg-app-inset p-4 text-xs leading-5 text-app-muted">
+            <p className="font-black text-app-text">Ringkasan saat ini</p>
             <p className="mt-1">
               Biaya: <b>{config.fee_value > 0 ? (config.fee_type === "PERCENTAGE" ? `${config.fee_value}%` : formatRupiah(config.fee_value)) : "Gratis"}</b> ·
               Rentang nominal: <b>{formatRupiah(config.min_transfer)}</b> s.d. <b>{formatRupiah(config.max_transfer)}</b> ·
@@ -123,7 +123,7 @@ export default function AdminTransfersPage() {
 
           <div className="mt-4 flex flex-wrap items-center gap-2">
             <Button onClick={save} loading={saving}>Simpan Pengaturan</Button>
-            <button onClick={load} className="rounded-xl border border-slate-200 bg-white px-4 py-2.5 text-sm font-bold text-slate-700 shadow-sm">↻ Muat Ulang</button>
+            <button onClick={load} className="rounded-xl border border-app-border bg-app-surface px-4 py-2.5 text-sm font-bold text-app-text shadow-sm">↻ Muat Ulang</button>
           </div>
         </section>
       )}
