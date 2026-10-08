@@ -2,8 +2,8 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { createClient } from '@/lib/supabase/server';
 import { createAdminClient } from '@/lib/supabase/admin';
-import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured, type GatewayMethod } from '@/lib/fr3newera';
-import QRCode from 'qrcode';
+import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured, GATEWAY_METHODS, type GatewayMethod } from '@/lib/midtrans';
+import { renderQrImage } from '@/lib/qr-image';
 import { fulfillPpobOrder } from '@/lib/ppob/fulfill';
 import { verifyTransactionPin } from '@/lib/security/transaction-pin';
 
@@ -15,8 +15,8 @@ const schema = z.object({
   pin: z.string().optional(),
 });
 
-// FR3 NEWERA hanya menyediakan QRIS (tidak ada Virtual Account seperti Pakasir).
-const allowedGateway = new Set(['qris']);
+// Midtrans Core API: QRIS + Virtual Account bca/bni/bri/permata.
+const allowedGateway = new Set<string>(GATEWAY_METHODS);
 
 export async function POST(request: Request) {
   const supabase = createClient();
@@ -84,7 +84,7 @@ export async function POST(request: Request) {
   const existingNumber = existing?.payment_number || existing?.qris_payload;
   if (existingNumber && existing?.status === 'PENDING') {
     const isQris = existing.payment_method === 'QRIS';
-    return NextResponse.json({ order_id:o.order_id, order_number:o.order_number, amount:existing.total_amount, payment_method:existing.payment_method, gateway_method:gatewayMethod, payment_number:existingNumber, expired_at:existing.qris_expired_at, qris_image:isQris ? await QRCode.toDataURL(existingNumber,{margin:1,width:360}) : null }, { status:201 });
+    return NextResponse.json({ order_id:o.order_id, order_number:o.order_number, amount:existing.total_amount, payment_method:existing.payment_method, gateway_method:gatewayMethod, payment_number:existingNumber, expired_at:existing.qris_expired_at, qris_image:isQris ? await renderQrImage(existingNumber, 360) : null }, { status:201 });
   }
 
   try {
@@ -99,7 +99,7 @@ export async function POST(request: Request) {
       qris_expired_at:payment.expired_at, gateway_fee:payment.fee ?? 0, gateway_total_payment:totalPayment, updated_at:new Date().toISOString()
     }).eq('id',o.order_id).eq('status','PENDING');
     if (saveError) throw saveError;
-    return NextResponse.json({ order_id:o.order_id, order_number:o.order_number, amount:totalPayment, base_amount:payment.amount, fee:payment.fee ?? 0, payment_method:isQris?'QRIS':'BANK_VA', gateway_method:gatewayMethod, payment_number:paymentNumber, expired_at:payment.expired_at, qris_image:isQris?await QRCode.toDataURL(paymentNumber,{margin:1,width:360}):null }, { status:201 });
+    return NextResponse.json({ order_id:o.order_id, order_number:o.order_number, amount:totalPayment, base_amount:payment.amount, fee:payment.fee ?? 0, payment_method:isQris?'QRIS':'BANK_VA', gateway_method:gatewayMethod, payment_number:paymentNumber, expired_at:payment.expired_at, qris_image:isQris?await renderQrImage(paymentNumber, 360):null }, { status:201 });
   } catch (e) {
     await admin.from('orders').update({ status:'FAILED', updated_at:new Date().toISOString() }).eq('id',o.order_id).eq('status','PENDING');
     return NextResponse.json({ message:'Gagal membuat instruksi pembayaran.' }, { status:502 });

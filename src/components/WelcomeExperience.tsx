@@ -14,7 +14,7 @@ const FEATURES = [
   {
     icon: "⚡",
     title: "QRIS Otomatis",
-    desc: "Bayar pakai QRIS lewat FR3 NEWERA — status terverifikasi real-time.",
+    desc: "Bayar pakai QRIS — status terverifikasi real-time.",
     tint: "bg-emerald-400/15 text-emerald-300",
   },
   {
@@ -78,7 +78,7 @@ export default function WelcomeExperience() {
 
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center overflow-y-auto bg-navy px-4 py-8">
-      {/* Background glow ala fr3newera.com */}
+      {/* Background glow brand */}
       <div
         className="pointer-events-none absolute inset-0 opacity-90"
         style={{
@@ -122,7 +122,7 @@ export default function WelcomeExperience() {
             Selamat datang di <span className="text-gold-400">AIDIL STORE</span> 👋
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-slate-300">
-            Marketplace digital dengan pembayaran QRIS otomatis via FR3 NEWERA, status transaksi real-time,
+            Marketplace digital dengan pembayaran QRIS otomatis, status transaksi real-time,
             dan saldo wallet yang bisa kamu pantau kapan saja.
           </p>
 

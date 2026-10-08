@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured } from "@/lib/fr3newera";
-import QRCode from "qrcode";
+import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured } from "@/lib/midtrans";
+import { renderQrImage } from "@/lib/qr-image";
 
 const bodySchema = z.object({
   items: z.array(z.object({ product_id: z.string().uuid(), quantity: z.number().int().positive() })).min(1),
@@ -13,7 +13,7 @@ const bodySchema = z.object({
 });
 
 // Membuat order QRIS: order & item disimpan dulu (status PENDING, saldo TIDAK
-// disentuh), lalu transaksi dibuat di Pakasir untuk mendapatkan QR code.
+// disentuh), lalu transaksi dibuat di Midtrans untuk mendapatkan QR code.
 export async function POST(request: Request) {
   if (!isGatewayConfigured()) {
     return NextResponse.json({ message: "Pembayaran QRIS belum dikonfigurasi. Silakan hubungi admin." }, { status: 503 });
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
 
   const { order_id, order_number, total_amount } = order as { order_id: string; order_number: string; total_amount: number };
 
-  // Kalau order ini sudah pernah dibuat transaksi Pakasir-nya (retry/double click),
+  // Kalau order ini sudah pernah dibuat transaksi Midtrans-nya (retry/double click),
   // pakai payload yang sudah ada supaya tidak membuat transaksi duplikat.
   const admin = createAdminClient();
 
@@ -105,27 +105,27 @@ export async function POST(request: Request) {
   const payableAmount = Number(existingOrder?.total_amount ?? total_amount);
 
   if (existingOrder?.qris_payload && existingOrder.status === "PENDING") {
-    const qrImage = await QRCode.toDataURL(existingOrder.qris_payload, { margin: 1, width: 320 });
+    const qrImage = await renderQrImage(existingOrder.qris_payload, 320);
     return NextResponse.json({ order_id, order_number, amount: payableAmount, qris_image: qrImage, expired_at: existingOrder.qris_expired_at }, { status: 201 });
   }
 
   try {
     const payment = await createGatewayTransaction(order_number, payableAmount, "qris");
-    const qrString = extractGatewayPaymentNumber(payment);
-    if (!payment.txn_id || !qrString) throw new Error("GATEWAY_INVALID_RESPONSE");
+    const paymentNumber = extractGatewayPaymentNumber(payment);
+    if (!payment.txn_id || !paymentNumber) throw new Error("GATEWAY_INVALID_RESPONSE");
     const { error: saveError } = await admin.from("orders").update({
       gateway_reference: order_number,
       gateway_txn_id: payment.txn_id,
       gateway_method: "qris",
-      qris_payload: qrString,
-      payment_number: qrString,
+      qris_payload: paymentNumber,
+      payment_number: paymentNumber,
       qris_expired_at: payment.expired_at,
       gateway_fee: payment.fee ?? 0,
       gateway_total_payment: payment.total_payment ?? payableAmount,
       updated_at: new Date().toISOString(),
     }).eq("id", order_id).eq("status", "PENDING");
     if (saveError) throw saveError;
-    const qrImage = await QRCode.toDataURL(qrString, { margin: 1, width: 320 });
+    const qrImage = await renderQrImage(paymentNumber, 320);
     return NextResponse.json({ order_id, order_number, amount: payment.total_payment ?? payableAmount, expired_at: payment.expired_at, qris_image: qrImage }, { status: 201 });
   } catch (gatewayError: any) {
     // Order sudah terlanjur dibuat; tandai gagal supaya tidak menggantung sebagai PENDING kosong.

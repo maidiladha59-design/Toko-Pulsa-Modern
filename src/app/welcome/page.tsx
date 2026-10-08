@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 
 export default function Welcome() {
@@ -66,7 +67,7 @@ export default function Welcome() {
             banner.file_type === "pdf" ? (
               <iframe title={banner.title} src={banner.file_url} className="absolute inset-0 h-full w-full opacity-35" />
             ) : (
-              <img src={banner.file_url} alt={banner.title} className="absolute inset-0 h-full w-full object-cover opacity-55" />
+              <Image src={banner.file_url} alt={banner.title} fill sizes="100vw" className="object-cover opacity-55" />
             )
           ) : (
             <div className="absolute inset-0 bg-gradient-to-br from-gold-700 via-zinc-900 to-slate-950" />
@@ -74,7 +75,7 @@ export default function Welcome() {
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/55 to-transparent" />
 
           <div className="relative z-10 flex min-h-[560px] flex-col justify-end p-7 sm:p-12">
-            <img src="/aidil-logo.png" alt="AIDIL STORE" className="h-14 w-14 rounded-2xl bg-white p-1 shadow-xl" />
+            <Image src="/aidil-logo.png" alt="AIDIL STORE" width={56} height={56} className="h-14 w-14 rounded-2xl bg-white p-1 shadow-xl" />
             <p className="mt-6 text-xs font-black uppercase tracking-[.25em] text-amber-300">SELAMAT DATANG DI AIDIL STORE</p>
             <h1 className="mt-2 max-w-2xl text-3xl font-black sm:text-5xl">
               Semua kebutuhan digital dalam satu tempat.

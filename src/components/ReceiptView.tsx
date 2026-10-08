@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useState } from "react";
 import { printReceiptBluetooth, receiptToText, type ReceiptData } from "@/lib/receipt-print";
 
@@ -74,7 +75,7 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
 
         <div className="print-avoid-break bg-white px-5 pb-6 pt-4 text-zinc-950 shadow-lg print:shadow-none">
           <div className="border-b-2 border-gold-400 pb-5 text-center">
-            <img src="/aidil-logo.png" alt="AIDIL STORE" className="mx-auto h-20 w-20 rounded-2xl object-cover ring-2 ring-gold-400" />
+            <Image src="/aidil-logo.png" alt="AIDIL STORE" width={80} height={80} className="mx-auto h-20 w-20 rounded-2xl object-cover ring-2 ring-gold-400" />
             <p className="mt-3 text-xs font-black tracking-[.25em] text-gold-700">AIDIL STORE</p>
             <h1 className="mt-1 text-2xl font-black text-zinc-950">{title}</h1>
           </div>

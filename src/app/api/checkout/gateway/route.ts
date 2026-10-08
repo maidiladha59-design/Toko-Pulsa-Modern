@@ -2,8 +2,8 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured, type GatewayMethod } from "@/lib/fr3newera";
-import QRCode from "qrcode";
+import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured, GATEWAY_METHODS } from "@/lib/midtrans";
+import { renderQrImage } from "@/lib/qr-image";
 
 const bodySchema = z.object({
   items: z.array(z.object({
@@ -13,14 +13,14 @@ const bodySchema = z.object({
   idempotency_key: z.string().min(10),
   voucher_code: z.string().trim().max(64).optional(),
   targets: z.record(z.object({ customer_no: z.string().min(3).max(64), target_data: z.record(z.unknown()).optional() })).optional(),
-  // FR3 NEWERA hanya menyediakan QRIS (tidak ada Virtual Account seperti Pakasir).
-  method: z.enum(["qris"]),
+  // Midtrans Core API: QRIS + Virtual Account (bca/bni/bri/permata).
+  method: z.enum(GATEWAY_METHODS),
 });
 
 export async function POST(request: Request) {
   if (!isGatewayConfigured()) {
     return NextResponse.json(
-      { message: "Pembayaran otomatis belum dikonfigurasi. Tambahkan FR3NEWERA_API_KEY di environment server." },
+      { message: "Pembayaran otomatis belum dikonfigurasi. Tambahkan MIDTRANS_SERVER_KEY di environment server." },
       { status: 503 }
     );
   }
@@ -109,12 +109,12 @@ export async function POST(request: Request) {
       payment_method: existing.payment_method,
       payment_number: existingNumber,
       expired_at: existing.qris_expired_at,
-      qris_image: isQris ? await QRCode.toDataURL(existingNumber, { margin: 1, width: 360 }) : null,
+      qris_image: isQris ? await renderQrImage(existingNumber, 360) : null,
     }, { status: 201 });
   }
 
   try {
-    const payment = await createGatewayTransaction(o.order_number, Number(existing?.total_amount ?? o.total_amount), method as GatewayMethod);
+    const payment = await createGatewayTransaction(o.order_number, Number(existing?.total_amount ?? o.total_amount), method);
     const isQris = method === "qris";
     const paymentNumber = extractGatewayPaymentNumber(payment);
     const totalPayment = payment.total_payment ?? Number(existing?.total_amount ?? o.total_amount);
@@ -144,7 +144,7 @@ export async function POST(request: Request) {
       gateway_method: method,
       payment_number: paymentNumber,
       expired_at: payment.expired_at,
-      qris_image: isQris ? await QRCode.toDataURL(paymentNumber, { margin: 1, width: 360 }) : null,
+      qris_image: isQris ? await renderQrImage(paymentNumber, 360) : null,
     }, { status: 201 });
   } catch (gatewayError) {
     await admin.from("orders").update({ status: "FAILED", updated_at: new Date().toISOString() }).eq("id", o.order_id).eq("status", "PENDING");

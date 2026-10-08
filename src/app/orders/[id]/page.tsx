@@ -7,7 +7,7 @@ import DownloadButton from "@/components/DownloadButton";
 import GatewayPayment from "@/components/GatewayPayment";
 import PPOBReceiptButton from "@/components/PPOBReceiptButton";
 import PPOBStatusPoller from "@/components/PPOBStatusPoller";
-import QRCode from "qrcode";
+import { renderQrImage } from "@/lib/qr-image";
 
 const ORDER_MESSAGE: Record<string, string> = {
   PENDING: "Pesanan Anda sedang menunggu pembayaran.",
@@ -19,6 +19,7 @@ const ORDER_MESSAGE: Record<string, string> = {
 };
 
 const bankNames: Record<string, string> = {
+  bca_va: "BCA Virtual Account",
   bri_va: "BRI Virtual Account", bni_va: "BNI Virtual Account",
   cimb_niaga_va: "CIMB Niaga Virtual Account", sampoerna_va: "Sampoerna Virtual Account",
   bnc_va: "BNC Virtual Account", maybank_va: "Maybank Virtual Account",
@@ -69,7 +70,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
     new Date(order.qris_expired_at).getTime() > Date.now();
 
   const qrisImage = showGateway && order.payment_method === "QRIS" && order.qris_payload
-    ? await QRCode.toDataURL(order.qris_payload as string, { margin: 1, width: 360 })
+    ? await renderQrImage(order.qris_payload as string, 360)
     : null;
 
   return (
@@ -157,7 +158,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between gap-3"><span className="text-app-subtle">Tanggal</span><b className="text-app-text">{formatDate(order.created_at)}</b></div>
               <div className="flex justify-between gap-3"><span className="shrink-0 text-app-subtle">ID Pesanan</span><b className="break-all text-right text-app-text">{order.order_number}</b></div>
-              <div className="flex justify-between gap-3"><span className="text-app-subtle">Metode</span><b className="text-right text-app-text">{order.payment_method === "BANK_VA" ? (bankNames[order.gateway_method || ""] || "Virtual Account") : order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method || "Wallet"}</b></div>
+              <div className="flex justify-between gap-3"><span className="text-app-subtle">Metode</span><b className="text-right text-app-text">{order.payment_method === "BANK_VA" ? (bankNames[order.gateway_method || ""] || "Virtual Account") : order.payment_method === "QRIS" ? "QRIS" : order.payment_method || "Wallet"}</b></div>
               <div className="flex justify-between"><span className="text-app-subtle">Status</span><StatusBadge status={order.status} /></div>
               <div className="flex justify-between border-t border-app-border pt-4"><span className="text-app-subtle">Subtotal produk</span><b className="tabular-nums text-app-text">{formatRupiah(order.total_amount)}</b></div>
               <div className="flex justify-between text-lg"><span className="font-black text-app-text">Total dibayar</span><b className="tabular-nums text-app-kicker">{formatRupiah(order.gateway_total_payment || order.total_amount)}</b></div>

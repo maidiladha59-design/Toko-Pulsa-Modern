@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { formatRupiah } from "@/lib/utils";
 
@@ -75,7 +76,7 @@ export default function QrisPayment({ orderId, qrisImage, amount, expiredAt, onS
     <div className="rounded-3xl border border-app-border bg-app-surface p-6 text-center shadow-sm">
       <p className="text-xs font-black uppercase tracking-widest text-gold-600">Scan untuk Bayar</p>
       <div className="mx-auto mt-4 w-fit rounded-2xl border border-app-border bg-white p-3">
-        <img src={qrisImage} alt="QRIS Payment" className="h-64 w-64" />
+        <Image src={qrisImage} alt="QRIS Payment" width={256} height={256} unoptimized className="h-64 w-64" />
       </div>
       <p className="mt-4 text-2xl font-black text-app-text">{formatRupiah(amount)}</p>
       <p className="mt-1 text-xs text-app-subtle">Scan kode QRIS di atas menggunakan aplikasi DANA, GoPay, OVO, ShopeePay, m-banking, atau aplikasi pendukung QRIS lainnya.</p>

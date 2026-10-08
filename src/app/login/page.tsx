@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -71,9 +72,11 @@ function LoginForm() {
 
           <div>
             <div className="flex items-center gap-3">
-              <img
+              <Image
                 src="/aidil-logo.png"
                 alt="Aidil Store"
+                width={56}
+                height={56}
                 className="h-14 w-14 rounded-2xl bg-white p-2 shadow-xl"
               />
 

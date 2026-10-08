@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import { isImageTooBlurry } from "@/lib/blur-check";
@@ -288,7 +289,7 @@ export default function KYC() {
   return (
     <div className="mx-auto max-w-xl brand-card p-6 sm:p-8">
       <div className="flex items-center gap-3">
-        <img src="/aidil-logo.png" className="h-14 w-14 rounded-2xl object-cover" alt="AIDIL STORE" />
+        <Image src="/aidil-logo.png" width={56} height={56} className="h-14 w-14 rounded-2xl object-cover" alt="AIDIL STORE" />
         <div>
           <p className="section-kicker">Verifikasi Akun</p>
           <h1 className="mt-1 text-2xl font-black">KYC — KTP dan Verifikasi Wajah</h1>

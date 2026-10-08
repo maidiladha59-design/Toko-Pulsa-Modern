@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getGatewayTransactionDetail, isGatewayConfigured } from "@/lib/fr3newera";
+import { getGatewayTransactionDetail, isGatewayConfigured, GATEWAY_PROVIDER } from "@/lib/midtrans";
 
 async function isAdmin() {
   const supabase = createClient();
@@ -18,7 +18,7 @@ export async function POST() {
   const checked: any[] = [];
   const errors: any[] = [];
 
-  const { data: topups } = await admin.from("topups").select("id,amount,payment_amount,status,provider,provider_order_id,provider_txn_id,payment_method").eq("provider","fr3newera").order("created_at", { ascending: false }).limit(100);
+  const { data: topups } = await admin.from("topups").select("id,amount,payment_amount,status,provider,provider_order_id,provider_txn_id,payment_method").eq("provider",GATEWAY_PROVIDER).order("created_at", { ascending: false }).limit(100);
   for (const t of topups || []) {
     try {
       let provider: any = null;
@@ -26,10 +26,10 @@ export async function POST() {
         provider = await getGatewayTransactionDetail(t.provider_txn_id);
         const { data: internal } = await admin.rpc("reconcile_internal_financial_record", { p_source_type: "TOPUP", p_source_id: t.id });
         await admin.from("payment_reconciliation").upsert({
-          source_type: "TOPUP", source_id: t.id, provider: "fr3newera", internal_status: t.status,
+          source_type: "TOPUP", source_id: t.id, provider: GATEWAY_PROVIDER, internal_status: t.status,
           provider_status: provider.status, internal_amount: Number(t.payment_amount), provider_amount: Number(provider.amount),
           state: internal?.state || "REVIEW",
-          discrepancy: internal?.discrepancy || (provider.status === "completed" && t.status !== "APPROVED" ? "FR3 NEWERA completed tetapi Top Up belum APPROVED" : null),
+          discrepancy: internal?.discrepancy || (provider.status === "completed" && t.status !== "APPROVED" ? "Midtrans completed tetapi Top Up belum APPROVED" : null),
           wallet_amount: internal?.wallet_amount ?? null,
           checked_at: new Date().toISOString(), metadata: { runner: "v41", payment_method: t.payment_method }
         }, { onConflict: "source_type,source_id" });
@@ -48,10 +48,10 @@ export async function POST() {
         const provider = await getGatewayTransactionDetail(o.gateway_txn_id);
         const { data: internal } = await admin.rpc("reconcile_internal_financial_record", { p_source_type: "ORDER", p_source_id: o.id });
         await admin.from("payment_reconciliation").upsert({
-          source_type: "ORDER", source_id: o.id, provider: "fr3newera", internal_status: o.status, provider_status: provider.status,
+          source_type: "ORDER", source_id: o.id, provider: GATEWAY_PROVIDER, internal_status: o.status, provider_status: provider.status,
           internal_amount: Number(o.total_amount), provider_amount: Number(provider.amount), state: internal?.state || "REVIEW",
           wallet_amount: internal?.wallet_amount ?? null,
-          discrepancy: internal?.discrepancy || (provider.status === "completed" && o.status === "FAILED" ? "FR3 NEWERA completed tetapi order FAILED" : null),
+          discrepancy: internal?.discrepancy || (provider.status === "completed" && o.status === "FAILED" ? "Midtrans completed tetapi order FAILED" : null),
           checked_at: new Date().toISOString(), metadata: { runner: "v41", order_number: o.order_number, gateway_method: o.gateway_method }
         }, { onConflict: "source_type,source_id" });
       } else await admin.rpc("reconcile_internal_financial_record", { p_source_type: "ORDER", p_source_id: o.id });

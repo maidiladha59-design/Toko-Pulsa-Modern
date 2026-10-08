@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatRupiah } from "@/lib/utils";
@@ -55,7 +56,7 @@ export default async function TransferPage({ searchParams }: { searchParams: { [
               {banks.map((x) => (
                 <div key={x.id} className="rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="flex items-center gap-3">
-                    {x.logo_url ? <img src={x.logo_url} className="h-11 w-11 rounded-xl object-contain" alt="" /> : <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100">🏦</div>}
+                    {x.logo_url ? <Image src={x.logo_url} alt="" width={44} height={44} className="h-11 w-11 rounded-xl object-contain" /> : <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100">🏦</div>}
                     <div><b>{x.name}</b><p className="text-xs text-slate-400">{x.provider || "Provider"}</p></div>
                   </div>
                   <p className="mt-3 text-sm text-slate-500">{x.description || "Transfer bank."}</p>

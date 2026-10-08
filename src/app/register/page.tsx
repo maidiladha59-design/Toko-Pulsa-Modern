@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Suspense, useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/Button";
@@ -404,7 +405,7 @@ function RegisterForm() {
         <div className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-gold-500/25 blur-3xl" />
         <div className="relative z-10 flex h-full flex-col justify-between">
           <div>
-            <div className="flex items-center gap-3"><img src="/aidil-logo.png" alt="Aidil Store" className="h-14 w-14 rounded-2xl bg-white p-2 shadow-xl" /><div><p className="text-sm font-black tracking-wide">AIDIL STORE</p><p className="text-xs text-yellow-300">Solusi Digital</p></div></div>
+            <div className="flex items-center gap-3"><Image src="/aidil-logo.png" alt="Aidil Store" width={56} height={56} className="h-14 w-14 rounded-2xl bg-white p-2 shadow-xl" /><div><p className="text-sm font-black tracking-wide">AIDIL STORE</p><p className="text-xs text-yellow-300">Solusi Digital</p></div></div>
             <p className="mt-10 text-xs font-black uppercase tracking-[.22em] text-yellow-300">MULAI SEKARANG</p>
             <h2 className="mt-3 text-4xl font-black leading-tight">Buat akun dan <span className="text-yellow-300">nikmati kemudahannya.</span></h2>
             <p className="mt-5 text-sm leading-6 text-zinc-300">Dengan akun AIDIL STORE, kamu dapat mengakses berbagai layanan digital dalam satu tempat.</p>

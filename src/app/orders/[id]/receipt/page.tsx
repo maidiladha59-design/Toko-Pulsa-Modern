@@ -88,7 +88,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
         <div className="mt-5 space-y-3 border-b border-dashed border-gold-500 pb-5">
           <Row label="Tanggal" value={formatDate(order.created_at)} />
           <Row label="ID Transaksi" value={order.order_number} />
-          {order.payment_method && <Row label="Metode Bayar" value={order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method} />}
+          {order.payment_method && <Row label="Metode Bayar" value={order.payment_method === "QRIS" ? "QRIS" : order.payment_method} />}
         </div>
 
         <div className="mt-5 space-y-5">
@@ -134,7 +134,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
 
       <div className="px-5">
         <PrintButton
-          receiptText={`AIDIL STORE\nRincian Transaksi\nTanggal: ${formatDate(order.created_at)}\nID Transaksi: ${order.order_number}\n${order.payment_method ? `Metode Bayar: ${order.payment_method === "QRIS" ? "QRIS · FR3 NEWERA" : order.payment_method}\n` : ""}${(items || [])
+          receiptText={`AIDIL STORE\nRincian Transaksi\nTanggal: ${formatDate(order.created_at)}\nID Transaksi: ${order.order_number}\n${order.payment_method ? `Metode Bayar: ${order.payment_method === "QRIS" ? "QRIS" : order.payment_method}\n` : ""}${(items || [])
             .map((item) => {
               const target = targetMap.get(item.id);
               const tx = txMap.get(item.id);

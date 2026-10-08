@@ -15,6 +15,7 @@ type Props = {
 };
 
 const bankNames: Record<string, string> = {
+  bca_va: "BCA Virtual Account",
   bri_va: "BRI Virtual Account",
   bni_va: "BNI Virtual Account",
   cimb_niaga_va: "CIMB Niaga Virtual Account",

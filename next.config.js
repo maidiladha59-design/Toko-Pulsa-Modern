@@ -19,6 +19,11 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [{ protocol: "https", hostname: "**.supabase.co" }],
+    // Bucket site-media/brand-logos mengizinkan upload SVG, dan optimizer next/image
+    // menolak remote SVG (400) tanpa flag ini. CSP ketat + sandbox supaya SVG yang
+    // diproses tidak bisa menjalankan script.
+    dangerouslyAllowSVG: true,
+    contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
   async headers() {
     return [{

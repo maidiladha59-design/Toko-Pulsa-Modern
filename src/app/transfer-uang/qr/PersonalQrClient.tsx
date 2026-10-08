@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import QRCode from "qrcode";
 import { useToast } from "@/components/ToastProvider";
@@ -90,7 +91,7 @@ export default function PersonalQrClient({ token: initialToken, displayName }: {
       <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
         <div className="mx-auto w-full max-w-[280px] rounded-2xl border border-slate-100 bg-white p-3 shadow-inner">
           {qrDataUrl ? (
-            <img src={qrDataUrl} alt="QR Pribadi AIDIL STORE" className="h-auto w-full" />
+            <Image src={qrDataUrl} alt="QR Pribadi AIDIL STORE" width={280} height={280} unoptimized className="h-auto w-full" />
           ) : (
             <div className="flex aspect-square items-center justify-center rounded-xl bg-slate-50 text-sm font-bold text-slate-400">Membuat QR...</div>
           )}

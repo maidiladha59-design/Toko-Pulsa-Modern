@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
@@ -214,7 +215,7 @@ function CheckoutForm() {
     <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] animate-page-in pb-28 lg:max-w-5xl lg:pb-0">
       <div className="mb-6 flex items-start gap-3">
         <button type="button" onClick={() => router.back()} aria-label="Kembali" className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-surface text-lg text-app-text transition hover:border-gold-400/50 hover:text-app-kicker">←</button>
-        <img src="/aidil-logo.png" alt="Aidil Store" className="h-11 w-11 rounded-2xl object-cover" />
+        <Image src="/aidil-logo.png" alt="Aidil Store" width={44} height={44} className="h-11 w-11 rounded-2xl object-cover" />
         <div><p className="text-xs font-black uppercase tracking-[.2em] text-app-kicker">AIDIL STORE</p><h1 className="text-xl font-black text-app-text sm:text-2xl">Checkout Aman & Otomatis</h1><p className="text-sm text-app-muted">Bayar tanpa approve manual, lalu akses produk digital dari pesanan.</p></div>
       </div>
 
@@ -223,7 +224,7 @@ function CheckoutForm() {
           <div className="rounded-[2rem] border border-app-border bg-app-surface p-5">
             <div className="flex gap-4">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-app-inset">
-                {product.thumbnail_url ? <img src={product.thumbnail_url} alt={product.name} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-3xl">🛍️</div>}
+                {product.thumbnail_url ? <Image src={product.thumbnail_url} alt={product.name} width={96} height={96} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-3xl">🛍️</div>}
               </div>
               <div className="min-w-0">
                 <p className="font-black text-app-text">{product.name}</p>

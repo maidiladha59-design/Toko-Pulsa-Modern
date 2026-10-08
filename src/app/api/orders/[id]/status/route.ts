@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { getGatewayTransactionDetail, isGatewayConfigured, isGatewayFailedStatus } from "@/lib/fr3newera";
+import { getGatewayTransactionDetail, isGatewayConfigured, isGatewayFailedStatus } from "@/lib/midtrans";
 import { fulfillPpobOrder } from "@/lib/ppob/fulfill";
 
 export async function GET(_request: Request, { params }: { params: { id: string } }) {
@@ -25,10 +25,11 @@ export async function GET(_request: Request, { params }: { params: { id: string 
 
   const admin = createAdminClient();
 
-  // FR3 NEWERA memeriksa status lewat trxId (orders.gateway_txn_id) — FR3 tidak
-  // mengenal konsep order_id, jadi pencocokannya hanya trxId + nominal. Order
-  // lama tanpa gateway_txn_id tidak bisa dicek; statusnya diselesaikan oleh
-  // webhook atau kedaluwarsa.
+  // Midtrans memeriksa status lewat transaction_id (orders.gateway_txn_id).
+  // Endpoint status Midtrans menerima transaction_id maupun order_id, tapi kita
+  // selalu memakai transaction_id supaya aman untuk semua metode pembayaran.
+  // Order lama tanpa gateway_txn_id tidak bisa dicek; statusnya diselesaikan
+  // oleh webhook atau kedaluwarsa.
   if (isGatewayConfigured() && order.gateway_txn_id) {
   try {
     const detail = await getGatewayTransactionDetail(order.gateway_txn_id);

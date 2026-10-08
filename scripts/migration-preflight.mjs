@@ -12,7 +12,7 @@ for (const file of files) {
   if (!byVersion.has(v)) byVersion.set(v, []);
   byVersion.get(v).push(file);
 }
-const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82];
+const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83];
 const missing = required.filter(v => !byVersion.has(v));
 const duplicateVersions = [...byVersion.entries()].filter(([, list]) => list.length > 1);
 const errors = [];
@@ -53,6 +53,7 @@ const checks = [
   ['v80', 'migrations_v80_topup_fee_tiers.sql', ['topup_fee_tiers', 'min_amount', 'max_amount', 'fee_amount', 'topup_fee_tier_overlap', 'topup_fee_tiers_admin_write', '9999', '81']],
   ['v81', 'migrations_v81_faq_gateway_wording.sql', ['faqs', 'gateway terverifikasi', 'pembayaran terverifikasi']],
   ['v82', 'migrations_v82_banner_title_cleanup.sql', ['home_banners', 'file_', 'randomuuid', 'btrim']],
+  ['v83', 'migrations_v83_midtrans_gateway.sql', ['confirm_gateway_topup', 'midtrans', 'bca_va', 'create_gateway_order', 'topup_payment_methods', 'cimb_niaga_va', 'sampoerna_va']],
 ];
 for (const [label, file, needles] of checks) {
   const p = path.join(dir, file);

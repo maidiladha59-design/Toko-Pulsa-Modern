@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { NetworkEmpty } from "@/components/NetworkState";
@@ -138,7 +139,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
           <div className="flex items-center gap-3 border-b border-app-border bg-app-inset px-4 py-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gold-400 text-base text-zinc-950">
               {logoMap[brand.trim().toLowerCase()] ? (
-                <img src={logoMap[brand.trim().toLowerCase()]} alt={`Logo ${brand}`} className="h-full w-full object-cover" />
+                <Image src={logoMap[brand.trim().toLowerCase()]} alt={`Logo ${brand}`} width={36} height={36} className="h-full w-full object-cover" />
               ) : (
                 brandIcon(brand)
               )}
@@ -161,7 +162,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
                 >
                   <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-app-inset text-lg">
                     {p.thumbnail_url ? (
-                      <img src={p.thumbnail_url} alt={p.name} className="h-full w-full object-cover" />
+                      <Image src={p.thumbnail_url} alt={p.name} width={44} height={44} className="h-full w-full object-cover" />
                     ) : (
                       <span className="text-app-kicker">{fallbackIcon}</span>
                     )}
