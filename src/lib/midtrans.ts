@@ -20,7 +20,7 @@
 import crypto from "node:crypto";
 import QRCode from "qrcode";
 
-const REQUEST_TIMEOUT_MS = 20000;
+const REQUEST_TIMEOUT_MS = 15000;
 const QR_RENDER_WIDTH = 360;
 // Batas aman supaya kolom payment_number/qris_payload (text) tidak membengkak.
 const MAX_QR_IMAGE_BYTES = 200 * 1024;
@@ -77,6 +77,27 @@ type MidtransConfig = {
   baseUrl: string;
 };
 
+// Error terstruktur supaya route bisa mencatat detail kegagalan ke log (status
+// HTTP Midtrans, status_code/status_message body) tanpa membocorkan kredensial.
+export class GatewayError extends Error {
+  kind: "TIMEOUT" | "UNREACHABLE" | "HTTP";
+  httpStatus: number | null;
+  statusCode: number | null;
+  statusMessage: string | null;
+  constructor(
+    kind: GatewayError["kind"],
+    detail: { httpStatus?: number | null; statusCode?: number | string | null; statusMessage?: string | null } = {}
+  ) {
+    super(kind === "TIMEOUT" ? "GATEWAY_TIMEOUT" : kind === "UNREACHABLE" ? "GATEWAY_UNREACHABLE" : `GATEWAY_HTTP_${detail.httpStatus ?? "?"}`);
+    this.name = "GatewayError";
+    this.kind = kind;
+    this.httpStatus = detail.httpStatus ?? null;
+    const code = Number(detail.statusCode);
+    this.statusCode = Number.isFinite(code) ? code : null;
+    this.statusMessage = detail.statusMessage ? String(detail.statusMessage) : null;
+  }
+}
+
 function readConfig(): MidtransConfig {
   const serverKey = String(process.env.MIDTRANS_SERVER_KEY || "").trim();
   const clientKey = String(process.env.MIDTRANS_CLIENT_KEY || "").trim();
@@ -129,7 +150,8 @@ async function rawRequest(
     });
   } catch (error: any) {
     // Jangan pernah membocorkan URL/kredensial ke pesan error.
-    throw new Error(error?.name === "TimeoutError" ? "GATEWAY_TIMEOUT" : "GATEWAY_UNREACHABLE");
+    const timedOut = error?.name === "TimeoutError" || error?.name === "AbortError";
+    throw new GatewayError(timedOut ? "TIMEOUT" : "UNREACHABLE");
   }
 }
 
@@ -150,14 +172,24 @@ async function apiRequest<T>(path: string, opts: JsonRequestOptions = {}): Promi
   const tolerated = opts.toleratedStatus || [];
   const bodyStatusCode = Number(json?.status_code);
   const toleratedBody = Number.isFinite(bodyStatusCode) && tolerated.includes(bodyStatusCode);
-  if (!res.ok && !tolerated.includes(res.status) && !toleratedBody) {
-    const message =
-      Array.isArray(json?.error_messages) && json.error_messages.length
-        ? json.error_messages.join(", ")
-        : json?.status_message || `GATEWAY_ERROR_${res.status}`;
-    throw new Error(String(message));
+  // status_code di body Midtrans adalah sumber kebenaran: charge bisa balas
+  // HTTP 200 tapi status_code 4xx (mis. 402 metode tidak aktif), jadi body
+  // ikut diperiksa, bukan hanya res.ok.
+  const bodyFailed = Number.isFinite(bodyStatusCode) && bodyStatusCode >= 400;
+  if ((!res.ok || bodyFailed) && !tolerated.includes(res.status) && !toleratedBody) {
+    throw new GatewayError("HTTP", {
+      httpStatus: res.status,
+      statusCode: Number.isFinite(bodyStatusCode) ? bodyStatusCode : res.status,
+      statusMessage: String(
+        json?.status_message ||
+          (Array.isArray(json?.error_messages) && json.error_messages.length ? json.error_messages.join(", ") : "") ||
+          `HTTP ${res.status}`
+      ),
+    });
   }
-  if (!json) throw new Error("GATEWAY_INVALID_RESPONSE");
+  if (!json) {
+    throw new GatewayError("HTTP", { httpStatus: res.status, statusCode: res.status, statusMessage: "Respons gateway bukan JSON valid" });
+  }
   return json as T;
 }
 
@@ -223,7 +255,7 @@ async function fetchQrImage(cfg: MidtransConfig, data: any): Promise<string> {
   const url = String(pick?.url || "").trim();
   if (!url) throw new Error("GATEWAY_QR_UNAVAILABLE");
   const res = await rawRequest(url, cfg, { accept: "image/png,image/*;q=0.9,application/json;q=0.8" });
-  if (!res.ok) throw new Error("GATEWAY_QR_UNAVAILABLE");
+  if (!res.ok) throw new GatewayError("HTTP", { httpStatus: res.status, statusCode: res.status, statusMessage: "Gambar QR Midtrans tidak tersedia" });
   const contentType = String(res.headers.get("content-type") || "").toLowerCase();
   if (contentType.includes("json")) {
     const json: any = await res.json().catch(() => null);

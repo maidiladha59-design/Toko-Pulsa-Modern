@@ -3,7 +3,7 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured, GATEWAY_PROVIDER, GATEWAY_METHODS } from "@/lib/midtrans";
+import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured, GatewayError, GATEWAY_PROVIDER, GATEWAY_METHODS } from "@/lib/midtrans";
 
 // Midtrans Core API: QRIS + Virtual Account bca/bni/bri/permata.
 const METHODS = GATEWAY_METHODS;
@@ -64,54 +64,77 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  if (!isGatewayConfigured()) return NextResponse.json({ message: "Top Up otomatis belum dikonfigurasi. Tambahkan MIDTRANS_SERVER_KEY di environment server." }, { status: 503 });
+  // Validasi env di awal. Yang dilog hanya true/false — tidak pernah nilainya.
+  const serverKeySet = Boolean(String(process.env.MIDTRANS_SERVER_KEY || "").trim());
+  const modeSet = ["true", "1", "yes", "false", "0", "no"].includes(String(process.env.MIDTRANS_IS_PRODUCTION || "").trim().toLowerCase());
+  if (!serverKeySet || !modeSet) {
+    console.error("[topup] env Midtrans belum diset", JSON.stringify({ server_key_set: serverKeySet, is_production_set: modeSet }));
+    return NextResponse.json({ ok: false, error: "Konfigurasi pembayaran belum lengkap", code: "GATEWAY_NOT_CONFIGURED" }, { status: 500 });
+  }
+
   const supabase = createClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) return NextResponse.json({ message: "Silakan login terlebih dahulu." }, { status: 401 });
-  const parsed = bodySchema.safeParse(await request.json().catch(() => null));
-  if (!parsed.success) return NextResponse.json({ message: "Nominal, metode pembayaran, atau idempotency key tidak valid." }, { status: 400 });
-
-  const { amount, method, idempotency_key } = parsed.data;
   const admin = createAdminClient();
-  const deadlineMinutes = await getDeadlineMinutes(admin);
-  // Expire stale unpaid top-up before enforcing the one-active-top-up rule.
-  const { data: activeTopup } = await admin.from("topups").select("id,status,expires_at,amount,payment_amount,payment_method,payment_number,provider_order_id,admin_fee,gateway_fee,gateway_total_payment,idempotency_key").eq("user_id", user.id).in("status", ["PENDING","VERIFYING"]).order("created_at", { ascending: false }).limit(1).maybeSingle();
-  if (activeTopup?.expires_at && new Date(activeTopup.expires_at).getTime() <= Date.now()) {
-    await admin.from("topups").update({ status: "EXPIRED", updated_at: new Date().toISOString() }).eq("id", activeTopup.id).in("status", ["PENDING","VERIFYING"]);
-  } else if (activeTopup && activeTopup.provider_order_id && activeTopup.idempotency_key !== idempotency_key) {
-    return NextResponse.json({ message: "Masih ada Top Up yang belum selesai. Selesaikan pembayaran atau batalkan Top Up sebelumnya terlebih dahulu.", active_topup: activeTopup }, { status: 409 });
-  }
-  let cfg: FeeConfig;
-  try { cfg = await getFeeConfig(admin, feeGroup(method)); } catch { return NextResponse.json({ message: "Pengaturan biaya Top Up belum tersedia. Jalankan migration v35." }, { status: 503 }); }
-  // Tier aktif (v80) diprioritaskan; nominal yang cocok tier boleh di luar rentang
-  // lama (mis. Rp1.000 dengan min_topup lama Rp10.000). Kalau tidak cocok tier
-  // manapun, batas & tarif lama tetap berlaku sebagai cadangan.
-  const tiers = await getActiveTiers(admin);
-  const tierFee = findTierFee(amount, tiers);
-  const inLegacyRange = amount >= cfg.min_topup && amount <= cfg.max_topup;
-  if (tierFee === null && !inLegacyRange) return NextResponse.json({ message: tiers.length ? "Nominal Top Up tidak termasuk rentang biaya yang tersedia. Periksa kembali nominal atau hubungi admin." : `Nominal Top Up harus antara Rp${cfg.min_topup.toLocaleString("id-ID")} dan Rp${cfg.max_topup.toLocaleString("id-ID")}.` }, { status: 400 });
-
-  const adminFee = tierFee !== null ? tierFee : calculateFee(amount, cfg);
-  const paymentAmount = amount + adminFee;
-  const { data: existing } = await admin.from("topups").select("id, amount, admin_fee, payment_amount, status, provider_order_id, payment_method, payment_number, gateway_fee, gateway_total_payment, expires_at").eq("idempotency_key", idempotency_key).eq("user_id", user.id).maybeSingle();
-  if (existing?.provider_order_id && ["PENDING", "VERIFYING"].includes(existing.status)) {
-    return NextResponse.json({ id: existing.id, amount: existing.amount, admin_fee: existing.admin_fee ?? 0, payment_amount: existing.payment_amount ?? existing.amount + (existing.admin_fee ?? 0), status: existing.status, order_id: existing.provider_order_id, payment_method: existing.payment_method, payment_number: existing.payment_number, fee: existing.gateway_fee ?? 0, total_payment: existing.gateway_total_payment, expired_at: existing.expires_at }, { status: 200 });
-  }
-
-  const providerOrderId = `TOPUP-${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}-${crypto.randomUUID().replaceAll("-", "").slice(0, 10)}`;
-  const { data: topup, error: insertError } = await admin.from("topups").insert({ user_id: user.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, fee_group: feeGroup(method), fee_type: tierFee !== null ? "FIXED" : cfg.fee_type, fee_rate: tierFee !== null ? null : (cfg.fee_type === "PERCENTAGE" ? cfg.fee_value : null), status: "PENDING", idempotency_key, provider: GATEWAY_PROVIDER, provider_order_id: providerOrderId, payment_method: method }).select("id").single();
-  if (insertError || !topup) {
-    const { data: raced } = await admin.from("topups").select("id, amount, admin_fee, payment_amount, status, provider_order_id, payment_method, payment_number, gateway_fee, gateway_total_payment, expires_at").eq("idempotency_key", idempotency_key).eq("user_id", user.id).maybeSingle();
-    if (raced?.provider_order_id) return NextResponse.json({ id: raced.id, amount: raced.amount, admin_fee: raced.admin_fee ?? 0, payment_amount: raced.payment_amount ?? raced.amount + (raced.admin_fee ?? 0), status: raced.status, order_id: raced.provider_order_id, payment_method: raced.payment_method, payment_number: raced.payment_number, fee: raced.gateway_fee ?? 0, total_payment: raced.gateway_total_payment, expired_at: raced.expires_at }, { status: 200 });
-    return NextResponse.json({ message: "Gagal membuat transaksi Top Up." }, { status: 500 });
-  }
-
+  let step = "auth";
+  let orderId: string | null = null;
+  let topupId: string | null = null;
   try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return NextResponse.json({ ok: false, error: "Silakan login terlebih dahulu.", code: "UNAUTHENTICATED" }, { status: 401 });
+
+    step = "parse_body";
+    const parsed = bodySchema.safeParse(await request.json().catch(() => null));
+    if (!parsed.success) return NextResponse.json({ ok: false, error: "Nominal, metode pembayaran, atau idempotency key tidak valid.", code: "INVALID_INPUT" }, { status: 400 });
+
+    const { amount, method, idempotency_key } = parsed.data;
+    const deadlineMinutes = await getDeadlineMinutes(admin);
+    // Expire stale unpaid top-up before enforcing the one-active-top-up rule.
+    step = "check_active_topup";
+    const { data: activeTopup } = await admin.from("topups").select("id,status,expires_at,amount,payment_amount,payment_method,payment_number,provider_order_id,admin_fee,gateway_fee,gateway_total_payment,idempotency_key").eq("user_id", user.id).in("status", ["PENDING","VERIFYING"]).order("created_at", { ascending: false }).limit(1).maybeSingle();
+    if (activeTopup?.expires_at && new Date(activeTopup.expires_at).getTime() <= Date.now()) {
+      await admin.from("topups").update({ status: "EXPIRED", updated_at: new Date().toISOString() }).eq("id", activeTopup.id).in("status", ["PENDING","VERIFYING"]);
+    } else if (activeTopup && activeTopup.provider_order_id && activeTopup.idempotency_key !== idempotency_key) {
+      return NextResponse.json({ ok: false, error: "Masih ada Top Up yang belum selesai. Selesaikan pembayaran atau batalkan Top Up sebelumnya terlebih dahulu.", code: "ACTIVE_TOPUP_EXISTS", active_topup: activeTopup }, { status: 409 });
+    }
+
+    step = "fee_config";
+    let cfg: FeeConfig;
+    try { cfg = await getFeeConfig(admin, feeGroup(method)); } catch { return NextResponse.json({ ok: false, error: "Pengaturan biaya Top Up belum tersedia. Jalankan migration v35.", code: "FEE_CONFIG_UNAVAILABLE" }, { status: 503 }); }
+    // Tier aktif (v80) diprioritaskan; nominal yang cocok tier boleh di luar rentang
+    // lama (mis. Rp1.000 dengan min_topup lama Rp10.000). Kalau tidak cocok tier
+    // manapun, batas & tarif lama tetap berlaku sebagai cadangan.
+    const tiers = await getActiveTiers(admin);
+    const tierFee = findTierFee(amount, tiers);
+    const inLegacyRange = amount >= cfg.min_topup && amount <= cfg.max_topup;
+    if (tierFee === null && !inLegacyRange) return NextResponse.json({ ok: false, error: tiers.length ? "Nominal Top Up tidak termasuk rentang biaya yang tersedia. Periksa kembali nominal atau hubungi admin." : `Nominal Top Up harus antara Rp${cfg.min_topup.toLocaleString("id-ID")} dan Rp${cfg.max_topup.toLocaleString("id-ID")}.`, code: "AMOUNT_OUT_OF_RANGE" }, { status: 400 });
+
+    const adminFee = tierFee !== null ? tierFee : calculateFee(amount, cfg);
+    const paymentAmount = amount + adminFee;
+
+    step = "check_existing";
+    const { data: existing } = await admin.from("topups").select("id, amount, admin_fee, payment_amount, status, provider_order_id, payment_method, payment_number, gateway_fee, gateway_total_payment, expires_at").eq("idempotency_key", idempotency_key).eq("user_id", user.id).maybeSingle();
+    if (existing?.provider_order_id && ["PENDING", "VERIFYING"].includes(existing.status)) {
+      return NextResponse.json({ ok: true, id: existing.id, amount: existing.amount, admin_fee: existing.admin_fee ?? 0, payment_amount: existing.payment_amount ?? existing.amount + (existing.admin_fee ?? 0), status: existing.status, order_id: existing.provider_order_id, payment_method: existing.payment_method, payment_number: existing.payment_number, fee: existing.gateway_fee ?? 0, total_payment: existing.gateway_total_payment, expired_at: existing.expires_at }, { status: 200 });
+    }
+
+    step = "insert_topup";
+    const providerOrderId = `TOPUP-${new Date().toISOString().replace(/[-:.TZ]/g, "").slice(0, 14)}-${crypto.randomUUID().replaceAll("-", "").slice(0, 10)}`;
+    orderId = providerOrderId;
+    const { data: topup, error: insertError } = await admin.from("topups").insert({ user_id: user.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, fee_group: feeGroup(method), fee_type: tierFee !== null ? "FIXED" : cfg.fee_type, fee_rate: tierFee !== null ? null : (cfg.fee_type === "PERCENTAGE" ? cfg.fee_value : null), status: "PENDING", idempotency_key, provider: GATEWAY_PROVIDER, provider_order_id: providerOrderId, payment_method: method }).select("id").single();
+    if (insertError || !topup) {
+      const { data: raced } = await admin.from("topups").select("id, amount, admin_fee, payment_amount, status, provider_order_id, payment_method, payment_number, gateway_fee, gateway_total_payment, expires_at").eq("idempotency_key", idempotency_key).eq("user_id", user.id).maybeSingle();
+      if (raced?.provider_order_id) return NextResponse.json({ ok: true, id: raced.id, amount: raced.amount, admin_fee: raced.admin_fee ?? 0, payment_amount: raced.payment_amount ?? raced.amount + (raced.admin_fee ?? 0), status: raced.status, order_id: raced.provider_order_id, payment_method: raced.payment_method, payment_number: raced.payment_number, fee: raced.gateway_fee ?? 0, total_payment: raced.gateway_total_payment, expired_at: raced.expires_at }, { status: 200 });
+      return NextResponse.json({ ok: false, error: "Gagal membuat transaksi Top Up.", code: "TOPUP_CREATE_FAILED" }, { status: 500 });
+    }
+    topupId = topup.id;
+
+    step = "midtrans_charge";
     const payment = await createGatewayTransaction(providerOrderId, paymentAmount, method, { expiryMinutes: deadlineMinutes });
     const paymentNumber = extractGatewayPaymentNumber(payment);
     const providerExpiry = new Date(payment.expired_at).getTime();
     const adminExpiry = Date.now() + deadlineMinutes * 60 * 1000;
     const effectiveExpiry = new Date(Math.min(providerExpiry, adminExpiry)).toISOString();
+
+    step = "update_topup";
     const { error: updateError } = await admin.from("topups").update({
       payment_number: paymentNumber,
       provider_txn_id: payment.txn_id,
@@ -121,10 +144,31 @@ export async function POST(request: Request) {
       updated_at: new Date().toISOString(),
     }).eq("id", topup.id).eq("status", "PENDING");
     if (updateError) throw updateError;
-    return NextResponse.json({ id: topup.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, status: "PENDING", order_id: providerOrderId, payment_method: payment.payment_method, payment_number: paymentNumber, fee: payment.fee ?? 0, total_payment: payment.total_payment ?? paymentAmount, expired_at: effectiveExpiry }, { status: 201 });
+    return NextResponse.json({ ok: true, id: topup.id, amount, admin_fee: adminFee, payment_amount: paymentAmount, status: "PENDING", order_id: providerOrderId, payment_method: payment.payment_method, payment_number: paymentNumber, fee: payment.fee ?? 0, total_payment: payment.total_payment ?? paymentAmount, expired_at: effectiveExpiry }, { status: 201 });
   } catch (error) {
-    await admin.from("topups").update({ status: "CANCELLED", updated_at: new Date().toISOString() }).eq("id", topup.id).eq("status", "PENDING");
-    if (process.env.NODE_ENV !== "production") console.error("TOPUP MIDTRANS CREATE ERROR:", error);
-    return NextResponse.json({ message: "Gagal membuat instruksi pembayaran Top Up." }, { status: 502 });
+    // Top up PENDING yang sudah dibuat dibatalkan supaya user bisa mencoba lagi.
+    if (topupId) {
+      await admin.from("topups").update({ status: "CANCELLED", updated_at: new Date().toISOString() }).eq("id", topupId).eq("status", "PENDING");
+    }
+    if (error instanceof GatewayError && error.kind === "TIMEOUT") {
+      console.error("[topup] timeout ke Midtrans", JSON.stringify({ step, order_id: orderId }));
+      return NextResponse.json({ ok: false, error: "Gateway pembayaran lambat merespons, coba lagi", code: "GATEWAY_TIMEOUT" }, { status: 504 });
+    }
+    // Log tanpa kredensial & tanpa data pribadi user: hanya step, order_id,
+    // dan status dari respons Midtrans.
+    const gateway = error instanceof GatewayError ? error : null;
+    console.error("[topup] gagal", JSON.stringify({
+      step,
+      order_id: orderId,
+      http_status: gateway?.httpStatus ?? null,
+      status_code: gateway?.statusCode ?? null,
+      status_message: gateway?.statusMessage ?? null,
+      error: gateway ? null : error instanceof Error ? error.message : String(error),
+    }));
+    const midtransCode = Number(gateway?.statusCode);
+    if (midtransCode === 401) return NextResponse.json({ ok: false, error: "Kunci pembayaran tidak valid", code: "GATEWAY_AUTH_INVALID" }, { status: 502 });
+    if (midtransCode === 402) return NextResponse.json({ ok: false, error: "Metode pembayaran ini belum aktif", code: "GATEWAY_METHOD_INACTIVE" }, { status: 502 });
+    if (midtransCode === 406) return NextResponse.json({ ok: false, error: "Transaksi duplikat, coba lagi", code: "GATEWAY_DUPLICATE" }, { status: 502 });
+    return NextResponse.json({ ok: false, error: "Permintaan pembayaran ditolak, coba metode lain", code: "GATEWAY_REJECTED" }, { status: 502 });
   }
 }
