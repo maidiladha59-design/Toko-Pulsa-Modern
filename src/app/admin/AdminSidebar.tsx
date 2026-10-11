@@ -17,6 +17,7 @@ const MENU = [
   ["/admin/topups", "💰", "Top Up"],
   ["/admin/transfers", "💸", "Transfer Saldo"],
   ["/admin/payment-settings", "💳", "Pembayaran"],
+  ["/admin/payment-channel-fees", "🧾", "Biaya Channel"],
   ["/admin/platform", "⚙️", "Platform & Biaya"],
   ["/admin/maintenance", "🛠️", "Maintenance Mode"],
   ["/admin/features", "🎚️", "Fitur Aplikasi"],

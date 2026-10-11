@@ -15,9 +15,11 @@ test('v81 customer pages no longer show gateway fee details', () => {
   assert.doesNotMatch(topupPage, /melalui gateway/);
   assert.doesNotMatch(topupPage, /payment\.fee/);
 
-  // Label pengganti + catatan total final, keduanya tanpa kata "gateway".
-  assert.match(topupPage, /Perkiraan Total/);
-  assert.match(topupPage, /Total final akan ditampilkan di langkah berikutnya\./);
+  // Wording perkiraan dihapus (v85): total yang tampil harus persis sama
+  // dengan yang dibayar, tanpa teks "Perkiraan Total".
+  assert.doesNotMatch(topupPage, /Perkiraan Total/);
+  assert.doesNotMatch(topupPage, /Total final akan ditampilkan di langkah berikutnya\./);
+  assert.match(topupPage, /Total bayar/);
 
   // Baris "Biaya Admin" tetap (biaya milik AIDIL STORE), nominal tidak berubah.
   assert.match(topupPage, /Biaya Admin/);

@@ -270,10 +270,16 @@ async function fetchQrImage(cfg: MidtransConfig, data: any): Promise<string> {
   return `data:${mime};base64,${bytes.toString("base64")}`;
 }
 
+export type GatewayItemDetail = { id: string; name: string; price: number };
+
 export type CreateGatewayTransactionOptions = {
   // Dipakai untuk custom_expiry Midtrans supaya kedaluwarsa di gateway sama
   // dengan batas pembayaran internal (mis. deadline_minutes Top Up).
   expiryMinutes?: number;
+  // Rincian item Midtrans: jumlah harga semua item WAJIB persis sama dengan
+  // gross_amount (Midtrans menolak charge kalau tidak cocok). Baris harga 0
+  // dibuang otomatis.
+  itemDetails?: GatewayItemDetail[];
 };
 
 export async function createGatewayTransaction(
@@ -293,6 +299,19 @@ export async function createGatewayTransaction(
     transaction_details: { order_id: orderId, gross_amount: grossAmount },
     custom_expiry: { expiry_duration: expiryMinutes, unit: "minute" },
   };
+  if (options.itemDetails?.length) {
+    const items = options.itemDetails
+      .map((item) => ({
+        id: String(item.id).slice(0, 50),
+        name: String(item.name).slice(0, 50),
+        price: Math.round(Number(item.price)),
+        quantity: 1,
+      }))
+      .filter((item) => item.price > 0 && item.name);
+    const itemsTotal = items.reduce((sum, item) => sum + item.price, 0);
+    if (itemsTotal !== grossAmount) throw new Error("GATEWAY_ITEM_TOTAL_MISMATCH");
+    if (items.length) body.item_details = items;
+  }
   if (method === "qris") {
     const acquirer = String(process.env.MIDTRANS_QRIS_ACQUIRER || "").trim().toLowerCase();
     // Field qris bersifat opsional; kalau kosong Midtrans memakai acquirer default merchant.

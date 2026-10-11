@@ -12,7 +12,7 @@ for (const file of files) {
   if (!byVersion.has(v)) byVersion.set(v, []);
   byVersion.get(v).push(file);
 }
-const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83];
+const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83,85,86];
 const missing = required.filter(v => !byVersion.has(v));
 const duplicateVersions = [...byVersion.entries()].filter(([, list]) => list.length > 1);
 const errors = [];
@@ -54,6 +54,8 @@ const checks = [
   ['v81', 'migrations_v81_faq_gateway_wording.sql', ['faqs', 'gateway terverifikasi', 'pembayaran terverifikasi']],
   ['v82', 'migrations_v82_banner_title_cleanup.sql', ['home_banners', 'file_', 'randomuuid', 'btrim']],
   ['v83', 'migrations_v83_midtrans_gateway.sql', ['confirm_gateway_topup', 'midtrans', 'bca_va', 'create_gateway_order', 'topup_payment_methods', 'cimb_niaga_va', 'sampoerna_va']],
+  ['v85', 'migrations_v85_payment_channel_fees.sql', ['payment_channel_fees', 'channel_code', 'gateway_fee_tax_percent', 'margin_type', 'fee_snapshot', 'payment_channel_fees_admin_write', 'is_admin()', 'on conflict(channel_code) do nothing', 'topups', 'customer_note']],
+  ['v86', 'migrations_v86_cleanup_legacy_va_methods.sql', ['topup_payment_methods', 'atm_bersama_va', 'artha_graha_va', 'cimb_niaga_va', 'maybank_va', 'bnc_va', 'sampoerna_va', 'on conflict(provider_method) do nothing', 'is_active = false', 'bca_va', 'permata_va']],
 ];
 for (const [label, file, needles] of checks) {
   const p = path.join(dir, file);
