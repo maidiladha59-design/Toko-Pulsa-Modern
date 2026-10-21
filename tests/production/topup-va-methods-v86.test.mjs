@@ -13,11 +13,15 @@ test('v86 whitelist Midtrans hanya memuat metode yang benar-benar didukung', () 
   const lib = read('src/lib/midtrans.ts');
   assert.match(lib, /export const GATEWAY_METHODS = \["qris", "bca_va", "bni_va", "bri_va", "permata_va"\] as const;/);
   for (const bank of LEGACY) assert.doesNotMatch(lib, new RegExp(`"${bank}"`), `GATEWAY_METHODS tidak boleh memuat ${bank}`);
-  // VA_BANK hanya memetakan 4 bank VA yang diterima payment_type bank_transfer.
-  assert.match(lib, /bca_va: "bca"/);
-  assert.match(lib, /bni_va: "bni"/);
-  assert.match(lib, /bri_va: "bri"/);
-  assert.match(lib, /permata_va: "permata"/);
+  // Peta metode → struktur charge Midtrans (diperbarui v88 saat lib dibangun ulang):
+  // bca/bni/bri memakai payment_type bank_transfer; permata memakai payment_type
+  // "permata" (per dokumentasi resmi Midtrans — bukan bank_transfer).
+  assert.match(lib, /bca_va: \{ paymentType: "bank_transfer", bank: "bca" \}/);
+  assert.match(lib, /bni_va: \{ paymentType: "bank_transfer", bank: "bni" \}/);
+  assert.match(lib, /bri_va: \{ paymentType: "bank_transfer", bank: "bri" \}/);
+  assert.match(lib, /permata_va: \{ paymentType: "permata" \}/);
+  // Permata tidak boleh dikirim sebagai bank_transfer.
+  assert.doesNotMatch(lib, /bank["']?\s*:\s*["']permata["']/);
 });
 
 test('v86 /api/payment-methods menyaring metode di luar whitelist Midtrans', () => {
@@ -67,7 +71,7 @@ test('v86 migrasi pembersih hanya mengubah data, bukan skema', () => {
 test('v86 migrasi pembersih terdaftar di preflight', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v86_cleanup_legacy_va_methods\.sql/);
-  assert.match(script, /83,85,86\]/);
+  assert.match(script, /83,85,86,87\]/);
 });
 
 test('v86 panel admin tidak menawarkan bank legacy sebagai metode Top Up', () => {

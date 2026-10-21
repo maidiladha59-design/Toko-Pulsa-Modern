@@ -5,12 +5,35 @@ import { useToast } from "@/components/ToastProvider";
 import Button from "@/components/Button";
 import { formatRupiah } from "@/lib/utils";
 
+type SyncResult = {
+  fetched: number;
+  processed: number;
+  created: number;
+  updated: number;
+  saved: number;
+  skipped: number;
+  skippedReasons: Record<string, number>;
+  skippedSamples: Record<string, string[]>;
+  fallbackCategory: { count: number; categories: string[] };
+  marginPercent: number;
+  activate: boolean;
+};
+
+const SKIP_LABELS: Record<string, string> = {
+  invalid_data: "Data produk tidak lengkap (SKU / nama kosong)",
+  price_zero: "Harga provider 0 atau tidak valid (prabayar)",
+  duplicate_sku: "SKU sama muncul lebih dari sekali di respons provider",
+  slug_collision: "Slug produk bentrok dengan SKU lain",
+  product_upsert_error: "Gagal menyimpan produk ke database",
+  service_upsert_error: "Gagal menyimpan layanan PPOB ke database",
+};
+
 export default function AdminPPOBPage() {
   const toast = useToast();
   const [margin, setMargin] = useState("10");
   const [activate, setActivate] = useState(true);
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<{ fetched: number; created: number; updated: number; skipped: number } | null>(null);
+  const [result, setResult] = useState<SyncResult | null>(null);
 
   async function sync() {
     const value = Number(margin);
@@ -27,15 +50,20 @@ export default function AdminPPOBPage() {
         body: JSON.stringify({ marginPercent: value, activate }),
       });
       const data = await response.json();
-      if (!response.ok) throw new Error(data.message || "Sinkronisasi gagal.");
+      if (!response.ok) {
+        const partial = data?.fetched != null ? ` (${data.processed ?? 0}/${data.fetched} SKU diproses sebelum gagal)` : "";
+        throw new Error((data.message || "Sinkronisasi gagal.") + partial);
+      }
       setResult(data);
-      toast.show(`Sinkronisasi selesai: ${data.created} baru, ${data.updated} diperbarui.`, "success");
+      toast.show(`Sinkronisasi selesai: ${data.saved} SKU tersimpan (${data.created} baru, ${data.updated} diperbarui), ${data.skipped} dilewati.`, data.skipped > 0 ? "error" : "success");
     } catch (error: any) {
       toast.show(error?.message || "Sinkronisasi gagal.", "error");
     } finally {
       setLoading(false);
     }
   }
+
+  const skippedList = result ? Object.entries(result.skippedReasons || {}).filter(([, count]) => count > 0) : [];
 
   return (
     <div className="animate-page-in space-y-5">
@@ -65,6 +93,40 @@ export default function AdminPPOBPage() {
 
       {result && <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         {[['Pricelist', result.fetched], ['Produk baru', result.created], ['Diperbarui', result.updated], ['Dilewati', result.skipped]].map(([label, value]) => <div key={String(label)} className="rounded-2xl border border-app-border bg-app-surface p-4 shadow-sm"><p className="text-xs font-bold text-app-subtle">{label}</p><p className="mt-1 text-2xl font-black text-app-text">{value}</p></div>)}
+      </section>}
+
+      {result && <section className="rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6">
+        <h2 className="font-black text-app-text">Ringkasan Sinkronisasi</h2>
+        <p className="mt-1 text-sm leading-6 text-app-muted">
+          {result.saved} dari {result.fetched} SKU yang diterima berhasil disimpan ({result.created} baru, {result.updated} diperbarui), {result.skipped} dilewati.
+        </p>
+
+        {result.skipped === 0 && result.fallbackCategory?.count === 0 && (
+          <p className="mt-4 rounded-xl bg-emerald-500/10 p-3 text-sm font-bold text-emerald-700 dark:text-emerald-400">Semua SKU yang diterima berhasil disinkronkan tanpa ada yang dilewati.</p>
+        )}
+
+        {skippedList.length > 0 && (
+          <div className="mt-4 space-y-2">
+            <p className="text-sm font-black text-app-text">SKU yang dilewati beserta alasannya</p>
+            {skippedList.map(([reason, count]) => (
+              <div key={reason} className="rounded-xl bg-app-inset p-3">
+                <div className="flex flex-wrap items-baseline justify-between gap-2 text-sm">
+                  <span className="text-app-text">{SKIP_LABELS[reason] || reason}</span>
+                  <b className="tabular-nums text-app-kicker">{count} SKU</b>
+                </div>
+                {result.skippedSamples?.[reason]?.length ? (
+                  <p className="mt-1 break-words text-xs leading-5 text-app-subtle">Contoh: {result.skippedSamples[reason].join(", ")}</p>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {result.fallbackCategory?.count > 0 && (
+          <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-900 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300">
+            <b>{result.fallbackCategory.count} SKU</b> masuk kategori fallback <b>Tagihan Lainnya</b> karena kategorinya belum dikenali pemetaan{result.fallbackCategory.categories?.length ? <>: {result.fallbackCategory.categories.join(", ")}</> : null}. Produknya tetap tersimpan dan bisa dijual; kategorinya bisa dirapikan lewat pemetaan kode.
+          </div>
+        )}
       </section>}
 
       <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
