@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import Link from "next/link";
+import Image from "next/image";
 import PrintButton from "@/components/PrintButton";
 
 const labels: Record<string, string> = {
@@ -71,7 +72,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
     <main className="mx-auto max-w-md animate-page-in pb-8 print:max-w-none print:pb-0" style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}>
       <div className="no-print flex items-center justify-between rounded-t-3xl bg-zinc-950 px-5 pb-5 pt-4 text-gold-400">
         <Link href={`/orders/${order.id}`} aria-label="Kembali" className="text-2xl font-black leading-none">←</Link>
-        <span className="text-[11px] font-black uppercase tracking-[.25em]">Struk Digital</span>
+        <span className="text-xs font-black uppercase tracking-widest">Struk Digital</span>
       </div>
       <div
         className="no-print h-3 bg-white"
@@ -80,8 +81,8 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
 
       <div className="bg-white px-5 pb-6 pt-4 text-zinc-950 shadow-lg print:shadow-none">
         <div className="border-b-2 border-gold-400 pb-5 text-center">
-          <img src="/aidil-logo.png" alt="AIDIL STORE" className="mx-auto h-20 w-20 rounded-2xl object-cover ring-2 ring-gold-400" />
-          <p className="mt-3 text-xs font-black tracking-[.25em] text-gold-700">AIDIL STORE</p>
+          <Image src="/aidil-logo.png" alt="AIDIL STORE" width={80} height={80} className="mx-auto h-20 w-20 rounded-2xl object-cover ring-2 ring-gold-400" />
+          <p className="mt-3 text-xs font-black uppercase tracking-widest text-gold-700">AIDIL STORE</p>
           <h1 className="mt-1 text-2xl font-black text-zinc-950">Rincian Transaksi</h1>
         </div>
 
@@ -126,7 +127,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
           <b className="text-gold-400">{plainNumber(order.total_amount)}</b>
         </div>
 
-        <p className="mt-5 text-center text-[11px] leading-5 text-zinc-500">
+        <p className="mt-5 text-center text-xs leading-5 text-zinc-500">
           Terima kasih telah menggunakan AIDIL STORE. Simpan struk ini sebagai bukti transaksi.
         </p>
       </div>

@@ -18,11 +18,11 @@ export default async function OrdersPage() {
   return (
     <div className="customer-shell">
       <div className="mx-auto w-full max-w-[480px] animate-page-in">
-        <p className="text-xs font-black uppercase tracking-[.18em] text-app-kicker">Akun</p>
+        <p className="text-xs font-black uppercase tracking-widest text-app-kicker">Akun</p>
         <h1 className="mt-1 text-2xl font-black tracking-tight text-app-text">Pesanan Saya</h1>
         <p className="mt-1 text-sm text-app-muted">Riwayat seluruh pesanan yang pernah kamu buat.</p>
 
-        <div className="mt-6 overflow-hidden rounded-2xl border border-app-border bg-app-surface">
+        <div className="mt-5 overflow-hidden rounded-3xl border border-app-border bg-app-surface">
           {orders && orders.length > 0 ? (
             <div className="divide-y divide-app-border">
               {orders.map((o) => (

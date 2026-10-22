@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { NetworkEmpty } from "@/components/NetworkState";
+import EmptyState from "@/components/ui/EmptyState";
 
 type Service = {
   id: string;
@@ -93,12 +94,12 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
 
   if (!services.length) {
     return (
-      <div className="rounded-3xl border border-app-border bg-app-surface p-8 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-app-accent-soft text-3xl">📡</div>
-        <h2 className="mt-4 text-lg font-black text-app-text">Layanan belum tersedia</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-app-muted">Admin perlu melakukan sinkronisasi SKU PPOB dan mengaktifkan produk terlebih dahulu.</p>
-        <Link href="/" className="mt-5 inline-flex min-h-[44px] items-center rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-gold-300">Kembali ke Beranda</Link>
-      </div>
+      <EmptyState
+        icon="📡"
+        title="Layanan belum tersedia"
+        description="Admin perlu melakukan sinkronisasi SKU PPOB dan mengaktifkan produk terlebih dahulu."
+        action={<Link href="/" className="inline-flex min-h-[44px] items-center rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-gold-300">Kembali ke Beranda</Link>}
+      />
     );
   }
 
@@ -106,7 +107,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
   const grouped = groupByBrand(filtered);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       <div className="flex flex-col gap-2 rounded-2xl border border-app-border bg-app-surface p-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
           <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-app-subtle">🔍</span>
@@ -135,7 +136,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
       )}
 
       {grouped.map(([brand, items]) => (
-        <section key={brand} className="overflow-hidden rounded-2xl border border-app-border bg-app-surface">
+        <section key={brand} className="overflow-hidden rounded-3xl border border-app-border bg-app-surface">
           <div className="flex items-center gap-3 border-b border-app-border bg-app-inset px-4 py-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gold-400 text-base text-zinc-950">
               {logoMap[brand.trim().toLowerCase()] ? (
@@ -146,7 +147,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
             </div>
             <div className="min-w-0">
               <h3 className="truncate text-sm font-black text-app-text">{brand}</h3>
-              <p className="text-[10px] font-bold uppercase tracking-wide text-app-kicker/80">{items.length} produk tersedia</p>
+              <p className="text-xs font-bold text-app-subtle">{items.length} produk tersedia</p>
             </div>
           </div>
 
@@ -169,7 +170,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-bold text-app-text">{p.name}</p>
-                    <p className="mt-0.5 text-[11px] font-bold uppercase tracking-wide text-app-subtle">
+                    <p className="mt-0.5 text-xs font-bold uppercase tracking-wide text-app-subtle">
                       {service.service_kind === "postpaid" ? "Pascabayar" : "Prabayar"}
                     </p>
                   </div>

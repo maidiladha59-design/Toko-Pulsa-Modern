@@ -66,7 +66,7 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
       >
         <div className="no-print flex items-center justify-between rounded-t-3xl bg-zinc-950 px-5 pb-5 pt-[calc(env(safe-area-inset-top)+16px)] text-gold-400">
           <button type="button" onClick={goBack} aria-label="Kembali" className="text-2xl font-black leading-none">←</button>
-          <span className="text-[11px] font-black uppercase tracking-[.25em]">Struk Digital</span>
+          <span className="text-xs font-black uppercase tracking-widest">Struk Digital</span>
         </div>
         <div
           className="no-print h-3 bg-white"
@@ -76,7 +76,7 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
         <div className="print-avoid-break bg-white px-5 pb-6 pt-4 text-zinc-950 shadow-lg print:shadow-none">
           <div className="border-b-2 border-gold-400 pb-5 text-center">
             <Image src="/aidil-logo.png" alt="AIDIL STORE" width={80} height={80} className="mx-auto h-20 w-20 rounded-2xl object-cover ring-2 ring-gold-400" />
-            <p className="mt-3 text-xs font-black tracking-[.25em] text-gold-700">AIDIL STORE</p>
+            <p className="mt-3 text-xs font-black uppercase tracking-widest text-gold-700">AIDIL STORE</p>
             <h1 className="mt-1 text-2xl font-black text-zinc-950">{title}</h1>
           </div>
 
@@ -96,7 +96,7 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
             <b className="text-gold-400">{total.value}</b>
           </div>
 
-          <p className="mt-5 text-center text-[11px] leading-5 text-zinc-500">
+          <p className="mt-5 text-center text-xs leading-5 text-zinc-500">
             {footer || "Terima kasih telah berbelanja di AIDIL STORE. Simpan struk ini sebagai bukti transaksi."}
           </p>
         </div>
@@ -120,7 +120,7 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
             📤 Bagikan Struk
           </button>
           {message && (
-            <p className={`rounded-xl px-4 py-3 text-xs font-bold leading-5 ${message.ok ? "bg-app-accent-soft text-app-text" : "bg-red-500/10 text-red-600 dark:text-red-400"}`}>
+            <p className={`rounded-xl px-4 py-3 text-xs font-bold leading-5 ${message.ok ? "bg-app-accent-soft text-app-text" : "bg-danger-500/10 text-danger-600 dark:text-danger-400"}`}>
               {message.text}
             </p>
           )}

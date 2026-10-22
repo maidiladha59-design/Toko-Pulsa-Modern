@@ -1,5 +1,16 @@
 import type { Config } from "tailwindcss";
+import colors from "tailwindcss/colors";
 
+// Acuan warna Design System AIDIL STORE:
+// - gold 50-950  : identitas emas (DEFAULT #F5C542 = gold-400). Skala sudah lengkap.
+// - zinc         : netral memakai palet bawaan Tailwind (lengkap 50-950), dipakai untuk
+//                  hitam pekat (zinc-950 = #09090b) dan teks sekunder.
+// - app-*        : token tema dual-mode (terang/gelap) dari CSS var di globals.css —
+//                  SELALU dipakai untuk latar/teks/border agar tema tidak rusak.
+// - success/danger/warning : token semantik status transaksi & badge (Berhasil/Gagal/
+//                  Pending). Alias 1:1 palet bawaan emerald/red/amber yang sudah dipakai
+//                  di seluruh situs — nilainya identik, hanya namanya yang distandarkan.
+//                  Komponen memakai shade eksplisit (mis. success-600, danger-400 di dark).
 const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
   darkMode: "class",
@@ -37,6 +48,9 @@ const config: Config = {
           900: "#5C480D",
           950: "#3A2D08",
         },
+        success: { ...colors.emerald, DEFAULT: colors.emerald[600] },
+        danger: { ...colors.red, DEFAULT: colors.red[600] },
+        warning: { ...colors.amber, DEFAULT: colors.amber[500] },
       },
     },
   },

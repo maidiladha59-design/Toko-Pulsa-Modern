@@ -2,6 +2,44 @@
 @tailwind components;
 @tailwind utilities;
 
+/* =====================================================================
+   ACUAN DESAIN AIDIL STORE (Design System) — gaya profesional-minimalis,
+   identitas hitam + kuning emas. Rincian lengkap: src/components/ui/README.md
+   ---------------------------------------------------------------------
+   TIPOGRAFI (ukuran dibatasi xs–3xl, keluarga font mengikuti body):
+   - Kicker/label kecil : text-xs font-black uppercase tracking-widest text-app-kicker
+   - Judul halaman      : text-2xl font-black text-app-text (sm:text-3xl)
+   - Judul kartu        : text-base font-black (kartu featured boleh text-lg)
+   - Body text          : text-sm font-normal text-app-text
+   - Teks sekunder      : text-sm text-app-muted
+   - Caption/hint       : text-xs text-app-subtle
+   - Nominal/angka penting: text-2xl font-black tabular-nums
+   Bobot standar: font-black (judul), font-bold (label/tekanan),
+   font-medium (caption & badge), font-normal (body).
+   ---------------------------------------------------------------------
+   SPACING:
+   - Padding kartu standar : p-5 (kartu besar/pembayaran: p-6 sm:p-8)
+   - Jarak antar section   : mt-5 / space-y-5
+   - Jarak antar blok dalam kartu: mt-3 / space-y-3
+   - Gap elemen sejajar    : gap-2 (rapat) atau gap-3 (lazim)
+   ---------------------------------------------------------------------
+   RADIUS:
+   - Kartu utama / panel   : rounded-3xl
+   - Elemen dalam kartu (baris, sub-kartu): rounded-2xl
+   - Input, select, tombol : rounded-xl
+   - Badge / pill          : rounded-full
+   - Pengecualian halaman auth (rounded-[2rem]) akan dinormalisasi saat
+     halaman tersebut dimigrasikan ke design system.
+   ---------------------------------------------------------------------
+   WARNA STATUS (token semantik di tailwind.config.ts, alias palet bawaan):
+   - Berhasil  : success-* (emerald)   contoh badge: bg-success-100 text-success-800
+                 dark:bg-success-500/15 dark:text-success-300
+   - Gagal     : danger-*  (red)
+   - Peringatan/Pending: warning-* (amber)
+   - Diproses/brand    : gold-*
+   JANGAN memakai warna acak per halaman untuk status transaksi.
+   ===================================================================== */
+
 /* Token tema AIDIL STORE. Nilai RGB (spasi) supaya bisa dipakai dengan alpha
    oleh Tailwind (mis. bg-app-surface/60). Gold #F5C542 tetap identik di kedua mode. */
 :root {
@@ -78,8 +116,9 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
   header, nav { display:none !important; }
   .print-avoid-break { break-inside: avoid; page-break-inside: avoid; }
 }
-.nav-link { border-radius:.75rem; padding:.5rem .75rem; font-size:.875rem; font-weight:700; color:rgb(var(--app-muted)); }
+.nav-link { border-radius:.75rem; padding:.5rem .75rem; font-size:.875rem; font-weight:700; color:rgb(var(--app-muted)); transition: color .18s ease, background-color .18s ease; }
 .nav-link:hover { background:rgb(var(--app-accent-soft)); color:rgb(var(--app-text)); }
+.nav-link-active { background:rgb(var(--app-accent-soft)); color:rgb(var(--app-kicker)); }
 .mobile-link {
   display:flex; flex-direction:column; align-items:center; gap:.2rem;
   padding:.65rem .5rem; font-size:10px; font-weight:800; color:rgb(var(--app-subtle));

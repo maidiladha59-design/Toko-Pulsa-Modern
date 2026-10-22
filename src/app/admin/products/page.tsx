@@ -3,7 +3,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
-import Button from "@/components/Button";
+import Button from "@/components/ui/Button";
+import { Card, CardTitle } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import Input from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
+import EmptyState from "@/components/ui/EmptyState";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import { formatRupiah, humanizeError } from "@/lib/utils";
 
 type Product = {
@@ -317,77 +323,76 @@ export default function AdminProductsPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-xl font-bold">Kelola Produk</h1>
+        <p className="text-xs font-black uppercase tracking-widest text-app-kicker">Katalog</p>
+        <h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Kelola Produk</h1>
         <p className="mt-1 text-sm text-app-muted">Tambah, edit, aktifkan/nonaktifkan, pasang gambar produk, dan upload file digital dari satu tempat.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-app-border bg-app-surface p-4 shadow-sm sm:p-6">
-        <div className="mb-5 flex items-center justify-between gap-3">
-          <div>
-            <h2 className="font-bold">{editingId ? "Edit Produk" : "Tambah Produk Baru"}</h2>
-            <p className="text-xs text-app-muted">Gambar JPG/PNG/WEBP maksimal 5 MB. File digital maksimal 100 MB.</p>
-          </div>
-          {editingId && <Button type="button" variant="secondary" onClick={resetForm}>Batal Edit</Button>}
-        </div>
-
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[220px_1fr]">
-          <div>
-            <label className="text-sm font-semibold">Gambar Produk</label>
-            <label className="mt-2 flex aspect-square cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-app-border bg-app-inset text-center hover:border-gold-400">
-              {imagePreview ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={imagePreview} alt="Preview produk" className="h-full w-full object-cover" />
-              ) : (
-                <><span className="text-4xl">🖼️</span><span className="mt-2 px-4 text-xs text-app-muted">Klik untuk pilih gambar</span></>
-              )}
-              <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => chooseImage(e.target.files?.[0])} />
-            </label>
-            <div className="mt-2 flex gap-2">
-              {imageFile && <span className="truncate text-xs text-green-600 dark:text-green-400">✓ {imageFile.name}</span>}
-              {!imageFile && editingId && products.find((p) => p.id === editingId)?.thumbnail_url && <button type="button" onClick={() => { const p = products.find((x) => x.id === editingId); if (p) removeThumbnail(p); }} className="text-xs font-semibold text-red-600">Hapus gambar</button>}
+      <Card className="p-4 sm:p-6">
+        <form onSubmit={handleSubmit}>
+          <div className="mb-5 flex items-center justify-between gap-3">
+            <div>
+              <CardTitle>{editingId ? "Edit Produk" : "Tambah Produk Baru"}</CardTitle>
+              <p className="mt-1 text-xs text-app-muted">Gambar JPG/PNG/WEBP maksimal 5 MB. File digital maksimal 100 MB.</p>
             </div>
+            {editingId && <Button type="button" variant="outline" size="sm" onClick={resetForm}>Batal Edit</Button>}
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <label className="text-sm font-medium">Nama Produk<input required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2" placeholder="Contoh: Template Desain Premium" /></label>
-            <label className="text-sm font-medium">Slug<input required value={form.slug} onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2" placeholder="template-desain-premium" /></label>
-            <label className="text-sm font-medium">Harga (Rp)<input required min="0" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2" placeholder="15000" /></label>
-            <label className="text-sm font-medium">Kategori<select value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2"><option value="">Tanpa kategori</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</select></label>
-            <label className="text-sm font-medium">Stok <span className="font-normal text-app-subtle">(kosong = unlimited)</span><input min="0" type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2" placeholder="Unlimited" /></label>
-            <label className="text-sm font-medium">
-              Tipe Produk
-              <select value={form.product_type} onChange={(e) => setForm({ ...form, product_type: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2">
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-[220px_1fr]">
+            <div>
+              <p className="text-sm font-bold text-app-text">Gambar Produk</p>
+              <label className="mt-2 flex aspect-square cursor-pointer flex-col items-center justify-center overflow-hidden rounded-2xl border-2 border-dashed border-app-border bg-app-inset text-center transition hover:border-gold-400">
+                {imagePreview ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={imagePreview} alt="Preview produk" className="h-full w-full object-cover" />
+                ) : (
+                  <><span className="text-4xl">🖼️</span><span className="mt-2 px-4 text-xs text-app-muted">Klik untuk pilih gambar</span></>
+                )}
+                <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => chooseImage(e.target.files?.[0])} />
+              </label>
+              <div className="mt-2 flex gap-2">
+                {imageFile && <span className="truncate text-xs text-success-600 dark:text-success-400">✓ {imageFile.name}</span>}
+                {!imageFile && editingId && products.find((p) => p.id === editingId)?.thumbnail_url && <button type="button" onClick={() => { const p = products.find((x) => x.id === editingId); if (p) removeThumbnail(p); }} className="text-xs font-bold text-danger-600 dark:text-danger-400">Hapus gambar</button>}
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Input label="Nama Produk" required value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} className="bg-app-inset" placeholder="Contoh: Template Desain Premium" />
+              <Input label="Slug" required value={form.slug} onChange={(e) => setForm({ ...form, slug: slugify(e.target.value) })} className="bg-app-inset" placeholder="template-desain-premium" />
+              <Input label="Harga (Rp)" required min="0" type="number" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} className="bg-app-inset" placeholder="15000" />
+              <Select label="Kategori" value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="bg-app-inset"><option value="">Tanpa kategori</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select>
+              <Input label="Stok" min="0" type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} hint="Kosong = unlimited" className="bg-app-inset" placeholder="Unlimited" />
+              <Select label="Tipe Produk" value={form.product_type} onChange={(e) => setForm({ ...form, product_type: e.target.value })} hint="Jasa cocok untuk subscribe channel, joki, request custom, dll." className="bg-app-inset">
                 <option value="digital">📥 Ambil Produk (Digital) — file langsung diunduh pembeli</option>
                 <option value="jasa">🎯 Upload Target (Jasa) — pembeli kirim link/file, dikerjakan admin</option>
-              </select>
-              <span className="mt-1 block text-xs font-normal text-app-subtle">Jasa cocok untuk subscribe channel, joki, request custom, dll.</span>
-            </label>
-            <label className="text-sm font-medium sm:col-span-2">Deskripsi<textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="mt-1 w-full rounded-lg border border-app-border px-3 py-2" placeholder="Jelaskan isi, format file, lisensi, dan informasi penting produk..." /></label>
+              </Select>
+              <label className="text-sm font-bold text-app-text sm:col-span-2">Deskripsi<textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="mt-2 w-full rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle/60 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20" placeholder="Jelaskan isi, format file, lisensi, dan informasi penting produk..." /></label>
 
-            <div className="rounded-xl border border-app-border bg-app-inset p-3 sm:col-span-2">
-              <label className="text-sm font-semibold">File Produk Digital {form.product_type === "jasa" && <span className="font-normal text-app-subtle">(opsional untuk Jasa)</span>}</label>
-              <p className="mt-1 text-xs text-app-muted">{form.product_type === "jasa" ? "Untuk produk Jasa, file di sini opsional (misal contoh hasil). Target pesanan dikirim pembeli sendiri saat checkout." : "File disimpan privat dan hanya dapat diakses pembeli yang berhak melalui link aman."}</p>
-              <div className="mt-2 flex flex-wrap items-center gap-3">
-                <input type="file" onChange={(e) => chooseDigitalFile(e.target.files?.[0])} className="block w-full text-sm sm:max-w-md" />
-                {digitalFile && <span className="text-xs font-medium text-green-600 dark:text-green-400">✓ {digitalFile.name}</span>}
-                {editingId && products.find((p) => p.id === editingId)?.digital_file_path && <button type="button" onClick={() => { const p = products.find((x) => x.id === editingId); if (p) removeDigitalFile(p); }} className="text-xs font-semibold text-red-600">Hapus file tersimpan</button>}
+              <div className="rounded-2xl border border-app-border bg-app-inset p-3 sm:col-span-2">
+                <p className="text-sm font-bold text-app-text">File Produk Digital {form.product_type === "jasa" && <span className="font-normal text-app-subtle">(opsional untuk Jasa)</span>}</p>
+                <p className="mt-1 text-xs text-app-muted">{form.product_type === "jasa" ? "Untuk produk Jasa, file di sini opsional (misal contoh hasil). Target pesanan dikirim pembeli sendiri saat checkout." : "File disimpan privat dan hanya dapat diakses pembeli yang berhak melalui link aman."}</p>
+                <div className="mt-2 flex flex-wrap items-center gap-3">
+                  <input type="file" onChange={(e) => chooseDigitalFile(e.target.files?.[0])} className="block w-full text-sm text-app-text sm:max-w-md" />
+                  {digitalFile && <span className="text-xs font-bold text-success-600 dark:text-success-400">✓ {digitalFile.name}</span>}
+                  {editingId && products.find((p) => p.id === editingId)?.digital_file_path && <button type="button" onClick={() => { const p = products.find((x) => x.id === editingId); if (p) removeDigitalFile(p); }} className="text-xs font-bold text-danger-600 dark:text-danger-400">Hapus file tersimpan</button>}
+                </div>
               </div>
             </div>
           </div>
-        </div>
 
-        <div className="mt-5 flex flex-wrap gap-2">
-          <Button type="submit" loading={saving}>{uploading ? "Mengunggah..." : editingId ? "Simpan Perubahan" : "Tambah Produk"}</Button>
-          {editingId && <Button type="button" variant="secondary" onClick={resetForm}>Reset</Button>}
-        </div>
-      </form>
+          <div className="mt-5 flex flex-wrap gap-2">
+            <Button type="submit" loading={saving}>{uploading ? "Mengunggah..." : editingId ? "Simpan Perubahan" : "Tambah Produk"}</Button>
+            {editingId && <Button type="button" variant="outline" onClick={resetForm}>Reset</Button>}
+          </div>
+        </form>
+      </Card>
 
-      <div className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-sm">
+      <Card className="p-0">
         <div className="flex flex-col gap-3 border-b border-app-border p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div><h2 className="font-bold">Daftar Produk</h2><p className="text-xs text-app-muted">{products.length} produk tersimpan</p></div>
-          <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari produk..." className="rounded-lg border border-app-border px-3 py-2 text-sm sm:w-64" />
+          <div><CardTitle>Daftar Produk</CardTitle><p className="mt-1 text-xs text-app-muted">{products.length} produk tersimpan</p></div>
+          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari produk..." className="sm:w-64" />
         </div>
-        {loading ? <p className="p-6 text-sm text-app-muted">Memuat...</p> : filteredProducts.length === 0 ? <p className="p-8 text-center text-sm text-app-muted">Belum ada produk.</p> : (
+        {loading ? <div className="p-4"><LoadingSkeleton rows={5} /></div> : filteredProducts.length === 0 ? <EmptyState icon="📦" title="Belum ada produk" description="Tambahkan produk pertama lewat formulir di atas." className="m-4" /> : (
           <div className="divide-y divide-app-border">
             {filteredProducts.map((p) => (
               <div key={p.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
@@ -396,21 +401,22 @@ export default function AdminProductsPage() {
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="truncate font-semibold">{p.name}</p>
-                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase ${p.product_type === "jasa" ? "bg-amber-100 text-amber-700" : "bg-gold-100 text-gold-700"}`}>{p.product_type === "jasa" ? "🎯 Jasa" : "📥 Digital"}</span>
+                    <p className="truncate font-bold text-app-text">{p.name}</p>
+                    <Badge tone={p.product_type === "jasa" ? "warning" : "gold"}>{p.product_type === "jasa" ? "🎯 Jasa" : "📥 Digital"}</Badge>
+                    <Badge tone={p.is_active ? "success" : "neutral"}>{p.is_active ? "Aktif" : "Nonaktif"}</Badge>
                   </div>
-                  <p className="text-sm font-bold text-brand">{formatRupiah(p.price)}</p>
+                  <p className="mt-1 text-sm font-black tabular-nums text-app-kicker">{formatRupiah(p.price)}</p>
                   <p className="text-xs text-app-subtle">/{p.slug} · {p.product_type === "jasa" ? "Target dikirim pembeli saat checkout" : p.digital_file_path ? "✓ File digital" : "Belum ada file"}</p>
                 </div>
                 <div className="flex flex-wrap gap-2 sm:justify-end">
-                  <Button variant="secondary" onClick={() => startEdit(p)}>Edit</Button>
-                  <Button variant={p.is_active ? "danger" : "secondary"} onClick={() => toggleActive(p)}>{p.is_active ? "Nonaktifkan" : "Aktifkan"}</Button>
+                  <Button variant="outline" size="sm" onClick={() => startEdit(p)}>Edit</Button>
+                  <Button variant={p.is_active ? "destructive" : "secondary"} size="sm" onClick={() => toggleActive(p)}>{p.is_active ? "Nonaktifkan" : "Aktifkan"}</Button>
                 </div>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

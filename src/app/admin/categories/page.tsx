@@ -3,8 +3,11 @@
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
-import Button from "@/components/Button";
-import EmptyState from "@/components/EmptyState";
+import Button from "@/components/ui/Button";
+import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import EmptyState from "@/components/ui/EmptyState";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import { humanizeError } from "@/lib/utils";
 
 type Category = { id: string; name: string; slug: string; created_at: string };
@@ -127,69 +130,94 @@ export default function AdminCategoriesPage() {
   return (
     <div className="animate-page-in space-y-5">
       <div>
-        <p className="text-xs font-black uppercase tracking-[.18em] text-app-kicker">Katalog</p>
-        <h1 className="mt-1 text-2xl font-black text-app-text">Kelola Kategori</h1>
+        <p className="text-xs font-black uppercase tracking-widest text-app-kicker">Katalog</p>
+        <h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Kelola Kategori</h1>
         <p className="mt-1 text-sm text-app-muted">Tambah kategori baru agar produk lebih mudah ditemukan dan dikelompokkan.</p>
       </div>
 
-      <form onSubmit={handleSubmit} className="rounded-2xl border border-app-border bg-app-surface p-4 shadow-sm sm:p-6">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <h2 className="font-bold text-app-text">{isEditing ? "Edit Kategori" : "Tambah Kategori Baru"}</h2>
-          {isEditing && <Button type="button" variant="secondary" onClick={resetForm}>Batal</Button>}
+      <Card>
+        <div className="flex items-center justify-between gap-3">
+          <CardTitle>{isEditing ? "Edit Kategori" : "Tambah Kategori Baru"}</CardTitle>
+          {isEditing && (
+            <Button type="button" variant="outline" onClick={resetForm}>
+              Batal
+            </Button>
+          )}
         </div>
-        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-          <label className="text-sm font-medium">
-            Nama Kategori
-            <input
-              required
-              value={name}
-              onChange={(e) => onNameChange(e.target.value)}
-              placeholder="Contoh: Jasa Sosial Media"
-              className="mt-1 w-full rounded-lg border border-app-border px-3 py-2 text-sm outline-none focus:border-gold-400"
-            />
-          </label>
-          <label className="text-sm font-medium">
-            Slug
-            <input
-              required
-              value={slug}
-              onChange={(e) => { setSlugTouched(true); setSlug(slugify(e.target.value)); }}
-              placeholder="jasa-sosial-media"
-              className="mt-1 w-full rounded-lg border border-app-border px-3 py-2 text-sm outline-none focus:border-gold-400"
-            />
-          </label>
-        </div>
-        <div className="mt-4">
-          <Button type="submit" loading={saving}>{isEditing ? "Simpan Perubahan" : "Tambah Kategori"}</Button>
-        </div>
-      </form>
+        <form onSubmit={handleSubmit} className="mt-4 grid gap-3 sm:grid-cols-2">
+          <Input
+            label="Nama Kategori"
+            required
+            value={name}
+            onChange={(e) => onNameChange(e.target.value)}
+            placeholder="Contoh: Jasa Sosial Media"
+            className="bg-app-inset"
+          />
+          <Input
+            label="Slug"
+            required
+            value={slug}
+            onChange={(e) => {
+              setSlugTouched(true);
+              setSlug(slugify(e.target.value));
+            }}
+            placeholder="jasa-sosial-media"
+            className="bg-app-inset"
+          />
+          <div className="sm:col-span-2">
+            <Button type="submit" loading={saving}>
+              {isEditing ? "Simpan Perubahan" : "Tambah Kategori"}
+            </Button>
+          </div>
+        </form>
+      </Card>
 
-      <div className="overflow-hidden rounded-2xl border border-app-border bg-app-surface shadow-sm">
-        <div className="border-b border-app-border p-4">
-          <h2 className="font-bold text-app-text">Daftar Kategori</h2>
-          <p className="text-xs text-app-muted">{categories.length} kategori tersimpan</p>
+      <Card className="p-0">
+        <div className="p-5">
+          <CardTitle>Daftar Kategori</CardTitle>
+          <CardDescription>{categories.length} kategori tersimpan</CardDescription>
         </div>
         {loading ? (
-          <p className="p-6 text-sm text-app-muted">Memuat...</p>
+          <div className="p-5">
+            <LoadingSkeleton rows={5} />
+          </div>
         ) : categories.length === 0 ? (
-          <EmptyState title="Belum ada kategori" />
+          <EmptyState icon="🗂️" title="Belum ada kategori" className="m-4" />
         ) : (
-          <div className="divide-y divide-app-border">
-            {categories.map((c) => (
-              <div key={c.id} className="flex flex-col gap-2 p-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="font-semibold text-app-text">{c.name}</p>
-                  <p className="text-xs text-app-subtle">/{c.slug} · {productCounts[c.id] || 0} produk</p>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="secondary" onClick={() => startEdit(c)}>Edit</Button>
-                  <Button variant="danger" onClick={() => handleDelete(c)}>Hapus</Button>
-                </div>
-              </div>
-            ))}
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[560px] text-sm">
+              <thead>
+                <tr className="border-b border-app-border text-left text-xs font-bold uppercase tracking-widest text-app-subtle">
+                  <th className="px-4 py-3">Kategori</th>
+                  <th className="px-4 py-3">Produk</th>
+                  <th className="px-4 py-3 text-right">Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                {categories.map((c) => (
+                  <tr key={c.id} className="border-b border-app-border last:border-0">
+                    <td className="px-4 py-3">
+                      <p className="font-bold text-app-text">{c.name}</p>
+                      <p className="mt-0.5 font-mono text-xs text-app-subtle">/{c.slug}</p>
+                    </td>
+                    <td className="px-4 py-3 tabular-nums text-app-muted">{productCounts[c.id] || 0} produk</td>
+                    <td className="px-4 py-3 text-right">
+                      <div className="flex justify-end gap-2">
+                        <Button size="sm" variant="outline" onClick={() => startEdit(c)}>
+                          Edit
+                        </Button>
+                        <Button size="sm" variant="destructive" onClick={() => handleDelete(c)}>
+                          Hapus
+                        </Button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

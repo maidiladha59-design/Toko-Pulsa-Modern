@@ -46,7 +46,7 @@ export default async function WalletPage() {
   return (
     <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] animate-page-in">
       <section className="app-hero rounded-[2rem] p-6">
-        <p className="text-xs font-bold uppercase tracking-[.18em] text-zinc-400">Saldo Anda saat ini</p>
+        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Saldo Anda saat ini</p>
         <p className="mt-2 text-4xl font-black tabular-nums text-gold-400">{formatRupiah(wallet?.balance || 0)}</p>
         <div className="mt-5 flex flex-wrap gap-2">
           <Link
@@ -71,7 +71,7 @@ export default async function WalletPage() {
       </section>
 
       {pendingTopups && pendingTopups.length > 0 && (
-        <section className="mt-4 rounded-2xl border border-gold-400/25 bg-app-accent-soft p-4">
+        <section className="mt-5 rounded-3xl border border-gold-400/25 bg-app-accent-soft p-5">
           <p className="text-sm font-black text-app-kicker">Top Up dalam proses</p>
           <ul className="mt-2 space-y-2">
             {pendingTopups.map((t) => (
@@ -84,11 +84,11 @@ export default async function WalletPage() {
         </section>
       )}
 
-      <section className="mt-8">
-        <p className="text-[10px] font-black uppercase tracking-[.18em] text-app-kicker">Aktivitas</p>
+      <section className="mt-5">
+        <p className="text-xs font-black uppercase tracking-widest text-app-kicker">Aktivitas</p>
         <h2 className="mt-1 text-base font-black text-app-text">Riwayat Saldo</h2>
       </section>
-      <div className="mt-3 overflow-hidden rounded-2xl border border-app-border bg-app-surface">
+      <div className="mt-3 overflow-hidden rounded-3xl border border-app-border bg-app-surface">
         {history && history.length > 0 ? (
           <ul className="divide-y divide-app-border">
             {history.map((h) => (
@@ -101,7 +101,7 @@ export default async function WalletPage() {
                   <p className="mt-0.5 truncate text-xs text-app-subtle">{h.description || "-"} · {formatDate(h.created_at)}</p>
                 </div>
                 <div className="shrink-0 text-right">
-                  <p className={`text-sm font-black tabular-nums ${h.amount >= 0 ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"}`}>
+                  <p className={`text-sm font-black tabular-nums ${h.amount >= 0 ? "text-success-600 dark:text-success-400" : "text-danger-600 dark:text-danger-400"}`}>
                     {h.amount >= 0 ? "+" : ""}{formatRupiah(h.amount)}
                   </p>
                   <p className="mt-0.5 text-xs tabular-nums text-app-subtle">Saldo: {formatRupiah(h.balance_after)}</p>

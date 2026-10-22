@@ -3,9 +3,13 @@
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
-import Button from "@/components/Button";
-import StatusBadge from "@/components/StatusBadge";
-import EmptyState from "@/components/EmptyState";
+import Button from "@/components/ui/Button";
+import Badge, { statusLabel, statusTone } from "@/components/ui/Badge";
+import EmptyState from "@/components/ui/EmptyState";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
+import Input from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
 import { formatRupiah, formatDate } from "@/lib/utils";
 
 type FeeConfig = { enabled: boolean; fee_type: "FIXED" | "PERCENTAGE"; fee_value: number; min_topup: number; max_topup: number; deadline_minutes: number; updated_at?: string };
@@ -110,52 +114,71 @@ export default function AdminTopupsPage() {
   }
 
   return (
-    <div className="animate-page-in">
-      <div className="mb-5"><p className="text-xs font-black uppercase tracking-[.18em] text-app-kicker">Keuangan</p><h1 className="mt-1 text-2xl font-black text-app-text">Top Up & Biaya Admin</h1><p className="mt-1 text-sm text-app-muted">Atur biaya Top Up otomatis dan pantau seluruh transaksi wallet.</p></div>
+    <div className="animate-page-in space-y-5">
+      <div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">Keuangan</p><h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Top Up & Biaya Admin</h1><p className="mt-1 text-sm text-app-muted">Atur biaya Top Up otomatis dan pantau seluruh transaksi wallet.</p></div>
 
-      <section className="rounded-3xl border border-app-border bg-app-surface p-5 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-black text-app-text">Biaya Top Up</h2><p className="text-xs text-app-muted">Biaya ini ditambahkan ke nominal pembayaran; saldo pengguna tetap menerima nominal Top Up.</p></div><label className="flex items-center gap-2 text-sm font-bold"><input type="checkbox" checked={fee.enabled} onChange={(e) => setFee({ ...fee, enabled: e.target.checked })} /> Aktif</label></div>
-        <div className="mt-4 grid gap-3 md:grid-cols-4">
-          <label className="text-sm font-bold text-app-text">Tipe<select value={fee.fee_type} onChange={(e) => setFee({ ...fee, fee_type: e.target.value as FeeConfig["fee_type"] })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5"><option value="FIXED">Nominal tetap</option><option value="PERCENTAGE">Persentase</option></select></label>
-          <label className="text-sm font-bold text-app-text">Nilai {fee.fee_type === "PERCENTAGE" ? "(%)" : "(Rp)"}<input type="number" min="0" step={fee.fee_type === "PERCENTAGE" ? "0.01" : "100"} value={fee.fee_value} onChange={(e) => setFee({ ...fee, fee_value: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5" /></label>
-          <label className="text-sm font-bold text-app-text">Minimal Top Up<input type="number" min="1000" value={fee.min_topup} onChange={(e) => setFee({ ...fee, min_topup: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5" /></label>
-          <label className="text-sm font-bold text-app-text">Maksimal Top Up<input type="number" min="1000" value={fee.max_topup} onChange={(e) => setFee({ ...fee, max_topup: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5" /></label>
-          <label className="text-sm font-bold text-app-text">Batas pembayaran (menit)<input type="number" min="5" max="1440" value={fee.deadline_minutes} onChange={(e) => setFee({ ...fee, deadline_minutes: Number(e.target.value) })} className="mt-1 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5" /><span className="mt-1 block text-[11px] font-normal text-app-muted">Default AIDIL STORE: 10 menit. QRIS/VA tetap mengikuti batas gateway jika lebih singkat.</span></label>
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-3"><div><CardTitle>Biaya Top Up</CardTitle><CardDescription>Biaya ini ditambahkan ke nominal pembayaran; saldo pengguna tetap menerima nominal Top Up.</CardDescription></div><label className="flex items-center gap-2 text-sm font-bold text-app-text"><input type="checkbox" checked={fee.enabled} onChange={(e) => setFee({ ...fee, enabled: e.target.checked })} className="h-4 w-4 rounded border-app-border accent-gold-400" /> Aktif</label></div>
+        <div className="mt-5 grid gap-3 md:grid-cols-4">
+          <Select label="Tipe" value={fee.fee_type} onChange={(e) => setFee({ ...fee, fee_type: e.target.value as FeeConfig["fee_type"] })} className="bg-app-inset"><option value="FIXED">Nominal tetap</option><option value="PERCENTAGE">Persentase</option></Select>
+          <Input label={`Nilai ${fee.fee_type === "PERCENTAGE" ? "(%)" : "(Rp)"}`} type="number" min="0" step={fee.fee_type === "PERCENTAGE" ? "0.01" : "100"} value={fee.fee_value} onChange={(e) => setFee({ ...fee, fee_value: Number(e.target.value) })} className="bg-app-inset" />
+          <Input label="Minimal Top Up" type="number" min="1000" value={fee.min_topup} onChange={(e) => setFee({ ...fee, min_topup: Number(e.target.value) })} className="bg-app-inset" />
+          <Input label="Maksimal Top Up" type="number" min="1000" value={fee.max_topup} onChange={(e) => setFee({ ...fee, max_topup: Number(e.target.value) })} className="bg-app-inset" />
+          <Input label="Batas pembayaran (menit)" type="number" min="5" max="1440" value={fee.deadline_minutes} onChange={(e) => setFee({ ...fee, deadline_minutes: Number(e.target.value) })} hint="Default AIDIL STORE: 10 menit. QRIS/VA tetap mengikuti batas gateway jika lebih singkat." className="bg-app-inset" />
         </div>
-        <Button className="mt-4" onClick={saveFee} loading={savingFee}>Simpan Pengaturan</Button><a href="/admin/platform" className="ml-2 inline-flex rounded-xl border border-app-border px-4 py-2.5 text-sm font-bold text-app-text">⚙️ Biaya QRIS / Bank / Bank Digital</a>
-      </section>
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          <Button onClick={saveFee} loading={savingFee}>Simpan Pengaturan</Button>
+          <a href="/admin/platform" className="inline-flex items-center justify-center gap-2 rounded-xl border border-app-border bg-transparent px-4 py-2.5 text-sm font-bold text-app-text transition hover:border-gold-400 hover:bg-app-accent-soft">⚙️ Biaya QRIS / Bank / Bank Digital</a>
+        </div>
+      </Card>
 
-      <section className="mt-6 rounded-3xl border border-app-border bg-app-surface p-5 shadow-sm">
-        <div className="flex flex-wrap items-center justify-between gap-3"><div><h2 className="font-black text-app-text">Biaya Admin Top Up Bertingkat</h2><p className="text-xs text-app-muted">Biaya tetap per rentang nominal (inklusif). Nominal yang tidak cocok tier aktif mana pun memakai pengaturan &quot;Biaya Top Up&quot; di atas sebagai cadangan.</p></div><button onClick={loadTiers} className="rounded-xl border border-app-border bg-app-surface px-4 py-2.5 text-sm font-bold text-app-text shadow-sm">↻ Muat ulang</button></div>
-        {tiersLoading ? <div className="mt-4 animate-pulse rounded-2xl border border-app-border bg-app-inset p-4 text-sm text-app-muted">Memuat tier biaya...</div> : tiers.length === 0 ? <p className="mt-4 rounded-2xl border border-dashed border-app-border bg-app-inset p-4 text-sm text-app-muted">Belum ada tier. Semua nominal memakai pengaturan Biaya Top Up di atas.</p> : <div className="mt-4 overflow-x-auto">
+      <Card>
+        <div className="flex flex-wrap items-center justify-between gap-3"><div><CardTitle>Biaya Admin Top Up Bertingkat</CardTitle><CardDescription>Biaya tetap per rentang nominal (inklusif). Nominal yang tidak cocok tier aktif mana pun memakai pengaturan &quot;Biaya Top Up&quot; di atas sebagai cadangan.</CardDescription></div><Button variant="outline" size="sm" onClick={loadTiers}>↻ Muat ulang</Button></div>
+        {tiersLoading ? <div className="mt-5"><LoadingSkeleton rows={4} /></div> : tiers.length === 0 ? <p className="mt-5 rounded-2xl border border-dashed border-app-border bg-app-inset p-4 text-sm text-app-muted">Belum ada tier. Semua nominal memakai pengaturan Biaya Top Up di atas.</p> : <div className="mt-5 overflow-x-auto">
           <table className="w-full min-w-[560px] text-left text-sm">
-            <thead><tr className="text-xs uppercase tracking-wider text-app-subtle"><th className="pb-2">Rentang nominal</th><th className="pb-2">Biaya admin</th><th className="pb-2">Urutan</th><th className="pb-2">Status</th><th className="pb-2 text-right">Aksi</th></tr></thead>
+            <thead><tr className="border-b border-app-border text-xs font-bold uppercase tracking-widest text-app-subtle"><th className="px-3 py-2">Rentang nominal</th><th className="px-3 py-2">Biaya admin</th><th className="px-3 py-2">Urutan</th><th className="px-3 py-2">Status</th><th className="px-3 py-2 text-right">Aksi</th></tr></thead>
             <tbody className="divide-y divide-app-border">
               {tiers.map((t) => <tr key={t.id}>
-                <td className="py-3 font-bold tabular-nums text-app-text">{formatRupiah(t.min_amount)} – {t.max_amount == null ? "tanpa batas" : formatRupiah(t.max_amount)}</td>
-                <td className="py-3 font-black tabular-nums text-app-kicker">{formatRupiah(t.fee_amount)}</td>
-                <td className="py-3 tabular-nums text-app-muted">{t.sort_order}</td>
-                <td className="py-3"><span className={`rounded-full px-2.5 py-1 text-[11px] font-black uppercase ${t.is_active ? "bg-emerald-50 text-emerald-600" : "bg-app-inset text-app-muted"}`}>{t.is_active ? "Aktif" : "Nonaktif"}</span></td>
-                <td className="py-3 text-right"><button onClick={() => deleteTier(t.id)} disabled={deletingTierId === t.id} className="rounded-lg border border-red-200 px-3 py-2 text-xs font-black text-red-600 transition hover:bg-red-500/10 dark:border-red-500/30 dark:text-red-400 disabled:opacity-50">{deletingTierId === t.id ? "Menghapus..." : "Hapus"}</button></td>
+                <td className="px-3 py-3 font-bold tabular-nums text-app-text">{formatRupiah(t.min_amount)} – {t.max_amount == null ? "tanpa batas" : formatRupiah(t.max_amount)}</td>
+                <td className="px-3 py-3 font-black tabular-nums text-app-kicker">{formatRupiah(t.fee_amount)}</td>
+                <td className="px-3 py-3 tabular-nums text-app-muted">{t.sort_order}</td>
+                <td className="px-3 py-3"><Badge tone={t.is_active ? "success" : "neutral"} className="uppercase">{t.is_active ? "Aktif" : "Nonaktif"}</Badge></td>
+                <td className="px-3 py-3 text-right"><Button size="sm" variant="destructive" onClick={() => deleteTier(t.id)} disabled={deletingTierId === t.id}>{deletingTierId === t.id ? "Menghapus..." : "Hapus"}</Button></td>
               </tr>)}
             </tbody>
           </table>
         </div>}
         <div className="mt-5 rounded-2xl border border-app-border bg-app-inset p-4">
-          <p className="font-black text-app-text">Tambah tier baru</p>
+          <p className="text-base font-black text-app-text">Tambah tier baru</p>
           <p className="mt-1 text-xs text-app-muted">Rentang inklusif di kedua ujung. Kosongkan batas atas untuk tier tertinggi (tanpa batas). Rentang yang tumpang tindih dengan tier aktif lain akan ditolak.</p>
           <div className="mt-3 grid gap-3 md:grid-cols-5">
-            <label className="text-sm font-bold text-app-text">Batas bawah (Rp)<input type="number" min="1" placeholder="1000" value={tierForm.min_amount} onChange={(e) => setTierForm({ ...tierForm, min_amount: e.target.value })} className="mt-1 w-full rounded-xl border border-app-border bg-app-surface px-3 py-2.5" /></label>
-            <label className="text-sm font-bold text-app-text">Batas atas (Rp)<input type="number" min="1" placeholder="Kosong = tanpa batas" value={tierForm.max_amount} onChange={(e) => setTierForm({ ...tierForm, max_amount: e.target.value })} className="mt-1 w-full rounded-xl border border-app-border bg-app-surface px-3 py-2.5" /></label>
-            <label className="text-sm font-bold text-app-text">Biaya admin (Rp)<input type="number" min="0" placeholder="81" value={tierForm.fee_amount} onChange={(e) => setTierForm({ ...tierForm, fee_amount: e.target.value })} className="mt-1 w-full rounded-xl border border-app-border bg-app-surface px-3 py-2.5" /></label>
-            <label className="text-sm font-bold text-app-text">Urutan<input type="number" min="0" placeholder="1" value={tierForm.sort_order} onChange={(e) => setTierForm({ ...tierForm, sort_order: e.target.value })} className="mt-1 w-full rounded-xl border border-app-border bg-app-surface px-3 py-2.5" /></label>
+            <Input label="Batas bawah (Rp)" type="number" min="1" placeholder="1000" value={tierForm.min_amount} onChange={(e) => setTierForm({ ...tierForm, min_amount: e.target.value })} className="bg-app-surface" />
+            <Input label="Batas atas (Rp)" type="number" min="1" placeholder="Kosong = tanpa batas" value={tierForm.max_amount} onChange={(e) => setTierForm({ ...tierForm, max_amount: e.target.value })} className="bg-app-surface" />
+            <Input label="Biaya admin (Rp)" type="number" min="0" placeholder="81" value={tierForm.fee_amount} onChange={(e) => setTierForm({ ...tierForm, fee_amount: e.target.value })} className="bg-app-surface" />
+            <Input label="Urutan" type="number" min="0" placeholder="1" value={tierForm.sort_order} onChange={(e) => setTierForm({ ...tierForm, sort_order: e.target.value })} className="bg-app-surface" />
             <div className="flex items-end"><Button onClick={addTier} loading={savingTier} className="w-full">+ Tambah Tier</Button></div>
           </div>
         </div>
-      </section>
+      </Card>
 
-      <div className="mt-6 flex items-end justify-between gap-3"><div><h2 className="text-xl font-black text-app-text">Riwayat Top Up</h2><p className="text-sm text-app-muted">Top Up Midtrans yang sudah lunas masuk otomatis tanpa approve manual.</p></div><button onClick={load} className="rounded-xl border border-app-border bg-app-surface px-4 py-2.5 text-sm font-bold text-app-text shadow-sm">↻ Refresh</button></div>
-      {loading ? <div className="mt-4 animate-pulse rounded-2xl border border-app-border bg-app-surface p-6 text-sm text-app-muted">Memuat data Top Up...</div> : topups.length === 0 ? <div className="mt-4"><EmptyState title="Belum ada transaksi Top Up" description="Transaksi baru akan muncul di sini." /></div> : <div className="mt-4 space-y-3">{topups.map((t) => { const automatic = t.provider === "midtrans" || t.provider === "fr3newera"; return <div key={t.id} className="rounded-2xl border border-app-border bg-app-surface p-4 shadow-sm"><div className="flex flex-wrap items-center justify-between gap-3"><div><p className="font-bold text-app-text">{t.profiles?.full_name || t.profiles?.email || "Pengguna"}</p><p className="text-xs text-app-muted">{t.profiles?.email || ""} · {formatDate(t.created_at)}</p></div><div className="flex items-center gap-2"><span className="rounded-full bg-app-inset px-2.5 py-1 text-[11px] font-black uppercase text-app-muted">{automatic ? "GATEWAY OTOMATIS" : "MANUAL"}</span><StatusBadge status={t.status} /></div></div><div className="mt-3 grid gap-2 rounded-xl bg-app-inset p-3 text-sm sm:grid-cols-4"><div><p className="text-xs text-app-subtle">Saldo masuk</p><p className="font-black">{formatRupiah(t.amount)}</p></div><div><p className="text-xs text-app-subtle">Biaya AIDIL STORE</p><p className="font-black">{formatRupiah(t.admin_fee ?? 0)}</p></div><div><p className="text-xs text-app-subtle">Biaya gateway</p><p className="font-black">{formatRupiah(t.gateway_fee ?? 0)}</p></div><div><p className="text-xs text-app-subtle">Total dibayar</p><p className="font-black text-app-kicker">{formatRupiah(t.gateway_total_payment ?? t.payment_amount ?? t.amount)}</p></div></div>{proofUrls[t.id] && <a href={proofUrls[t.id]} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-bold text-app-kicker">Lihat bukti pembayaran →</a>}{!automatic && (t.status === "PENDING" || t.status === "VERIFYING") && <div className="mt-3 flex flex-wrap gap-2"><Button onClick={() => handleApprove(t.id)} loading={actingId === t.id}>✓ Approve</Button><Button variant="danger" onClick={() => setRejectingId(rejectingId === t.id ? null : t.id)}>✕ Reject</Button></div>}{!automatic && rejectingId === t.id && <div className="mt-3 flex gap-2 rounded-xl border border-red-100 bg-red-50 p-3"><input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Alasan penolakan..." className="min-w-0 flex-1 rounded-lg border border-red-200 bg-app-surface px-3 py-2 text-sm" /><Button variant="danger" onClick={() => handleReject(t.id)} loading={actingId === t.id}>Kirim</Button></div>}</div>})}</div>}
+      <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-xl font-black text-app-text">Riwayat Top Up</h2><p className="mt-1 text-sm text-app-muted">Top Up Midtrans yang sudah lunas masuk otomatis tanpa approve manual.</p></div><Button variant="outline" size="sm" onClick={load}>↻ Refresh</Button></div>
+      {loading ? <LoadingSkeleton rows={5} /> : topups.length === 0 ? <EmptyState icon="💰" title="Belum ada transaksi Top Up" description="Transaksi baru akan muncul di sini." /> : <div className="space-y-3">{topups.map((t) => { const automatic = t.provider === "midtrans" || t.provider === "fr3newera"; return (
+        <Card key={t.id}>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div><p className="font-bold text-app-text">{t.profiles?.full_name || t.profiles?.email || "Pengguna"}</p><p className="mt-1 text-xs text-app-muted">{t.profiles?.email || ""} · {formatDate(t.created_at)}</p></div>
+            <div className="flex flex-wrap items-center gap-2"><Badge tone={automatic ? "gold" : "neutral"} className="font-black">{automatic ? "GATEWAY OTOMATIS" : "MANUAL"}</Badge><Badge tone={statusTone(t.status)}>{statusLabel(t.status)}</Badge></div>
+          </div>
+          <div className="mt-3 grid gap-2 rounded-2xl bg-app-inset p-3 text-sm sm:grid-cols-4">
+            <div><p className="text-xs text-app-subtle">Saldo masuk</p><p className="mt-1 font-black tabular-nums text-app-text">{formatRupiah(t.amount)}</p></div>
+            <div><p className="text-xs text-app-subtle">Biaya AIDIL STORE</p><p className="mt-1 font-black tabular-nums text-app-text">{formatRupiah(t.admin_fee ?? 0)}</p></div>
+            <div><p className="text-xs text-app-subtle">Biaya gateway</p><p className="mt-1 font-black tabular-nums text-app-text">{formatRupiah(t.gateway_fee ?? 0)}</p></div>
+            <div><p className="text-xs text-app-subtle">Total dibayar</p><p className="mt-1 font-black tabular-nums text-app-kicker">{formatRupiah(t.gateway_total_payment ?? t.payment_amount ?? t.amount)}</p></div>
+          </div>
+          {proofUrls[t.id] && <a href={proofUrls[t.id]} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-bold text-app-kicker">Lihat bukti pembayaran →</a>}
+          {!automatic && (t.status === "PENDING" || t.status === "VERIFYING") && <div className="mt-3 flex flex-wrap gap-2"><Button onClick={() => handleApprove(t.id)} loading={actingId === t.id}>✓ Approve</Button><Button variant="destructive" onClick={() => setRejectingId(rejectingId === t.id ? null : t.id)}>✕ Reject</Button></div>}
+          {!automatic && rejectingId === t.id && <div className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-danger-500/30 bg-danger-500/10 p-3"><Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Alasan penolakan..." className="min-w-0 flex-1 bg-app-surface" /><Button variant="destructive" onClick={() => handleReject(t.id)} loading={actingId === t.id}>Kirim</Button></div>}
+        </Card>
+      ); })}</div>}
     </div>
   );
 }

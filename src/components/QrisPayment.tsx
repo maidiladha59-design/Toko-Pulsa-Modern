@@ -54,36 +54,36 @@ export default function QrisPayment({ orderId, qrisImage, amount, expiredAt, onS
 
   if (status === "COMPLETED" || status === "PROCESSING") {
     return (
-      <div className="rounded-3xl border border-emerald-200 bg-emerald-50 p-8 text-center dark:border-emerald-500/30 dark:bg-emerald-500/10">
-        <div className="text-5xl">✅</div>
-        <p className="mt-3 text-lg font-black text-emerald-800 dark:text-emerald-300">Pembayaran Berhasil!</p>
-        <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">Mengarahkan ke halaman pesanan...</p>
+      <div className="rounded-3xl border border-success-500/30 bg-success-500/10 p-8 text-center">
+        <div className="text-5xl">✓</div>
+        <p className="mt-3 text-xl font-black text-success-600 dark:text-success-400">Pembayaran Berhasil!</p>
+        <p className="mt-1 text-sm text-success-600/80 dark:text-success-400/80">Mengarahkan ke halaman pesanan...</p>
       </div>
     );
   }
 
   if (status === "FAILED" || expired) {
     return (
-      <div className="rounded-3xl border border-red-200 bg-red-50 p-8 text-center dark:border-red-500/30 dark:bg-red-500/10">
-        <div className="text-5xl">⏱️</div>
-        <p className="mt-3 text-lg font-black text-red-700 dark:text-red-300">QRIS Kadaluarsa / Gagal</p>
-        <p className="mt-1 text-sm text-red-600 dark:text-red-300">Silakan buat pesanan baru untuk mendapatkan QR code lagi.</p>
+      <div className="rounded-3xl border border-danger-500/30 bg-danger-500/10 p-8 text-center">
+        <div className="text-4xl">⌛</div>
+        <p className="mt-3 text-lg font-black text-danger-600 dark:text-danger-400">QRIS Kadaluarsa / Gagal</p>
+        <p className="mt-1 text-sm text-danger-600/80 dark:text-danger-400/80">Silakan buat pesanan baru untuk mendapatkan QR code lagi.</p>
       </div>
     );
   }
 
   return (
     <div className="rounded-3xl border border-app-border bg-app-surface p-6 text-center shadow-sm">
-      <p className="text-xs font-black uppercase tracking-widest text-gold-600">Scan untuk Bayar</p>
+      <p className="text-xs font-black uppercase tracking-widest text-app-kicker">Scan untuk Bayar</p>
       <div className="mx-auto mt-4 w-fit rounded-2xl border border-app-border bg-white p-3">
         <Image src={qrisImage} alt="QRIS Payment" width={256} height={256} unoptimized className="h-64 w-64" />
       </div>
-      <p className="mt-4 text-2xl font-black text-app-text">{formatRupiah(amount)}</p>
+      <p className="mt-4 text-3xl font-black tabular-nums text-app-kicker">{formatRupiah(amount)}</p>
       <p className="mt-1 text-xs text-app-subtle">Scan kode QRIS di atas menggunakan aplikasi DANA, GoPay, OVO, ShopeePay, m-banking, atau aplikasi pendukung QRIS lainnya.</p>
-      <div className="mx-auto mt-4 flex w-fit items-center gap-2 rounded-full bg-amber-50 px-4 py-2 text-sm font-bold text-amber-700 dark:bg-amber-500/10 dark:text-amber-300">
-        <span className="h-2 w-2 animate-pulse rounded-full bg-amber-500" /> Menunggu pembayaran · {label}
+      <div className="mx-auto mt-4 flex w-fit items-center gap-2 rounded-full bg-app-accent-soft px-4 py-2 text-sm font-bold tabular-nums text-app-kicker">
+        <span className="h-2 w-2 animate-pulse rounded-full bg-gold-400" /> Menunggu pembayaran · {label}
       </div>
-      <p className="mt-3 text-[11px] text-app-subtle">Halaman ini akan otomatis berpindah begitu pembayaran terdeteksi.</p>
+      <p className="mt-3 text-xs text-app-subtle">Halaman ini akan otomatis berpindah begitu pembayaran terdeteksi.</p>
     </div>
   );
 }

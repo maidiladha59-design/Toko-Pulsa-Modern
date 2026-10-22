@@ -1,4 +1,5 @@
 import { notFound, redirect } from "next/navigation";
+import Image from "next/image";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatRupiah, formatDate } from "@/lib/utils";
@@ -76,15 +77,15 @@ export default async function OrderDetailPage({ params }: { params: { id: string
   return (
     <div className="customer-shell">
       <div className="mx-auto w-full max-w-[480px] animate-page-in lg:max-w-4xl">
-        <div className="mb-6 flex items-center gap-3">
-          <img src="/aidil-logo.png" alt="Aidil Store" className="h-12 w-12 rounded-2xl object-cover shadow-lg" />
-          <div><p className="text-xs font-black uppercase tracking-[.2em] text-app-kicker">AIDIL STORE</p><h1 className="text-2xl font-black text-app-text">Pesanan {order.order_number}</h1><p className="text-sm text-app-muted">{formatDate(order.created_at)}</p></div>
+        <div className="mb-5 flex items-center gap-3">
+          <Image src="/aidil-logo.png" alt="Logo AIDIL STORE" width={48} height={48} className="h-12 w-12 rounded-2xl object-cover shadow-lg" />
+          <div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">AIDIL STORE</p><h1 className="text-2xl font-black text-app-text">Pesanan {order.order_number}</h1><p className="text-sm text-app-muted">{formatDate(order.created_at)}</p></div>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-[1fr_330px]">
-          <div className="space-y-4">
-            <div className="rounded-2xl border border-app-border bg-app-surface p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3"><StatusBadge status={order.status} /><p className="text-sm font-medium text-app-muted">{ORDER_MESSAGE[order.status]}</p></div>
+          <div className="space-y-5">
+            <div className="rounded-3xl border border-app-border bg-app-surface p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3"><StatusBadge status={order.status} /><p className="text-sm text-app-muted">{ORDER_MESSAGE[order.status]}</p></div>
             </div>
 
             {showGateway && (
@@ -108,13 +109,13 @@ export default async function OrderDetailPage({ params }: { params: { id: string
 
             <div className="space-y-3">
               {items?.map((item) => (
-                <div key={item.id} className="rounded-2xl border border-app-border bg-app-surface p-5">
+                <div key={item.id} className="rounded-3xl border border-app-border bg-app-surface p-5">
                   <div className="flex justify-between gap-4"><p className="font-black text-app-text">{item.product_name}</p><p className="font-bold tabular-nums text-app-text">{formatRupiah(item.subtotal)}</p></div>
                   <p className="mt-1 text-sm tabular-nums text-app-subtle">{item.quantity} × {formatRupiah(item.unit_price)}</p>
 
                   {order.status === "COMPLETED" && (item.products as any)?.product_type === "digital" && (
-                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-emerald-500/10 p-4 text-emerald-600 dark:text-emerald-400">
-                      <div><p className="font-black">✓ Produk siap diambil</p><p className="text-xs text-emerald-600/80 dark:text-emerald-400/80">Link download dibuat aman dan sementara.</p></div>
+                    <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-success-500/10 p-4 text-success-600 dark:text-success-400">
+                      <div><p className="font-black">✓ Produk siap diambil</p><p className="text-xs text-success-600/80 dark:text-success-400/80">Link download dibuat aman dan sementara.</p></div>
                       <DownloadButton productId={item.product_id} />
                     </div>
                   )}
@@ -134,7 +135,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                           <div className="flex justify-between gap-3"><span className="text-app-muted">Harga Jual</span><b className="tabular-nums text-app-text">{formatRupiah(hargaJual)}</b></div>
 
                         </div>
-                        {tx?.serial_number && <div className="mt-3 rounded-xl bg-app-inset p-3"><p className="text-[10px] font-black uppercase tracking-wider text-app-subtle">SN/Ref</p><p className="mt-1 break-all font-black text-app-kicker">{tx.serial_number}</p></div>}
+                        {tx?.serial_number && <div className="mt-3 rounded-xl bg-app-inset p-3"><p className="text-xs font-black uppercase tracking-widest text-app-subtle">SN/Ref</p><p className="mt-1 break-all font-black text-app-kicker">{tx.serial_number}</p></div>}
                         {tx?.provider_message && tx.status !== "SUCCESS" && <p className="mt-2 text-xs text-app-muted">{tx.provider_message}</p>}
                       </div>
                     );
@@ -153,7 +154,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
             </div>
           </div>
 
-          <aside className="h-fit rounded-2xl border border-app-border bg-app-surface p-5 lg:sticky lg:top-24">
+          <aside className="h-fit rounded-3xl border border-app-border bg-app-surface p-6 lg:sticky lg:top-24">
             <p className="text-xs font-black uppercase tracking-widest text-app-subtle">Rincian Transaksi</p>
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between gap-3"><span className="text-app-subtle">Tanggal</span><b className="text-app-text">{formatDate(order.created_at)}</b></div>
@@ -163,7 +164,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
               <div className="flex justify-between border-t border-app-border pt-4"><span className="text-app-subtle">Subtotal produk</span><b className="tabular-nums text-app-text">{formatRupiah(order.total_amount)}</b></div>
               <div className="flex justify-between text-lg"><span className="font-black text-app-text">Total dibayar</span><b className="tabular-nums text-app-kicker">{formatRupiah(order.gateway_total_payment || order.total_amount)}</b></div>
             </div>
-            {order.status === "COMPLETED" && <div className="mt-5 rounded-2xl bg-emerald-500/10 p-4 text-xs font-bold text-emerald-600 dark:text-emerald-400">📥 Produk digital yang tersedia sudah bisa diambil dari kartu produk di atas.</div>}
+            {order.status === "COMPLETED" && <div className="mt-5 rounded-2xl bg-success-500/10 p-4 text-xs font-bold text-success-600 dark:text-success-400">📥 Produk digital yang tersedia sudah bisa diambil dari kartu produk di atas.</div>}
           </aside>
         </div>
       </div>

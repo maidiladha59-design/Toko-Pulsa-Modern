@@ -72,13 +72,13 @@ export default async function PPOBCategoryPage({ params }: { params: { category:
       <section className="app-hero mt-3 overflow-hidden rounded-[2rem] p-6 text-white sm:p-8">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gold-400 text-3xl text-zinc-950">{config.icon}</div>
-          <div><p className="text-[10px] font-black uppercase tracking-[.2em] text-gold-400">AIDIL STORE</p><h1 className="mt-1 text-2xl font-black sm:text-3xl">{config.title}</h1><p className="mt-2 text-sm text-zinc-400">{config.desc}</p></div>
+          <div><p className="text-xs font-black uppercase tracking-widest text-gold-400">AIDIL STORE</p><h1 className="mt-1 text-2xl font-black sm:text-3xl">{config.title}</h1><p className="mt-2 text-sm text-zinc-400">{config.desc}</p></div>
         </div>
         <div className="mt-6 grid grid-cols-3 gap-2 text-xs font-bold text-zinc-400">
           <div className="rounded-xl bg-white/5 p-3">🔒 Aman</div><div className="rounded-xl bg-white/5 p-3">⚡ Otomatis</div><div className="rounded-xl bg-white/5 p-3">🧾 Ada riwayat</div>
         </div>
       </section>
-      <div className="mb-4 mt-7 flex items-end justify-between gap-3"><div><p className="text-[10px] font-black uppercase tracking-[.18em] text-app-kicker">Pilihan layanan</p><h2 className="mt-1 text-xl font-black text-app-text">Pilih produk</h2></div><span className="text-xs font-bold text-app-subtle">{services.length} produk tersedia</span></div>
+      <div className="mb-3 mt-5 flex items-end justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">Pilihan layanan</p><h2 className="mt-1 text-xl font-black text-app-text">Pilih produk</h2></div><span className="text-xs font-bold text-app-subtle">{services.length} produk tersedia</span></div>
       <PPOBServiceGrid services={services} category={params.category} />
     </div>
     </div>

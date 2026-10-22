@@ -1,6 +1,6 @@
 # AIDIL STORE — v33 Production Integration Verification
 
-Generated: 2026-10-21T06:35:15.159Z
+Generated: 2026-10-22T19:01:12.369Z
 
 ## Scope
 Static verification of the Supabase/Vercel/FR3 NEWERA/Digiflazz/OAuth/cron integration contract. Live external verification is only performed when the --live flag is explicitly used in a real deployment environment.

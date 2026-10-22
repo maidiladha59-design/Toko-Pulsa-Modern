@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState} from 'react';import Button from '@/components/Button';import {useToast} from '@/components/ToastProvider';
+import {useEffect,useState} from 'react';import Button from '@/components/ui/Button';import { Card } from '@/components/ui/Card';import Input from '@/components/ui/Input';import EmptyState from '@/components/ui/EmptyState';import LoadingSkeleton from '@/components/ui/LoadingSkeleton';import {useToast} from '@/components/ToastProvider';
 
 type Brand = {brand_key:string;brand_name:string;logo_url:string|null;updated_at:string|null;product_count:number};
 
@@ -43,38 +43,38 @@ export default function AdminBrandMedia(){
   const filtered=brands.filter(b=>!query.trim()||b.brand_name.toLowerCase().includes(query.trim().toLowerCase())||b.brand_key.includes(query.trim().toLowerCase()));
   const withLogo=brands.filter(b=>b.logo_url).length;
 
-  return <div>
-    <div className="mb-5">
+  return <div className="space-y-5">
+    <div>
       <p className="text-xs font-black uppercase tracking-widest text-app-kicker">PPOB</p>
-      <h1 className="mt-1 text-2xl font-black">Logo Brand</h1>
-      <p className="text-sm text-app-muted">Kelola logo untuk setiap brand PPOB. Logo otomatis tampil pada badge kelompok produk di katalog {withLogo>0&&<span className="font-bold text-app-text">({withLogo} brand berlogo)</span>}.</p>
+      <h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Logo Brand</h1>
+      <p className="mt-1 text-sm text-app-muted">Kelola logo untuk setiap brand PPOB. Logo otomatis tampil pada badge kelompok produk di katalog {withLogo>0&&<span className="font-black text-app-kicker">({withLogo} brand berlogo)</span>}.</p>
     </div>
 
-    <div className="rounded-3xl border border-app-border bg-app-surface p-4">
-      <input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Cari brand..." className="w-full rounded-xl border border-app-border bg-app-inset px-4 py-2.5 text-sm outline-none transition focus:border-gold-400 focus:bg-app-surface focus:ring-4 focus:ring-gold-400/20"/>
-    </div>
+    <Card className="p-4">
+      <Input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Cari brand..." className="bg-app-inset"/>
+    </Card>
 
-    {loading?<p className="mt-5 text-sm text-app-muted">Memuat...</p>:filtered.length===0?<p className="mt-5 rounded-2xl border border-dashed border-gold-300 bg-app-surface p-6 text-center text-sm text-app-muted">Tidak ada brand PPOB yang cocok. Brand muncul otomatis dari SKU PPOB yang tersinkron.</p>:(
-      <div className="mt-5 space-y-3">
+    {loading?<LoadingSkeleton rows={5} />:filtered.length===0?<EmptyState icon="🖼️" title="Tidak ada brand PPOB yang cocok" description="Brand muncul otomatis dari SKU PPOB yang tersinkron." />:(
+      <div className="space-y-3">
         {filtered.map(brand=>(
-          <div key={brand.brand_key} className="rounded-2xl border border-app-border bg-app-surface p-4">
+          <Card key={brand.brand_key} className="p-4">
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-zinc-950 text-lg">
                 {brand.logo_url?(brand.logo_url.toLowerCase().endsWith('.pdf')?<a href={brand.logo_url} target="_blank" rel="noreferrer" title="Buka file PDF" className="flex h-full w-full flex-col items-center justify-center leading-none text-gold-400"><span className="text-base">📄</span><span className="mt-0.5 text-[8px] font-black">PDF</span></a>:<img src={brand.logo_url} alt={brand.brand_name} className="h-full w-full object-contain"/>):<span className="text-gold-400">🖼️</span>}
               </div>
               <div className="min-w-0 flex-1">
-                <p className="truncate font-black">{brand.brand_name}</p>
+                <p className="truncate font-black text-app-text">{brand.brand_name}</p>
                 <p className="text-xs text-app-subtle">{brand.product_count} produk · key: <code className="rounded bg-app-inset px-1">{brand.brand_key}</code></p>
               </div>
               <div className="flex items-center gap-2">
-                <label className={`cursor-pointer rounded-xl bg-zinc-950 px-3 py-2 text-xs font-black text-gold-400 hover:bg-zinc-800 ${busyKey===brand.brand_key?'pointer-events-none opacity-60':''}`}>
+                <label className={`inline-flex cursor-pointer items-center rounded-xl bg-zinc-950 px-4 py-2.5 text-xs font-black text-gold-400 transition hover:bg-zinc-800 ${busyKey===brand.brand_key?'pointer-events-none opacity-60':''}`}>
                   {busyKey===brand.brand_key?'Mengunggah...':brand.logo_url?'Ganti Logo':'Upload Logo'}
                   <input type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml,application/pdf" className="hidden" disabled={busyKey===brand.brand_key} onChange={e=>{const f=e.target.files?.[0];if(f)uploadLogo(brand,f);e.target.value=''}}/>
                 </label>
-                {brand.logo_url&&<Button variant="danger" disabled={busyKey===brand.brand_key} onClick={()=>removeLogo(brand)}>Hapus</Button>}
+                {brand.logo_url&&<Button size="sm" variant="destructive" disabled={busyKey===brand.brand_key} onClick={()=>removeLogo(brand)}>Hapus</Button>}
               </div>
             </div>
-          </div>
+          </Card>
         ))}
       </div>
     )}

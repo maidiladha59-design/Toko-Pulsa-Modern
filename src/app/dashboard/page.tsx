@@ -3,6 +3,9 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import StatusBadge from "@/components/StatusBadge";
+import { Card } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import EmptyState from "@/components/ui/EmptyState";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -27,8 +30,8 @@ export default async function DashboardPage() {
 
   return (
     <div className="customer-shell">
-      <div className="mx-auto w-full max-w-[480px] space-y-6 animate-page-in pb-10 lg:max-w-5xl">
-        <section className="relative overflow-hidden rounded-[2rem] bg-gradient-to-br from-slate-950 via-zinc-950 to-gold-700 p-6 text-white shadow-2xl sm:p-8">
+      <div className="mx-auto w-full max-w-[480px] space-y-5 animate-page-in pb-10 lg:max-w-5xl">
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-zinc-950 to-gold-700 p-6 text-white shadow-2xl sm:p-8">
           <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-gold-400/20 blur-3xl" />
           <div className="absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-gold-400/15 blur-3xl" />
           <div className="relative grid items-center gap-5 md:grid-cols-[1fr_300px]">
@@ -45,26 +48,30 @@ export default async function DashboardPage() {
         </section>
 
         <section className="grid gap-4 sm:grid-cols-3">
-          <div className="dashboard-card rounded-2xl border border-app-border bg-app-surface p-5"><div className="flex items-center justify-between"><span className="text-2xl">💳</span><span className="rounded-full bg-app-accent-soft px-2 py-1 text-[10px] font-black uppercase text-app-kicker">Wallet</span></div><p className="mt-4 text-xs font-semibold text-app-muted">Saldo saat ini</p><p className="mt-1 text-2xl font-black tabular-nums text-app-kicker">{formatRupiah(wallet?.balance || 0)}</p><Link href="/wallet/topup" className="mt-3 inline-block text-sm font-bold text-app-kicker hover:underline">+ Top Up Saldo</Link></div>
-          <div className="dashboard-card rounded-2xl border border-app-border bg-app-surface p-5"><div className="flex items-center justify-between"><span className="text-2xl">📦</span><span className="rounded-full bg-emerald-500/10 px-2 py-1 text-[10px] font-black uppercase text-emerald-600 dark:text-emerald-400">Aktivitas</span></div><p className="mt-4 text-xs font-semibold text-app-muted">Total pesanan</p><p className="mt-1 text-2xl font-black tabular-nums text-app-text">{totalOrders ?? 0}</p><Link href="/orders" className="mt-3 inline-block text-sm font-bold text-app-text transition hover:text-app-kicker">Lihat semua pesanan →</Link></div>
-          <div className="dashboard-card rounded-2xl border border-app-border bg-app-surface p-5"><div className="flex items-center justify-between"><span className="text-2xl">⚡</span><span className="rounded-full bg-app-accent-soft px-2 py-1 text-[10px] font-black uppercase text-app-kicker">Cepat</span></div><p className="mt-4 text-xs font-semibold text-app-muted">Akun</p><p className="mt-1 truncate text-lg font-black text-app-text">{profile?.email || "Akun pengguna"}</p><Link href="/profile" className="mt-3 inline-block text-sm font-bold text-app-text transition hover:text-app-kicker">Edit profil →</Link></div>
+          <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">💳</span><Badge tone="gold">Wallet</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Saldo saat ini</p><p className="mt-1 text-2xl font-black tabular-nums text-app-kicker">{formatRupiah(wallet?.balance || 0)}</p><Link href="/wallet/topup" className="mt-3 inline-block text-sm font-bold text-app-kicker hover:underline">+ Top Up Saldo</Link></Card>
+          <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">📦</span><Badge tone="success">Aktivitas</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Total pesanan</p><p className="mt-1 text-2xl font-black tabular-nums text-app-text">{totalOrders ?? 0}</p><Link href="/orders" className="mt-3 inline-block text-sm font-bold text-app-text transition hover:text-app-kicker">Lihat semua pesanan →</Link></Card>
+          <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">⚡</span><Badge tone="neutral">Cepat</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Akun</p><p className="mt-1 truncate text-lg font-black text-app-text">{profile?.email || "Akun pengguna"}</p><Link href="/profile" className="mt-3 inline-block text-sm font-bold text-app-text transition hover:text-app-kicker">Edit profil →</Link></Card>
         </section>
 
         <section>
-          <div className="mb-3 flex items-end justify-between"><div><p className="text-xs font-black uppercase tracking-[.18em] text-app-kicker">Shortcut</p><h2 className="mt-1 text-xl font-black text-app-text">Menu Cepat</h2></div></div>
+          <div className="mb-3 flex items-end justify-between"><div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">Shortcut</p><h2 className="mt-1 text-xl font-black text-app-text">Menu Cepat</h2></div></div>
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {quickLinks.map(([icon, title, desc, href]) => <Link key={title} href={href} className="dashboard-card group rounded-2xl border border-app-border bg-app-surface p-4"><span className="flex h-11 w-11 items-center justify-center rounded-2xl border border-app-border bg-app-inset text-xl transition group-hover:scale-110 group-hover:border-gold-400/40 group-hover:bg-app-accent-soft">{icon}</span><p className="mt-3 font-black text-app-text transition group-hover:text-app-kicker">{title}</p><p className="mt-1 text-xs text-app-subtle">{desc}</p></Link>)}
           </div>
         </section>
 
         <section>
-          <div className="mb-3 flex items-end justify-between"><div><p className="text-xs font-black uppercase tracking-[.18em] text-app-kicker">Aktivitas</p><h2 className="mt-1 text-xl font-black text-app-text">Pesanan Terbaru</h2></div><Link href="/orders" className="text-sm font-bold text-app-kicker hover:underline">Lihat semua</Link></div>
-          <div className="overflow-hidden rounded-2xl border border-app-border bg-app-surface">
-            {orders && orders.length > 0 ? <div className="divide-y divide-app-border">{orders.map((o) => <Link href={`/orders/${o.id}`} key={o.id} className="flex items-center justify-between gap-3 p-4 transition hover:bg-app-inset"><div className="min-w-0"><p className="truncate font-bold text-app-text">{o.order_number}</p><p className="mt-1 text-xs text-app-subtle">{formatDate(o.created_at)}</p></div><div className="flex shrink-0 items-center gap-3"><span className="hidden text-sm font-bold tabular-nums text-zinc-300 sm:block">{formatRupiah(o.total_amount)}</span><StatusBadge status={o.status} /></div></Link>)}</div> : <div className="flex flex-col items-center gap-2 px-6 py-12 text-center"><span className="text-3xl">📦</span><p className="text-sm font-bold text-app-text">Belum ada pesanan</p><p className="text-xs leading-5 text-app-muted">Yuk mulai belanja produk digital pertama Anda.</p></div>}
-          </div>
+          <div className="mb-3 flex items-end justify-between"><div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">Aktivitas</p><h2 className="mt-1 text-xl font-black text-app-text">Pesanan Terbaru</h2></div><Link href="/orders" className="text-sm font-bold text-app-kicker hover:underline">Lihat semua</Link></div>
+          {orders && orders.length > 0 ? (
+            <div className="overflow-hidden rounded-3xl border border-app-border bg-app-surface">
+              <div className="divide-y divide-app-border">{orders.map((o) => <Link href={`/orders/${o.id}`} key={o.id} className="flex items-center justify-between gap-3 p-4 transition hover:bg-app-inset"><div className="min-w-0"><p className="truncate font-bold text-app-text">{o.order_number}</p><p className="mt-1 text-xs text-app-subtle">{formatDate(o.created_at)}</p></div><div className="flex shrink-0 items-center gap-3"><span className="hidden text-sm font-bold tabular-nums text-app-text sm:block">{formatRupiah(o.total_amount)}</span><StatusBadge status={o.status} /></div></Link>)}</div>
+            </div>
+          ) : (
+            <EmptyState icon="📦" title="Belum ada pesanan" description="Yuk mulai belanja produk digital pertama Anda." action={<Link href="/" className="inline-flex min-h-[44px] items-center rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-gold-300">Mulai Belanja</Link>} />
+          )}
         </section>
 
-        <section className="relative overflow-hidden rounded-2xl border border-gold-400/25 bg-app-accent-soft p-5"><div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold-400/10 blur-2xl" /><div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-black text-app-text">✨ Siap menemukan produk baru?</p><p className="mt-1 text-sm text-app-muted">Jelajahi template, voucher, aset kreatif, dan produk digital lainnya.</p></div><Link href="/" className="rounded-xl bg-gold-400 px-4 py-2.5 text-center text-sm font-black text-zinc-950 transition hover:-translate-y-0.5 hover:bg-gold-300">Jelajahi Sekarang</Link></div></section>
+        <section className="relative overflow-hidden rounded-3xl border border-gold-400/25 bg-app-accent-soft p-5"><div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold-400/10 blur-2xl" /><div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-black text-app-text">✨ Siap menemukan produk baru?</p><p className="mt-1 text-sm text-app-muted">Jelajahi template, voucher, aset kreatif, dan produk digital lainnya.</p></div><Link href="/" className="rounded-xl bg-gold-400 px-4 py-2.5 text-center text-sm font-black text-zinc-950 transition hover:-translate-y-0.5 hover:bg-gold-300">Jelajahi Sekarang</Link></div></section>
       </div>
     </div>
   );

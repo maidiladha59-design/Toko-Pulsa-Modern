@@ -1,6 +1,10 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ToastProvider";
+import { Card } from "@/components/ui/Card";
+import Badge from "@/components/ui/Badge";
+import EmptyState from "@/components/ui/EmptyState";
+import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 
 type Feature = { key: string; label: string; description: string; enabled: boolean };
 
@@ -34,48 +38,48 @@ export default function AdminFeaturesPage() {
     setBusyKey("");
   }
 
-  if (loading) return <div className="rounded-2xl border border-app-border bg-app-surface p-6">Memuat...</div>;
-
   return (
     <div className="space-y-5">
-      <div className="rounded-3xl bg-zinc-950 p-6 text-white">
-        <p className="text-xs font-black uppercase tracking-[.2em] text-gold-400">SYSTEM CONTROL</p>
-        <h1 className="mt-2 text-2xl font-black">Fitur Aplikasi</h1>
-        <p className="mt-2 text-sm text-white/65">Aktifkan atau nonaktifkan fitur untuk pelanggan. Perubahan langsung berlaku.</p>
+      <div>
+        <p className="text-xs font-black uppercase tracking-widest text-app-kicker">SYSTEM CONTROL</p>
+        <h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Fitur Aplikasi</h1>
+        <p className="mt-1 text-sm text-app-muted">Aktifkan atau nonaktifkan fitur untuk pelanggan. Perubahan langsung berlaku.</p>
       </div>
 
       {!tableReady && (
-        <div className="rounded-2xl border border-gold-300 bg-app-accent-soft p-4 text-sm text-app-text">
+        <div className="rounded-2xl border border-warning-500/30 bg-warning-500/10 p-4 text-sm leading-6 text-warning-800 dark:text-warning-300">
           Tabel <b>feature_flags</b> belum ada. Jalankan <b>supabase/migrations_v75_feature_flags.sql</b> di Supabase SQL Editor agar pengaturan bisa disimpan.
         </div>
       )}
 
-      <section className="space-y-3">
-        {features.map((f) => (
-          <div key={f.key} className="flex items-center justify-between gap-4 rounded-2xl border border-gold-200 bg-app-surface p-5 shadow-sm">
-            <div className="min-w-0">
-              <div className="flex flex-wrap items-center gap-2">
-                <h2 className="font-black">{f.label}</h2>
-                <span className={`rounded-full px-2.5 py-0.5 text-[11px] font-black ${f.enabled ? "bg-gold-400 text-black" : "bg-zinc-950 text-gold-400"}`}>
-                  {f.enabled ? "AKTIF" : "NONAKTIF"}
-                </span>
+      {loading ? <LoadingSkeleton rows={5} /> : features.length === 0 ? <EmptyState icon="🧩" title="Belum ada fitur" description="Belum ada feature flag yang tersedia untuk diatur." /> : (
+        <div className="space-y-3">
+          {features.map((f) => (
+            <Card key={f.key} className="p-4">
+              <div className="flex items-center justify-between gap-4">
+                <div className="min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <p className="font-black text-app-text">{f.label}</p>
+                    <Badge tone={f.enabled ? "success" : "neutral"} className="px-2 py-0.5">{f.enabled ? "AKTIF" : "NONAKTIF"}</Badge>
+                  </div>
+                  <p className="mt-1 text-sm text-app-muted">{f.description}</p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={f.enabled}
+                  aria-label={`Ubah status ${f.label}`}
+                  disabled={busyKey === f.key || !tableReady}
+                  onClick={() => toggle(f)}
+                  className={`relative h-8 w-14 shrink-0 rounded-full transition disabled:opacity-50 ${f.enabled ? "bg-gold-400" : "bg-zinc-300"}`}
+                >
+                  <span className={`absolute top-1 h-6 w-6 rounded-full bg-zinc-950 transition-all ${f.enabled ? "left-7" : "left-1"}`} />
+                </button>
               </div>
-              <p className="mt-1 text-sm text-app-muted">{f.description}</p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={f.enabled}
-              aria-label={`Ubah status ${f.label}`}
-              disabled={busyKey === f.key || !tableReady}
-              onClick={() => toggle(f)}
-              className={`relative h-8 w-14 shrink-0 rounded-full transition disabled:opacity-50 ${f.enabled ? "bg-gold-400" : "bg-zinc-300"}`}
-            >
-              <span className={`absolute top-1 h-6 w-6 rounded-full bg-zinc-950 transition-all ${f.enabled ? "left-7" : "left-1"}`} />
-            </button>
-          </div>
-        ))}
-      </section>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

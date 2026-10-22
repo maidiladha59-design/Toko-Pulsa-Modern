@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useToast } from "@/components/ToastProvider";
-import Button from "@/components/Button";
+import Button from "@/components/ui/Button";
+import Input from "@/components/ui/Input";
+import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import { formatRupiah } from "@/lib/utils";
 
 type SyncResult = {
@@ -67,46 +69,58 @@ export default function AdminPPOBPage() {
 
   return (
     <div className="animate-page-in space-y-5">
-      <div className="rounded-3xl bg-gradient-to-r from-slate-950 via-slate-900 to-zinc-950 p-6 text-white shadow-xl sm:p-8">
-        <p className="text-xs font-black uppercase tracking-[.2em] text-amber-300">PPOB ENGINE</p>
-        <h1 className="mt-2 text-2xl font-black sm:text-3xl">Sinkronisasi PPOB</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-white/65">Ambil pricelist provider, buat produk PPOB, simpan SKU provider, hitung harga jual berdasarkan margin, dan aktifkan layanan yang tersedia.</p>
+      <div>
+        <p className="text-xs font-black uppercase tracking-widest text-app-kicker">PPOB ENGINE</p>
+        <h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Sinkronisasi PPOB</h1>
+        <p className="mt-1 text-sm text-app-muted">Ambil pricelist provider, buat produk PPOB, simpan SKU provider, hitung harga jual berdasarkan margin, dan aktifkan layanan yang tersedia.</p>
       </div>
 
-      <section className="rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6">
+      <Card>
         <div className="grid gap-4 md:grid-cols-[1fr_1fr_auto] md:items-end">
-          <label className="text-sm font-bold text-app-text">Margin jual (%)
-            <input type="number" min="0" max="100" step="0.5" value={margin} onChange={(e) => setMargin(e.target.value)} className="mt-1 w-full rounded-xl border border-app-border px-3 py-3 outline-none focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20" />
-          </label>
+          <Input label="Margin jual (%)" type="number" min="0" max="100" step="0.5" value={margin} onChange={(e) => setMargin(e.target.value)} className="bg-app-inset" />
           <label className="flex items-center gap-3 rounded-xl border border-app-border bg-app-inset p-3 text-sm font-bold text-app-text">
-            <input type="checkbox" checked={activate} onChange={(e) => setActivate(e.target.checked)} className="h-4 w-4" />
+            <input type="checkbox" checked={activate} onChange={(e) => setActivate(e.target.checked)} className="h-4 w-4 accent-gold-400" />
             Aktifkan SKU yang aktif di provider
           </label>
           <Button onClick={sync} loading={loading}>{loading ? "Sinkronisasi..." : "🔄 Sync PPOB"}</Button>
         </div>
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
-          <div className="rounded-xl bg-app-accent-soft p-4"><p className="text-xs font-bold text-app-kicker">Contoh modal</p><p className="mt-1 text-lg font-black text-app-text">{formatRupiah(10000)}</p></div>
-          <div className="rounded-xl bg-amber-50 p-4"><p className="text-xs font-bold text-amber-700">Margin {margin || 0}%</p><p className="mt-1 text-lg font-black text-app-text">+{formatRupiah(Math.round(10000 * (Number(margin) || 0) / 100))}</p></div>
-          <div className="rounded-xl bg-emerald-50 p-4"><p className="text-xs font-bold text-emerald-700">Harga jual contoh</p><p className="mt-1 text-lg font-black text-app-text">{formatRupiah(10000 + Math.round(10000 * (Number(margin) || 0) / 100))}</p></div>
+          <div className="rounded-xl bg-app-accent-soft p-4">
+            <p className="text-xs font-bold text-app-kicker">Contoh modal</p>
+            <p className="mt-1 text-lg font-black text-app-text">{formatRupiah(10000)}</p>
+          </div>
+          <div className="rounded-xl bg-warning-500/10 p-4">
+            <p className="text-xs font-bold text-warning-700 dark:text-warning-400">Margin {margin || 0}%</p>
+            <p className="mt-1 text-lg font-black text-app-text">+{formatRupiah(Math.round(10000 * (Number(margin) || 0) / 100))}</p>
+          </div>
+          <div className="rounded-xl bg-success-500/10 p-4">
+            <p className="text-xs font-bold text-success-700 dark:text-success-400">Harga jual contoh</p>
+            <p className="mt-1 text-lg font-black text-app-text">{formatRupiah(10000 + Math.round(10000 * (Number(margin) || 0) / 100))}</p>
+          </div>
         </div>
-      </section>
+      </Card>
 
-      {result && <section className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        {[['Pricelist', result.fetched], ['Produk baru', result.created], ['Diperbarui', result.updated], ['Dilewati', result.skipped]].map(([label, value]) => <div key={String(label)} className="rounded-2xl border border-app-border bg-app-surface p-4 shadow-sm"><p className="text-xs font-bold text-app-subtle">{label}</p><p className="mt-1 text-2xl font-black text-app-text">{value}</p></div>)}
-      </section>}
+      {result && <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        {[['Pricelist', result.fetched], ['Produk baru', result.created], ['Diperbarui', result.updated], ['Dilewati', result.skipped]].map(([label, value]) => (
+          <Card key={String(label)}>
+            <p className="text-xs font-bold text-app-subtle">{label}</p>
+            <p className="mt-1 text-2xl font-black tabular-nums text-app-text">{value}</p>
+          </Card>
+        ))}
+      </div>}
 
-      {result && <section className="rounded-2xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6">
-        <h2 className="font-black text-app-text">Ringkasan Sinkronisasi</h2>
-        <p className="mt-1 text-sm leading-6 text-app-muted">
+      {result && <Card>
+        <CardTitle>Ringkasan Sinkronisasi</CardTitle>
+        <CardDescription>
           {result.saved} dari {result.fetched} SKU yang diterima berhasil disimpan ({result.created} baru, {result.updated} diperbarui), {result.skipped} dilewati.
-        </p>
+        </CardDescription>
 
         {result.skipped === 0 && result.fallbackCategory?.count === 0 && (
-          <p className="mt-4 rounded-xl bg-emerald-500/10 p-3 text-sm font-bold text-emerald-700 dark:text-emerald-400">Semua SKU yang diterima berhasil disinkronkan tanpa ada yang dilewati.</p>
+          <p className="mt-4 rounded-xl bg-success-500/10 p-3 text-sm font-bold text-success-700 dark:text-success-400">Semua SKU yang diterima berhasil disinkronkan tanpa ada yang dilewati.</p>
         )}
 
         {skippedList.length > 0 && (
-          <div className="mt-4 space-y-2">
+          <div className="mt-4 space-y-3">
             <p className="text-sm font-black text-app-text">SKU yang dilewati beserta alasannya</p>
             {skippedList.map(([reason, count]) => (
               <div key={reason} className="rounded-xl bg-app-inset p-3">
@@ -123,13 +137,13 @@ export default function AdminPPOBPage() {
         )}
 
         {result.fallbackCategory?.count > 0 && (
-          <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-900 dark:border-amber-400/30 dark:bg-amber-400/10 dark:text-amber-300">
+          <div className="mt-3 rounded-xl border border-warning-500/30 bg-warning-500/10 p-3 text-sm leading-6 text-warning-800 dark:text-warning-300">
             <b>{result.fallbackCategory.count} SKU</b> masuk kategori fallback <b>Tagihan Lainnya</b> karena kategorinya belum dikenali pemetaan{result.fallbackCategory.categories?.length ? <>: {result.fallbackCategory.categories.join(", ")}</> : null}. Produknya tetap tersimpan dan bisa dijual; kategorinya bisa dirapikan lewat pemetaan kode.
           </div>
         )}
-      </section>}
+      </Card>}
 
-      <section className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
+      <div className="rounded-3xl border border-warning-500/30 bg-warning-500/10 p-5 text-sm leading-6 text-warning-800 dark:text-warning-300">
         <p className="font-black">⚠️ Sebelum transaksi nyata</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li>Isi <code>DIGIFLAZZ_USERNAME</code> dan <code>DIGIFLAZZ_API_KEY</code> hanya di environment server.</li>
@@ -137,7 +151,7 @@ export default function AdminPPOBPage() {
           <li>Pastikan margin dan pemetaan kategori sudah benar sebelum mengaktifkan semua SKU.</li>
           <li>Webhook provider harus diarahkan ke endpoint PPOB AIDIL STORE agar status pending/sukses dapat diperbarui.</li>
         </ul>
-      </section>
+      </div>
     </div>
   );
 }
