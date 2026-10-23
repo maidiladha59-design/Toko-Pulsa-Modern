@@ -34,14 +34,13 @@ function LoginForm() {
     setLoading(true);
     setError(null);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data: authData, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    setLoading(false);
-
     if (error) {
+      setLoading(false);
       const humanized = humanizeError(error.message);
       const msg =
         humanized === "Terjadi kesalahan. Silakan coba lagi."
@@ -52,7 +51,24 @@ function LoginForm() {
       return;
     }
 
-    toast.show("Login berhasil.", "success");
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("account_status, blocked_reason")
+      .eq("id", authData.user.id)
+      .maybeSingle();
+
+    if (profile?.account_status === "BLOCKED") {
+      const reason = profile.blocked_reason
+        ? `?reason=${encodeURIComponent(profile.blocked_reason)}`
+        : "";
+      await supabase.auth.signOut();
+      setLoading(false);
+      router.replace(`/akun-diblokir${reason}`);
+      router.refresh();
+      return;
+    }
+
+    setLoading(false);
     toast.show("Login berhasil.", "success");
     void fetch("/api/notifications/login-event", { method: "POST" }).catch(() => {});
     router.push(redirectTo);

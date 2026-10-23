@@ -82,6 +82,16 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .toast-pop { animation: toast-pop-in .25s ease-out both; }
 .toast-pop-out { animation: toast-pop-out .2s ease-in forwards; }
 .animate-page-in { animation: page-in .45s ease-out both; }
+
+/* Splash sesi (AppLoader): intro emas-hitam sekali per tab, tanpa spinner berputar. */
+@keyframes app-loader-rise { from { opacity: 0; transform: translateY(6px) scale(.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes app-loader-halo { 0%, 100% { opacity: .38; transform: scale(.9); } 50% { opacity: .12; transform: scale(1.1); } }
+@keyframes app-loader-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+.app-loader-aura { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 45%, rgba(245, 197, 66, .16), transparent 55%); }
+.app-loader-logo { animation: app-loader-rise .5s ease-out both; }
+.app-loader-word { animation: app-loader-rise .6s .1s ease-out both; }
+.app-loader-halo { background: radial-gradient(circle, rgba(245, 197, 66, .6), transparent 62%); animation: app-loader-halo 1.2s ease-in-out infinite; }
+.app-loader-bar { animation: app-loader-bar 1.15s cubic-bezier(.22, .61, .36, 1) both; }
 .dashboard-card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
 .dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 18px 35px rgba(9, 9, 11, .18); border-color: #F5C542; }
 

@@ -24,9 +24,10 @@ export default function AdminLoginPage() {
       if (autoRequested.current) return;
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
-      const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+      const { data: profile } = await supabase.from("profiles").select("role, account_status").eq("id", user.id).single();
       const isAdmin = profile?.role === "ADMIN" || profile?.role === "SUPER_ADMIN";
       if (!isAdmin) return;
+      if (profile?.account_status === "BLOCKED") { await supabase.auth.signOut(); return; }
       autoRequested.current = true;
       await requestOtp(user.email || "");
     })();
@@ -53,8 +54,9 @@ export default function AdminLoginPage() {
       if (loginError) { setError(humanizeError(loginError.message)); return; }
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { setError("Sesi login tidak ditemukan. Silakan coba lagi."); return; }
-      const { data: profile, error: profileError } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+      const { data: profile, error: profileError } = await supabase.from("profiles").select("role, account_status").eq("id", user.id).single();
       if (profileError) { console.error(profileError); await supabase.auth.signOut(); setError("Profil admin belum tersedia atau gagal dibaca. Pastikan data profile akun ini sudah dibuat di Supabase."); return; }
+      if (profile?.account_status === "BLOCKED") { await supabase.auth.signOut(); setError("Akun ini sedang diblokir. Hubungi CS AIDIL STORE untuk peninjauan."); return; }
       const isAdmin = profile?.role === "ADMIN" || profile?.role === "SUPER_ADMIN";
       if (!isAdmin) { await supabase.auth.signOut(); setError("Akun ini bukan akun admin."); return; }
       localStorage.setItem("aidil_admin_remember", remember ? "1" : "0");

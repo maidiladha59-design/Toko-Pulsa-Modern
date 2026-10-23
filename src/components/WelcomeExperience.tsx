@@ -48,6 +48,16 @@ export default function WelcomeExperience() {
       setStep("done");
       return;
     }
+    // AppLoader sudah menampilkan intro brand di sesi tab ini; lewatkan fase
+    // loading versi welcome supaya pengguna baru tidak melihat dua animasi bertumpuk.
+    try {
+      if (sessionStorage.getItem("aidilstore_app_loader_v1") === "1") {
+        setStep("welcome");
+        return;
+      }
+    } catch {
+      /* sessionStorage tidak tersedia — jalankan intro normal */
+    }
     setStep("loading");
   }, []);
 

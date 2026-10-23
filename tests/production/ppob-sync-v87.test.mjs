@@ -85,7 +85,7 @@ test('v87 migrasi menambah kolom progres tanpa mengubah skema lama', () => {
   assert.doesNotMatch(sql, /alter column/);
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v87_ppob_sync_details\.sql/);
-  assert.match(script, /86,87\]/);
+  assert.match(script, /86,87,88\]/);
 });
 
 test('v87 halaman admin menampilkan ringkasan masuk vs dilewati beserta alasan', () => {

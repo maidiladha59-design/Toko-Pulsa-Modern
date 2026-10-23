@@ -58,7 +58,15 @@ export async function updateSession(request: NextRequest) {
   // pengunjung biasa langsung diarahkan ke /maintenance saat status aktif.
   // Rute admin, API, aset, dan halaman /maintenance sendiri selalu dikecualikan
   // agar admin tetap bisa masuk untuk mematikannya kembali.
-  const maintenanceBypassPaths = ["/maintenance", "/admin", "/login", "/register", "/daftar", "/auth"];
+  const maintenanceBypassPaths = [
+    "/maintenance",
+    "/admin",
+    "/login",
+    "/register",
+    "/daftar",
+    "/auth",
+    "/akun-diblokir",
+  ];
   const isMaintenanceBypassPath = maintenanceBypassPaths.some(
     (path) => pathname === path || pathname.startsWith(`${path}/`)
   );
@@ -104,6 +112,7 @@ export async function updateSession(request: NextRequest) {
     "/auth",
     "/auth/callback",
     "/verify-email",
+    "/akun-diblokir",
   ];
 
   const isPublicPath = publicPaths.some(
@@ -156,9 +165,18 @@ export async function updateSession(request: NextRequest) {
   if (user && !isApiRoute && !isNextAsset) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("last_activity_at")
+      .select("last_activity_at, account_status")
       .eq("id", user.id)
       .maybeSingle();
+
+    // Akun diblokir tidak boleh mengakses halaman apa pun kecuali halaman
+    // pemberitahuan blokir (yang juga berisi kontak CS).
+    if (profile?.account_status === "BLOCKED" && pathname !== "/akun-diblokir") {
+      const blockedUrl = request.nextUrl.clone();
+      blockedUrl.pathname = "/akun-diblokir";
+      blockedUrl.search = "";
+      return NextResponse.redirect(blockedUrl);
+    }
 
     const profileActivity = profile?.last_activity_at
       ? new Date(profile.last_activity_at).getTime()

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { formatRupiah, formatDate } from "@/lib/utils";
+import { formatRupiah, formatBalanceCompact, formatDate } from "@/lib/utils";
 import StatusBadge from "@/components/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
@@ -48,7 +48,7 @@ export default async function DashboardPage() {
         </section>
 
         <section className="grid gap-4 sm:grid-cols-3">
-          <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">💳</span><Badge tone="gold">Wallet</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Saldo saat ini</p><p className="mt-1 text-2xl font-black tabular-nums text-app-kicker">{formatRupiah(wallet?.balance || 0)}</p><Link href="/wallet/topup" className="mt-3 inline-block text-sm font-bold text-app-kicker hover:underline">+ Top Up Saldo</Link></Card>
+          <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">💳</span><Badge tone="gold">Wallet</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Saldo saat ini</p><p className="mt-1 truncate text-2xl font-black tabular-nums text-app-kicker" title={formatRupiah(wallet?.balance || 0)}>{formatBalanceCompact(wallet?.balance || 0)}</p><Link href="/wallet/topup" className="mt-3 inline-block text-sm font-bold text-app-kicker hover:underline">+ Top Up Saldo</Link></Card>
           <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">📦</span><Badge tone="success">Aktivitas</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Total pesanan</p><p className="mt-1 text-2xl font-black tabular-nums text-app-text">{totalOrders ?? 0}</p><Link href="/orders" className="mt-3 inline-block text-sm font-bold text-app-text transition hover:text-app-kicker">Lihat semua pesanan →</Link></Card>
           <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">⚡</span><Badge tone="neutral">Cepat</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Akun</p><p className="mt-1 truncate text-lg font-black text-app-text">{profile?.email || "Akun pengguna"}</p><Link href="/profile" className="mt-3 inline-block text-sm font-bold text-app-text transition hover:text-app-kicker">Edit profil →</Link></Card>
         </section>

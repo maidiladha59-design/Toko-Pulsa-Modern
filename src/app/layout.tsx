@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
+import AppLoader from "@/components/AppLoader";
 import Navbar from "@/components/Navbar";
 import ToastProvider from "@/components/ToastProvider";
 import WelcomeExperience from "@/components/WelcomeExperience";
@@ -42,6 +43,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ToastProvider>
+            <AppLoader />
             <WelcomeExperience />
             <Navbar scanQrisEnabled={scanQrisEnabled} />
             <main className="mx-auto min-h-[calc(100vh-80px)] max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>

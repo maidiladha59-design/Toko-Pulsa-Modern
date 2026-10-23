@@ -95,6 +95,11 @@ export async function POST(request: Request) {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return NextResponse.json({ ok: false, error: "Silakan login terlebih dahulu.", code: "UNAUTHENTICATED" }, { status: 401 });
 
+    const { data: account } = await supabase.from("profiles").select("account_status").eq("id", user.id).maybeSingle();
+    if (account?.account_status === "BLOCKED") {
+      return NextResponse.json({ ok: false, error: "Akun Anda sedang diblokir sehingga tidak dapat membuat Top Up.", code: "ACCOUNT_BLOCKED" }, { status: 403 });
+    }
+
     step = "parse_body";
     const parsed = bodySchema.safeParse(await request.json().catch(() => null));
     if (!parsed.success) {

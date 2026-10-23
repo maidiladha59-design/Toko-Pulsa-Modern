@@ -6,6 +6,23 @@ export function formatRupiah(amount: number): string {
   }).format(amount);
 }
 
+// Saldo ringkas untuk tabel/kartu: angka besar tidak boleh melebarkan layout.
+// Nilai penuh tetap tersedia lewat formatRupiah (tooltip/modal detail).
+export function formatBalanceCompact(amount: number): string {
+  const value = Number.isFinite(amount) ? amount : 0;
+  const abs = Math.abs(value);
+  const sign = value < 0 ? "-" : "";
+  const short = (n: number) =>
+    new Intl.NumberFormat("id-ID", { maximumFractionDigits: 1, minimumFractionDigits: 0 }).format(n);
+  const full = (n: number) =>
+    new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(n);
+
+  if (abs < 1_000_000) return `${sign}Rp${full(abs)}`;
+  if (abs < 1_000_000_000) return `${sign}Rp${short(abs / 1_000_000)} Jt`;
+  if (abs < 1_000_000_000_000) return `${sign}Rp${short(abs / 1_000_000_000)} M`;
+  return `${sign}Rp${short(abs / 1_000_000_000_000)} T`;
+}
+
 export function formatDate(dateStr: string): string {
   return new Intl.DateTimeFormat("id-ID", {
     dateStyle: "medium",
