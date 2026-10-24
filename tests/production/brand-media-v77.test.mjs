@@ -92,7 +92,7 @@ test('v77 halaman platform: accept baru, ikon PDF banner, indikator Mengunggah',
   assert.ok(exists(PLATFORM), PLATFORM);
   const p = read(PLATFORM);
   assert.match(p, /accept="image\/jpeg,image\/png,image\/webp,image\/svg\+xml,application\/pdf"/);
-  assert.match(p, /uploading&&<span className="ml-3 text-xs font-black text-gold-600">Mengunggah\.\.\.<\/span>/);
+  assert.match(p, /uploading&&<span className="ml-3 text-xs font-black text-gold-600 dark:text-gold-300">Mengunggah\.\.\.<\/span>/);
   assert.match(p, /b\.file_type==='pdf'\?'📄 PDF':'🖼️ Gambar'/);
   assert.match(p, /Jaringan gagal\. Periksa koneksi internet lalu coba lagi\./);
   assert.match(p, /file_type:f\.type==='application\/pdf'\?'pdf':'image'/);

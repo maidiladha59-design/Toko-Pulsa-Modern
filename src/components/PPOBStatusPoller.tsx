@@ -10,5 +10,5 @@ export default function PPOBStatusPoller({ active }: { active: boolean }) {
     const timer = window.setInterval(() => router.refresh(), 15000);
     return () => window.clearInterval(timer);
   }, [active, router]);
-  return active ? <p className="mt-2 text-xs text-gold-700">Status diperbarui otomatis setiap 15 detik.</p> : null;
+  return active ? <p className="mt-2 text-xs text-gold-700 dark:text-gold-300">Status diperbarui otomatis setiap 15 detik.</p> : null;
 }

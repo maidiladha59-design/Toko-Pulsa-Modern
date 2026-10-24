@@ -93,7 +93,7 @@ export default function WelcomeExperience() {
         className="pointer-events-none absolute inset-0 opacity-90"
         style={{
           background:
-            "radial-gradient(circle at 20% 15%, rgba(245,197,66,0.16), transparent 45%), radial-gradient(circle at 85% 80%, rgba(245,197,66,0.10), transparent 50%), linear-gradient(180deg, #0b0b10 0%, #111119 55%, #09090b 100%)",
+            "radial-gradient(circle at 20% 15%, rgba(201,162,39,0.18), transparent 45%), radial-gradient(circle at 85% 80%, rgba(240,216,120,0.1), transparent 50%), linear-gradient(180deg, #0b0b10 0%, #111119 55%, #09090b 100%)",
         }}
       />
 
@@ -105,7 +105,7 @@ export default function WelcomeExperience() {
             <img
               src="/aidil-logo.png"
               alt="AIDIL STORE"
-              className="h-16 w-16 rounded-2xl object-cover shadow-[0_0_30px_rgba(245,197,66,0.35)]"
+              className="h-16 w-16 rounded-2xl object-cover shadow-[0_0_30px_rgba(201,162,39,0.4)]"
             />
           </div>
           <div>

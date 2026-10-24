@@ -81,7 +81,7 @@ function LoginForm() {
       {/* LEFT - BRANDING */}
       <div className="relative hidden overflow-hidden bg-gradient-to-br from-black via-zinc-950 to-zinc-950 p-10 text-white md:block">
 
-        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-yellow-400/20 blur-3xl" />
+        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gold-400/20 blur-3xl" />
         <div className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-gold-500/25 blur-3xl" />
 
         <div className="relative z-10 flex h-full flex-col justify-between">
@@ -100,19 +100,19 @@ function LoginForm() {
                 <p className="text-sm font-black tracking-wide">
                   AIDIL STORE
                 </p>
-                <p className="text-xs text-yellow-300">
+                <p className="text-xs text-gold-200">
                   Solusi Digital
                 </p>
               </div>
             </div>
 
-            <p className="mt-10 text-xs font-black uppercase tracking-[.22em] text-yellow-300">
+            <p className="mt-10 text-xs font-black uppercase tracking-[.22em] text-gold-200">
               SELAMAT DATANG KEMBALI
             </p>
 
             <h1 className="mt-3 text-4xl font-black leading-tight">
               Login dan lanjutkan
-              <span className="text-yellow-300"> perjalananmu.</span>
+              <span className="text-gold-200"> perjalananmu.</span>
             </h1>
 
             <p className="mt-5 max-w-sm text-sm leading-6 text-zinc-300">
@@ -122,13 +122,13 @@ function LoginForm() {
           </div>
 
           <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-            <p className="text-sm font-black text-yellow-300">
+            <p className="text-sm font-black text-gold-200">
               📖 Panduan Login
             </p>
 
             <div className="mt-4 space-y-3">
               <div className="flex gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-xs font-black text-black">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">
                   1
                 </span>
                 <p className="text-xs leading-5 text-zinc-300">
@@ -137,7 +137,7 @@ function LoginForm() {
               </div>
 
               <div className="flex gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-500 text-xs font-black text-white">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">
                   2
                 </span>
                 <p className="text-xs leading-5 text-zinc-300">
@@ -146,7 +146,7 @@ function LoginForm() {
               </div>
 
               <div className="flex gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-xs font-black text-black">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">
                   3
                 </span>
                 <p className="text-xs leading-5 text-zinc-300">
@@ -165,7 +165,7 @@ function LoginForm() {
         <div className="mb-6 flex rounded-2xl bg-black p-1 text-sm font-bold">
           <Link
             href="/login"
-            className="flex-1 rounded-xl bg-yellow-400 px-4 py-2.5 text-center text-black shadow-sm transition hover:bg-yellow-300"
+            className="flex-1 rounded-xl bg-gold-400 px-4 py-2.5 text-center text-[#1A1200] shadow-sm transition hover:bg-gold-300"
           >
             Login
           </Link>
@@ -216,7 +216,7 @@ function LoginForm() {
 
               <Link
                 href="/forgot-password"
-                className="text-xs font-bold text-gold-600 hover:text-zinc-900 hover:underline"
+                className="text-xs font-bold text-gold-300 hover:text-gold-200 hover:underline"
               >
                 Lupa password?
               </Link>
@@ -252,7 +252,7 @@ function LoginForm() {
           <Button
             type="submit"
             loading={loading}
-            className="w-full !bg-yellow-400 !text-black hover:!bg-yellow-300"
+            className="w-full"
           >
             Login ke AIDIL STORE
           </Button>
@@ -270,7 +270,7 @@ function LoginForm() {
 
           <Link
             href="/register"
-            className="mt-4 flex w-full items-center justify-center rounded-xl bg-gold-700 px-4 py-3 text-sm font-black text-white transition hover:bg-zinc-900"
+            className="btn-gold-metal mt-4 flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-black transition"
           >
             ✨ Buat Akun Sekarang
           </Link>

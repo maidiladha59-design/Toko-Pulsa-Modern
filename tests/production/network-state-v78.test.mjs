@@ -29,7 +29,7 @@ test("v78: NetworkState.tsx ada, client component, ekspor tiga tampilan", () => 
 test("v78: NetworkSkeleton memakai skeleton abu-abu berdenyut", () => {
   const src = read("src/components/NetworkState.tsx");
   assert.match(src, /animate-pulse/);
-  assert.match(src, /bg-zinc-800/);
+  assert.match(src, /bg-app-inset/);
   assert.match(src, /aria-busy="true"/);
 });
 
@@ -42,12 +42,12 @@ test("v78: NetworkError menampilkan status koneksi bermasalah + tombol Coba Lagi
   assert.match(src, /onRetry/);
 });
 
-test("v78: NetworkEmpty menampilkan status kosong dengan gaya hitam-emas", () => {
+test("v78: NetworkEmpty & NetworkError memakai token tema hitam-emas", () => {
   const src = read("src/components/NetworkState.tsx");
   assert.match(src, /Belum ada data/);
-  assert.match(src, /border-zinc-700|border-zinc-800/);
-  assert.match(src, /bg-gold-400/);
-  assert.match(src, /text-zinc-950/);
+  assert.match(src, /border-dashed border-app-border/);
+  assert.match(src, /btn-gold-3d/);
+  assert.match(src, /bg-app-accent-soft/);
 });
 
 test("v78: Navbar mendeteksi offline via event online/offline dengan cleanup", () => {

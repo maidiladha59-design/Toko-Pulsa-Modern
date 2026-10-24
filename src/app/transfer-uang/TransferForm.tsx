@@ -263,7 +263,7 @@ export default function TransferForm({ initialQr, initialAmount }: { initialQr: 
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
           <button type="button" onClick={copyReceipt} className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-black text-white">📋 Salin Bukti</button>
           <button type="button" onClick={() => setResult(null)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">🔄 Transfer Lagi</button>
-          <Link href="/wallet" className="rounded-2xl bg-gold-600 px-4 py-3 text-center text-sm font-black text-white">💰 Lihat Saldo</Link>
+          <Link href="/wallet" className="btn-gold-metal rounded-2xl px-4 py-3 text-center text-sm font-black">💰 Lihat Saldo</Link>
         </div>
       </section>
     );
@@ -298,7 +298,7 @@ export default function TransferForm({ initialQr, initialAmount }: { initialQr: 
           {recipient ? (
             <div className="flex items-center justify-between gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4">
               <div className="flex items-center gap-3">
-                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-sm font-black text-yellow-300">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-slate-950 text-sm font-black text-gold-200">
                   {recipient.display_name.charAt(0).toUpperCase()}
                 </span>
                 <div>
@@ -355,7 +355,7 @@ export default function TransferForm({ initialQr, initialAmount }: { initialQr: 
                         {searchResult.email_masked}{searchResult.phone_masked ? ` · ${searchResult.phone_masked}` : ""}
                       </p>
                     </div>
-                    <button type="button" onClick={chooseSearchResult} className="shrink-0 rounded-xl bg-gold-600 px-3 py-2 text-xs font-black text-white hover:bg-gold-700">Pilih</button>
+                    <button type="button" onClick={chooseSearchResult} className="btn-gold-metal shrink-0 rounded-xl px-3 py-2 text-xs font-black">Pilih</button>
                   </div>
                 )}
               </div>
@@ -431,7 +431,7 @@ export default function TransferForm({ initialQr, initialAmount }: { initialQr: 
 
           {error && <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700">{error}</div>}
 
-          <button type="submit" disabled={busy} className="w-full rounded-2xl bg-gold-600 px-5 py-3.5 text-sm font-black text-white transition hover:bg-gold-700 disabled:cursor-not-allowed disabled:opacity-50">
+          <button type="submit" disabled={busy} className="btn-gold-3d w-full rounded-2xl px-5 py-3.5 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50">
             {busy ? "Memproses Transfer..." : "Kirim Transfer"}
           </button>
         </form>

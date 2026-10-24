@@ -350,7 +350,7 @@ export default function KYC() {
                 : "Ikuti panduan di atas: posisikan wajah tepat di dalam oval, lihat lurus ke kamera, pencahayaan cukup."}
             </p>
             {!cameraReady && (
-              <button type="button" onClick={() => requestCamera(stage)} className="mt-3 rounded-xl bg-gold-700 px-4 py-3 text-sm font-black text-white">
+              <button type="button" onClick={() => requestCamera(stage)} className="btn-gold-3d mt-3 rounded-xl px-4 py-3 text-sm font-black">
                 📷 Izinkan Kamera & Mulai
               </button>
             )}
@@ -367,7 +367,7 @@ export default function KYC() {
               )}
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => handleCaptureAndSave(stage)} disabled={busy} className="rounded-xl bg-yellow-400 px-4 py-3 font-black text-black disabled:opacity-50">
+              <button type="button" onClick={() => handleCaptureAndSave(stage)} disabled={busy} className="btn-gold-3d rounded-xl px-4 py-3 font-black disabled:opacity-50">
                 {busy ? busyLabel : "Ambil & Simpan Foto"}
               </button>
               <button type="button" onClick={stopCamera} className="rounded-xl bg-white px-4 py-3 font-black">Batal</button>

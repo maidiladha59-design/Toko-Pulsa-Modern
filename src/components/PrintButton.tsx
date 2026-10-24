@@ -70,7 +70,7 @@ export default function PrintButton({ receiptText = "AIDIL STORE\nStruk Transaks
       >
         {busy ? "Menghubungkan..." : bluetooth ? "✓ Cetak Bluetooth Berhasil" : "🖨️ Cetak via Bluetooth"}
       </button>
-      <button type="button" onClick={() => window.print()} className="w-full rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-zinc-950 hover:bg-gold-300">
+      <button type="button" onClick={() => window.print()} className="btn-gold-3d w-full rounded-xl px-4 py-3 text-sm font-black">
         🖨️ Cetak / Simpan PDF
       </button>
       <button type="button" onClick={share} className="w-full rounded-xl border border-app-border px-4 py-3 text-sm font-black text-app-text transition hover:border-gold-400/60 hover:text-app-kicker">

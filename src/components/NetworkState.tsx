@@ -52,7 +52,7 @@ export function NetworkError({
       {onRetry && (
         <button
           onClick={onRetry}
-          className="mt-5 inline-flex min-h-[44px] items-center rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-gold-300"
+          className="btn-gold-3d mt-5 inline-flex min-h-[44px] items-center rounded-xl px-4 py-2.5 text-sm font-black transition"
         >
           Coba Lagi
         </button>

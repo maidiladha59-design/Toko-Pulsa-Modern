@@ -1,5 +1,5 @@
 const STATUS_STYLES: Record<string, string> = {
-  PENDING: "bg-yellow-100 text-yellow-800 dark:bg-yellow-500/15 dark:text-yellow-300",
+  PENDING: "bg-warning-100 text-warning-800 dark:bg-warning-500/15 dark:text-warning-300",
   VERIFYING: "bg-gold-100 text-zinc-900 dark:bg-gold-400/15 dark:text-gold-300",
   APPROVED: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",
   COMPLETED: "bg-emerald-100 text-emerald-800 dark:bg-emerald-500/15 dark:text-emerald-300",

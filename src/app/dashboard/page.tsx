@@ -40,7 +40,7 @@ export default async function DashboardPage() {
               <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">Halo, {firstName}! 👋</h1>
               <p className="mt-2 max-w-xl text-sm leading-6 text-gold-100">Kelola saldo, pesanan, profil, dan koleksi produk digitalmu dari satu tempat.</p>
               <div className="mt-5 flex flex-wrap gap-3">
-                <Link href="/" className="rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-black text-zinc-950 shadow-lg transition hover:-translate-y-0.5 hover:bg-gold-300">Mulai Belanja →</Link>
+                <Link href="/" className="btn-gold-3d rounded-xl px-4 py-2.5 text-sm font-black transition">Mulai Belanja →</Link>
                 <Link href="/wallet" className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/15">Lihat Saldo</Link>
               </div>
             </div>
@@ -67,11 +67,11 @@ export default async function DashboardPage() {
               <div className="divide-y divide-app-border">{orders.map((o) => <Link href={`/orders/${o.id}`} key={o.id} className="flex items-center justify-between gap-3 p-4 transition hover:bg-app-inset"><div className="min-w-0"><p className="truncate font-bold text-app-text">{o.order_number}</p><p className="mt-1 text-xs text-app-subtle">{formatDate(o.created_at)}</p></div><div className="flex shrink-0 items-center gap-3"><span className="hidden text-sm font-bold tabular-nums text-app-text sm:block">{formatRupiah(o.total_amount)}</span><StatusBadge status={o.status} /></div></Link>)}</div>
             </div>
           ) : (
-            <EmptyState icon="📦" title="Belum ada pesanan" description="Yuk mulai belanja produk digital pertama Anda." action={<Link href="/" className="inline-flex min-h-[44px] items-center rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-gold-300">Mulai Belanja</Link>} />
+            <EmptyState icon="📦" title="Belum ada pesanan" description="Yuk mulai belanja produk digital pertama Anda." action={<Link href="/" className="btn-gold-metal inline-flex min-h-[44px] items-center rounded-xl px-4 py-2.5 text-sm font-black transition">Mulai Belanja</Link>} />
           )}
         </section>
 
-        <section className="relative overflow-hidden rounded-3xl border border-gold-400/25 bg-app-accent-soft p-5"><div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold-400/10 blur-2xl" /><div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-black text-app-text">✨ Siap menemukan produk baru?</p><p className="mt-1 text-sm text-app-muted">Jelajahi template, voucher, aset kreatif, dan produk digital lainnya.</p></div><Link href="/" className="rounded-xl bg-gold-400 px-4 py-2.5 text-center text-sm font-black text-zinc-950 transition hover:-translate-y-0.5 hover:bg-gold-300">Jelajahi Sekarang</Link></div></section>
+        <section className="relative overflow-hidden rounded-3xl border border-gold-400/25 bg-app-accent-soft p-5"><div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold-400/10 blur-2xl" /><div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-black text-app-text">✨ Siap menemukan produk baru?</p><p className="mt-1 text-sm text-app-muted">Jelajahi template, voucher, aset kreatif, dan produk digital lainnya.</p></div><Link href="/" className="btn-gold-metal rounded-xl px-4 py-2.5 text-center text-sm font-black transition hover:-translate-y-0.5">Jelajahi Sekarang</Link></div></section>
       </div>
     </div>
   );

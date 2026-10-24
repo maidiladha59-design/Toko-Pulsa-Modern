@@ -40,7 +40,7 @@ export default async function TransferPage({ searchParams }: { searchParams: { [
         <h1 className="mt-2 text-2xl font-black">Transfer Saldo Sesama Pengguna</h1>
         <p className="mt-2 text-sm text-white/60">Kirim saldo ke pengguna AIDIL STORE lain lewat QR Pribadi, kontak favorit, atau pencarian akun.</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <Link href="/transfer-uang/qr" className="rounded-xl bg-gold-500 px-4 py-2.5 text-sm font-black text-slate-950 hover:bg-gold-400">📥 Terima Saldo (QR Saya)</Link>
+          <Link href="/transfer-uang/qr" className="btn-gold-metal rounded-xl px-4 py-2.5 text-sm font-black">📥 Terima Saldo (QR Saya)</Link>
           <Link href="/wallet" className="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/20">💰 Lihat Saldo</Link>
         </div>
       </div>

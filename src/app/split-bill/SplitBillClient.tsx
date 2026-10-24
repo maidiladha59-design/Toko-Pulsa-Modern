@@ -244,7 +244,7 @@ export default function SplitBillClient() {
                   <button
                     type="button"
                     onClick={() => { addParticipant(searchResult.recipient_id, searchResult.display_name_masked); setSearchResult(null); setQuery(""); }}
-                    className="shrink-0 rounded-xl bg-gold-600 px-3 py-2 text-xs font-black text-white hover:bg-gold-700"
+                    className="btn-gold-metal shrink-0 rounded-xl px-3 py-2 text-xs font-black"
                   >
                     Tambah
                   </button>
@@ -258,7 +258,7 @@ export default function SplitBillClient() {
                 <div className="mt-2 space-y-2">
                   {selected.map((p, i) => (
                     <div key={p.user_id} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
-                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-xs font-black text-yellow-300">
+                      <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-xs font-black text-gold-200">
                         {p.display_name.charAt(0).toUpperCase()}
                       </span>
                       <div className="min-w-0 flex-1">
@@ -311,7 +311,7 @@ export default function SplitBillClient() {
           <button
             type="submit"
             disabled={busy}
-            className="w-full rounded-2xl bg-gold-500 px-4 py-3.5 text-sm font-black text-slate-950 hover:bg-gold-400 disabled:opacity-50"
+            className="btn-gold-3d w-full rounded-2xl px-4 py-3.5 text-sm font-black disabled:opacity-50"
           >
             {busy ? "Membuat tagihan..." : "🧾 Buat Tagihan Patungan"}
           </button>

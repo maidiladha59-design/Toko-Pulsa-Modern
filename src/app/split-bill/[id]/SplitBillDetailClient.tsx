@@ -279,7 +279,7 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
             <button
               type="submit"
               disabled={payBusy || (settings ? !settings.enabled : false)}
-              className="w-full rounded-2xl bg-gold-500 px-4 py-3.5 text-sm font-black text-slate-950 hover:bg-gold-400 disabled:opacity-50"
+              className="btn-gold-3d w-full rounded-2xl px-4 py-3.5 text-sm font-black disabled:opacity-50"
             >
               {payBusy ? "Memproses..." : `💰 Bayar ${formatRupiah(shareNumber)}`}
             </button>
@@ -303,7 +303,7 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
             const cooldownLeft = cooldownEnd ? cooldownEnd - now : 0;
             return (
               <div key={p.user_id} className={`flex items-center gap-3 rounded-2xl border p-3 ${paid ? "border-emerald-200 bg-emerald-50/60" : "border-slate-200 bg-white"}`}>
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black ${paid ? "bg-emerald-100 text-emerald-700" : "bg-slate-950 text-yellow-300"}`}>
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black ${paid ? "bg-emerald-100 text-emerald-700" : "bg-slate-950 text-gold-200"}`}>
                   {paid ? "✓" : p.display_name.charAt(0).toUpperCase()}
                 </span>
                 <div className="min-w-0 flex-1">

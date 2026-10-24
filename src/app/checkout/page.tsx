@@ -279,7 +279,7 @@ function CheckoutForm() {
               </ul>
               {ppob.service_kind === "postpaid" && (
                 <div className="mt-4 rounded-2xl border border-app-border bg-app-inset/60 p-4">
-                  <button type="button" onClick={runInquiry} disabled={inquiring} className="min-h-[44px] rounded-xl bg-gold-400 px-4 py-2.5 text-sm font-black text-zinc-950 transition hover:bg-gold-300 disabled:opacity-60">{inquiring ? "Mengecek..." : "Cek Tagihan"}</button>
+                  <button type="button" onClick={runInquiry} disabled={inquiring} className="btn-gold-metal min-h-[44px] rounded-xl px-4 py-2.5 text-sm font-black transition disabled:opacity-60">{inquiring ? "Mengecek..." : "Cek Tagihan"}</button>
                   {inquiry && (
                     <div className="mt-3 rounded-2xl border border-app-border bg-app-surface p-4">
                       <div className="flex items-center justify-between gap-3">
@@ -340,7 +340,7 @@ function CheckoutForm() {
 
           <div className={`sticky bottom-[76px] z-30 -mx-6 -mb-6 mt-5 space-y-2 border-t border-app-border bg-app-surface/95 px-6 pb-5 pt-4 backdrop-blur lg:static lg:border-0 lg:bg-transparent lg:px-0 lg:pb-0 lg:pt-0 lg:backdrop-blur-none`}>
             <div className={`rounded-2xl p-3 text-xs font-bold ${enoughBalance ? "bg-success-500/10 text-success-600 dark:text-success-400" : "bg-danger-500/10 text-danger-600 dark:text-danger-400"}`}>{enoughBalance ? "✓ Saldo mencukupi." : "Saldo kurang, silakan top up terlebih dahulu."}</div>
-            <button type="button" onClick={payWallet} disabled={confirming || !enoughBalance || (ppob?.service_kind === "postpaid" && !inquiryId)} className="flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-zinc-950 transition hover:bg-gold-300 disabled:cursor-not-allowed disabled:opacity-50">
+            <button type="button" onClick={payWallet} disabled={confirming || !enoughBalance || (ppob?.service_kind === "postpaid" && !inquiryId)} className="btn-gold-3d flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50">
               {confirming && <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" />}Bayar dengan Saldo
             </button>
             {!enoughBalance && <button type="button" onClick={() => router.push(`/wallet/topup?amount=${encodeURIComponent(String(subtotal - balance))}`)} className="flex min-h-[44px] w-full items-center justify-center rounded-xl border border-app-border px-4 py-3 text-sm font-black text-app-text transition hover:border-gold-400/60 hover:text-app-kicker">Top Up Saldo</button>}

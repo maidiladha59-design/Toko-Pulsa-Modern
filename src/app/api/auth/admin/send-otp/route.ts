@@ -86,7 +86,7 @@ export async function POST() {
           from: emailFrom,
           to: [email],
           subject: "Kode Verifikasi Login Admin — AIDIL STORE",
-          html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto"><div style="background:#09090b;color:#fff;padding:24px;border-radius:18px 18px 0 0"><b style="color:#F5C542;letter-spacing:2px">AIDIL STORE</b><h1 style="margin:10px 0 0">Verifikasi Login Admin</h1></div><div style="padding:24px;border:1px solid #F0E2B6;border-top:0;border-radius:0 0 18px 18px"><p>Kode verifikasi 2 langkah untuk masuk ke panel admin:</p><div style="font-size:32px;font-weight:900;letter-spacing:8px;background:#FFFBEA;color:#09090b;padding:18px;text-align:center;border-radius:14px">${otp}</div><p>Kode berlaku ${OTP_EXPIRES_MINUTES} menit. Jika kamu tidak sedang mencoba login sebagai admin, segera ganti password akunmu.</p></div></div>`,
+          html: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:auto"><div style="background:#09090b;color:#fff;padding:24px;border-radius:18px 18px 0 0"><b style="color:#D9B73B;letter-spacing:2px">AIDIL STORE</b><h1 style="margin:10px 0 0">Verifikasi Login Admin</h1></div><div style="padding:24px;border:1px solid #F0D878;border-top:0;border-radius:0 0 18px 18px"><p>Kode verifikasi 2 langkah untuk masuk ke panel admin:</p><div style="font-size:32px;font-weight:900;letter-spacing:8px;background:#FBF7E9;color:#09090b;padding:18px;text-align:center;border-radius:14px">${otp}</div><p>Kode berlaku ${OTP_EXPIRES_MINUTES} menit. Jika kamu tidak sedang mencoba login sebagai admin, segera ganti password akunmu.</p></div></div>`,
         }),
       });
       if (!emailResponse.ok) {

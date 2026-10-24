@@ -75,7 +75,7 @@ export default function AppLoader() {
             width={72}
             height={72}
             priority
-            className="app-loader-logo relative h-16 w-16 rounded-2xl object-cover shadow-[0_0_34px_rgba(245,197,66,0.35)]"
+            className="app-loader-logo relative h-16 w-16 rounded-2xl object-cover shadow-[0_0_34px_rgba(201,162,39,0.4)]"
           />
         </div>
         <p className="app-loader-word text-xs font-black uppercase tracking-[0.24em] text-gold-400">AIDIL STORE</p>

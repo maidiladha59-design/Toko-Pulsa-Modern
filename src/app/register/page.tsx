@@ -72,7 +72,7 @@ function InfoModal({
         <button
           type="button"
           onClick={onClose}
-          className="mt-6 w-full rounded-xl bg-gold-700 px-4 py-3 text-sm font-black text-white transition hover:bg-zinc-900"
+          className="btn-gold-metal mt-6 w-full rounded-xl px-4 py-3 text-sm font-black transition"
         >
           Tutup
         </button>
@@ -286,7 +286,7 @@ function RegisterForm() {
           <Link href="/login" className="flex-1 rounded-xl px-4 py-2.5 text-center text-white transition hover:bg-zinc-950">
             Login
           </Link>
-          <Link href="/register" className="flex-1 rounded-xl bg-yellow-400 px-4 py-2.5 text-center text-black shadow-sm transition hover:bg-yellow-300">
+          <Link href="/register" className="flex-1 rounded-xl bg-gold-400 px-4 py-2.5 text-center text-[#1A1200] shadow-sm transition hover:bg-gold-300">
             Daftar
           </Link>
         </div>
@@ -310,7 +310,7 @@ function RegisterForm() {
             <div className="mt-2 flex gap-2">
               <input type="email" required value={email} onChange={(e) => handleEmailChange(e.target.value)} disabled={emailVerified} autoComplete="email" placeholder="nama@email.com" className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20 disabled:bg-emerald-500/10" />
               {!emailVerified && (
-                <button type="button" onClick={sendOtp} disabled={sendingOtp || resendRemaining > 0 || !email.trim()} className="shrink-0 rounded-xl bg-gold-700 px-3 py-3 text-xs font-black text-white transition hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4">
+                <button type="button" onClick={sendOtp} disabled={sendingOtp || resendRemaining > 0 || !email.trim()} className="btn-gold-metal shrink-0 rounded-xl px-3 py-3 text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-50 sm:px-4">
                   {sendingOtp ? "Mengirim..." : resendRemaining > 0 ? `${resendRemaining}s` : otpSent ? "Kirim Lagi" : "Kirim OTP"}
                 </button>
               )}
@@ -325,7 +325,7 @@ function RegisterForm() {
                 <span className="rounded-full bg-black/40 px-3 py-1 text-xs font-black text-gold-300">{formatTime(otpRemaining)}</span>
               </div>
               <input inputMode="numeric" autoComplete="one-time-code" maxLength={6} value={otp} onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))} placeholder="000000" className="mt-3 w-full rounded-xl border border-gold-400/30 bg-white/5 px-4 py-3 text-center text-2xl font-black text-white tracking-[.45em] outline-none focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20" />
-              <button type="button" onClick={verifyOtp} disabled={verifyingOtp || otp.length !== 6} className="mt-3 w-full rounded-xl bg-gold-700 px-4 py-3 text-sm font-black text-white transition hover:bg-zinc-900 disabled:cursor-not-allowed disabled:opacity-50">
+              <button type="button" onClick={verifyOtp} disabled={verifyingOtp || otp.length !== 6} className="btn-gold-metal mt-3 w-full rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50">
                 {verifyingOtp ? "Memverifikasi..." : "Verifikasi OTP"}
               </button>
               <p className="mt-2 text-center text-xs text-white/50">Resend tersedia {resendRemaining > 0 ? `dalam ${resendRemaining} detik` : "sekarang"}.</p>
@@ -361,7 +361,7 @@ function RegisterForm() {
               <button
                 type="button"
                 onClick={() => setActiveModal("terms")}
-                className="text-xs font-black text-gold-700 hover:underline"
+                className="text-xs font-black text-gold-300 hover:text-gold-200 hover:underline"
               >
                 Baca selengkapnya
               </button>
@@ -375,7 +375,7 @@ function RegisterForm() {
               <button
                 type="button"
                 onClick={() => setActiveModal("privacy")}
-                className="text-xs font-black text-gold-700 hover:underline"
+                className="text-xs font-black text-gold-300 hover:text-gold-200 hover:underline"
               >
                 Baca selengkapnya
               </button>
@@ -390,33 +390,33 @@ function RegisterForm() {
 
           {error && <div className="animate-page-in rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">{error}</div>}
 
-          <Button type="submit" loading={loading} disabled={!emailVerified || loading} className="w-full !bg-yellow-400 !text-black hover:!bg-yellow-300 disabled:!bg-slate-200 disabled:!text-slate-400">Daftar Sekarang</Button>
+          <Button type="submit" loading={loading} disabled={!emailVerified || loading} className="w-full">Daftar Sekarang</Button>
         </form>
 
         <div className="mt-7 rounded-2xl border border-gold-400/20 bg-white/5 p-5">
           <p className="text-sm font-black text-white">Sudah punya akun?</p>
           <p className="mt-1 text-xs leading-5 text-white/60">Tidak perlu membuat akun baru. Silakan login menggunakan email dan password yang sudah terdaftar.</p>
-          <Link href="/login" className="mt-4 flex w-full items-center justify-center rounded-xl bg-gold-700 px-4 py-3 text-sm font-black text-white transition hover:bg-zinc-900">🔐 Login ke AIDIL STORE</Link>
+          <Link href="/login" className="btn-gold-metal mt-4 flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-black transition">🔐 Login ke AIDIL STORE</Link>
         </div>
       </div>
 
       <div className="relative order-1 hidden overflow-hidden bg-gradient-to-br from-black via-zinc-950 to-zinc-950 p-10 text-white md:order-2 md:block">
-        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-yellow-400/20 blur-3xl" />
+        <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-gold-400/20 blur-3xl" />
         <div className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-gold-500/25 blur-3xl" />
         <div className="relative z-10 flex h-full flex-col justify-between">
           <div>
-            <div className="flex items-center gap-3"><Image src="/aidil-logo.png" alt="Aidil Store" width={56} height={56} className="h-14 w-14 rounded-2xl bg-white p-2 shadow-xl" /><div><p className="text-sm font-black tracking-wide">AIDIL STORE</p><p className="text-xs text-yellow-300">Solusi Digital</p></div></div>
-            <p className="mt-10 text-xs font-black uppercase tracking-[.22em] text-yellow-300">MULAI SEKARANG</p>
-            <h2 className="mt-3 text-4xl font-black leading-tight">Buat akun dan <span className="text-yellow-300">nikmati kemudahannya.</span></h2>
+            <div className="flex items-center gap-3"><Image src="/aidil-logo.png" alt="Aidil Store" width={56} height={56} className="h-14 w-14 rounded-2xl bg-white p-2 shadow-xl" /><div><p className="text-sm font-black tracking-wide">AIDIL STORE</p><p className="text-xs text-gold-200">Solusi Digital</p></div></div>
+            <p className="mt-10 text-xs font-black uppercase tracking-[.22em] text-gold-200">MULAI SEKARANG</p>
+            <h2 className="mt-3 text-4xl font-black leading-tight">Buat akun dan <span className="text-gold-200">nikmati kemudahannya.</span></h2>
             <p className="mt-5 text-sm leading-6 text-zinc-300">Dengan akun AIDIL STORE, kamu dapat mengakses berbagai layanan digital dalam satu tempat.</p>
           </div>
           <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-            <p className="text-sm font-black text-yellow-300">📖 Panduan Pendaftaran</p>
+            <p className="text-sm font-black text-gold-200">📖 Panduan Pendaftaran</p>
             <div className="mt-4 space-y-4">
-              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-xs font-black text-black">1</span><div><p className="text-sm font-bold text-white">Isi data akun</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan nama, email, nomor WhatsApp dan password.</p></div></div>
-              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-600 text-xs font-black text-white">2</span><div><p className="text-sm font-bold text-white">Verifikasi email</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan OTP 6 digit yang berlaku selama 5 menit.</p></div></div>
+              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">1</span><div><p className="text-sm font-bold text-white">Isi data akun</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan nama, email, nomor WhatsApp dan password.</p></div></div>
+              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">2</span><div><p className="text-sm font-bold text-white">Verifikasi email</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan OTP 6 digit yang berlaku selama 5 menit.</p></div></div>
               <div className="flex gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-yellow-400 text-xs font-black text-black">3</span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">3</span>
                 <div>
                   <p className="text-sm font-bold text-white">Selesai &amp; login</p>
                   <p className="mt-1 text-xs leading-5 text-zinc-400">Akun langsung aktif dan siap digunakan.</p>

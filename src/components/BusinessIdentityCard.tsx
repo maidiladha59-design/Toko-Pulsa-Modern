@@ -36,7 +36,7 @@ export default function BusinessIdentityCard({ compact = false }: { compact?: bo
 
   return (
     <div className="rounded-3xl border border-app-border bg-app-surface p-6 shadow-sm">
-      <p className="text-xs font-black uppercase tracking-widest text-gold-600">Identitas Pelaku Usaha</p>
+      <p className="text-xs font-black uppercase tracking-widest text-gold-600 dark:text-gold-300">Identitas Pelaku Usaha</p>
       <h1 className="mt-2 text-2xl font-black">{biz.legalName}</h1>
       {!biz.isConfigured && (
         <p className="mt-2 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">

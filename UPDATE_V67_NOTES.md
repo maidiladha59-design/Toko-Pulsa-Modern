@@ -2,7 +2,7 @@
 
 ## 1. Tema warna: kuning emas + hitam di seluruh halaman
 - `tailwind.config.ts`: warna `gold` sekarang skala penuh (50–950), `brand` & `navy` diarahkan ke emas/hitam.
-- `src/app/globals.css`: seluruh warna dasar (background, border kartu, hero, navbar, tombol, footer) diubah dari ungu/biru ke kombinasi emas (#F5C542/#D4AF37) + hitam (#09090b).
+- `src/app/globals.css`: seluruh warna dasar (background, border kartu, hero, navbar, tombol, footer) diubah dari ungu/biru ke kombinasi emas (#C9A227/#D9B73B) + hitam (#09090b).
 - 313 kelas Tailwind (biru, indigo, ungu, violet, sky, cyan) di 49 file otomatis dipetakan ke skala emas/zinc-hitam agar konsisten di semua halaman (home, dashboard, checkout, admin, dst).
 - Template email OTP juga disesuaikan ke gold+hitam.
 

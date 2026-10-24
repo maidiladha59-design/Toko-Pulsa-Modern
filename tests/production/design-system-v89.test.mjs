@@ -8,11 +8,14 @@ const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
 test('v89 token warna: gold 50-950 utuh, semantik success/danger/warning alias palet bawaan', () => {
   const cfg = read('tailwind.config.ts');
-  // Identitas emas tidak boleh berubah nilai.
-  assert.match(cfg, /400: "#F5C542"/);
-  assert.match(cfg, /600: "#D4AF37"/);
-  assert.match(cfg, /700: "#B8941F"/);
-  assert.match(cfg, /950: "#3A2D08"/);
+  // Identitas emas tua v90 tidak boleh berubah nilai.
+  assert.match(cfg, /DEFAULT: "#C9A227"/);
+  assert.match(cfg, /200: "#F0D878"/);
+  assert.match(cfg, /300: "#D9B73B"/);
+  assert.match(cfg, /400: "#C9A227"/);
+  assert.match(cfg, /600: "#8A6D14"/);
+  assert.match(cfg, /700: "#7A5F12"/);
+  assert.match(cfg, /950: "#241C05"/);
   // Token semantik = alias 1:1 palet bawaan Tailwind (bukan warna baru).
   assert.match(cfg, /import colors from "tailwindcss\/colors";/);
   assert.match(cfg, /success: \{ \.\.\.colors\.emerald, DEFAULT: colors\.emerald\[600\] \}/);
@@ -32,7 +35,7 @@ test('v89 acuan desain: tipografi, spacing, radius terdokumentasi di atas global
   assert.match(css, /Jarak antar section\s*:\s*mt-5 \/ space-y-5/);
   assert.match(css, /Kartu utama \/ panel\s*:\s*rounded-3xl/);
   // Token tema lama tidak boleh berubah.
-  assert.match(css, /--app-accent: 245 197 66;/);
+  assert.match(css, /--app-accent: 201 162 39;/);
   assert.match(css, /\.dark \{/, 'mode gelap tetap ada');
 });
 
@@ -44,7 +47,7 @@ test('v89 Button: 5 varian, 3 ukuran, state loading & disabled', () => {
   assert.match(src, /loading = false/);
   assert.match(src, /animate-spin/);
   assert.match(src, /disabled:cursor-not-allowed disabled:opacity-50/);
-  assert.match(src, /primary: "bg-gold-400 text-zinc-950 hover:bg-gold-300"/);
+  assert.match(src, /primary: "btn-gold-3d"/);
   assert.match(src, /destructive:\s*\n\s*"bg-danger-600 text-white/);
 });
 
@@ -103,9 +106,8 @@ test('v89 EmptyState/LoadingSkeleton/ErrorState: pola status muat data yang cano
 
 test('v89 README design system ada dan menjelaskan token + komponen + komponen lama', () => {
   const readme = read('src/components/ui/README.md');
-  // Baselene suite sejak v88 adalah 229/205/24 — README lama menulis 221/197/24
-  // (angka sebelum 8 test v88 masuk); pin diikuti ke nilai baseline terkini.
-  for (const pin of ['statusTone', 'p-5', 'rounded-3xl', 'success-*', 'ui/Button', 'StatusBadge.tsx', 'NetworkState.tsx', '229 tests / 205 pass / 24 fail']) {
+  // Baseline suite setelah v90 (5 guard test palet emas) adalah 245/223/22.
+  for (const pin of ['statusTone', 'p-5', 'rounded-3xl', 'success-*', 'ui/Button', 'StatusBadge.tsx', 'NetworkState.tsx', '249 tests / 227 pass / 22 fail']) {
     assert.ok(readme.includes(pin), `README harus menjelaskan: ${pin}`);
   }
 });

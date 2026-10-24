@@ -45,7 +45,7 @@ export default function PushNotificationRegistrar() {
   return <div className="rounded-2xl border border-dashed border-app-border bg-app-inset p-3">
     <div className="text-sm font-bold text-app-text">Push di perangkat ini</div>
     <p className="mt-1 text-xs text-app-subtle">Izinkan browser/perangkat ini menerima notifikasi push (di luar kategori di bawah, ini kontrol izin per perangkat).</p>
-    <button onClick={enabled ? disablePush : enablePush} className="mt-2 rounded-xl bg-gold-400 px-4 py-2 text-sm font-bold text-zinc-950 transition hover:bg-gold-300">
+    <button onClick={enabled ? disablePush : enablePush} className="btn-gold-metal mt-2 rounded-xl px-4 py-2 text-sm font-bold transition">
       {enabled ? 'Matikan notifikasi push' : 'Aktifkan notifikasi push'}
     </button>
   </div>;

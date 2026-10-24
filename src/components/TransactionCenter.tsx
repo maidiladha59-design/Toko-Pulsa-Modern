@@ -31,7 +31,7 @@ export default function TransactionCenter({ entries }: { entries: Entry[] }) {
     <div className="rounded-2xl border border-app-border bg-app-surface p-4">
       <div className="flex flex-col gap-3 sm:flex-row">
         <div className="relative flex-1"><span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-app-subtle">⌕</span><input value={query} onChange={e => setQuery(e.target.value)} placeholder="Cari nomor order, produk, atau nomor tujuan..." className="w-full rounded-xl border border-app-border bg-app-inset py-3 pl-9 pr-4 text-sm text-app-text outline-none transition placeholder:text-app-subtle focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20" /></div>
-        <Link href="/" className="inline-flex min-h-[44px] items-center justify-center rounded-xl bg-gold-400 px-4 py-3 text-center text-sm font-black text-zinc-950 transition hover:bg-gold-300">+ Transaksi Baru</Link>
+        <Link href="/" className="btn-gold-3d inline-flex min-h-[44px] items-center justify-center rounded-xl px-4 py-3 text-center text-sm font-black transition">+ Transaksi Baru</Link>
       </div>
       <div className="mt-4 flex gap-2 overflow-x-auto pb-1">{tabs.map(([value, label]) => <button key={value} onClick={() => setTab(value)} className={`whitespace-nowrap rounded-full px-3.5 py-2 text-xs font-black transition ${tab === value ? "bg-gold-400 text-zinc-950" : "bg-app-inset text-app-muted hover:bg-app-accent-soft hover:text-app-kicker"}`}>{label}</button>)}</div>
     </div>

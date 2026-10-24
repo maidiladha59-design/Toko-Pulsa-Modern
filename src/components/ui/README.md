@@ -1,12 +1,12 @@
 # Design System AIDIL STORE
 
-Gaya: profesional-minimalis-classic-modern. Identitas warna tetap **hitam + kuning emas** (gold DEFAULT `#F5C542`). Fondasi ini belum diterapkan ke halaman — task berikutnya memigrasikan halaman satu per satu memakai komponen di folder ini.
+Gaya: profesional-minimalis-classic-modern. Identitas warna tetap **hitam + emas tua** (gold DEFAULT `#C9A227`). CTA utama memakai emas 3D `.btn-gold-3d` (gradient 180deg + sisi tebal 6px); aksen emas sekunder/kompak memakai `.btn-gold-metal` datar. Fondasi ini belum diterapkan ke halaman — task berikutnya memigrasikan halaman satu per satu memakai komponen di folder ini.
 
 ## 1. Token warna (tailwind.config.ts)
 
 | Token | Pakai untuk | Catatan |
 | --- | --- | --- |
-| `gold-50 … gold-950` | identitas emas: aksen, tombol primary, kicker | `gold-400` = `#F5C542` (DEFAULT). Sudah lengkap 50–950. |
+| `gold-50 … gold-950` | identitas emas: aksen, tombol primary, kicker | `gold-400` = `#C9A227` (DEFAULT), `gold-300` = `#D9B73B` (hover), `gold-200` = `#F0D878` (shine), `gold-600/700` untuk teks emas di latar terang. Sudah lengkap 50–950. |
 | `zinc-*` | hitam pekat (`zinc-950` = `#09090b`), teks sekunder, netral | palet bawaan Tailwind, lengkap. |
 | `app-bg / app-surface / app-inset / app-border / app-text / app-muted / app-subtle / app-accent / app-accent-soft / app-kicker` | **latar, teks, border** semua permukaan | dual-mode terang/gelap dari CSS var di `globals.css`. WAJIB dipakai agar tema tidak rusak. |
 | `success-*` (emerald) | status **Berhasil** | alias 1:1 palet bawaan — nilainya identik, hanya nama yang distandarkan. |
@@ -33,7 +33,7 @@ Ukuran dibatasi `xs, sm, base, lg, xl, 2xl, 3xl`. Bobot: `font-black` judul, `fo
 
 - Padding kartu: **`p-5`**; kartu besar/pembayaran `p-6 sm:p-8`.
 - Jarak antar section: **`mt-5` / `space-y-5`**; antar blok dalam kartu `mt-3 / space-y-3`; gap elemen sejajar `gap-2`/`gap-3`.
-- Radius: kartu utama **`rounded-3xl`**, elemen dalam kartu `rounded-2xl`, input/tombol `rounded-xl`, badge `rounded-full`. (Auth `rounded-[2rem]` = pengecualian yang akan dinormalisasi saat migrasi.)
+- Radius: kartu utama **`rounded-3xl`**, elemen dalam kartu `rounded-2xl`, input/tombol `rounded-xl`, badge `rounded-full`. CTA utama `.btn-gold-3d` memakai radius **14px** + sisi tebal 6px (state tekan turun 4px). (Auth `rounded-[2rem]` = pengecualian yang akan dinormalisasi saat migrasi.)
 
 Acuan ini juga tertera sebagai komentar di bagian atas `src/app/globals.css`.
 
@@ -44,7 +44,7 @@ Acuan ini juga tertera sebagai komentar di bagian atas `src/app/globals.css`.
 import Button from "@/components/ui/Button";
 <Button variant="primary" size="md" loading={saving} onClick={save}>Simpan</Button>
 ```
-Varian: `primary` (emas solid, teks hitam) · `secondary` (hitam solid) · `outline` · `ghost` · `destructive` (merah). Ukuran `sm | md | lg`. Prop `loading` menampilkan spinner + men-disable otomatis.
+Varian: `primary` (emas 3D `.btn-gold-3d`, teks `#1A1200`, sisi tebal 6px + state tekan) · `secondary` (hitam solid) · `outline` · `ghost` · `destructive` (merah). Ukuran `sm | md | lg`. Prop `loading` menampilkan spinner + men-disable otomatis. Untuk aksen emas kompak yang bukan CTA utama (tab, tombol “Pilih”, keypad) tetap pakai `.btn-gold-metal` datar agar hierarki visual terjaga.
 
 ### Card
 ```tsx
@@ -91,4 +91,4 @@ Komponen lama **tetap berfungsi** sampai halaman dimigrasikan (task berikutnya),
 | `src/components/NetworkState.tsx` (`NetworkSkeleton/NetworkError/NetworkEmpty`) | `ui/LoadingSkeleton` + `ui/ErrorState` + `ui/EmptyState` — NetworkState dipatenkan test v78, jangan diubah dulu; migrasi halaman mengganti pemakaiannya per halaman |
 | `src/components/StatusBadge.tsx` | `ui/Badge` + `statusTone()` |
 
-Aturan migrasi (task penerapan): satu halaman = satu task kecil; jangan mengubah logic bisnis; jalankan `npm run test:production` dan bandingkan dengan baseline (**229 tests / 205 pass / 24 fail**) karena banyak literal UI dipatenkan test produksi.
+Aturan migrasi (task penerapan): satu halaman = satu task kecil; jangan mengubah logic bisnis; jalankan `npm run test:production` dan bandingkan dengan baseline (**249 tests / 227 pass / 22 fail**) karena banyak literal UI dipatenkan test produksi.
