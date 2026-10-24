@@ -310,7 +310,7 @@ export default function ScanQRIS() {
               type="button"
               onClick={startScanner}
               disabled={busy}
-              className="btn-gold-3d w-full rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
+              className="btn-gold w-full rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
             >
               {busy
                 ? 'Memproses...'
@@ -405,7 +405,7 @@ export default function ScanQRIS() {
                 <button
                   type="button"
                   onClick={goToPayment}
-                  className="btn-gold-3d w-full rounded-2xl px-4 py-3.5 text-sm font-black transition"
+                  className="btn-gold w-full rounded-2xl px-4 py-3.5 text-sm font-black transition"
                 >
                   💳 Lanjutkan ke Pembayaran
                 </button>

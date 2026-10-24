@@ -6,6 +6,7 @@ import StatusBadge from "@/components/StatusBadge";
 import { Card } from "@/components/ui/Card";
 import Badge from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
+import RatingPrompt from "@/components/RatingPrompt";
 
 export default async function DashboardPage() {
   const supabase = createClient();
@@ -18,7 +19,8 @@ export default async function DashboardPage() {
     supabase.from("orders").select("id, order_number, total_amount, status, created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
   ]);
 
-  const { count: totalOrders } = await supabase.from("orders").select("id", { count: "exact", head: true }).eq("user_id", user.id);
+  // Sumber yang sama dengan rating & halaman Peringkat: hanya order COMPLETED.
+  const { count: completedOrders } = await supabase.from("orders").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "COMPLETED");
   const firstName = (profile?.full_name || profile?.email || "Pengguna").split(" ")[0];
 
   const quickLinks = [
@@ -40,7 +42,7 @@ export default async function DashboardPage() {
               <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">Halo, {firstName}! 👋</h1>
               <p className="mt-2 max-w-xl text-sm leading-6 text-gold-100">Kelola saldo, pesanan, profil, dan koleksi produk digitalmu dari satu tempat.</p>
               <div className="mt-5 flex flex-wrap gap-3">
-                <Link href="/" className="btn-gold-3d rounded-xl px-4 py-2.5 text-sm font-black transition">Mulai Belanja →</Link>
+                <Link href="/" className="btn-gold rounded-xl px-4 py-2.5 text-sm font-black transition">Mulai Belanja →</Link>
                 <Link href="/wallet" className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/15">Lihat Saldo</Link>
               </div>
             </div>
@@ -49,7 +51,7 @@ export default async function DashboardPage() {
 
         <section className="grid gap-4 sm:grid-cols-3">
           <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">💳</span><Badge tone="gold">Wallet</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Saldo saat ini</p><p className="mt-1 truncate text-2xl font-black tabular-nums text-app-kicker" title={formatRupiah(wallet?.balance || 0)}>{formatBalanceCompact(wallet?.balance || 0)}</p><Link href="/wallet/topup" className="mt-3 inline-block text-sm font-bold text-app-kicker hover:underline">+ Top Up Saldo</Link></Card>
-          <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">📦</span><Badge tone="success">Aktivitas</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Total pesanan</p><p className="mt-1 text-2xl font-black tabular-nums text-app-text">{totalOrders ?? 0}</p><Link href="/orders" className="mt-3 inline-block text-sm font-bold text-app-text transition hover:text-app-kicker">Lihat semua pesanan →</Link></Card>
+          <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">📦</span><Badge tone="success">Aktivitas</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Transaksi berhasil</p><p className="mt-1 text-2xl font-black tabular-nums text-app-text">{completedOrders ?? 0}</p><Link href="/orders" className="mt-3 inline-block text-sm font-bold text-app-text transition hover:text-app-kicker">Lihat semua pesanan →</Link></Card>
           <Card className="dashboard-card"><div className="flex items-center justify-between"><span className="text-2xl">⚡</span><Badge tone="neutral">Cepat</Badge></div><p className="mt-4 text-xs font-bold text-app-muted">Akun</p><p className="mt-1 truncate text-lg font-black text-app-text">{profile?.email || "Akun pengguna"}</p><Link href="/profile" className="mt-3 inline-block text-sm font-bold text-app-text transition hover:text-app-kicker">Edit profil →</Link></Card>
         </section>
 
@@ -73,6 +75,7 @@ export default async function DashboardPage() {
 
         <section className="relative overflow-hidden rounded-3xl border border-gold-400/25 bg-app-accent-soft p-5"><div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-gold-400/10 blur-2xl" /><div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between"><div><p className="font-black text-app-text">✨ Siap menemukan produk baru?</p><p className="mt-1 text-sm text-app-muted">Jelajahi template, voucher, aset kreatif, dan produk digital lainnya.</p></div><Link href="/" className="btn-gold-metal rounded-xl px-4 py-2.5 text-center text-sm font-black transition hover:-translate-y-0.5">Jelajahi Sekarang</Link></div></section>
       </div>
+      <RatingPrompt />
     </div>
   );
 }

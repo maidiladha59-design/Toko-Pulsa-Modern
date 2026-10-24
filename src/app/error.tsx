@@ -23,7 +23,7 @@ export default function Error({
       </p>
       <button
         onClick={() => reset()}
-        className="btn-gold-3d mt-4 rounded-xl px-5 py-2.5 text-sm font-black"
+        className="btn-gold mt-4 rounded-xl px-5 py-2.5 text-sm font-black"
       >
         Coba Lagi
       </button>

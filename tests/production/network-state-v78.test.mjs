@@ -46,7 +46,7 @@ test("v78: NetworkEmpty & NetworkError memakai token tema hitam-emas", () => {
   const src = read("src/components/NetworkState.tsx");
   assert.match(src, /Belum ada data/);
   assert.match(src, /border-dashed border-app-border/);
-  assert.match(src, /btn-gold-3d/);
+  assert.match(src, /btn-gold(?!-)/);
   assert.match(src, /bg-app-accent-soft/);
 });
 

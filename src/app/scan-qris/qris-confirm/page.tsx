@@ -83,7 +83,7 @@ export default function QrisConfirmPage() {
           <button
             type="button"
             onClick={() => router.push('/')}
-            className="btn-gold-3d mt-6 w-full rounded-xl px-4 py-3 text-sm font-black"
+            className="btn-gold mt-6 w-full rounded-xl px-4 py-3 text-sm font-black"
           >
             Kembali ke Beranda
           </button>
@@ -136,7 +136,7 @@ export default function QrisConfirmPage() {
               type="button"
               onClick={handleConfirmPayment}
               disabled={loading}
-              className="btn-gold-3d w-full rounded-2xl px-5 py-3 font-black transition disabled:cursor-not-allowed disabled:opacity-50"
+              className="btn-gold w-full rounded-2xl px-5 py-3 font-black transition disabled:cursor-not-allowed disabled:opacity-50"
             >
               {loading ? 'Memproses...' : 'Bayar Sekarang'}
             </button>

@@ -311,7 +311,7 @@ export default function SplitBillClient() {
           <button
             type="submit"
             disabled={busy}
-            className="btn-gold-3d w-full rounded-2xl px-4 py-3.5 text-sm font-black disabled:opacity-50"
+            className="btn-gold w-full rounded-2xl px-4 py-3.5 text-sm font-black disabled:opacity-50"
           >
             {busy ? "Membuat tagihan..." : "🧾 Buat Tagihan Patungan"}
           </button>

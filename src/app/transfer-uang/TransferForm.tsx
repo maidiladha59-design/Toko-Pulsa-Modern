@@ -431,7 +431,7 @@ export default function TransferForm({ initialQr, initialAmount }: { initialQr: 
 
           {error && <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700">{error}</div>}
 
-          <button type="submit" disabled={busy} className="btn-gold-3d w-full rounded-2xl px-5 py-3.5 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50">
+          <button type="submit" disabled={busy} className="btn-gold w-full rounded-2xl px-5 py-3.5 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50">
             {busy ? "Memproses Transfer..." : "Kirim Transfer"}
           </button>
         </form>

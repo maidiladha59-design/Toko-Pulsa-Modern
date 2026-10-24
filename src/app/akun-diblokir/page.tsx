@@ -46,7 +46,7 @@ export default async function BlockedAccountPage({
     typeof searchParams?.reason === "string" ? searchParams.reason.slice(0, 300) : null;
   const displayReason = blockedReason || reasonFromQuery;
 
-  const biz = getBusinessIdentity();
+  const biz = await getBusinessIdentity();
   const phoneHref = biz.phone ? `tel:${biz.phone.replace(/[^\d+]/g, "")}` : null;
 
   return (
@@ -140,7 +140,7 @@ export default async function BlockedAccountPage({
           ) : (
             <Link
               href="/login"
-              className="btn-gold-3d inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-bold transition"
+              className="btn-gold inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-bold transition"
             >
               Kembali ke Login
             </Link>

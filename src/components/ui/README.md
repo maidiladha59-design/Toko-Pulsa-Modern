@@ -1,6 +1,6 @@
 # Design System AIDIL STORE
 
-Gaya: profesional-minimalis-classic-modern. Identitas warna tetap **hitam + emas tua** (gold DEFAULT `#C9A227`). CTA utama memakai emas 3D `.btn-gold-3d` (gradient 180deg + sisi tebal 6px); aksen emas sekunder/kompak memakai `.btn-gold-metal` datar. Fondasi ini belum diterapkan ke halaman — task berikutnya memigrasikan halaman satu per satu memakai komponen di folder ini.
+Gaya: profesional-minimalis-classic-modern. Identitas warna tetap **hitam + emas tua** (gold DEFAULT `#C9A227`). CTA utama memakai emas flat glossy `.btn-gold` (gradient 135deg + sapuan highlight putih tipis di paruh atas); aksen emas sekunder/kompak memakai `.btn-gold-metal` datar. Fondasi ini belum diterapkan ke halaman — task berikutnya memigrasikan halaman satu per satu memakai komponen di folder ini.
 
 ## 1. Token warna (tailwind.config.ts)
 
@@ -33,7 +33,7 @@ Ukuran dibatasi `xs, sm, base, lg, xl, 2xl, 3xl`. Bobot: `font-black` judul, `fo
 
 - Padding kartu: **`p-5`**; kartu besar/pembayaran `p-6 sm:p-8`.
 - Jarak antar section: **`mt-5` / `space-y-5`**; antar blok dalam kartu `mt-3 / space-y-3`; gap elemen sejajar `gap-2`/`gap-3`.
-- Radius: kartu utama **`rounded-3xl`**, elemen dalam kartu `rounded-2xl`, input/tombol `rounded-xl`, badge `rounded-full`. CTA utama `.btn-gold-3d` memakai radius **14px** + sisi tebal 6px (state tekan turun 4px). (Auth `rounded-[2rem]` = pengecualian yang akan dinormalisasi saat migrasi.)
+- Radius: kartu utama **`rounded-3xl`**, elemen dalam kartu `rounded-2xl`, input/tombol `rounded-xl`, badge `rounded-full`. CTA utama `.btn-gold` memakai radius **12px**, tanpa border, hanya satu shadow tipis `0 2px 8px rgba(0,0,0,.25)` (hover `0 4px 12px`), tanpa translateY. (Auth `rounded-[2rem]` = pengecualian yang akan dinormalisasi saat migrasi.)
 
 Acuan ini juga tertera sebagai komentar di bagian atas `src/app/globals.css`.
 
@@ -44,7 +44,7 @@ Acuan ini juga tertera sebagai komentar di bagian atas `src/app/globals.css`.
 import Button from "@/components/ui/Button";
 <Button variant="primary" size="md" loading={saving} onClick={save}>Simpan</Button>
 ```
-Varian: `primary` (emas 3D `.btn-gold-3d`, teks `#1A1200`, sisi tebal 6px + state tekan) · `secondary` (hitam solid) · `outline` · `ghost` · `destructive` (merah). Ukuran `sm | md | lg`. Prop `loading` menampilkan spinner + men-disable otomatis. Untuk aksen emas kompak yang bukan CTA utama (tab, tombol “Pilih”, keypad) tetap pakai `.btn-gold-metal` datar agar hierarki visual terjaga.
+Varian: `primary` (emas flat glossy `.btn-gold`, teks `#1A1200`, sapuan highlight halus + shadow tipis) · `secondary` (hitam solid) · `outline` · `ghost` · `destructive` (merah). Ukuran `sm | md | lg`. Prop `loading` menampilkan spinner + men-disable otomatis. Untuk aksen emas kompak yang bukan CTA utama (tab, tombol “Pilih”, keypad) tetap pakai `.btn-gold-metal` datar agar hierarki visual terjaga.
 
 ### Card
 ```tsx
@@ -91,4 +91,4 @@ Komponen lama **tetap berfungsi** sampai halaman dimigrasikan (task berikutnya),
 | `src/components/NetworkState.tsx` (`NetworkSkeleton/NetworkError/NetworkEmpty`) | `ui/LoadingSkeleton` + `ui/ErrorState` + `ui/EmptyState` — NetworkState dipatenkan test v78, jangan diubah dulu; migrasi halaman mengganti pemakaiannya per halaman |
 | `src/components/StatusBadge.tsx` | `ui/Badge` + `statusTone()` |
 
-Aturan migrasi (task penerapan): satu halaman = satu task kecil; jangan mengubah logic bisnis; jalankan `npm run test:production` dan bandingkan dengan baseline (**249 tests / 227 pass / 22 fail**) karena banyak literal UI dipatenkan test produksi.
+Aturan migrasi (task penerapan): satu halaman = satu task kecil; jangan mengubah logic bisnis; jalankan `npm run test:production` dan bandingkan dengan baseline (**266 tests / 244 pass / 22 fail**) karena banyak literal UI dipatenkan test produksi.

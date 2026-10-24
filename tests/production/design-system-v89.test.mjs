@@ -47,7 +47,7 @@ test('v89 Button: 5 varian, 3 ukuran, state loading & disabled', () => {
   assert.match(src, /loading = false/);
   assert.match(src, /animate-spin/);
   assert.match(src, /disabled:cursor-not-allowed disabled:opacity-50/);
-  assert.match(src, /primary: "btn-gold-3d"/);
+  assert.match(src, /primary: "btn-gold"/);
   assert.match(src, /destructive:\s*\n\s*"bg-danger-600 text-white/);
 });
 
@@ -107,7 +107,7 @@ test('v89 EmptyState/LoadingSkeleton/ErrorState: pola status muat data yang cano
 test('v89 README design system ada dan menjelaskan token + komponen + komponen lama', () => {
   const readme = read('src/components/ui/README.md');
   // Baseline suite setelah v90 (5 guard test palet emas) adalah 245/223/22.
-  for (const pin of ['statusTone', 'p-5', 'rounded-3xl', 'success-*', 'ui/Button', 'StatusBadge.tsx', 'NetworkState.tsx', '249 tests / 227 pass / 22 fail']) {
+  for (const pin of ['statusTone', 'p-5', 'rounded-3xl', 'success-*', 'ui/Button', 'StatusBadge.tsx', 'NetworkState.tsx', '266 tests / 244 pass / 22 fail']) {
     assert.ok(readme.includes(pin), `README harus menjelaskan: ${pin}`);
   }
 });

@@ -117,59 +117,43 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .brand-yellow { color:#D9B73B; }
 .brand-card { border:1px solid rgb(var(--app-border)); background:rgb(var(--app-surface)); border-radius:1.5rem; box-shadow:0 12px 32px rgba(9,9,11,.10); }
 
-/* CTA emas 3D (kelas pusat, v91). Tombol timbul: gradient metalik dengan cahaya
-   jatuh dari atas, sisi tebal 6px, dan state tekan turun 4px. Teks gelap #1A1200
-   + bobot 900 menjaga kontras di mode terang maupun gelap. */
-.btn-gold-3d {
-  background: linear-gradient(180deg, #F5D576 0%, #E8B93C 20%, #C9971F 55%, #A87415 80%, #8C5E10 100%);
+/* CTA emas flat glossy (kelas pusat, v92). Gradient tipis 135deg + satu lapis
+   highlight putih di paruh atas (blend overlay) memberi kesan mengkilat tanpa
+   emboss. Hanya satu shadow tipis, tanpa border/translateY. Teks gelap #1A1200
+   weight 800 menjaga kontras di mode terang maupun gelap. */
+.btn-gold {
+  background-image:
+    linear-gradient(135deg, #F0D878 0%, #D4AF37 45%, #C9A227 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, .35) 0%, rgba(255, 255, 255, 0) 50%);
+  background-blend-mode: overlay;
   color: #1A1200;
-  border: 1px solid #7A5410;
-  border-radius: 14px;
-  font-weight: 900;
-  letter-spacing: 0.02em;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, .25);
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, .55),
-    inset 0 -3px 6px rgba(0, 0, 0, .35),
-    0 6px 0 #5C3F0A,
-    0 10px 18px rgba(0, 0, 0, .55);
-  transition: transform .08s ease, box-shadow .08s ease, background .15s ease;
+  font-weight: 800;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  transition: filter .15s ease, box-shadow .15s ease;
 }
-.btn-gold-3d:hover:not(:disabled) {
-  background: linear-gradient(180deg, #F8DF8F 0%, #EEC652 20%, #D6A533 55%, #B88327 80%, #9E6E22 100%);
-  box-shadow:
-    inset 0 2px 0 rgba(255, 255, 255, .65),
-    inset 0 -3px 6px rgba(0, 0, 0, .32),
-    0 6px 0 #5C3F0A,
-    0 10px 18px rgba(0, 0, 0, .55);
+.btn-gold:hover:not(:disabled) {
+  filter: brightness(1.08);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
 }
-.btn-gold-3d:active:not(:disabled) {
-  transform: translateY(4px);
-  box-shadow:
-    inset 0 2px 4px rgba(0, 0, 0, .4),
-    0 2px 0 #5C3F0A,
-    0 4px 8px rgba(0, 0, 0, .4);
+.btn-gold:active:not(:disabled) {
+  filter: brightness(.95);
 }
-.btn-gold-3d:focus-visible {
+.btn-gold:focus-visible {
   outline: 2px solid #F0D878;
   outline-offset: 3px;
 }
-.btn-gold-3d:disabled {
-  background: linear-gradient(180deg, #E7E1CE 0%, #D8D0B6 55%, #BDB394 100%);
-  border-color: #B3A67F;
-  color: #5A5342;
-  text-shadow: none;
-  box-shadow: none;
+.btn-gold:disabled {
+  background-image: linear-gradient(135deg, #F0D878 0%, #D4AF37 45%, #C9A227 100%);
+  background-blend-mode: normal;
   filter: none;
   opacity: .5;
   cursor: not-allowed;
 }
-.dark .btn-gold-3d:not(:disabled) {
-  filter: drop-shadow(0 0 12px rgba(230, 180, 60, .25));
-}
 
 /* CTA emas metalik datar (kelas pusat). Dipakai kontrol emas sekunder/kompak
-   agar hierarki tetap: hanya CTA utama yang memakai efek 3D. */
+   agar hierarki tetap: hanya CTA utama yang memakai .btn-gold glossy. */
 .btn-gold-metal {
   background-color: #C9A227;
   background-image: linear-gradient(135deg, #C9A227 0%, #E8C766 50%, #C9A227 100%);

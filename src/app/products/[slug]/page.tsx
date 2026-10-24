@@ -25,7 +25,7 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
           {product.stock !== null && <p className="mt-2 text-sm font-bold text-app-muted">Stok tersisa: <span className="tabular-nums text-app-text">{product.stock}</span></p>}
           <div className="mt-5 rounded-2xl border border-app-border bg-app-inset p-4 text-sm leading-6 text-app-text"><span className="font-bold">Deskripsi</span><p className="mt-2 whitespace-pre-line">{product.description || "Tidak ada deskripsi untuk produk ini."}</p></div>
           <div className="mt-5 grid gap-3 sm:grid-cols-2">
-            <Link href={`/checkout?product=${encodeURIComponent(product.id)}&qty=1`} className="btn-gold-3d flex min-h-[44px] items-center justify-center rounded-xl px-5 py-3 text-center text-sm font-black transition">Beli Sekarang</Link>
+            <Link href={`/checkout?product=${encodeURIComponent(product.id)}&qty=1`} className="btn-gold flex min-h-[44px] items-center justify-center rounded-xl px-5 py-3 text-center text-sm font-black transition">Beli Sekarang</Link>
             <Link href="/wallet/topup" className="flex min-h-[44px] items-center justify-center rounded-xl border border-app-border bg-transparent px-5 py-3 text-center text-sm font-black text-app-text transition hover:border-gold-400/60 hover:text-app-kicker">Top Up Saldo</Link>
           </div>
         </div>

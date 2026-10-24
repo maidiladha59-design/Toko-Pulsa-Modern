@@ -27,8 +27,8 @@ const steps = [
   },
 ];
 
-export default function PengaduanKonsumenPage() {
-  const biz = getBusinessIdentity();
+export default async function PengaduanKonsumenPage() {
+  const biz = await getBusinessIdentity();
   return (
     <div className="mx-auto max-w-3xl animate-page-in space-y-5">
       <article className="rounded-3xl border bg-white p-6 shadow-sm">

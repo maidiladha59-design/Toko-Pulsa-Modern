@@ -279,7 +279,7 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
             <button
               type="submit"
               disabled={payBusy || (settings ? !settings.enabled : false)}
-              className="btn-gold-3d w-full rounded-2xl px-4 py-3.5 text-sm font-black disabled:opacity-50"
+              className="btn-gold w-full rounded-2xl px-4 py-3.5 text-sm font-black disabled:opacity-50"
             >
               {payBusy ? "Memproses..." : `💰 Bayar ${formatRupiah(shareNumber)}`}
             </button>

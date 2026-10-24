@@ -27,7 +27,7 @@ export default function ErrorState({
         <button
           type="button"
           onClick={onRetry}
-          className="btn-gold-3d mt-5 inline-flex min-h-[44px] items-center rounded-xl px-4 py-2.5 text-sm font-black transition"
+          className="btn-gold mt-5 inline-flex min-h-[44px] items-center rounded-xl px-4 py-2.5 text-sm font-black transition"
         >
           Coba Lagi
         </button>

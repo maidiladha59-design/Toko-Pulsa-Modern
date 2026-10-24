@@ -98,7 +98,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
         icon="📡"
         title="Layanan belum tersedia"
         description="Admin perlu melakukan sinkronisasi SKU PPOB dan mengaktifkan produk terlebih dahulu."
-        action={<Link href="/" className="btn-gold-3d inline-flex min-h-[44px] items-center rounded-xl px-4 py-2.5 text-sm font-black transition">Kembali ke Beranda</Link>}
+        action={<Link href="/" className="btn-gold inline-flex min-h-[44px] items-center rounded-xl px-4 py-2.5 text-sm font-black transition">Kembali ke Beranda</Link>}
       />
     );
   }

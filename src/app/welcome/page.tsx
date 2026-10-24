@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
+import RatingBadgeLive from "@/components/RatingBadgeLive";
 
 export default function Welcome() {
   const [banners, setBanners] = useState<any[]>([]);
@@ -115,6 +116,9 @@ export default function Welcome() {
             {loading && <p className="mt-4 text-xs text-white/40">Memuat promosi...</p>}
           </div>
         </div>
+      </div>
+      <div className="mt-4 flex justify-center">
+        <RatingBadgeLive />
       </div>
       <p className="mt-4 text-center text-xs text-slate-400">Geser banner di HP atau gunakan tombol panah. Konten promosi dapat dikelola admin.</p>
     </main>

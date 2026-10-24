@@ -51,7 +51,7 @@ export default async function WalletPage() {
         <div className="mt-5 flex flex-wrap gap-2">
           <Link
             href="/wallet/topup"
-            className="btn-gold-3d inline-flex min-h-[44px] items-center justify-center rounded-xl px-4 py-3 text-sm font-black transition"
+            className="btn-gold inline-flex min-h-[44px] items-center justify-center rounded-xl px-4 py-3 text-sm font-black transition"
           >
             + Top Up Saldo
           </Link>

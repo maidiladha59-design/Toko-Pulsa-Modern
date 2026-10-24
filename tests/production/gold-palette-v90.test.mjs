@@ -24,9 +24,9 @@ test('v90 palet emas tua: token pusat + CTA metalik dengan teks gelap', () => {
   assert.match(css, /color: #1A1200;/);
 });
 
-test('v90 Button bersama memakai kelas CTA pusat (3D sejak v91)', () => {
-  assert.match(read('src/components/ui/Button.tsx'), /primary: "btn-gold-3d"/);
-  assert.match(read('src/components/Button.tsx'), /primary: "btn-gold-3d"/);
+test('v90 Button bersama memakai kelas CTA pusat (flat glossy sejak v92)', () => {
+  assert.match(read('src/components/ui/Button.tsx'), /primary: "btn-gold"/);
+  assert.match(read('src/components/Button.tsx'), /primary: "btn-gold"/);
 });
 
 test('v90 halaman auth memakai emas metalik + tab aktif kontras gelap', () => {
@@ -53,7 +53,8 @@ test('v90 tidak ada hex/kuning lama atau kelas yellow-* di UI & manifest', () =>
   walk(path.join(root, 'src'));
   files.push(path.join(root, 'public/manifest.webmanifest'));
 
-  const legacy = /#F5C542|#D4AF37|#B8941F|#E4B93A|#FCD34D|rgba\(\s*245\s*,\s*197\s*,\s*66|(?:bg|text|border|ring|from|via|to)-yellow-\d{2,3}/i;
+  // #D4AF37 sengaja diizinkan lagi sebagai stop gradient .btn-gold v92.
+  const legacy = /#F5C542|#B8941F|#E4B93A|#FCD34D|rgba\(\s*245\s*,\s*197\s*,\s*66|(?:bg|text|border|ring|from|via|to)-yellow-\d{2,3}/i;
   for (const file of files) {
     assert.doesNotMatch(
       fs.readFileSync(file, 'utf8'),

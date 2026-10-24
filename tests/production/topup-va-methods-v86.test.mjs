@@ -71,7 +71,7 @@ test('v86 migrasi pembersih hanya mengubah data, bukan skema', () => {
 test('v86 migrasi pembersih terdaftar di preflight', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v86_cleanup_legacy_va_methods\.sql/);
-  assert.match(script, /83,85,86,87,88\]/);
+  assert.match(script, /83,85,86,87,88,89,90\]/);
 });
 
 test('v86 panel admin tidak menawarkan bank legacy sebagai metode Top Up', () => {

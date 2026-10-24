@@ -149,7 +149,7 @@ export default function PersonalQrClient({ token: initialToken, displayName }: {
       </section>
 
       <div className="grid gap-2 sm:grid-cols-2">
-        <Link href="/transfer-uang" className="btn-gold-3d px-4 py-3 text-center text-sm font-black">📤 Kirim Saldo</Link>
+        <Link href="/transfer-uang" className="btn-gold px-4 py-3 text-center text-sm font-black">📤 Kirim Saldo</Link>
         <Link href="/wallet" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-bold text-slate-700 hover:bg-slate-50">💰 Lihat Saldo</Link>
       </div>
     </div>

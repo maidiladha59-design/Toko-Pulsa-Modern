@@ -1,7 +1,7 @@
 "use client";
 
 // Button standar Design System AIDIL STORE.
-// Varian: primary (emas metalik), secondary (hitam solid), outline, ghost,
+// Varian: primary (emas flat glossy), secondary (hitam solid), outline, ghost,
 // destructive (merah). Ukuran sm/md/lg. Mendukung state loading & disabled.
 // Selalu pakai token tema (app-*) / token semantik supaya dual-mode aman.
 
@@ -9,7 +9,7 @@ export type ButtonVariant = "primary" | "secondary" | "outline" | "ghost" | "des
 export type ButtonSize = "sm" | "md" | "lg";
 
 const VARIANTS: Record<ButtonVariant, string> = {
-  primary: "btn-gold-3d",
+  primary: "btn-gold",
   secondary:
     "bg-zinc-950 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700",
   outline:
