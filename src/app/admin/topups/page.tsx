@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import Button from "@/components/ui/Button";
@@ -128,7 +129,7 @@ export default function AdminTopupsPage() {
         </div>
         <div className="mt-5 flex flex-wrap items-center gap-2">
           <Button onClick={saveFee} loading={savingFee}>Simpan Pengaturan</Button>
-          <a href="/admin/platform" className="inline-flex items-center justify-center gap-2 rounded-xl border border-app-border bg-transparent px-4 py-2.5 text-sm font-bold text-app-text transition hover:border-gold-400 hover:bg-app-accent-soft">⚙️ Biaya QRIS / Bank / Bank Digital</a>
+          <Link href="/admin/platform" className="inline-flex items-center justify-center gap-2 rounded-xl border border-app-border bg-transparent px-4 py-2.5 text-sm font-bold text-app-text transition hover:border-gold-400 hover:bg-app-accent-soft">⚙️ Biaya QRIS / Bank / Bank Digital</Link>
         </div>
       </Card>
 

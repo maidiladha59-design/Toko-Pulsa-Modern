@@ -1,4 +1,5 @@
 import { createClient } from "@supabase/supabase-js";
+import { unstable_cache } from "next/cache";
 
 export const FEATURES = [
   {
@@ -10,20 +11,30 @@ export const FEATURES = [
 
 export type FeatureKey = (typeof FEATURES)[number]["key"];
 
+// Feature flag bersifat global (tidak bergantung user), jadi cukup di-cache
+// 60 detik. Admin bisa memaksa pembaruan lewat revalidateTag("feature-flags").
+const readFeatureFlag = unstable_cache(
+  async (key: string): Promise<boolean> => {
+    try {
+      const sb = createClient(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        {
+          auth: { autoRefreshToken: false, persistSession: false },
+          global: { fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }) },
+        }
+      );
+      const { data, error } = await sb.from("feature_flags").select("enabled").eq("key", key).maybeSingle();
+      if (error || !data) return true;
+      return data.enabled !== false;
+    } catch {
+      return true;
+    }
+  },
+  ["feature-flag"],
+  { revalidate: 60, tags: ["feature-flags"] }
+);
+
 export async function isFeatureEnabled(key: FeatureKey): Promise<boolean> {
-  try {
-    const sb = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      {
-        auth: { autoRefreshToken: false, persistSession: false },
-        global: { fetch: (input, init) => fetch(input, { ...init, cache: "no-store" }) },
-      }
-    );
-    const { data, error } = await sb.from("feature_flags").select("enabled").eq("key", key).maybeSingle();
-    if (error || !data) return true;
-    return data.enabled !== false;
-  } catch {
-    return true;
-  }
+  return readFeatureFlag(key);
 }

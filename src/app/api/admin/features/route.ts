@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidateTag } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { FEATURES } from "@/lib/features";
@@ -38,5 +39,6 @@ export async function POST(req: Request) {
     { onConflict: "key" }
   );
   if (error) return NextResponse.json({ message: error.message }, { status: 400 });
+  revalidateTag("feature-flags");
   return NextResponse.json({ ok: true, key, enabled: body.enabled });
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ToastProvider";
 import { calcEqualShares, equalSplitRemainder, type SplitMode } from "@/lib/splitbill/utils";
@@ -330,7 +331,7 @@ export default function SplitBillClient() {
             {bills.map((b) => {
               const progress = b.total_amount > 0 ? Math.min(Math.round((b.collected_amount / b.total_amount) * 100), 100) : 0;
               return (
-                <a
+                <Link
                   key={b.id}
                   href={`/split-bill/${b.id}`}
                   className="block rounded-2xl border border-slate-200 bg-white p-4 hover:border-gold-300 hover:bg-gold-50/40"
@@ -356,7 +357,7 @@ export default function SplitBillClient() {
                   <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
                     <div className="h-full rounded-full bg-gold-500" style={{ width: `${progress}%` }} />
                   </div>
-                </a>
+                </Link>
               );
             })}
           </div>

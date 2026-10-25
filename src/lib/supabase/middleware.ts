@@ -4,6 +4,41 @@ import type { NextRequest } from "next/server";
 
 const INACTIVITY_DAYS = 7;
 const INACTIVITY_MS = INACTIVITY_DAYS * 24 * 60 * 60 * 1000;
+// Navigasi tidak perlu menulis last_activity_at di setiap request.
+const ACTIVITY_WRITE_INTERVAL_MS = 15 * 60 * 1000;
+// maintenance_settings bersifat global (bukan data user), aman di-cache singkat.
+const MAINTENANCE_CACHE_TTL_MS = 30 * 1000;
+
+type MaintenanceSettings = {
+  enabled: boolean;
+  starts_at: string | null;
+  ends_at: string | null;
+  allow_admin_bypass: boolean;
+};
+
+let maintenanceCache: {
+  value: MaintenanceSettings | null;
+  expiresAt: number;
+} | null = null;
+
+// getSession() hanya membaca cookie lokal. Payload JWT dipakai untuk mengambil
+// sub tanpa menyentuh user object (yang memicu peringatan "insecure" di server).
+// Otorisasi sebenarnya tetap divalidasi ulang oleh halaman/layout via getUser().
+function readSessionUserId(accessToken: string | undefined): string | null {
+  if (!accessToken) return null;
+  try {
+    const segment = accessToken.split(".")[1] || "";
+    const base64 = segment.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = base64.padEnd(
+      base64.length + ((4 - (base64.length % 4)) % 4),
+      "="
+    );
+    const payload = JSON.parse(atob(padded)) as { sub?: unknown };
+    return typeof payload.sub === "string" ? payload.sub : null;
+  } catch {
+    return null;
+  }
+}
 
 export async function updateSession(request: NextRequest) {
   let response = NextResponse.next({
@@ -43,9 +78,14 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  // Validasi penuh (jaringan) hanya dilakukan di halaman/layout yang memang
+  // membutuhkan data user. Middleware cukup membaca sesi dari cookie; refresh
+  // token otomatis hanya terjadi saat access token mendekati kedaluwarsa.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const userId = readSessionUserId(session?.access_token);
+  let authenticated = Boolean(session && userId);
 
   const pathname = request.nextUrl.pathname;
   const isApiRoute = pathname.startsWith("/api/");
@@ -72,24 +112,34 @@ export async function updateSession(request: NextRequest) {
   );
 
   if (!isApiRoute && !isNextAsset && !isMaintenanceBypassPath) {
-    const { data: maintenance } = await supabase
-      .from("maintenance_settings")
-      .select("enabled,starts_at,ends_at,allow_admin_bypass")
-      .eq("id", 1)
-      .maybeSingle();
+    const now = Date.now();
+    if (!maintenanceCache || maintenanceCache.expiresAt <= now) {
+      const { data, error } = await supabase
+        .from("maintenance_settings")
+        .select("enabled,starts_at,ends_at,allow_admin_bypass")
+        .eq("id", 1)
+        .maybeSingle();
+      // Hanya hasil sukses yang di-cache; error dibiarkan dicek ulang.
+      if (!error) {
+        maintenanceCache = {
+          value: (data as MaintenanceSettings | null) ?? null,
+          expiresAt: now + MAINTENANCE_CACHE_TTL_MS,
+        };
+      }
+    }
+    const maintenance = maintenanceCache?.value;
 
     if (maintenance?.enabled) {
-      const now = Date.now();
       const startsOk = !maintenance.starts_at || new Date(maintenance.starts_at).getTime() <= now;
       const endsOk = !maintenance.ends_at || new Date(maintenance.ends_at).getTime() >= now;
 
       if (startsOk && endsOk) {
         let bypass = false;
-        if (user && maintenance.allow_admin_bypass) {
+        if (userId && maintenance.allow_admin_bypass) {
           const { data: profile } = await supabase
             .from("profiles")
             .select("role")
-            .eq("id", user.id)
+            .eq("id", userId)
             .maybeSingle();
           bypass = Boolean(profile && ["ADMIN", "SUPER_ADMIN"].includes(String(profile.role)));
         }
@@ -126,7 +176,7 @@ export async function updateSession(request: NextRequest) {
   // First-time visitors must see the welcome/onboarding screen before Login/Register.
   // The welcome screen sets a long-lived cookie when the visitor continues or skips.
   if (
-    !user &&
+    !authenticated &&
     !onboardingSeen &&
     !isApiRoute &&
     !isNextAsset &&
@@ -139,19 +189,28 @@ export async function updateSession(request: NextRequest) {
   }
 
   // An already authenticated user should not be asked to log in/register again.
+  // Di halaman auth, sesi lokal dikonfirmasi ke Auth server dulu agar token yang
+  // sudah dicabut tidak memicu loop redirect dengan halaman yang memanggil getUser().
   if (
-    user &&
+    authenticated &&
     !isApiRoute &&
     !isNextAsset &&
     (pathname === "/login" || pathname === "/register" || pathname === "/daftar" || pathname === "/welcome")
   ) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/dashboard";
-    url.search = "";
-    return NextResponse.redirect(url);
+    const {
+      data: { user: verifiedUser },
+    } = await supabase.auth.getUser();
+
+    if (verifiedUser) {
+      const url = request.nextUrl.clone();
+      url.pathname = "/dashboard";
+      url.search = "";
+      return NextResponse.redirect(url);
+    }
+    authenticated = false;
   }
 
-  if (!user && !isPublicPath && !isApiRoute && !isNextAsset) {
+  if (!authenticated && !isPublicPath && !isApiRoute && !isNextAsset) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = "/login";
     loginUrl.search = "";
@@ -162,11 +221,11 @@ export async function updateSession(request: NextRequest) {
   // Authenticated users stay logged in until they have been inactive for 7 days.
   // last_activity_at is server-side, so the client cannot extend the session by
   // editing localStorage/cookies.
-  if (user && !isApiRoute && !isNextAsset) {
+  if (authenticated && userId && !isApiRoute && !isNextAsset) {
     const { data: profile } = await supabase
       .from("profiles")
       .select("last_activity_at, account_status")
-      .eq("id", user.id)
+      .eq("id", userId)
       .maybeSingle();
 
     // Akun diblokir tidak boleh mengakses halaman apa pun kecuali halaman
@@ -181,9 +240,11 @@ export async function updateSession(request: NextRequest) {
     const profileActivity = profile?.last_activity_at
       ? new Date(profile.last_activity_at).getTime()
       : 0;
-    const lastSignIn = user.last_sign_in_at
-      ? new Date(user.last_sign_in_at).getTime()
-      : 0;
+    const lastSignIn = profileActivity
+      ? 0
+      : session?.user?.last_sign_in_at
+        ? new Date(session.user.last_sign_in_at).getTime()
+        : 0;
     const lastActivity = profileActivity || lastSignIn;
 
     if (lastActivity && Date.now() - lastActivity >= INACTIVITY_MS) {
@@ -196,15 +257,22 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    await supabase
-      .from("profiles")
-      .update({ last_activity_at: new Date().toISOString() })
-      .eq("id", user.id);
+    if (!profileActivity || Date.now() - profileActivity >= ACTIVITY_WRITE_INTERVAL_MS) {
+      await supabase
+        .from("profiles")
+        .update({ last_activity_at: new Date().toISOString() })
+        .eq("id", userId);
+    }
   }
 
   return response;
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
+  // Middleware tidak perlu dijalankan untuk API (setiap route punya guard
+  // sendiri), callback auth, maupun aset statis. Halaman aplikasi tetap
+  // tercakup agar aturan redirect/onboarding/blokir tidak berubah.
+  matcher: [
+    "/((?!api/|auth/|_next/static|_next/image|favicon.ico|robots.txt|sitemap.xml|manifest.webmanifest|.*\\.(?:svg|png|jpg|jpeg|gif|webp|avif|ico|css|js|map|txt|xml|woff|woff2|ttf|otf)$).*)",
+  ],
 };

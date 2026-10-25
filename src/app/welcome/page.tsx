@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import RatingBadgeLive from "@/components/RatingBadgeLive";
 
@@ -93,15 +94,15 @@ export default function Welcome() {
             )}
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <a onClick={goNext} href="/register" className="rounded-xl bg-amber-300 px-5 py-3 text-sm font-black text-slate-950">
+              <Link onClick={goNext} href="/register" className="rounded-xl bg-amber-300 px-5 py-3 text-sm font-black text-slate-950">
                 Lanjutkan · Daftar
-              </a>
-              <a onClick={goNext} href="/login" className="rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950">
+              </Link>
+              <Link onClick={goNext} href="/login" className="rounded-xl bg-white px-5 py-3 text-sm font-black text-slate-950">
                 Lanjutkan · Login
-              </a>
-              <a onClick={goNext} href="/login" className="rounded-xl border border-white/25 bg-white/5 px-5 py-3 text-sm font-bold text-white">
+              </Link>
+              <Link onClick={goNext} href="/login" className="rounded-xl border border-white/25 bg-white/5 px-5 py-3 text-sm font-bold text-white">
                 Skip
-              </a>
+              </Link>
             </div>
 
             {banners.length > 1 && (

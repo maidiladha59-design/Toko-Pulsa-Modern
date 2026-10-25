@@ -44,24 +44,28 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
     .eq("id", params.id).eq("user_id", user.id).maybeSingle();
   if (!order) notFound();
 
-  const { data: items } = await supabase.from("order_items")
-    .select("id,product_id,product_name,unit_price,quantity,subtotal")
-    .eq("order_id", order.id);
+  const [{ data: items }, { data: txs }] = await Promise.all([
+    supabase.from("order_items")
+      .select("id,product_id,product_name,unit_price,quantity,subtotal")
+      .eq("order_id", order.id),
+    supabase.from("ppob_transactions")
+      .select("order_item_id,customer_no,status,response_code,serial_number,provider_message,completed_at")
+      .eq("order_id", order.id),
+  ]);
 
   const itemIds = (items || []).map((i) => i.id);
   const productIds = (items || []).map((i) => i.product_id).filter(Boolean) as string[];
 
-  const { data: targets } = itemIds.length
-    ? await supabase.from("ppob_order_targets").select("order_item_id,customer_no,target_data").in("order_item_id", itemIds)
-    : { data: [] };
-  const { data: txs } = await supabase.from("ppob_transactions")
-    .select("order_item_id,customer_no,status,response_code,serial_number,provider_message,completed_at")
-    .eq("order_id", order.id);
   // cost_price (modal) hanya bisa dibaca lewat service role, bukan lewat client
   // yang tunduk RLS/hak akses kolom milik user biasa — lihat migrations_v70.
-  const { data: services } = productIds.length
-    ? await createAdminClient().from("ppob_services").select("product_id,cost_price").in("product_id", productIds)
-    : { data: [] };
+  const [{ data: targets }, { data: services }] = await Promise.all([
+    itemIds.length
+      ? supabase.from("ppob_order_targets").select("order_item_id,customer_no,target_data").in("order_item_id", itemIds)
+      : Promise.resolve({ data: [] }),
+    productIds.length
+      ? createAdminClient().from("ppob_services").select("product_id,cost_price").in("product_id", productIds)
+      : Promise.resolve({ data: [] }),
+  ]);
 
   const targetMap = new Map((targets || []).map((t) => [t.order_item_id, t]));
   const txMap = new Map((txs || []).map((t) => [t.order_item_id, t]));

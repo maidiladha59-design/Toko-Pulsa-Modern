@@ -13,14 +13,13 @@ export default async function DashboardPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: profile }, { data: wallet }, { data: orders }] = await Promise.all([
+  // Sumber yang sama dengan rating & halaman Peringkat: hanya order COMPLETED.
+  const [{ data: profile }, { data: wallet }, { data: orders }, { count: completedOrders }] = await Promise.all([
     supabase.from("profiles").select("full_name, email").eq("id", user.id).single(),
     supabase.from("wallets").select("balance").eq("user_id", user.id).single(),
     supabase.from("orders").select("id, order_number, total_amount, status, created_at").eq("user_id", user.id).order("created_at", { ascending: false }).limit(5),
+    supabase.from("orders").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "COMPLETED"),
   ]);
-
-  // Sumber yang sama dengan rating & halaman Peringkat: hanya order COMPLETED.
-  const { count: completedOrders } = await supabase.from("orders").select("id", { count: "exact", head: true }).eq("user_id", user.id).eq("status", "COMPLETED");
   const firstName = (profile?.full_name || profile?.email || "Pengguna").split(" ")[0];
 
   const quickLinks = [

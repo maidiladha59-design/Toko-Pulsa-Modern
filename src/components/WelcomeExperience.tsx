@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 const STORAGE_KEY = "aidilstore_welcome_seen_v1";
 
@@ -153,13 +154,13 @@ export default function WelcomeExperience() {
             >
               Mulai Belanja
             </button>
-            <a
+            <Link
               href="/bantuan"
               onClick={dismiss}
               className="flex-1 rounded-2xl border border-white/15 bg-white/[0.03] px-5 py-3 text-center text-sm font-black text-white transition active:scale-[0.98]"
             >
               📖 Pusat Bantuan
-            </a>
+            </Link>
           </div>
         </div>
       )}

@@ -14,12 +14,11 @@ export default async function TransactionsPage() {
     supabase.from("wallets").select("id, balance").eq("user_id", user.id).maybeSingle(),
   ]);
   const ids = (orders || []).map(o => o.id);
-  const [{ data: items }, { data: walletTx }] = await Promise.all([
+  const [{ data: items }, { data: walletTx }, { data: ppob }] = await Promise.all([
     ids.length ? supabase.from("order_items").select("id, order_id, product_name").in("order_id", ids) : Promise.resolve({ data: [] as any[] }),
     wallet ? supabase.from("wallet_transactions").select("id, type, amount, reference_id, created_at").eq("wallet_id", wallet.id).order("created_at", { ascending: false }).limit(100) : Promise.resolve({ data: [] as any[] }),
+    ids.length ? supabase.from("ppob_transactions").select("id, order_item_id, customer_no, status").in("order_id", ids) : Promise.resolve({ data: [] as any[] }),
   ]);
-  const itemIds = (items || []).map(i => i.id);
-  const { data: ppob } = itemIds.length ? await supabase.from("ppob_transactions").select("id, order_item_id, customer_no, status").in("order_item_id", itemIds) : { data: [] as any[] };
   const itemMap = new Map((items || []).map(i => [i.id, i]));
   const ppobMap = new Map((ppob || []).map(t => [t.order_item_id, t]));
 

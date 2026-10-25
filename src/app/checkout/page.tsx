@@ -1,6 +1,7 @@
 "use client";
 
 import { Suspense, useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
@@ -324,7 +325,7 @@ function CheckoutForm() {
                 placeholder="6 digit PIN"
                 className="mt-2 w-full rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm tracking-[.4em] text-app-text outline-none transition placeholder:tracking-normal placeholder:text-app-subtle focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
               />
-              <span className="mt-1 block text-xs text-app-subtle">Belum punya PIN? <a href="/settings" className="font-bold text-app-kicker underline">Buat di Pengaturan</a>.</span>
+              <span className="mt-1 block text-xs text-app-subtle">Belum punya PIN? <Link href="/settings" className="font-bold text-app-kicker underline">Buat di Pengaturan</Link>.</span>
             </label>
           </div>
         </div>

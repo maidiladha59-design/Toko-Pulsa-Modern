@@ -1,5 +1,6 @@
 import { notFound, redirect } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { formatRupiah, formatDate } from "@/lib/utils";
@@ -39,32 +40,33 @@ export default async function OrderDetailPage({ params }: { params: { id: string
 
   if (!order || order.user_id !== user.id) notFound();
 
-  const { data: items } = await supabase.from("order_items")
-    .select("id, product_id, product_name, unit_price, quantity, subtotal, products(product_type)")
-    .eq("order_id", order.id);
-
-  const { data: ppobTransactions } = await supabase.from("ppob_transactions")
-    .select("id, order_item_id, customer_no, status, response_code, serial_number, provider_message, completed_at")
-    .eq("order_id", order.id);
-
-  const { data: ppobTargets } = await supabase.from("ppob_order_targets")
-    .select("order_item_id, customer_no, target_data")
-    .in("order_item_id", (items || []).map((item) => item.id));
+  const [{ data: items }, { data: ppobTransactions }, { data: submission }] = await Promise.all([
+    supabase.from("order_items")
+      .select("id, product_id, product_name, unit_price, quantity, subtotal, products(product_type)")
+      .eq("order_id", order.id),
+    supabase.from("ppob_transactions")
+      .select("id, order_item_id, customer_no, status, response_code, serial_number, provider_message, completed_at")
+      .eq("order_id", order.id),
+    supabase.from("order_submissions")
+      .select("target_text, target_file_path, created_at")
+      .eq("order_id", order.id).maybeSingle(),
+  ]);
 
   // cost_price (modal) hanya bisa dibaca lewat service role, bukan lewat client
   // yang tunduk RLS/hak akses kolom milik user biasa — lihat migrations_v70.
   const ppobProductIds = (items || []).map((item) => item.product_id).filter(Boolean) as string[];
-  const { data: ppobServices } = ppobProductIds.length
-    ? await createAdminClient().from("ppob_services").select("product_id, cost_price").in("product_id", ppobProductIds)
-    : { data: [] };
+  const [{ data: ppobTargets }, { data: ppobServices }] = await Promise.all([
+    supabase.from("ppob_order_targets")
+      .select("order_item_id, customer_no, target_data")
+      .in("order_item_id", (items || []).map((item) => item.id)),
+    ppobProductIds.length
+      ? createAdminClient().from("ppob_services").select("product_id, cost_price").in("product_id", ppobProductIds)
+      : Promise.resolve({ data: [] }),
+  ]);
 
   const ppobTxMap = new Map((ppobTransactions || []).map((tx) => [tx.order_item_id, tx]));
   const ppobTargetMap = new Map((ppobTargets || []).map((target) => [target.order_item_id, target]));
   const ppobCostMap = new Map((ppobServices || []).map((svc) => [svc.product_id, Number(svc.cost_price || 0)]));
-
-  const { data: submission } = await supabase.from("order_submissions")
-    .select("target_text, target_file_path, created_at")
-    .eq("order_id", order.id).maybeSingle();
 
   const showGateway = ["QRIS", "BANK_VA"].includes(order.payment_method) &&
     order.status === "PENDING" && order.payment_number && order.qris_expired_at &&
@@ -146,7 +148,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                       <p className="font-black">🎯 Status jasa: {order.status === "PROCESSING" ? "sedang dikerjakan" : order.status === "COMPLETED" ? "selesai" : "menunggu diproses"}</p>
                       {submission?.target_text && <p className="mt-2 text-xs text-app-kicker/80">Target: {submission.target_text}</p>}
                       {submission?.target_file_path && <p className="mt-1 text-xs text-app-kicker/80">📎 File target sudah dikirim.</p>}
-                      <a href="/bantuan" className="mt-2 inline-block text-xs font-bold underline">Butuh bantuan terkait pesanan ini?</a>
+                      <Link href="/bantuan" className="mt-2 inline-block text-xs font-bold underline">Butuh bantuan terkait pesanan ini?</Link>
                     </div>
                   )}
                 </div>

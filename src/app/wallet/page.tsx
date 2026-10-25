@@ -25,7 +25,15 @@ export default async function WalletPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const { data: wallet } = await supabase.from("wallets").select("id, balance").eq("user_id", user.id).single();
+  const [{ data: wallet }, { data: pendingTopups }] = await Promise.all([
+    supabase.from("wallets").select("id, balance").eq("user_id", user.id).single(),
+    supabase
+      .from("topups")
+      .select("id, amount, status, created_at")
+      .eq("user_id", user.id)
+      .in("status", ["PENDING", "VERIFYING"])
+      .order("created_at", { ascending: false }),
+  ]);
 
   const { data: history } = wallet
     ? await supabase
@@ -35,13 +43,6 @@ export default async function WalletPage() {
         .order("created_at", { ascending: false })
         .limit(20)
     : { data: [] };
-
-  const { data: pendingTopups } = await supabase
-    .from("topups")
-    .select("id, amount, status, created_at")
-    .eq("user_id", user.id)
-    .in("status", ["PENDING", "VERIFYING"])
-    .order("created_at", { ascending: false });
 
   return (
     <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] animate-page-in">
