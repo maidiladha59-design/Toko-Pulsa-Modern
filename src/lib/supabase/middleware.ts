@@ -163,6 +163,11 @@ export async function updateSession(request: NextRequest) {
     "/auth/callback",
     "/verify-email",
     "/akun-diblokir",
+    "/lupa-password",
+    "/forgot-password",
+    // Token recovery diproses di browser, jadi halaman ini harus bisa dibuka
+    // walau middleware belum melihat sesi di cookie.
+    "/reset-password",
   ];
 
   const isPublicPath = publicPaths.some(

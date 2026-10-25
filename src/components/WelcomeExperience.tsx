@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 const STORAGE_KEY = "aidilstore_welcome_seen_v1";
 
@@ -37,8 +38,18 @@ type Step = "checking" | "loading" | "welcome" | "done";
 export default function WelcomeExperience() {
   const [step, setStep] = useState<Step>("checking");
   const [progress, setProgress] = useState(0);
+  const pathname = usePathname();
+  // Link reset dari email bisa dibuka di perangkat/tab baru tanpa localStorage.
+  // Jangan tutupi form pemulihan akun dengan onboarding.
+  const isPasswordRecoveryPath =
+    pathname === "/lupa-password" || pathname === "/reset-password";
 
   useEffect(() => {
+    if (isPasswordRecoveryPath) {
+      setStep("done");
+      return;
+    }
+
     let seen = true;
     try {
       seen = localStorage.getItem(STORAGE_KEY) === "1";
@@ -60,7 +71,7 @@ export default function WelcomeExperience() {
       /* sessionStorage tidak tersedia — jalankan intro normal */
     }
     setStep("loading");
-  }, []);
+  }, [isPasswordRecoveryPath]);
 
   useEffect(() => {
     if (step !== "loading") return;

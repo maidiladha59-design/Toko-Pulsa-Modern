@@ -78,10 +78,21 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 
 @keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes float-soft { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-7px); } }
-@keyframes toast-pop-in { from { opacity: 0; transform: translateY(-14px) scale(.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
-@keyframes toast-pop-out { from { opacity: 1; transform: translateY(0) scale(1); } to { opacity: 0; transform: translateY(-10px) scale(.97); } }
-.toast-pop { animation: toast-pop-in .25s ease-out both; }
-.toast-pop-out { animation: toast-pop-out .2s ease-in forwards; }
+/* Modal notifikasi: scale-in + fade, ikon digambar, shake khusus error. */
+@keyframes toast-modal-in { from { opacity: 0; transform: scale(.9); } to { opacity: 1; transform: scale(1); } }
+@keyframes toast-error-shake {
+  0%, 100% { transform: translateX(0); }
+  15% { transform: translateX(-6px); }
+  30% { transform: translateX(6px); }
+  45% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+  75% { transform: translateX(-2px); }
+}
+@keyframes toast-icon-draw { to { stroke-dashoffset: 0; } }
+.toast-modal-in { animation: toast-modal-in .2s ease-out both; }
+.toast-error-shake { animation: toast-error-shake .3s .12s ease-in-out both; }
+.toast-icon-draw { stroke-dasharray: 1; stroke-dashoffset: 1; animation: toast-icon-draw .4s .15s ease-out forwards; }
+.toast-icon-draw-2 { animation-delay: .3s; }
 .animate-page-in { animation: page-in .45s ease-out both; }
 
 /* Splash sesi (AppLoader): intro emas-hitam sekali per tab, tanpa spinner berputar. */
@@ -98,6 +109,8 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
+  .toast-icon-draw { animation-delay: 0ms !important; }
+  .toast-error-shake { animation: none !important; }
 }
 
 .app-hero { position: relative; background: radial-gradient(circle at 80% 15%, rgba(201, 162, 39, .24), transparent 30%), radial-gradient(circle at 15% 100%, rgba(201, 162, 39, .12), transparent 38%), #09090b; box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }

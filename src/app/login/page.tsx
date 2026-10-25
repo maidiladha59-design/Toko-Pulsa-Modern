@@ -215,7 +215,7 @@ function LoginForm() {
               <span>Password</span>
 
               <Link
-                href="/forgot-password"
+                href="/lupa-password"
                 className="text-xs font-bold text-gold-300 hover:text-gold-200 hover:underline"
               >
                 Lupa password?

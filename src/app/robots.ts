@@ -27,6 +27,7 @@ export default function robots(): MetadataRoute.Robots {
           "/verify-email",
           "/reset-password",
           "/forgot-password",
+          "/lupa-password",
         ],
       },
     ],
