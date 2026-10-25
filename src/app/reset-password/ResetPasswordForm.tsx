@@ -2,33 +2,18 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import Button from "@/components/Button";
 import Input from "@/components/ui/Input";
-import { humanizeError } from "@/lib/utils";
+import { friendlyPasswordResetError } from "@/lib/password-reset";
 
-type Status = "checking" | "ready" | "invalid" | "done";
+type Status = "checking" | "ready" | "invalid";
 
-const INVALID_LINK_MESSAGE =
-  "Link reset tidak valid atau sudah kedaluwarsa. Silakan minta link baru.";
-
-function friendlyError(message: string) {
-  const m = message.toLowerCase();
-  if (m.includes("different from the old"))
-    return "Password baru harus berbeda dari password lama.";
-  if (m.includes("session missing") || m.includes("not authenticated") || m.includes("jwt"))
-    return "Sesi reset tidak ditemukan atau sudah berakhir. Silakan minta link baru.";
-  if (m.includes("at least") && m.includes("character"))
-    return "Password belum memenuhi syarat minimal.";
-  if (m.includes("weak") || m.includes("pwned"))
-    return "Password terlalu lemah. Gunakan kombinasi huruf, angka, dan simbol.";
-  if (m.includes("rate limit") || m.includes("too many"))
-    return "Terlalu banyak permintaan. Coba lagi beberapa menit lagi.";
-  return humanizeError(message);
-}
+const INVALID_SESSION_MESSAGE =
+  "Sesi verifikasi tidak ditemukan atau sudah berakhir. Silakan minta kode verifikasi baru.";
 
 export default function ResetPasswordForm() {
   const supabase = createClient();
@@ -40,69 +25,21 @@ export default function ResetPasswordForm() {
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const completedRef = useRef(false);
 
+  // Session dibuat oleh supabase.auth.verifyOtp({ type: "recovery" }) di
+  // halaman verifikasi kode. Tidak ada token yang dibaca dari URL.
   useEffect(() => {
     let active = true;
-    let timeout: ReturnType<typeof setTimeout> | undefined;
 
-    const params = new URLSearchParams(window.location.search);
-    const hash = new URLSearchParams(window.location.hash.replace(/^#/, ""));
-
-    // Link yang sudah kedaluwarsa/ditolak Supabase membawa parameter error.
-    const hasLinkError = Boolean(
-      params.get("error") ||
-        params.get("error_code") ||
-        hash.get("error") ||
-        hash.get("error_code")
-    );
-    if (hasLinkError) {
-      setStatus("invalid");
-      return;
-    }
-
-    const hasRecoveryParams =
-      params.has("code") ||
-      params.get("type") === "recovery" ||
-      hash.has("access_token") ||
-      hash.get("type") === "recovery";
-
-    // Flow PKCE memancarkan SIGNED_IN setelah kode ditukar, sedangkan flow
-    // implicit memancarkan PASSWORD_RECOVERY. Keduanya sama-sama valid.
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((event, session) => {
-      if (!active || completedRef.current) return;
-      if (event === "PASSWORD_RECOVERY" || (session && event !== "SIGNED_OUT")) {
-        setStatus("ready");
-      }
-    });
-
-    void supabase.auth.getSession().then(({ data }) => {
+    void supabase.auth.getSession().then(({ data, error: sessionError }) => {
       if (!active) return;
-      if (data.session) setStatus("ready");
-      else if (!hasRecoveryParams) setStatus("invalid");
+      setStatus(!sessionError && data.session ? "ready" : "invalid");
     });
-
-    timeout = setTimeout(() => {
-      if (!active) return;
-      setStatus((prev) => (prev === "checking" ? "invalid" : prev));
-    }, 10000);
 
     return () => {
       active = false;
-      if (timeout) clearTimeout(timeout);
-      subscription.unsubscribe();
     };
   }, [supabase]);
-
-  // Token recovery di URL tidak diperlukan lagi setelah sesi terbentuk.
-  useEffect(() => {
-    if (status !== "ready") return;
-    if (window.location.hash || window.location.search.includes("code=")) {
-      window.history.replaceState({}, "", "/reset-password");
-    }
-  }, [status]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -126,31 +63,29 @@ export default function ResetPasswordForm() {
 
     setLoading(true);
 
-    const { error: updateError } = await supabase.auth.updateUser({ password });
+    try {
+      const { error: updateError } = await supabase.auth.updateUser({
+        password,
+      });
 
-    if (updateError) {
-      setLoading(false);
-      const message = friendlyError(updateError.message);
+      if (updateError) {
+        const message = friendlyPasswordResetError(updateError.message);
+        setError(message);
+        toast.show(message, "error");
+        return;
+      }
+
+      // Sesi recovery tidak dipakai untuk langsung masuk; akhiri sesi lalu
+      // arahkan user ke Login dengan pesan sukses.
+      await supabase.auth.signOut().catch(() => {});
+      router.replace("/login?reset=success");
+    } catch {
+      const message = friendlyPasswordResetError("network");
       setError(message);
       toast.show(message, "error");
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
-    completedRef.current = true;
-    setStatus("done");
-    toast.show(
-      "Password berhasil diubah. Silakan login dengan password baru.",
-      "success"
-    );
-
-    // Sesi recovery tidak dipakai untuk langsung masuk; akhiri sesi lalu
-    // arahkan user ke halaman login.
-    await supabase.auth.signOut().catch(() => {});
-    setTimeout(() => {
-      router.replace("/login");
-      router.refresh();
-    }, 1500);
   }
 
   return (
@@ -179,7 +114,7 @@ export default function ResetPasswordForm() {
             <div className="py-8 text-center" role="status" aria-live="polite">
               <span className="mx-auto block h-8 w-8 animate-spin rounded-full border-2 border-app-border border-t-gold-500" />
               <p className="mt-4 text-sm font-bold text-app-text">
-                Memeriksa link reset...
+                Memeriksa sesi verifikasi...
               </p>
               <p className="mt-1 text-xs text-app-muted">Mohon tunggu sebentar.</p>
             </div>
@@ -191,16 +126,16 @@ export default function ResetPasswordForm() {
                 !
               </div>
               <h2 className="mt-4 text-lg font-black text-app-text">
-                Link tidak valid
+                Sesi tidak valid
               </h2>
               <p className="mt-2 text-sm leading-6 text-app-muted">
-                {INVALID_LINK_MESSAGE}
+                {INVALID_SESSION_MESSAGE}
               </p>
               <Link
                 href="/lupa-password"
                 className="btn-gold mt-5 inline-flex min-h-[44px] items-center justify-center rounded-xl px-5 py-2.5 text-sm font-black transition"
               >
-                Minta Link Baru
+                Minta Kode Baru
               </Link>
               <Link
                 href="/login"
@@ -258,27 +193,6 @@ export default function ResetPasswordForm() {
                 ← Kembali ke Login
               </Link>
             </>
-          )}
-
-          {status === "done" && (
-            <div className="text-center" role="status" aria-live="polite">
-              <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-100 text-2xl font-black text-emerald-600 dark:bg-emerald-500/15 dark:text-emerald-300">
-                ✓
-              </div>
-              <h2 className="mt-4 text-lg font-black text-app-text">
-                Password berhasil diubah
-              </h2>
-              <p className="mt-2 text-sm leading-6 text-app-muted">
-                Silakan login dengan password baru. Mengarahkan ke halaman
-                login...
-              </p>
-              <Link
-                href="/login"
-                className="btn-gold mt-5 inline-flex min-h-[44px] items-center justify-center rounded-xl px-5 py-2.5 text-sm font-black transition"
-              >
-                Ke Halaman Login
-              </Link>
-            </div>
           )}
         </div>
       </div>

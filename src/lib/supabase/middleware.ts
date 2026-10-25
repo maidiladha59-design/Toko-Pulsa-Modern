@@ -165,8 +165,9 @@ export async function updateSession(request: NextRequest) {
     "/akun-diblokir",
     "/lupa-password",
     "/forgot-password",
-    // Token recovery diproses di browser, jadi halaman ini harus bisa dibuka
-    // walau middleware belum melihat sesi di cookie.
+    "/verifikasi-kode-reset",
+    // Verifikasi OTP membuat sesi di browser, jadi halaman ini harus bisa
+    // dibuka walau middleware belum melihat sesi di cookie.
     "/reset-password",
   ];
 

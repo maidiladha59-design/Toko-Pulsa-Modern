@@ -39,10 +39,12 @@ export default function WelcomeExperience() {
   const [step, setStep] = useState<Step>("checking");
   const [progress, setProgress] = useState(0);
   const pathname = usePathname();
-  // Link reset dari email bisa dibuka di perangkat/tab baru tanpa localStorage.
+  // Halaman pemulihan akun bisa dibuka di perangkat/tab baru tanpa localStorage.
   // Jangan tutupi form pemulihan akun dengan onboarding.
   const isPasswordRecoveryPath =
-    pathname === "/lupa-password" || pathname === "/reset-password";
+    pathname === "/lupa-password" ||
+    pathname === "/verifikasi-kode-reset" ||
+    pathname === "/reset-password";
 
   useEffect(() => {
     if (isPasswordRecoveryPath) {

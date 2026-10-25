@@ -3,65 +3,61 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import Button from "@/components/Button";
 import Input from "@/components/ui/Input";
-import { humanizeError } from "@/lib/utils";
+import {
+  friendlyPasswordResetError,
+  isEmailEnumerationError,
+  startResetCooldown,
+} from "@/lib/password-reset";
 
-const SUCCESS_MESSAGE =
-  "Kalau email terdaftar, link reset sudah dikirim. Silakan cek inbox atau folder spam.";
-
-// Supabase bisa membalas "User not found" bila proteksi enumerasi email aktif.
-// Balasan itu tetap diperlakukan sebagai sukses agar status pendaftaran email
-// tidak bisa ditebak dari halaman ini.
-function isEnumerationError(message: string) {
-  const m = message.toLowerCase();
-  return (
-    m.includes("user not found") ||
-    m.includes("email not found") ||
-    m.includes("not registered")
-  );
-}
-
-function friendlyError(message: string) {
-  const m = message.toLowerCase();
-  if (m.includes("rate limit") || m.includes("too many") || m.includes("email rate"))
-    return "Terlalu banyak permintaan. Coba lagi beberapa menit lagi.";
-  return humanizeError(message);
-}
+const SENT_MESSAGE =
+  "Kode verifikasi 6 digit sudah dikirim ke email kamu, masukkan kode di bawah ini.";
 
 export default function LupaPasswordForm() {
   const supabase = createClient();
+  const router = useRouter();
   const toast = useToast();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (loading) return;
 
+    const cleanEmail = email.trim();
     setLoading(true);
     setError(null);
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-      email.trim(),
-      { redirectTo: `${window.location.origin}/reset-password` }
-    );
+    try {
+      // Tanpa redirectTo, Supabase mengirim kode OTP dari template email,
+      // bukan link yang langsung membuka halaman reset.
+      const { error: resetError } =
+        await supabase.auth.resetPasswordForEmail(cleanEmail);
 
-    setLoading(false);
+      if (resetError && !isEmailEnumerationError(resetError.message)) {
+        const message = friendlyPasswordResetError(resetError.message);
+        setError(message);
+        toast.show(message, "error");
+        return;
+      }
 
-    if (resetError && !isEnumerationError(resetError.message)) {
-      const message = friendlyError(resetError.message);
+      startResetCooldown(cleanEmail);
+      toast.show(SENT_MESSAGE, "success");
+      router.push(
+        `/verifikasi-kode-reset?email=${encodeURIComponent(cleanEmail)}`
+      );
+    } catch {
+      const message = friendlyPasswordResetError("network");
       setError(message);
       toast.show(message, "error");
-      return;
+    } finally {
+      setLoading(false);
     }
-
-    setSent(true);
-    toast.show(SUCCESS_MESSAGE, "success");
   }
 
   return (
@@ -80,47 +76,37 @@ export default function LupaPasswordForm() {
           </p>
           <h1 className="mt-2 text-2xl font-black">Lupa password?</h1>
           <p className="mt-2 text-sm text-gold-100">
-            Masukkan email akunmu. Kami akan mengirim tautan untuk membuat
-            password baru.
+            Masukkan email akunmu. Kami akan mengirim kode verifikasi 6 digit
+            untuk membuat password baru.
           </p>
         </div>
 
         <div className="p-7 sm:p-8">
-          {sent ? (
-            <div
-              role="status"
-              className="rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm leading-6 text-emerald-700 dark:border-emerald-500/30 dark:bg-emerald-500/10 dark:text-emerald-300"
-            >
-              <p className="font-black">Permintaan diterima</p>
-              <p className="mt-2">{SUCCESS_MESSAGE}</p>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <Input
-                label="Email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-                placeholder="nama@email.com"
-                hint="Gunakan email yang kamu pakai untuk login."
-              />
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <Input
+              label="Email"
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+              placeholder="nama@email.com"
+              hint="Gunakan email yang kamu pakai untuk login."
+            />
 
-              {error && (
-                <div
-                  role="alert"
-                  className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
-                >
-                  {error}
-                </div>
-              )}
+            {error && (
+              <div
+                role="alert"
+                className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700 dark:border-red-500/30 dark:bg-red-500/10 dark:text-red-300"
+              >
+                {error}
+              </div>
+            )}
 
-              <Button type="submit" loading={loading} className="w-full">
-                Kirim Link Reset
-              </Button>
-            </form>
-          )}
+            <Button type="submit" loading={loading} className="w-full">
+              Kirim Kode Verifikasi
+            </Button>
+          </form>
 
           <Link
             href="/login"

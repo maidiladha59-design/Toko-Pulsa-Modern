@@ -3,7 +3,7 @@ import LupaPasswordForm from "./LupaPasswordForm";
 
 export const metadata: Metadata = {
   title: "Lupa Password — AIDIL STORE",
-  description: "Minta link reset password untuk akun AIDIL STORE.",
+  description: "Minta kode verifikasi 6 digit untuk mengatur ulang password akun AIDIL STORE.",
 };
 
 export default function LupaPasswordPage() {

@@ -22,6 +22,7 @@ function LoginForm() {
     !rawRedirectTo.startsWith("//")
       ? rawRedirectTo
       : "/dashboard";
+  const resetSuccess = searchParams.get("reset") === "success";
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -191,6 +192,15 @@ function LoginForm() {
             Gunakan email dan password yang sudah terdaftar.
           </p>
         </div>
+
+        {resetSuccess && (
+          <div
+            role="status"
+            className="mb-4 animate-page-in rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-sm font-medium text-emerald-300"
+          >
+            Password berhasil diubah. Silakan login dengan password baru.
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
 
