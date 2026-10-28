@@ -11,7 +11,7 @@ type Entry = {
 };
 
 const tabs = [
-  ["ALL", "Semua"], ["PPOB", "Digital"], ["ORDER", "Pesanan"], ["WALLET", "Wallet"], ["PROCESSING", "Diproses"], ["SUCCESS", "Berhasil"], ["FAILED", "Gagal"],
+  ["ALL", "Semua"], ["PPOB", "Digital"], ["ORDER", "Pesanan"], ["WALLET", "Saldo"], ["PROCESSING", "Diproses"], ["SUCCESS", "Berhasil"], ["FAILED", "Gagal"],
 ] as const;
 
 export default function TransactionCenter({ entries }: { entries: Entry[] }) {

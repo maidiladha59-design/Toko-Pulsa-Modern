@@ -2,20 +2,21 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PPOBServiceGrid from "@/components/PPOBServiceGrid";
+import ServiceTrustBadges from "@/components/ui/ServiceTrustBadges";
 
 const CONFIG: Record<string, { title: string; desc: string; icon: string }> = {
   pulsa: { title: "Pulsa Semua Operator", desc: "Isi pulsa semua operator dengan cepat dan otomatis.", icon: "📱" },
   "paket-data": { title: "Paket Data", desc: "Paket internet dan kuota dari operator yang tersedia.", icon: "🌐" },
-  "top-up-game": { title: "Games", desc: "Top up diamond, UC, dan voucher game favorit Anda.", icon: "🎮" },
+  "top-up-game": { title: "Games", desc: "Top Up diamond, UC, dan voucher game favorit Anda.", icon: "🎮" },
   voucher: { title: "Voucher", desc: "Voucher digital yang tersedia.", icon: "🎟️" },
   pln: { title: "PLN", desc: "Token listrik dan layanan PLN prabayar yang tersedia.", icon: "⚡" },
-  "china-topup": { title: "China TOPUP", desc: "Top up layanan China yang tersedia.", icon: "🇨🇳" },
-  "malaysia-topup": { title: "Malaysia TOPUP", desc: "Top up layanan Malaysia yang tersedia.", icon: "🇲🇾" },
-  "philippines-topup": { title: "Philippines TOPUP", desc: "Top up layanan Philippines yang tersedia.", icon: "🇵🇭" },
-  "singapore-topup": { title: "Singapore TOPUP", desc: "Top up layanan Singapore yang tersedia.", icon: "🇸🇬" },
-  "thailand-topup": { title: "Thailand TOPUP", desc: "Top up layanan Thailand yang tersedia.", icon: "🇹🇭" },
+  "china-topup": { title: "Top Up China", desc: "Top Up layanan China yang tersedia.", icon: "🇨🇳" },
+  "malaysia-topup": { title: "Top Up Malaysia", desc: "Top Up layanan Malaysia yang tersedia.", icon: "🇲🇾" },
+  "philippines-topup": { title: "Top Up Philippines", desc: "Top Up layanan Philippines yang tersedia.", icon: "🇵🇭" },
+  "singapore-topup": { title: "Top Up Singapore", desc: "Top Up layanan Singapore yang tersedia.", icon: "🇸🇬" },
+  "thailand-topup": { title: "Top Up Thailand", desc: "Top Up layanan Thailand yang tersedia.", icon: "🇹🇭" },
   "sms-telpon": { title: "Paket SMS & Telpon", desc: "Paket komunikasi prabayar yang tersedia.", icon: "☎️" },
-  "vietnam-topup": { title: "Vietnam Topup", desc: "Top up layanan Vietnam yang tersedia.", icon: "🇻🇳" },
+  "vietnam-topup": { title: "Top Up Vietnam", desc: "Top Up layanan Vietnam yang tersedia.", icon: "🇻🇳" },
   streaming: { title: "Streaming", desc: "Voucher dan paket streaming yang tersedia.", icon: "▶️" },
   tv: { title: "TV", desc: "Produk TV dan voucher yang tersedia.", icon: "📺" },
   "aktivasi-voucher": { title: "Aktivasi Voucher", desc: "Produk aktivasi voucher yang tersedia.", icon: "🎫" },
@@ -25,23 +26,23 @@ const CONFIG: Record<string, { title: string; desc: string; icon: string }> = {
   gas: { title: "Gas", desc: "Produk gas prabayar yang tersedia.", icon: "🔥" },
   "media-sosial": { title: "Media Sosial", desc: "Produk media sosial yang tersedia.", icon: "📣" },
   hotel: { title: "Hotel", desc: "Produk hotel/travel yang tersedia.", icon: "🏨" },
-  "e-wallet": { title: "E-Wallet", desc: "Top up saldo dompet digital yang tersedia.", icon: "💳" },
+  "e-wallet": { title: "E-Wallet", desc: "Top Up saldo dompet digital yang tersedia.", icon: "💳" },
   bpjs: { title: "BPJS", desc: "Layanan BPJS yang tersedia.", icon: "🏥" },
   internet: { title: "Internet", desc: "Layanan internet yang tersedia.", icon: "📡" },
   pdam: { title: "PDAM", desc: "Tagihan air yang tersedia.", icon: "💧" },
   "pascabayar": { title: "HP Pascabayar", desc: "Tagihan HP pascabayar yang tersedia.", icon: "☎️" },
   "tagihan-lainnya": { title: "Tagihan Lainnya", desc: "Layanan pascabayar tambahan yang tersedia.", icon: "🧾" },
   pbb: { title: "PBB", desc: "Layanan pajak bumi dan bangunan yang tersedia.", icon: "🏠" },
-  "pln-pascabayar": { title: "PLN PASCABAYAR", desc: "Tagihan listrik pascabayar.", icon: "⚡" },
-  "hp-pascabayar": { title: "HP PASCABAYAR", desc: "Tagihan operator seluler pascabayar.", icon: "📱" },
-  "internet-pascabayar": { title: "INTERNET PASCABAYAR", desc: "Tagihan internet pascabayar.", icon: "🌐" },
-  "bpjs-kesehatan": { title: "BPJS KESEHATAN", desc: "Tagihan BPJS Kesehatan.", icon: "🏥" },
-  multifinance: { title: "MULTIFINANCE", desc: "Tagihan multifinance yang tersedia.", icon: "💰" },
-  "gas-negara": { title: "GAS NEGARA", desc: "Tagihan gas negara yang tersedia.", icon: "🔥" },
-  "tv-pascabayar": { title: "TV PASCABAYAR", desc: "Tagihan TV pascabayar.", icon: "📺" },
+  "pln-pascabayar": { title: "PLN Pascabayar", desc: "Tagihan listrik pascabayar.", icon: "⚡" },
+  "hp-pascabayar": { title: "HP Pascabayar", desc: "Tagihan operator seluler pascabayar.", icon: "📱" },
+  "internet-pascabayar": { title: "Internet Pascabayar", desc: "Tagihan internet pascabayar.", icon: "🌐" },
+  "bpjs-kesehatan": { title: "BPJS Kesehatan", desc: "Tagihan BPJS Kesehatan.", icon: "🏥" },
+  multifinance: { title: "Multifinance", desc: "Tagihan multifinance yang tersedia.", icon: "💰" },
+  "gas-negara": { title: "Gas Negara", desc: "Tagihan gas negara yang tersedia.", icon: "🔥" },
+  "tv-pascabayar": { title: "TV Pascabayar", desc: "Tagihan TV pascabayar.", icon: "📺" },
   samsat: { title: "SAMSAT", desc: "Layanan Samsat yang tersedia.", icon: "🚗" },
-  "bpjs-ketenagakerjaan": { title: "BPJS KETENAGAKERJAAN", desc: "Layanan BPJS Ketenagakerjaan.", icon: "🧾" },
-  "pln-nontaglis": { title: "PLN NONTAGLIS", desc: "Layanan PLN Nontaglis yang tersedia.", icon: "⚡" },
+  "bpjs-ketenagakerjaan": { title: "BPJS Ketenagakerjaan", desc: "Layanan BPJS Ketenagakerjaan.", icon: "🧾" },
+  "pln-nontaglis": { title: "PLN Nontaglis", desc: "Layanan PLN Nontaglis yang tersedia.", icon: "⚡" },
   "telkomsel-omni": { title: "Telkomsel Omni", desc: "Produk khusus Telkomsel yang tersedia.", icon: "🔴" },
   "indosat-only4u": { title: "Indosat Only4u", desc: "Produk khusus Indosat yang tersedia.", icon: "🟡" },
   "tri-cuanmax": { title: "Tri CuanMax", desc: "Produk khusus Tri yang tersedia.", icon: "🟣" },
@@ -72,13 +73,11 @@ export default async function PPOBCategoryPage({ params }: { params: { category:
       <section className="app-hero mt-3 overflow-hidden rounded-[2rem] p-6 text-white sm:p-8">
         <div className="flex items-center gap-4">
           <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gold-400 text-3xl text-zinc-950">{config.icon}</div>
-          <div><p className="text-xs font-black uppercase tracking-widest text-gold-400">AIDIL STORE</p><h1 className="mt-1 text-2xl font-black sm:text-3xl">{config.title}</h1><p className="mt-2 text-sm text-zinc-400">{config.desc}</p></div>
+          <div><h1 className="text-2xl font-black sm:text-3xl">{config.title}</h1><p className="mt-2 text-sm text-zinc-400">{config.desc}</p></div>
         </div>
-        <div className="mt-6 grid grid-cols-3 gap-2 text-xs font-bold text-zinc-400">
-          <div className="rounded-xl bg-white/5 p-3">🔒 Aman</div><div className="rounded-xl bg-white/5 p-3">⚡ Otomatis</div><div className="rounded-xl bg-white/5 p-3">🧾 Ada riwayat</div>
-        </div>
+        <ServiceTrustBadges />
       </section>
-      <div className="mb-3 mt-5 flex items-end justify-between gap-3"><div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">Pilihan layanan</p><h2 className="mt-1 text-xl font-black text-app-text">Pilih produk</h2></div><span className="text-xs font-bold text-app-subtle">{services.length} produk tersedia</span></div>
+      <div className="mb-3 mt-5 flex items-end justify-between gap-3"><h2 className="text-xl font-black text-app-text">Pilih produk</h2><span className="text-xs font-bold text-app-subtle">{services.length} produk tersedia</span></div>
       <PPOBServiceGrid services={services} category={params.category} />
     </div>
     </div>

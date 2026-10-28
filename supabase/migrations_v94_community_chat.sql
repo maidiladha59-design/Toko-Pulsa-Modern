@@ -171,7 +171,7 @@ begin
    where user_id = p_user_id;
   if found and v_status.is_muted then
     raise exception 'CHAT_MUTED:%',
-      coalesce(nullif(btrim(v_status.muted_reason), ''), 'Kamu dibisukan dari ruang diskusi.');
+      coalesce(nullif(btrim(v_status.muted_reason), ''), 'Anda dibisukan dari ruang diskusi.');
   end if;
 
   v_message := btrim(coalesce(p_message, ''));
@@ -353,10 +353,10 @@ begin
   insert into public.notifications (user_id, title, message, reference_type, reference_id)
   values (
     p_target_user_id,
-    case when p_muted then 'Kamu Dibisukan dari Ruang Diskusi' else 'Bisuan Ruang Diskusi Dibuka' end,
+    case when p_muted then 'Anda Dibisukan dari Ruang Diskusi' else 'Bisuan Ruang Diskusi Dibuka' end,
     case
-      when p_muted then 'Kamu tidak bisa mengirim pesan di Ruang Diskusi. Alasan: ' || v_reason
-      else 'Kamu kembali bisa mengirim pesan di Ruang Diskusi.'
+      when p_muted then 'Anda tidak bisa mengirim pesan di Ruang Diskusi. Alasan: ' || v_reason
+      else 'Anda kembali bisa mengirim pesan di Ruang Diskusi.'
     end,
     'chat_user_status',
     p_target_user_id

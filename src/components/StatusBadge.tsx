@@ -1,3 +1,5 @@
+import { statusLabel } from "@/lib/labels";
+
 const STATUS_STYLES: Record<string, string> = {
   PENDING: "bg-warning-100 text-warning-800 dark:bg-warning-500/15 dark:text-warning-300",
   VERIFYING: "bg-gold-100 text-zinc-900 dark:bg-gold-400/15 dark:text-gold-300",
@@ -11,23 +13,11 @@ const STATUS_STYLES: Record<string, string> = {
   REFUNDED: "bg-gold-100 text-zinc-900 dark:bg-gold-400/15 dark:text-gold-300",
 };
 
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "Menunggu pembayaran",
-  VERIFYING: "Sedang diproses",
-  APPROVED: "Berhasil",
-  COMPLETED: "Selesai",
-  PROCESSING: "Sedang diproses",
-  REJECTED: "Ditolak",
-  FAILED: "Gagal",
-  EXPIRED: "Kedaluwarsa",
-  CANCELLED: "Dibatalkan",
-  REFUNDED: "Dana dikembalikan",
-};
-
+// Label selalu dari src/lib/labels.ts — nama status database tidak pernah tampil.
 export default function StatusBadge({ status }: { status: string }) {
   return (
     <span className={`inline-block rounded-full px-3 py-1 text-xs font-medium ${STATUS_STYLES[status] || "bg-gray-100 text-gray-700 dark:bg-zinc-500/15 dark:text-zinc-300"}`}>
-      {STATUS_LABEL[status] || status}
+      {statusLabel(status)}
     </span>
   );
 }

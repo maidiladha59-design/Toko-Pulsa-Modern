@@ -219,10 +219,10 @@ test('v93 API user: channel aktif, upload bukti privat, riwayat + signed URL', (
 test('v93 UI user: pilih Otomatis/Manual, bukti, pending, riwayat, alasan tolak', () => {
   const page = read('src/app/wallet/topup/page.tsx');
   assert.match(page, /Top Up Saldo Otomatis/);
-  assert.match(page, /Instan via Midtrans/);
+  assert.match(page, /Instan, saldo masuk otomatis/);
   assert.match(page, /Top Up Manual/);
-  assert.match(page, /Konfirmasi admin 1x24 jam/);
-  assert.match(page, /Riwayat Top Up/);
+  assert.match(page, /Dicek admin, maksimal 1x24 jam/);
+  assert.match(page, /Pilih cara Top Up/);
   assert.match(page, /<TopUpForm\/>/);
   assert.match(page, /<ManualTopupForm\/>/);
   // Form otomatis Midtrans tetap utuh.
@@ -239,6 +239,7 @@ test('v93 UI user: pilih Otomatis/Manual, bukti, pending, riwayat, alasan tolak'
   assert.match(manual, /qris_image_url/);
   assert.match(manual, /accept="image\/jpeg,image\/png,image\/webp"/);
   assert.match(manual, /Pratinjau bukti transfer/);
+  assert.doesNotMatch(manual, /channel pembayaran/);
   assert.match(manual, /URL\.createObjectURL/);
   assert.match(manual, /Kirim Konfirmasi Top Up/);
   assert.match(manual, /Menunggu konfirmasi admin \(maksimal 1x24 jam\)/);

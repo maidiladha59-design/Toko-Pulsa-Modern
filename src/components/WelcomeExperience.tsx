@@ -28,7 +28,7 @@ const FEATURES = [
   {
     icon: "💰",
     title: "Saldo Real-time",
-    desc: "Top up saldo kapan saja dan pantau mutasi wallet-mu secara langsung.",
+    desc: "Top up saldo kapan saja dan pantau mutasi saldo Anda secara langsung.",
     tint: "bg-violet-400/15 text-violet-300",
   },
 ] as const;
@@ -124,7 +124,7 @@ export default function WelcomeExperience() {
           </div>
           <div>
             <p className="text-sm font-black uppercase tracking-[.3em] text-gold-400">AIDIL STORE</p>
-            <p className="mt-1 text-xs text-slate-400">Menyiapkan pengalaman belanjamu...</p>
+            <p className="mt-1 text-xs text-slate-400">Menyiapkan pengalaman belanja Anda...</p>
           </div>
           <div className="h-1.5 w-56 overflow-hidden rounded-full bg-white/10">
             <div
@@ -147,7 +147,7 @@ export default function WelcomeExperience() {
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-slate-300">
             Marketplace digital dengan pembayaran QRIS otomatis, status transaksi real-time,
-            dan saldo wallet yang bisa kamu pantau kapan saja.
+            dan saldo wallet yang bisa Anda pantau kapan saja.
           </p>
 
           <div className="mt-6 grid grid-cols-2 gap-3">

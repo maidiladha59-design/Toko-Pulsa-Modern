@@ -34,7 +34,7 @@ export default function MaintenancePage() {
           <p className="mx-auto mt-4 max-w-md text-sm leading-7 text-white/65">{message}</p>
           <div className="mt-7 rounded-2xl border border-gold-400/20 bg-black/30 p-4 text-left text-sm text-white/75">
             <p className="font-bold text-gold-400">Apa yang perlu dilakukan?</p>
-            <p className="mt-2 leading-6">Silakan tunggu beberapa saat, kemudian tekan tombol Coba Lagi. Jika pemeliharaan selesai, kamu akan otomatis dapat menggunakan layanan kembali.</p>
+            <p className="mt-2 leading-6">Silakan tunggu beberapa saat, kemudian tekan tombol Coba Lagi. Jika pemeliharaan selesai, Anda akan otomatis dapat menggunakan layanan kembali.</p>
           </div>
           <div className="mt-7 flex justify-center">
             <button onClick={() => window.location.reload()} className="rounded-xl bg-gold-400 px-5 py-3 text-sm font-black text-black hover:bg-gold-300">↻ Coba Lagi</button>

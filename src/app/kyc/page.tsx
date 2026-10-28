@@ -5,6 +5,7 @@ import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import { isImageTooBlurry } from "@/lib/blur-check";
+import { statusLabel } from "@/lib/labels";
 
 type Status = "PENDING" | "KTP_SUBMITTED" | "SUBMITTED" | "VERIFIED" | "REJECTED";
 type Stage = "ktp" | "selfie";
@@ -292,12 +293,12 @@ export default function KYC() {
         <Image src="/aidil-logo.png" width={56} height={56} className="h-14 w-14 rounded-2xl object-cover" alt="AIDIL STORE" />
         <div>
           <p className="section-kicker">Verifikasi Akun</p>
-          <h1 className="mt-1 text-2xl font-black">KYC — KTP dan Verifikasi Wajah</h1>
+          <h1 className="mt-1 text-2xl font-black">Verifikasi KTP &amp; Wajah</h1>
         </div>
       </div>
 
       <p className="mt-3 text-sm leading-6 text-slate-500">
-        Status: <b className="text-slate-800">{status}</b>. Data digunakan hanya untuk proses verifikasi akun.
+        Status verifikasi: <b className="text-slate-800">{statusLabel(status)}</b>. Data ini hanya dipakai untuk memverifikasi akun Anda.
       </p>
 
       {!locked && <StepDots stage={stage} />}
@@ -311,12 +312,12 @@ export default function KYC() {
 
       {status === "SUBMITTED" && (
         <div className="mt-4 rounded-2xl border border-gold-200 bg-gold-50 p-4 text-sm text-zinc-950">
-          <b>Sedang diperiksa.</b><br />Admin akan memeriksa KTP dan foto wajah yang sudah kamu kirim.
+          <b>Sedang diperiksa.</b><br />Admin akan memeriksa KTP dan foto wajah yang sudah Anda kirim.
         </div>
       )}
       {status === "VERIFIED" && (
         <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
-          <b>Verifikasi berhasil.</b><br />Akun kamu sudah terverifikasi.
+          <b>Verifikasi berhasil.</b><br />Akun Anda sudah terverifikasi.
         </div>
       )}
       {status === "REJECTED" && (
@@ -325,7 +326,7 @@ export default function KYC() {
           <br />
           <span className="text-xs">
             {rejectedStage === "KTP" && "Yang ditolak: foto KTP. Silakan ulangi Tahap 1 (foto KTP), lalu lanjut ke Tahap 2 seperti biasa."}
-            {rejectedStage === "SELFIE" && "Yang ditolak: verifikasi wajah. KTP kamu sudah oke, cukup ulangi Tahap 2 (foto wajah) saja."}
+            {rejectedStage === "SELFIE" && "Yang ditolak: verifikasi wajah. KTP Anda sudah oke, cukup ulangi Tahap 2 (foto wajah) saja."}
             {!rejectedStage && "Silakan ajukan ulang mulai dari Tahap 1."}
           </span>
         </div>

@@ -17,7 +17,7 @@ export type CommunityChatMember = {
 export const COMMUNITY_CHAT_ERRORS: Record<string, string> = {
   UNAUTHENTICATED: "Sesi login tidak valid. Silakan login ulang.",
   USER_ID_MISMATCH: "Sesi login tidak valid. Silakan login ulang.",
-  ACCOUNT_BLOCKED: "Akun kamu sedang diblokir sehingga tidak bisa mengirim pesan.",
+  ACCOUNT_BLOCKED: "Akun Anda sedang diblokir sehingga tidak bisa mengirim pesan.",
   INVALID_MESSAGE: "Pesan tidak boleh kosong.",
   MESSAGE_TOO_LONG: "Pesan maksimal 1000 karakter.",
   CHAT_RATE_LIMIT: "Tunggu sebentar sebelum kirim pesan lagi.",
@@ -42,8 +42,8 @@ function rawCode(message: string) {
 export function mutedChatMessage(reason?: string | null) {
   const clean = String(reason || "").trim();
   return clean
-    ? `Kamu dibisukan dari ruang diskusi. Alasan: ${clean}`
-    : "Kamu dibisukan dari ruang diskusi. Alasan: tidak disebutkan admin.";
+    ? `Anda dibisukan dari ruang diskusi. Alasan: ${clean}`
+    : "Anda dibisukan dari ruang diskusi. Alasan: tidak disebutkan admin.";
 }
 
 export function chatErrorMessage(message: string) {

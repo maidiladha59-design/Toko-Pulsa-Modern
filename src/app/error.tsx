@@ -16,8 +16,7 @@ export default function Error({
 
   return (
     <div className="mx-auto max-w-lg animate-page-in rounded-3xl border bg-white p-8 text-center shadow-sm">
-      <p className="text-xs font-black uppercase tracking-widest text-gold-600">AIDIL STORE</p>
-      <h1 className="mt-2 text-xl font-black">Halaman ini mengalami kendala</h1>
+      <h1 className="text-xl font-black">Halaman ini mengalami kendala</h1>
       <p className="mt-2 text-sm text-slate-500">
         Laporan error sudah terkirim otomatis ke tim teknis. Silakan coba lagi.
       </p>

@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { loadActiveAvatars, type AvatarRow } from "@/lib/avatar";
@@ -48,6 +49,21 @@ export default function AvatarPicker({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
+  // Halaman di bawah sheet tidak boleh ikut bergulir saat pemilih terbuka.
+  useEffect(() => {
+    if (!open) return;
+    const body = document.body;
+    const previousOverflow = body.style.overflow;
+    const previousPaddingRight = body.style.paddingRight;
+    const scrollbar = window.innerWidth - document.documentElement.clientWidth;
+    body.style.overflow = "hidden";
+    if (scrollbar > 0) body.style.paddingRight = `${scrollbar}px`;
+    return () => {
+      body.style.overflow = previousOverflow;
+      body.style.paddingRight = previousPaddingRight;
+    };
+  }, [open]);
+
   const save = useCallback(async () => {
     if (!changed || saving) return;
     setSaving(true);
@@ -73,26 +89,30 @@ export default function AvatarPicker({
   }, [changed, saving, selected, onSaved, onClose, toast]);
 
   const heading = "Pilih Foto Profil";
-  if (!open) return null;
+  if (!open || typeof document === "undefined") return null;
 
-  return (
-    <div
-      className="fixed inset-0 z-[210] flex items-end justify-center bg-black/60 backdrop-blur-sm sm:items-center"
-      role="dialog"
-      aria-modal="true"
-      aria-label={heading}
-      tabIndex={-1}
-      ref={dialogRef}
-      onClick={(event) => { if (event.target === event.currentTarget) onClose(); }}
-    >
-      <div className="w-full max-w-md rounded-t-3xl border border-app-border bg-app-surface p-5 pb-[calc(20px+env(safe-area-inset-bottom))] shadow-2xl sm:rounded-3xl sm:p-6">
+  // Portal ke document.body: container halaman memakai .animate-page-in yang
+  // menahan transform, sehingga position:fixed di dalam hero menjadi relatif
+  // terhadap konten (sheet terselip di bawah halaman, overlay tak menutup
+  // header dan bottom nav).
+  return createPortal(
+    <>
+      <div className="fixed inset-0 z-[1000] h-[100dvh] w-screen bg-black/60 backdrop-blur-sm" onClick={onClose} />
+      <div
+        ref={dialogRef}
+        role="dialog"
+        aria-modal="true"
+        aria-label={heading}
+        tabIndex={-1}
+        className="fixed inset-x-0 bottom-0 z-[1001] max-h-[85dvh] w-full overflow-y-auto rounded-t-[20px] border-t border-app-border bg-app-surface p-5 pb-[calc(16px+env(safe-area-inset-bottom))] shadow-[0_-18px_45px_rgba(0,0,0,.45)] outline-none"
+      >
         <div className="flex items-start justify-between gap-3">
           <h2 className="min-w-0 break-words text-base font-black text-app-text">{heading}</h2>
           <button onClick={onClose} aria-label="Tutup" className="shrink-0 rounded-lg px-2 py-1 text-lg leading-none text-app-muted transition hover:bg-app-inset hover:text-app-text">✕</button>
         </div>
 
         {loading ? (
-          <div className="mt-4 grid grid-cols-3 gap-3">
+          <div className="mt-4 grid grid-cols-3 gap-3 p-1.5">
             {Array.from({ length: 6 }).map((_, i) => <Skeleton key={i} className="aspect-square rounded-full" />)}
           </div>
         ) : items.length === 0 ? (
@@ -101,7 +121,7 @@ export default function AvatarPicker({
             <p className="mt-1 text-xs leading-5 text-app-muted">Admin dapat menambahkannya lewat Panel Admin ▸ Foto Profil.</p>
           </div>
         ) : (
-          <div className="mt-4 grid max-h-[52vh] grid-cols-3 gap-3 overflow-y-auto">
+          <div className="mt-4 grid grid-cols-3 gap-3 p-1.5">
             {items.map((a) => {
               const active = a.id === selected;
               return (
@@ -111,7 +131,7 @@ export default function AvatarPicker({
                   onClick={() => setSelected(a.id)}
                   aria-pressed={active}
                   className={`relative aspect-square overflow-hidden rounded-full transition ${
-                    active ? "ring-4 ring-gold-400 ring-offset-2 ring-offset-app-surface" : "ring-1 ring-app-border hover:ring-gold-400/50"
+                    active ? "ring-4 ring-gold-400 ring-offset-0" : "ring-1 ring-app-border hover:ring-gold-400/50"
                   }`}
                 >
                   <Image src={a.image_url} alt={a.label || "Avatar"} width={140} height={140} className="h-full w-full object-cover" />
@@ -131,6 +151,7 @@ export default function AvatarPicker({
           <Button onClick={save} disabled={!changed} loading={saving} className="flex-1 py-3">Simpan</Button>
         </div>
       </div>
-    </div>
+    </>,
+    document.body
   );
 }

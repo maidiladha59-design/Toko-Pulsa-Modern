@@ -30,23 +30,8 @@ export function statusTone(status: string | null | undefined): BadgeTone {
   return "gold";
 }
 
-// Label status bahasa Indonesia, pengganti STATUS_LABEL di StatusBadge lama.
-const STATUS_LABEL: Record<string, string> = {
-  PENDING: "Menunggu pembayaran",
-  VERIFYING: "Sedang diproses",
-  APPROVED: "Berhasil",
-  COMPLETED: "Selesai",
-  PROCESSING: "Sedang diproses",
-  REJECTED: "Ditolak",
-  FAILED: "Gagal",
-  EXPIRED: "Kedaluwarsa",
-  CANCELLED: "Dibatalkan",
-  REFUNDED: "Dana dikembalikan",
-};
-
-export function statusLabel(status: string | null | undefined): string {
-  return STATUS_LABEL[String(status || "").toUpperCase()] || String(status || "-");
-}
+// Label status bahasa Indonesia diambil dari satu sumber: src/lib/labels.ts.
+export { statusLabel } from "@/lib/labels";
 
 export default function Badge({
   tone = "neutral",

@@ -113,12 +113,12 @@ function LoginForm() {
 
             <h1 className="mt-3 text-4xl font-black leading-tight">
               Login dan lanjutkan
-              <span className="text-gold-200"> perjalananmu.</span>
+              <span className="text-gold-200"> perjalanan Anda.</span>
             </h1>
 
             <p className="mt-5 max-w-sm text-sm leading-6 text-zinc-300">
               Masuk ke akun AIDIL STORE untuk mengakses pesanan,
-              produk digital, saldo, dan berbagai fitur akunmu.
+              produk digital, saldo, dan berbagai fitur akun Anda.
             </p>
           </div>
 
@@ -142,7 +142,7 @@ function LoginForm() {
                   2
                 </span>
                 <p className="text-xs leading-5 text-zinc-300">
-                  Masukkan password akunmu dengan benar.
+                  Masukkan password akun Anda dengan benar.
                 </p>
               </div>
 
@@ -151,7 +151,7 @@ function LoginForm() {
                   3
                 </span>
                 <p className="text-xs leading-5 text-zinc-300">
-                  Klik Login dan kamu akan diarahkan ke akunmu.
+                  Klik Login dan Anda akan diarahkan ke akun Anda.
                 </p>
               </div>
             </div>
@@ -185,7 +185,7 @@ function LoginForm() {
           </p>
 
           <h2 className="mt-2 text-2xl font-black text-white">
-            Masuk ke akunmu
+            Masuk ke akun Anda
           </h2>
 
           <p className="mt-1 text-sm text-white/50">
@@ -240,15 +240,31 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 placeholder="Masukkan password"
-                className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 pr-20 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20"
+                className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 pr-14 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20"
               />
 
+              {/* Ikon mata, bukan teks "Lihat"/"Sembunyi" — label terbaca oleh screen reader. */}
               <button
                 type="button"
                 onClick={() => setShowPassword((v) => !v)}
-                className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs font-bold text-white/50 transition hover:bg-white/10 hover:text-gold-300"
+                aria-label={showPassword ? "Sembunyikan password" : "Lihat password"}
+                aria-pressed={showPassword}
+                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-white/60 transition hover:bg-white/10 hover:text-gold-300"
               >
-                {showPassword ? "Sembunyi" : "Lihat"}
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
+                  {showPassword ? (
+                    <>
+                      <path d="M3 3l18 18" strokeLinecap="round" />
+                      <path d="M10.6 6.2A9.9 9.9 0 0 1 12 6c5 0 9 4.5 9 6 0 .7-.6 1.9-1.7 3.1M6.4 8.1C4.1 9.7 3 11.4 3 12c0 1.5 4 6 9 6 1.6 0 3-.4 4.2-1" strokeLinecap="round" strokeLinejoin="round" />
+                      <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" />
+                    </>
+                  ) : (
+                    <>
+                      <path d="M3 12c0-1.5 4-6 9-6s9 4.5 9 6-4 6-9 6-9-4.5-9-6Z" strokeLinejoin="round" />
+                      <circle cx="12" cy="12" r="2.6" />
+                    </>
+                  )}
+                </svg>
               </button>
             </span>
           </label>
@@ -264,7 +280,7 @@ function LoginForm() {
             loading={loading}
             className="w-full"
           >
-            Login ke AIDIL STORE
+            LOGIN
           </Button>
         </form>
 
@@ -287,7 +303,7 @@ function LoginForm() {
         </div>
 
         <p className="mt-5 text-center text-xs text-white/40">
-          Dengan login, kamu dapat mengakses fitur akun dan
+          Dengan login, Anda dapat mengakses fitur akun dan
           layanan AIDIL STORE.
         </p>
 

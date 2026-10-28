@@ -28,7 +28,7 @@ export default function Settings(){
   return <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] space-y-5 animate-page-in lg:max-w-2xl"><div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">Pengaturan</p><h1 className="text-2xl font-black text-app-text sm:text-3xl">Pengaturan Akun</h1></div>
     <Card>
       <h2 className="text-base font-black text-app-text">Tampilan</h2>
-      <p className="mt-1 text-xs text-app-subtle">Pilih tema aplikasi. Saat kamu masuk, pilihan ini tersimpan di akun dan terbawa ke perangkat lain.</p>
+      <p className="mt-1 text-xs text-app-subtle">Pilih tema aplikasi. Saat Anda masuk, pilihan ini tersimpan di akun dan terbawa ke perangkat lain.</p>
       <div className="mt-3"><ThemeToggle variant="block"/></div>
     </Card>
     <Card><h2 className="text-base font-black text-app-text">PIN Transaksi</h2><p className="mt-1 text-xs text-app-subtle">PIN 6 digit digunakan saat pembayaran menggunakan saldo. PIN tidak disimpan sebagai teks biasa.</p>{pinSet&&<Input inputMode="numeric" maxLength={6} value={currentPin} onChange={e=>setCurrentPin(e.target.value.replace(/\D/g,''))} placeholder="PIN lama" className="mt-3 bg-app-inset"/>}<Input inputMode="numeric" maxLength={6} value={pin} onChange={e=>setPin(e.target.value.replace(/\D/g,''))} placeholder={pinSet?'PIN baru':'Buat PIN 6 digit'} className="mt-3 bg-app-inset"/><Button disabled={pinBusy} onClick={savePin} className="mt-3 px-4 py-3">{pinBusy?'Menyimpan...':pinSet?'Ubah PIN':'Buat PIN'}</Button></Card>
@@ -36,7 +36,7 @@ export default function Settings(){
     <Card><h2 className="text-base font-black text-app-text">Keamanan & Pemberitahuan</h2><label className="mt-3 block text-sm text-app-muted"><input type="checkbox" className="accent-gold-400" checked={d.login_otp_email} onChange={e=>setD({...d,login_otp_email:e.target.checked})}/> Kirim OTP login melalui Email</label><label className="mt-3 block text-sm text-app-muted"><input type="checkbox" className="accent-gold-400" checked={d.email_notifications} onChange={e=>setD({...d,email_notifications:e.target.checked})}/> Pemberitahuan masuk melalui Email</label></Card>
     <Card>
       <h2 className="text-base font-black text-app-text">Notifikasi</h2>
-      <p className="mt-1 text-xs text-app-subtle">Atur notifikasi push di perangkat ini, dan pilih jenis notifikasi apa saja yang mau kamu terima (berlaku untuk notifikasi dalam-app maupun push).</p>
+      <p className="mt-1 text-xs text-app-subtle">Atur notifikasi push di perangkat ini, dan pilih jenis notifikasi apa saja yang mau Anda terima (berlaku untuk notifikasi dalam-app maupun push).</p>
       <div className="mt-3"><PushNotificationRegistrar /></div>
       <div className="mt-3 space-y-3">
         {NOTIF_CATEGORIES.map(c=>(

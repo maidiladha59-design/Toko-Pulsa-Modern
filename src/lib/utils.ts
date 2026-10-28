@@ -1,9 +1,10 @@
+// Spasi tipis anti-pisah (U+00A0) supaya "Rp 1.950" tidak pernah melipat
+// jadi dua baris di kolom sempit.
 export function formatRupiah(amount: number): string {
-  return new Intl.NumberFormat("id-ID", {
-    style: "currency",
-    currency: "IDR",
-    minimumFractionDigits: 0,
-  }).format(amount);
+  const value = Number.isFinite(amount) ? amount : 0;
+  const sign = value < 0 ? "-" : "";
+  const digits = new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(Math.abs(value));
+  return `${sign}Rp\u00A0${digits}`;
 }
 
 // Saldo ringkas untuk tabel/kartu: angka besar tidak boleh melebarkan layout.
@@ -17,16 +18,37 @@ export function formatBalanceCompact(amount: number): string {
   const full = (n: number) =>
     new Intl.NumberFormat("id-ID", { maximumFractionDigits: 0 }).format(n);
 
-  if (abs < 1_000_000) return `${sign}Rp${full(abs)}`;
-  if (abs < 1_000_000_000) return `${sign}Rp${short(abs / 1_000_000)} Jt`;
-  if (abs < 1_000_000_000_000) return `${sign}Rp${short(abs / 1_000_000_000)} M`;
-  return `${sign}Rp${short(abs / 1_000_000_000_000)} T`;
+  if (abs < 1_000_000) return `${sign}Rp\u00A0${full(abs)}`;
+  if (abs < 1_000_000_000) return `${sign}Rp\u00A0${short(abs / 1_000_000)} Jt`;
+  if (abs < 1_000_000_000_000) return `${sign}Rp\u00A0${short(abs / 1_000_000_000)} M`;
+  return `${sign}Rp\u00A0${short(abs / 1_000_000_000_000)} T`;
 }
 
-export function formatDate(dateStr: string): string {
+export function formatDate(dateStr: string | number | Date): string {
   return new Intl.DateTimeFormat("id-ID", {
     dateStyle: "medium",
     timeStyle: "short",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(dateStr));
+}
+
+// Tanggal saja: "23 Okt 2026". Pakai ini, jangan toLocaleDateString mentah.
+export function formatDateOnly(dateStr: string | Date): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+    timeZone: "Asia/Jakarta",
+  }).format(new Date(dateStr));
+}
+
+// Waktu saja: "15.30".
+export function formatTimeOnly(dateStr: string | Date): string {
+  return new Intl.DateTimeFormat("id-ID", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Jakarta",
   }).format(new Date(dateStr));
 }
 
@@ -56,11 +78,11 @@ export function humanizeError(rawMessage: string | undefined | null): string {
   // ID Order di tiket bantuan: map kode RPC create_support_ticket dan sisa
   // error tipe uuid mentah Postgres (22P02) agar tidak pernah tampil ke user.
   if (msg.includes("order_not_found_or_forbidden"))
-    return "ID Order tidak ditemukan di akunmu.";
+    return "ID Order tidak ditemukan di akun Anda.";
   if (msg.includes("invalid_order_id") || msg.includes("invalid input syntax for type uuid"))
     return "Format ID Order tidak valid. ID Order bisa dilihat di halaman Pesanan Saya.";
   if (msg.includes("order_required"))
-    return "ID Order wajib diisi. Kamu bisa menyalin ID Order dari halaman Pesanan Saya.";
+    return "ID Order wajib diisi. Anda bisa menyalin ID Order dari halaman Pesanan Saya.";
 
   if (msg.includes("row-level security") || msg.includes("permission denied"))
     return "Anda tidak memiliki akses untuk melakukan ini.";

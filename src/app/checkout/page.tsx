@@ -219,7 +219,7 @@ function CheckoutForm() {
       <div className="mb-5 flex items-start gap-3">
         <button type="button" onClick={() => router.back()} aria-label="Kembali" className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-surface text-lg text-app-text transition hover:border-gold-400/50 hover:text-app-kicker">←</button>
         <Image src="/aidil-logo.png" alt="Aidil Store" width={44} height={44} className="h-11 w-11 rounded-2xl object-cover" />
-        <div className="min-w-0"><p className="text-xs font-black uppercase tracking-widest text-app-kicker">AIDIL STORE</p><h1 className="text-xl font-black text-app-text sm:text-2xl">Checkout Aman & Otomatis</h1><p className="text-sm text-app-muted">Bayar tanpa approve manual, lalu akses produk digital dari pesanan.</p></div>
+        <div className="min-w-0"><h1 className="text-xl font-black text-app-text sm:text-2xl">Pembayaran</h1><p className="text-sm text-app-muted">Bayar tanpa approve manual, lalu akses produk digital dari pesanan.</p></div>
       </div>
 
       <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">

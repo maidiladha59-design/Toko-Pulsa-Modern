@@ -10,6 +10,7 @@ import GatewayPayment from "@/components/GatewayPayment";
 import PPOBReceiptButton from "@/components/PPOBReceiptButton";
 import PPOBStatusPoller from "@/components/PPOBStatusPoller";
 import { renderQrImage } from "@/lib/qr-image";
+import { paymentMethodLabel, statusLabel, GENERIC_ERRORS } from "@/lib/labels";
 
 const ORDER_MESSAGE: Record<string, string> = {
   PENDING: "Pesanan Anda sedang menunggu pembayaran.",
@@ -81,7 +82,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
       <div className="mx-auto w-full max-w-[480px] animate-page-in lg:max-w-4xl">
         <div className="mb-5 flex items-center gap-3">
           <Image src="/aidil-logo.png" alt="Logo AIDIL STORE" width={48} height={48} className="h-12 w-12 rounded-2xl object-cover shadow-lg" />
-          <div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">AIDIL STORE</p><h1 className="text-2xl font-black text-app-text">Pesanan {order.order_number}</h1><p className="text-sm text-app-muted">{formatDate(order.created_at)}</p></div>
+          <div><h1 className="text-2xl font-black text-app-text">Pesanan {order.order_number}</h1><p className="text-sm text-app-muted">{formatDate(order.created_at)}</p></div>
         </div>
 
         <div className="grid gap-5 lg:grid-cols-[1fr_330px]">
@@ -133,12 +134,12 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                         <div className="flex items-center justify-between gap-3"><p className="font-black text-app-text">⚡ Rincian Transaksi</p></div>
                         <div className="mt-3 space-y-1.5 text-sm">
                           <div className="flex justify-between gap-3"><span className="text-app-muted">Nomor Pelanggan</span><b className="text-app-text">{target?.customer_no || tx?.customer_no || "-"}</b></div>
-                          <div className="flex justify-between gap-3"><span className="text-app-muted">Status</span><b className="text-app-text">{tx?.status}</b></div>
+                          <div className="flex justify-between gap-3"><span className="text-app-muted">Status</span><b className="text-app-text">{statusLabel(tx?.status)}</b></div>
                           <div className="flex justify-between gap-3"><span className="text-app-muted">Harga Jual</span><b className="tabular-nums text-app-text">{formatRupiah(hargaJual)}</b></div>
 
                         </div>
                         {tx?.serial_number && <div className="mt-3 rounded-xl bg-app-inset p-3"><p className="text-xs font-black uppercase tracking-widest text-app-subtle">SN/Ref</p><p className="mt-1 break-all font-black text-app-kicker">{tx.serial_number}</p></div>}
-                        {tx?.provider_message && tx.status !== "SUCCESS" && <p className="mt-2 text-xs text-app-muted">{tx.provider_message}</p>}
+                        {tx?.provider_message && tx.status !== "SUCCESS" && <p className="mt-2 text-xs text-app-muted">{GENERIC_ERRORS.serviceDown}</p>}
                       </div>
                     );
                   })()}
@@ -161,7 +162,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
             <div className="mt-4 space-y-3 text-sm">
               <div className="flex justify-between gap-3"><span className="text-app-subtle">Tanggal</span><b className="text-app-text">{formatDate(order.created_at)}</b></div>
               <div className="flex justify-between gap-3"><span className="shrink-0 text-app-subtle">ID Pesanan</span><b className="break-all text-right text-app-text">{order.order_number}</b></div>
-              <div className="flex justify-between gap-3"><span className="text-app-subtle">Metode</span><b className="text-right text-app-text">{order.payment_method === "BANK_VA" ? (bankNames[order.gateway_method || ""] || "Virtual Account") : order.payment_method === "QRIS" ? "QRIS" : order.payment_method || "Wallet"}</b></div>
+              <div className="flex justify-between gap-3"><span className="text-app-subtle">Metode</span><b className="text-right text-app-text">{order.payment_method === "BANK_VA" ? (bankNames[order.gateway_method || ""] || "Virtual Account") : paymentMethodLabel(order.payment_method)}</b></div>
               <div className="flex justify-between"><span className="text-app-subtle">Status</span><StatusBadge status={order.status} /></div>
               <div className="flex justify-between border-t border-app-border pt-4"><span className="text-app-subtle">Subtotal produk</span><b className="tabular-nums text-app-text">{formatRupiah(order.total_amount)}</b></div>
               <div className="flex justify-between text-lg"><span className="font-black text-app-text">Total dibayar</span><b className="tabular-nums text-app-kicker">{formatRupiah(order.gateway_total_payment || order.total_amount)}</b></div>

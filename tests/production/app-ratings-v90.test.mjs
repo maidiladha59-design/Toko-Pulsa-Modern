@@ -112,12 +112,12 @@ test('v90 API rating: session RPC, pesan ramah, schema-missing aman', () => {
   assert.match(messages, /RATING_ALREADY_SUBMITTED/);
   assert.match(messages, /RATING_NOT_ELIGIBLE/);
   assert.match(messages, /PGRST202/);
-  assert.match(messages, /Kamu sudah pernah mengirim rating/);
+  assert.match(messages, /Anda sudah pernah mengirim rating/);
 });
 
 test('v90 modal muncul hanya di beranda/dashboard, 5 bintang + dismiss', () => {
   const modal = read('src/components/RatingPrompt.tsx');
-  assert.match(modal, /Gimana pengalaman kamu pakai AIDIL STORE\?/);
+  assert.match(modal, /Bagaimana pengalaman Anda memakai AIDIL STORE\?/);
   assert.match(modal, /MAX_COMMENT = 1000/);
   assert.match(modal, /role="radiogroup"/);
   assert.match(modal, /\[1, 2, 3, 4, 5\]\.map/);

@@ -106,7 +106,7 @@ export default async function BlockedAccountPage({
         <div className="mt-5 rounded-2xl border border-app-border bg-app-inset p-4">
           <p className="text-sm font-black text-app-text">Butuh bantuan?</p>
           <p className="mt-1 text-xs leading-5 text-app-muted">
-            Jika kamu merasa blokir ini keliru atau ingin mengajukan peninjauan, hubungi CS AIDIL
+            Jika Anda merasa blokir ini keliru atau ingin mengajukan peninjauan, hubungi CS AIDIL
             STORE:
           </p>
           <div className="mt-3 space-y-1.5 text-sm font-bold">

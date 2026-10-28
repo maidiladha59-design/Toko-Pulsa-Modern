@@ -1,6 +1,8 @@
 // Utilitas struk: teks untuk dibagikan + cetak thermal 58mm via Bluetooth (ESC/POS).
 // Catatan: memakai Web Bluetooth (BLE). Jalan di Chrome Android / Chrome & Edge desktop lewat HTTPS.
 
+import { statusLabel } from "@/lib/labels";
+
 export type ReceiptRow = { label: string; value: string };
 export type ReceiptData = {
   title: string;
@@ -138,14 +140,9 @@ export async function printReceiptBluetooth(receipt: ReceiptData): Promise<strin
   }
 }
 
-const RECEIPT_STATUS: Record<string, string> = {
-  SUCCESS: "Berhasil", COMPLETED: "Berhasil", PROCESSING: "Sedang diproses", WAITING: "Sedang diproses",
-  PENDING: "Menunggu pembayaran", FAILED: "Gagal", REFUNDED: "Dana dikembalikan", CANCELLED: "Dibatalkan",
-};
-
-/** Label status yang ramah untuk pelanggan. */
+/** Label status yang ramah untuk pelanggan (sumber: src/lib/labels.ts). */
 export function receiptStatusLabel(status: string | null | undefined): string {
-  return RECEIPT_STATUS[String(status || "").toUpperCase()] || String(status || "-");
+  return statusLabel(status, "Diproses");
 }
 
 /** Tanggal ala struk: 21/09/2026 20:48:53 (WIB). */

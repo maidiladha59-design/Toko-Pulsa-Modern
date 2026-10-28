@@ -15,7 +15,7 @@ import {
 } from "@/lib/password-reset";
 
 const SENT_MESSAGE =
-  "Kode verifikasi 6 digit sudah dikirim ke email kamu, masukkan kode di bawah ini.";
+  "Kode verifikasi 6 digit sudah dikirim ke email Anda, masukkan kode di bawah ini.";
 
 export default function LupaPasswordForm() {
   const supabase = createClient();
@@ -76,7 +76,7 @@ export default function LupaPasswordForm() {
           </p>
           <h1 className="mt-2 text-2xl font-black">Lupa password?</h1>
           <p className="mt-2 text-sm text-gold-100">
-            Masukkan email akunmu. Kami akan mengirim kode verifikasi 6 digit
+            Masukkan email akun Anda. Kami akan mengirim kode verifikasi 6 digit
             untuk membuat password baru.
           </p>
         </div>
@@ -91,7 +91,7 @@ export default function LupaPasswordForm() {
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
               placeholder="nama@email.com"
-              hint="Gunakan email yang kamu pakai untuk login."
+              hint="Gunakan email yang Anda pakai untuk login."
             />
 
             {error && (

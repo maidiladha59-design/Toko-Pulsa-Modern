@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { getBusinessIdentity } from "@/lib/business";
+import { formatDateOnly } from "@/lib/utils";
 import RatingBadge from "@/components/RatingBadge";
 
 const pseLabel: Record<string, string> = {
@@ -127,7 +128,7 @@ export default async function BusinessIdentityCard({ compact = false }: { compac
       </p>
       {biz.updatedAt ? (
         <p className="mt-2 text-[11px] text-app-subtle">
-          Diperbarui {new Date(biz.updatedAt).toLocaleDateString("id-ID", { day: "numeric", month: "long", year: "numeric" })}
+          Diperbarui {formatDateOnly(biz.updatedAt)}
         </p>
       ) : null}
       <div className="mt-5 border-t border-app-border pt-4">

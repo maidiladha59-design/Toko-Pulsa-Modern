@@ -104,7 +104,7 @@ export default function ResetPasswordForm() {
           </p>
           <h1 className="mt-2 text-2xl font-black">Buat password baru</h1>
           <p className="mt-2 text-sm text-gold-100">
-            Gunakan password yang mudah kamu ingat dan tidak dibagikan kepada
+            Gunakan password yang mudah Anda ingat dan tidak dibagikan kepada
             orang lain.
           </p>
         </div>

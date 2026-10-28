@@ -67,7 +67,7 @@ test('v94 RPC post: auth, cek blokir, cek bisu + alasan, trim/length, rate limit
   assert.match(sql, /perform public\.assert_account_active\(p_user_id\)/);
   assert.match(sql, /from public\.chat_user_status\s+where user_id = p_user_id/);
   assert.match(sql, /if found and v_status\.is_muted then\s+raise exception 'chat_muted:%'/);
-  assert.match(sql, /coalesce\(nullif\(btrim\(v_status\.muted_reason\), ''\), 'kamu dibisukan dari ruang diskusi\.'\)/);
+  assert.match(sql, /coalesce\(nullif\(btrim\(v_status\.muted_reason\), ''\), 'anda dibisukan dari ruang diskusi\.'\)/);
   assert.match(sql, /v_message := btrim\(coalesce\(p_message, ''\)\)/);
   assert.match(sql, /if v_message = '' then\s+raise exception 'invalid_message'/);
   assert.match(sql, /char_length\(v_message\) > 1000 then\s+raise exception 'message_too_long'/);
@@ -103,7 +103,7 @@ test('v94 RPC admin bisu: alasan wajib, upsert status, audit mute/unmute, notifi
   assert.match(sql, /on conflict \(user_id\) do update/);
   assert.match(sql, /case when p_muted then 'chat\.user_muted' else 'chat\.user_unmuted' end/);
   assert.match(sql, /insert into public\.notifications/);
-  assert.match(sql, /'kamu dibisukan dari ruang diskusi'/);
+  assert.match(sql, /'anda dibisukan dari ruang diskusi'/);
   assert.match(sql, /'bisuan ruang diskusi dibuka'/);
   assert.match(sql, /alasan: ' \|\| v_reason/);
   assert.match(sql, /grant execute on function public\.admin_set_chat_mute\(uuid, uuid, boolean, text\) to authenticated, service_role/);
@@ -165,7 +165,7 @@ test('v94 UI user /diskusi: realtime INSERT/UPDATE, broadcast hapus, auto-scroll
   assert.match(ui, /community_chat_display_names/);
 
   const lib = read('src/lib/community-chat.ts');
-  assert.match(lib, /Kamu dibisukan dari ruang diskusi\. Alasan:/);
+  assert.match(lib, /Anda dibisukan dari ruang diskusi\. Alasan:/);
   assert.match(lib, /CHAT_RATE_LIMIT: "Tunggu sebentar sebelum kirim pesan lagi\."/);
   assert.match(lib, /CHAT_MUTED/);
   assert.match(lib, /COMMUNITY_CHAT_MAX_LENGTH = 1000/);

@@ -43,12 +43,12 @@ test('v79: form bantuan memvalidasi ID Order sebelum memanggil RPC', () => {
   assert.match(s, /ID Order <span className="text-gold-400">\*<\/span>/);
   assert.doesNotMatch(s, /ID Order \(opsional\)/);
   // Validasi kosong
-  assert.match(s, /ID Order wajib diisi\. Kamu bisa menyalin ID Order dari halaman Pesanan Saya\./);
+  assert.match(s, /ID Order wajib diisi\. Anda bisa menyalin ID Order dari halaman Pesanan Saya\./);
   // Validasi format UUID + kepemilikan sebelum kirim
   assert.match(s, /\^\[0-9a-f\]\{8\}-\[0-9a-f\]\{4\}-\[0-9a-f\]\{4\}-\[0-9a-f\]\{4\}-\[0-9a-f\]\{12\}\$/);
   assert.match(s, /Format ID Order tidak valid\. ID Order bisa dilihat di halaman Pesanan Saya\./);
   assert.match(s, /from\("orders"\)\.select\("id"\)\.eq\("id",trimmedOrderId\)\.maybeSingle\(\)/);
-  assert.match(s, /ID Order tidak ditemukan di akunmu\./);
+  assert.match(s, /ID Order tidak ditemukan di akun Anda\./);
   // Jalur atomic tetap satu RPC, order id terkirim setelah lolos validasi
   assert.match(s, /supabase\.rpc\("create_support_ticket"/);
   assert.match(s, /p_order_id:trimmedOrderId/);

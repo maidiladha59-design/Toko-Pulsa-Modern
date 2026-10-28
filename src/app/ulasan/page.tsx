@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { getPublishedRatings, getRatingSummary } from "@/lib/ratings";
+import { formatDateOnly } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Ulasan Pelanggan — AIDIL STORE",
@@ -16,15 +17,14 @@ export default async function UlasanPage() {
   return (
     <div className="mx-auto max-w-3xl animate-page-in space-y-5">
       <section className="overflow-hidden rounded-3xl border border-app-border bg-gradient-to-br from-zinc-950 via-zinc-950 to-gold-700 p-6 text-white shadow-xl">
-        <p className="text-xs font-black uppercase tracking-[.2em] text-gold-300">AIDIL STORE</p>
-        <h1 className="mt-2 text-3xl font-black">Ulasan Pelanggan</h1>
+        <h1 className="text-3xl font-black">Ulasan Pelanggan</h1>
         <p className="mt-2 text-sm leading-6 text-white/70">
           Penilaian dari pengguna yang sudah menyelesaikan transaksi. Hanya ulasan yang disetujui
           admin yang ditampilkan.
         </p>
         <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
-          <p className="text-5xl font-black leading-none">
-            ⭐ {summary.average.toFixed(1)}
+          <p className="inline-flex text-5xl font-black leading-none whitespace-nowrap">
+            <span aria-hidden>⭐</span>&nbsp;{summary.average.toFixed(1)}
           </p>
           <p className="pb-1 text-sm font-bold text-white/70">
             dari {summary.totalCount} ulasan
@@ -56,11 +56,7 @@ export default async function UlasanPage() {
                 </p>
                 {review.createdAt ? (
                   <time className="text-xs text-app-subtle" dateTime={review.createdAt}>
-                    {new Date(review.createdAt).toLocaleDateString("id-ID", {
-                      day: "numeric",
-                      month: "long",
-                      year: "numeric",
-                    })}
+                    {formatDateOnly(review.createdAt)}
                   </time>
                 ) : null}
               </div>

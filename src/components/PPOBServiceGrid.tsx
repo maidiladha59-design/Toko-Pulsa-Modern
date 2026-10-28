@@ -146,8 +146,8 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
               )}
             </div>
             <div className="min-w-0">
-              <h3 className="truncate text-sm font-black text-app-text">{brand}</h3>
-              <p className="text-xs font-bold text-app-subtle">{items.length} produk tersedia</p>
+              <h3 className="line-clamp-2 break-words text-sm font-black leading-tight text-app-text">{brand}</h3>
+              <p className="text-xs font-bold text-app-subtle">{items.length} produk</p>
             </div>
           </div>
 

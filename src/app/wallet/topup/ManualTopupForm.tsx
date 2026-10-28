@@ -189,7 +189,7 @@ export default function ManualTopupForm() {
       return;
     }
     if (!selectedChannel) {
-      setFormError("Pilih channel pembayaran terlebih dahulu.");
+      setFormError("Pilih metode pembayaran terlebih dahulu.");
       return;
     }
     if (!Number.isInteger(amount) || amount <= 0) {
@@ -250,8 +250,10 @@ export default function ManualTopupForm() {
 
   if (loading) {
     return (
-      <div className="mx-auto w-full max-w-[480px] animate-pulse rounded-2xl border border-app-border bg-app-surface p-8 text-sm text-app-muted">
-        Memuat Top Up Manual...
+      <div className="mx-auto w-full max-w-[480px] animate-pulse space-y-3 pb-6" aria-busy="true">
+        <div className="h-20 rounded-3xl border border-app-border bg-app-surface" />
+        <div className="grid grid-cols-3 gap-2">{[0, 1, 2].map((i) => <div key={i} className="h-12 rounded-xl bg-app-inset" />)}</div>
+        <div className="h-28 rounded-3xl border border-app-border bg-app-surface" />
       </div>
     );
   }
@@ -268,11 +270,10 @@ export default function ManualTopupForm() {
     <div className="mx-auto w-full max-w-[480px] space-y-4">
       <div className="overflow-hidden rounded-3xl border border-app-border bg-app-surface">
         <div className="border-b border-app-border p-6">
-          <p className="text-xs font-black uppercase tracking-widest text-app-kicker">AIDIL STORE WALLET</p>
           <h1 className="text-2xl font-black text-app-text">Top Up Manual</h1>
           <p className="mt-2 text-sm leading-6 text-app-text/65">
-            Transfer ke rekening atau akun pembayaran di bawah, lalu unggah bukti transfer. Admin
-            memverifikasi maksimal 1x24 jam.
+            Bayar sesuai nomor tujuan di bawah, lalu unggah bukti transfer. Admin memverifikasi
+            maksimal 1x24 jam.
           </p>
         </div>
 
@@ -285,10 +286,10 @@ export default function ManualTopupForm() {
         ) : (
           <form onSubmit={submit}>
             <div className="p-5 sm:p-7">
-              <p className="font-black text-app-text">1. Pilih channel pembayaran</p>
+              <p className="font-black text-app-text">1. Pilih metode pembayaran</p>
               {channels.length === 0 ? (
                 <p className="mt-3 rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-muted">
-                  Belum ada channel pembayaran manual yang aktif. Silakan hubungi admin.
+                  Belum ada metode pembayaran manual yang aktif. Silakan hubungi admin.
                 </p>
               ) : (
                 <div className="mt-3 grid gap-2">

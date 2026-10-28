@@ -293,7 +293,7 @@ function RegisterForm() {
 
         <div className="mb-6">
           <p className="text-xs font-black uppercase tracking-[.18em] text-gold-400">AIDIL STORE</p>
-          <h1 className="mt-2 text-2xl font-black text-white sm:text-3xl">Buat akun baru ✨</h1>
+          <h1 className="mt-2 text-2xl font-black text-white sm:text-3xl">Buat akun baru</h1>
           <p className="mt-2 text-sm leading-6 text-white/50">
             Yuk buat akun AIDIL STORE dan mulai gunakan berbagai layanan digital dengan mudah.
           </p>
@@ -351,7 +351,7 @@ function RegisterForm() {
             <span className="text-sm font-bold text-white/80">Password</span>
             <span className="relative mt-2 block">
               <input type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="Minimal 6 karakter" className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 pr-20 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20" />
-              <button type="button" onClick={() => setShowPassword((v) => !v)} className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-2 py-1 text-xs font-bold text-white/50 transition hover:bg-white/10 hover:text-gold-300">{showPassword ? "Sembunyi" : "Lihat"}</button>
+              <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Sembunyikan password" : "Lihat password"} aria-pressed={showPassword} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-white/60 transition hover:bg-white/10 hover:text-gold-300"><svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>{showPassword ? <><path d="M3 3l18 18" strokeLinecap="round" /><path d="M10.6 6.2A9.9 9.9 0 0 1 12 6c5 0 9 4.5 9 6 0 .7-.6 1.9-1.7 3.1M6.4 8.1C4.1 9.7 3 11.4 3 12c0 1.5 4 6 9 6 1.6 0 3-.4 4.2-1" strokeLinecap="round" strokeLinejoin="round" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></> : <><path d="M3 12c0-1.5 4-6 9-6s9 4.5 9 6-4 6-9 6-9-4.5-9-6Z" strokeLinejoin="round" /><circle cx="12" cy="12" r="2.6" /></>}</svg></button>
             </span>
           </label>
 
@@ -390,13 +390,13 @@ function RegisterForm() {
 
           {error && <div className="animate-page-in rounded-xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-sm font-medium text-red-300">{error}</div>}
 
-          <Button type="submit" loading={loading} disabled={!emailVerified || loading} className="w-full">Daftar Sekarang</Button>
+          <Button type="submit" loading={loading} disabled={!emailVerified || loading} className="w-full">DAFTAR</Button>
         </form>
 
         <div className="mt-7 rounded-2xl border border-gold-400/20 bg-white/5 p-5">
           <p className="text-sm font-black text-white">Sudah punya akun?</p>
           <p className="mt-1 text-xs leading-5 text-white/60">Tidak perlu membuat akun baru. Silakan login menggunakan email dan password yang sudah terdaftar.</p>
-          <Link href="/login" className="btn-gold-metal mt-4 flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-black transition">🔐 Login ke AIDIL STORE</Link>
+          <Link href="/login" className="btn-gold-metal mt-4 flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-black transition">Login</Link>
         </div>
       </div>
 
@@ -408,7 +408,7 @@ function RegisterForm() {
             <div className="flex items-center gap-3"><Image src="/aidil-logo.png" alt="Aidil Store" width={56} height={56} className="h-14 w-14 rounded-2xl bg-white p-2 shadow-xl" /><div><p className="text-sm font-black tracking-wide">AIDIL STORE</p><p className="text-xs text-gold-200">Solusi Digital</p></div></div>
             <p className="mt-10 text-xs font-black uppercase tracking-[.22em] text-gold-200">MULAI SEKARANG</p>
             <h2 className="mt-3 text-4xl font-black leading-tight">Buat akun dan <span className="text-gold-200">nikmati kemudahannya.</span></h2>
-            <p className="mt-5 text-sm leading-6 text-zinc-300">Dengan akun AIDIL STORE, kamu dapat mengakses berbagai layanan digital dalam satu tempat.</p>
+            <p className="mt-5 text-sm leading-6 text-zinc-300">Dengan akun AIDIL STORE, Anda dapat mengakses berbagai layanan digital dalam satu tempat.</p>
           </div>
           <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
             <p className="text-sm font-black text-gold-200">📖 Panduan Pendaftaran</p>

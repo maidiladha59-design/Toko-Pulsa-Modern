@@ -39,7 +39,7 @@ export default async function DashboardPage() {
             <div>
               <span className="inline-flex rounded-full border border-white/15 bg-white/10 px-3 py-1 text-xs font-bold text-gold-100">✨ Dashboard Pengguna</span>
               <h1 className="mt-4 text-3xl font-black tracking-tight sm:text-4xl">Halo, {firstName}! 👋</h1>
-              <p className="mt-2 max-w-xl text-sm leading-6 text-gold-100">Kelola saldo, pesanan, profil, dan koleksi produk digitalmu dari satu tempat.</p>
+              <p className="mt-2 max-w-xl text-sm leading-6 text-gold-100">Kelola saldo, pesanan, profil, dan koleksi produk digital Anda dari satu tempat.</p>
               <div className="mt-5 flex flex-wrap gap-3">
                 <Link href="/" className="btn-gold rounded-xl px-4 py-2.5 text-sm font-black transition">Mulai Belanja →</Link>
                 <Link href="/wallet" className="rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-white/15">Lihat Saldo</Link>

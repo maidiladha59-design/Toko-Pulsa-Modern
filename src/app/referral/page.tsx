@@ -71,7 +71,7 @@ export default function Referral() {
       <Card className="p-6">
         <p className="text-xs font-black uppercase tracking-widest text-app-kicker">Undang Teman</p>
         <h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Ajak 20 teman, bonus Rp5.000</h1>
-        <p className="mt-2 text-sm text-app-muted">Teman harus mendaftar melalui link kamu dan menyelesaikan transaksi agar dihitung.</p>
+        <p className="mt-2 text-sm text-app-muted">Teman harus mendaftar melalui link Anda dan menyelesaikan transaksi agar dihitung.</p>
       </Card>
 
       <Card>

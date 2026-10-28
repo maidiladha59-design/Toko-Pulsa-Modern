@@ -122,7 +122,7 @@ export default function ToastProvider({ children }: { children: React.ReactNode 
       {current && accent && (
         <div
           key={current.id}
-          className="fixed inset-0 z-[300] flex items-center justify-center overflow-y-auto bg-black/60 p-4"
+          className="fixed inset-0 z-[1100] flex items-center justify-center overflow-y-auto bg-black/60 p-4"
         >
           <div className="toast-modal-in w-full max-w-sm">
             <div

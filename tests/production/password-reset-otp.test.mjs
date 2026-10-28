@@ -18,7 +18,7 @@ test("lupa password mengirim kode OTP tanpa redirectTo dan pindah ke halaman ver
   assert.doesNotMatch(form, /redirectTo\s*:/, "permintaan reset tidak boleh memakai redirectTo");
   assert.match(form, /startResetCooldown\(cleanEmail\)/);
   assert.match(form, /\/verifikasi-kode-reset\?email=\$\{encodeURIComponent\(cleanEmail\)\}/);
-  assert.match(form, /Kode verifikasi 6 digit sudah dikirim ke email kamu, masukkan kode di bawah ini\./);
+  assert.match(form, /Kode verifikasi 6 digit sudah dikirim ke email Anda, masukkan kode di bawah ini\./);
   assert.match(form, /Kirim Kode Verifikasi/);
   assert.match(form, /useRouter/);
 

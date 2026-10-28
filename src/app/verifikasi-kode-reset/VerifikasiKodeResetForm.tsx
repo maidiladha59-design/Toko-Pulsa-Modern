@@ -106,7 +106,7 @@ export default function VerifikasiKodeResetForm() {
 
       startResetCooldown(email);
       setCooldown(RESET_CODE_COOLDOWN_SECONDS);
-      setInfo("Kode verifikasi baru sudah dikirim ke email kamu.");
+      setInfo("Kode verifikasi baru sudah dikirim ke email Anda.");
     } catch {
       const message = friendlyPasswordResetError("network");
       setError(message);
@@ -132,7 +132,7 @@ export default function VerifikasiKodeResetForm() {
           </p>
           <h1 className="mt-2 text-2xl font-black">Verifikasi kode reset</h1>
           <p className="mt-2 text-sm text-gold-100">
-            Kode verifikasi 6 digit sudah dikirim ke email kamu, masukkan kode
+            Kode verifikasi 6 digit sudah dikirim ke email Anda, masukkan kode
             di bawah ini.
           </p>
         </div>

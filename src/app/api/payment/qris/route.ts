@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
 function mapErrorMessage(code: string) {
   switch (code) {
     case "INSUFFICIENT_BALANCE":
-      return "Saldo kamu tidak mencukupi untuk pembayaran ini.";
+      return "Saldo Anda tidak mencukupi untuk pembayaran ini.";
     case "WALLET_NOT_FOUND":
       return "Wallet tidak ditemukan. Silakan hubungi bantuan.";
     case "INVALID_AMOUNT":
@@ -71,7 +71,7 @@ function mapErrorMessage(code: string) {
     case "QRIS_DATA_REQUIRED":
       return "Data QRIS tidak lengkap. Coba scan ulang.";
     case "UNAUTHENTICATED":
-      return "Sesi kamu berakhir. Silakan login kembali.";
+      return "Sesi Anda berakhir. Silakan login kembali.";
     default:
       return "Pembayaran gagal diproses. Coba lagi.";
   }

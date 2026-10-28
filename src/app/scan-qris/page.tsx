@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { formatRupiah, formatDate } from '@/lib/utils';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { parsePersonalQrPayload } from '@/lib/transfer/qr';
@@ -361,7 +362,7 @@ export default function ScanQRIS() {
               <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4 text-center">
                 <p className="text-xs font-black uppercase tracking-widest text-gold-700">Total Nominal</p>
                 {qris.amount ? (
-                  <p className="mt-1 text-3xl font-black text-slate-900">Rp {Number(qris.amount).toLocaleString('id-ID')}</p>
+                  <p className="mt-1 text-3xl font-black text-slate-900">{formatRupiah(Number(qris.amount))}</p>
                 ) : (
                   <>
                     <div className="mx-auto mt-2 flex max-w-[220px] items-center rounded-xl border border-gold-300 bg-white px-3">
@@ -390,7 +391,7 @@ export default function ScanQRIS() {
                 <DetailRow label="Mata Uang" value={qris.currency || 'IDR (Rupiah)'} />
                 <DetailRow label="Tipe QRIS" value={qris.amount ? 'Dinamis (nominal tetap)' : 'Statis (nominal manual)'} />
                 <DetailRow label="Referensi" value={shortRef(qris.raw)} mono />
-                <DetailRow label="Waktu Scan" value={scannedAt ? scannedAt.toLocaleString('id-ID', { dateStyle: 'medium', timeStyle: 'medium' }) : '-'} />
+                <DetailRow label="Waktu Scan" value={scannedAt ? formatDate(scannedAt) : '-'} />
                 <DetailRow label="Status" value="Berhasil dibaca" badge="success" />
               </div>
 

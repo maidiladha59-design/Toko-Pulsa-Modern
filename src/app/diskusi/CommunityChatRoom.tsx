@@ -397,7 +397,7 @@ export default function CommunityChatRoom() {
               ) : (
                 messages.map((message) => {
                   const mine = message.user_id === userId;
-                  const name = mine ? "Kamu" : names[message.user_id] || "Pengguna";
+                  const name = mine ? "Anda" : names[message.user_id] || "Pengguna";
                   return (
                     <div
                       key={message.id}

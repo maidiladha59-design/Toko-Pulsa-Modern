@@ -32,8 +32,7 @@ export default async function PengaduanKonsumenPage() {
   return (
     <div className="mx-auto max-w-3xl animate-page-in space-y-5">
       <article className="rounded-3xl border bg-white p-6 shadow-sm">
-        <p className="text-xs font-black uppercase tracking-widest text-gold-600">AIDIL STORE</p>
-        <h1 className="mt-2 text-3xl font-black">Pengaduan Konsumen</h1>
+        <h1 className="text-3xl font-black">Pengaduan Konsumen</h1>
         <p className="mt-3 text-sm leading-6 text-slate-600">
           Halaman ini adalah jalur pengaduan konsumen formal — berbeda dari Pusat Bantuan biasa —
           khusus untuk keluhan transaksional serius, misalnya <b>saldo terpotong tetapi pulsa, token,

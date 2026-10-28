@@ -2,6 +2,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
+import { formatDate } from "@/lib/utils";
 
 type Notice = {
   id: string; type: string; title: string; subtitle?: string;
@@ -80,7 +81,7 @@ export default function NotificationBell() {
                     </Link>
                   ) : body(n)}
                   <p className="mt-1 text-[10px] text-app-subtle">
-                    {new Date(n.created_at).toLocaleString("id-ID")}
+                    {formatDate(n.created_at)}
                   </p>
                 </div>
               ))

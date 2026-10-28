@@ -139,7 +139,7 @@ export default function RatingPrompt() {
                   10 transaksi berhasil
                 </p>
                 <h2 id="rating-modal-title" className="mt-2 text-xl font-black leading-snug text-app-text">
-                  Gimana pengalaman kamu pakai AIDIL STORE?
+                  Bagaimana pengalaman Anda memakai AIDIL STORE?
                 </h2>
               </div>
               <button
@@ -198,7 +198,7 @@ export default function RatingPrompt() {
                 onChange={(event) => setComment(event.target.value.slice(0, MAX_COMMENT))}
                 rows={3}
                 maxLength={MAX_COMMENT}
-                placeholder="Ceritakan pengalamanmu memakai AIDIL STORE..."
+                placeholder="Ceritakan pengalaman Anda memakai AIDIL STORE..."
                 className="w-full resize-none rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle/60 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
               />
               <span className="mt-1 block text-right text-[11px] text-app-subtle">

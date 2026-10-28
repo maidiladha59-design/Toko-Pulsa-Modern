@@ -8,7 +8,7 @@ const bodySchema = z.object({
 });
 
 const RPC_MESSAGES: Record<string, string> = {
-  UNAUTHENTICATED: "Sesi kamu berakhir. Silakan login ulang.",
+  UNAUTHENTICATED: "Sesi Anda berakhir. Silakan login ulang.",
   AVATAR_NOT_AVAILABLE: "Foto profil tidak tersedia. Pilih avatar lain.",
   PROFILE_NOT_FOUND: "Data profil tidak ditemukan.",
 };

@@ -134,6 +134,23 @@ test('v97 komponen UserAvatar dipakai di beranda, profil, dan navbar', () => {
   assert.match(read('src/app/admin/avatars/page.tsx'), /Pratinjau \(dipotong 1:1, 500×500\)/);
 });
 
+test('v97 pemilih avatar: portal ke body, overlay full viewport, scroll terkunci', () => {
+  const picker = read('src/components/AvatarPicker.tsx');
+  assert.match(picker, /import \{ createPortal \} from "react-dom";/);
+  assert.match(picker, /document\.body\s*\n\s*\);/, 'sheet harus keluar dari container beranimasi lewat portal');
+  assert.match(picker, /fixed inset-0 z-\[1000\] h-\[100dvh\] w-screen/);
+  assert.match(picker, /fixed inset-x-0 bottom-0 z-\[1001\] max-h-\[85dvh\] w-full overflow-y-auto rounded-t-\[20px\]/);
+  assert.match(picker, /pb-\[calc\(16px\+env\(safe-area-inset-bottom\)\)\]/);
+  assert.match(picker, /body\.style\.overflow = "hidden";/);
+  assert.match(picker, /body\.style\.overflow = previousOverflow;/, 'posisi scroll harus dipulihkan saat ditutup');
+  // Ring 4px tidak boleh terpotong: grid punya padding, tanpa offset tambahan.
+  assert.match(picker, /grid grid-cols-3 gap-3 p-1\.5/);
+  assert.match(picker, /ring-4 ring-gold-400 ring-offset-0/);
+  assert.doesNotMatch(picker, /grid max-h-\[52vh\][^"]*overflow-y-auto/, 'scroll ada di sheet, bukan di grid');
+  // Toast wajib tetap di atas sheet supaya pesan gagal tidak tertutup overlay.
+  assert.match(read('src/components/ToastProvider.tsx'), /fixed inset-0 z-\[1100\]/);
+});
+
 test('v97 preflight mewajibkan migrasi v97', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v97_profile_avatars\.sql/);

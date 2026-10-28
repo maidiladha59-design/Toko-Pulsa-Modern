@@ -98,17 +98,17 @@ test('v88 migrasi terdaftar di preflight dan pin versi v86 diperbarui', () => {
 
 test('v88 formatBalanceCompact meringkas angka besar sesuai notasi Indonesia', async () => {
   const { formatBalanceCompact } = await loadUtils();
-  assert.equal(formatBalanceCompact(0), 'Rp0');
-  assert.equal(formatBalanceCompact(750_000), 'Rp750.000');
-  assert.equal(formatBalanceCompact(999_999), 'Rp999.999');
-  assert.equal(formatBalanceCompact(1_000_000), 'Rp1 Jt');
-  assert.equal(formatBalanceCompact(12_000_000), 'Rp12 Jt');
-  assert.equal(formatBalanceCompact(12_500_000), 'Rp12,5 Jt');
-  assert.equal(formatBalanceCompact(1_000_000_000), 'Rp1 M');
-  assert.equal(formatBalanceCompact(100_000_000_000), 'Rp100 M');
-  assert.equal(formatBalanceCompact(1_050_000_000), 'Rp1,1 M');
-  assert.equal(formatBalanceCompact(1_200_000_000_000), 'Rp1,2 T');
-  assert.equal(formatBalanceCompact(Number.NaN), 'Rp0');
+  assert.equal(formatBalanceCompact(0), 'Rp 0');
+  assert.equal(formatBalanceCompact(750_000), 'Rp 750.000');
+  assert.equal(formatBalanceCompact(999_999), 'Rp 999.999');
+  assert.equal(formatBalanceCompact(1_000_000), 'Rp 1 Jt');
+  assert.equal(formatBalanceCompact(12_000_000), 'Rp 12 Jt');
+  assert.equal(formatBalanceCompact(12_500_000), 'Rp 12,5 Jt');
+  assert.equal(formatBalanceCompact(1_000_000_000), 'Rp 1 M');
+  assert.equal(formatBalanceCompact(100_000_000_000), 'Rp 100 M');
+  assert.equal(formatBalanceCompact(1_050_000_000), 'Rp 1,1 M');
+  assert.equal(formatBalanceCompact(1_200_000_000_000), 'Rp 1,2 T');
+  assert.equal(formatBalanceCompact(Number.NaN), 'Rp 0');
 });
 
 test('v88 saldo ringkas dipakai di tabel/kartu + nilai penuh tetap di tooltip', () => {

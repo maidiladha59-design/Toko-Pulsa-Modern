@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { formatRupiah } from '@/lib/utils';
 
 type PendingPayment = {
   raw: string;
@@ -40,7 +41,7 @@ export default function QrisConfirmPage() {
 
     try {
       // PENTING: sesuaikan endpoint ini dengan API route pembayaran QRIS
-      // yang sudah/akan kamu buat di backend (potong saldo wallet + kirim ke payment gateway).
+      // yang sudah/akan Anda buat di backend (potong saldo wallet + kirim ke payment gateway).
       const response = await fetch('/api/payment/qris', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -78,7 +79,7 @@ export default function QrisConfirmPage() {
           <h1 className="text-xl font-black text-slate-900">Pembayaran Berhasil</h1>
           <p className="mt-2 text-sm text-slate-500">
             Pembayaran ke {payment.merchantName} sebesar Rp{' '}
-            {Number(payment.amount).toLocaleString('id-ID')} berhasil diproses.
+            {formatRupiah(Number(payment.amount))} berhasil diproses.
           </p>
           <button
             type="button"
@@ -112,18 +113,18 @@ export default function QrisConfirmPage() {
                 Total Pembayaran
               </p>
               <p className="mt-1 text-3xl font-black text-slate-900">
-                Rp {Number(payment.amount).toLocaleString('id-ID')}
+                {formatRupiah(Number(payment.amount))}
               </p>
 
               {payment.isStatic && (
                 <p className="mt-2 text-xs text-slate-500">
-                  Nominal ini kamu masukkan sendiri (QRIS statis).
+                  Nominal ini Anda masukkan sendiri (QRIS statis).
                 </p>
               )}
             </div>
 
             <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4 text-xs text-slate-600">
-              Pembayaran akan dipotong langsung dari saldo AIDIL STORE kamu.
+              Pembayaran akan dipotong langsung dari saldo AIDIL STORE Anda.
             </div>
 
             {error && (

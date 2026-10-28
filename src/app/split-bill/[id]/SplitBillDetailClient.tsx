@@ -4,7 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useToast } from "@/components/ToastProvider";
 import { calcTransferFee, type TransferFeeType } from "@/lib/transfer/utils";
-import { formatRupiah } from "@/lib/utils";
+import {formatRupiah, formatDateOnly} from "@/lib/utils";
 
 type Bill = {
   id: string;
@@ -311,7 +311,7 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
                     {p.display_name}{p.is_viewer ? " (Anda)" : ""}
                   </p>
                   <p className="text-[11px] font-bold text-slate-400">
-                    {formatRupiah(p.share_amount)} · {paid ? `Dibayar ${p.paid_at ? new Date(p.paid_at).toLocaleDateString("id-ID", { day: "numeric", month: "short", hour: "2-digit", minute: "2-digit" }) : ""}` : "Belum bayar"}
+                    {formatRupiah(p.share_amount)} · {paid ? `Dibayar ${p.paid_at ? formatDateOnly(p.paid_at) : ""}` : "Belum bayar"}
                   </p>
                 </div>
                 {bill.is_creator && !paid && bill.status === "ACTIVE" && (

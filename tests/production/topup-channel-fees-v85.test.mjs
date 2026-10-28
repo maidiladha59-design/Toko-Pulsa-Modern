@@ -151,7 +151,7 @@ test('v85 halaman topup: total persis dibayar, tanpa teks perkiraan', () => {
   assert.doesNotMatch(page, /Perkiraan Total/);
   assert.doesNotMatch(page, /Total final akan ditampilkan di langkah berikutnya/);
   assert.match(page, /topup\/preview/);
-  assert.match(page, /Biaya layanan channel/);
+  assert.match(page, />Biaya layanan</);
   assert.match(page, /Total bayar/);
   assert.match(page, /customer_note/);
   // Cadangan pra-v85 tetap dipakai dengan mesin tier lama.
