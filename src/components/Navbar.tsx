@@ -8,9 +8,11 @@ import { useToast } from "./ToastProvider";
 import NotificationBell from "./NotificationBell";
 import ThemeToggle from "./ThemeToggle";
 import NavIcon from "./NavIcon";
+import UserAvatar from "./UserAvatar";
+import { resolveAvatarUrl } from "@/lib/avatar";
 import { Skeleton } from "./ui/LoadingSkeleton";
 
-type Profile = { full_name: string | null; email: string; role: string };
+type Profile = { full_name: string | null; email: string; role: string; avatar_id: string | null };
 
 export default function Navbar({ scanQrisEnabled = true }: { scanQrisEnabled?: boolean }) {
   const pathname = usePathname();
@@ -21,18 +23,19 @@ export default function Navbar({ scanQrisEnabled = true }: { scanQrisEnabled?: b
 function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
   const pathname = usePathname();
   const supabase = createClient(), router = useRouter(), toast = useToast();
-  const [profile, setProfile] = useState<Profile | null>(null), [loading, setLoading] = useState(true), [menuOpen, setMenuOpen] = useState(false), [accountOpen, setAccountOpen] = useState(false), [offline, setOffline] = useState(false);
+  const [profile, setProfile] = useState<Profile | null>(null), [avatarUrl, setAvatarUrl] = useState<string | null>(null), [loading, setLoading] = useState(true), [menuOpen, setMenuOpen] = useState(false), [accountOpen, setAccountOpen] = useState(false), [offline, setOffline] = useState(false);
 
   useEffect(() => {
     let mounted = true;
     async function load() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        if (mounted) { setProfile(null); setLoading(false); }
+        if (mounted) { setProfile(null); setAvatarUrl(null); setLoading(false); }
         return;
       }
-      const { data } = await supabase.from("profiles").select("full_name,email,role").eq("id", user.id).single();
-      if (mounted) { setProfile(data as Profile); setLoading(false); }
+      const { data } = await supabase.from("profiles").select("full_name,email,role,avatar_id").eq("id", user.id).single();
+      const url = await resolveAvatarUrl(supabase, (data as Profile | null)?.avatar_id);
+      if (mounted) { setProfile(data as Profile); setAvatarUrl(url); setLoading(false); }
     }
     load();
     const { data: listener } = supabase.auth.onAuthStateChange(() => { load(); });
@@ -57,8 +60,16 @@ function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
   }
 
   const name = profile?.full_name || profile?.email?.split("@")[0] || "Pengguna";
-  const initial = name.charAt(0).toUpperCase();
   const isAdmin = profile?.role === "ADMIN" || profile?.role === "SUPER_ADMIN";
+
+  useEffect(() => {
+    const onAvatarUpdated = (event: Event) => {
+      const detail = (event as CustomEvent<{ image_url?: string | null }>).detail;
+      setAvatarUrl(detail?.image_url || null);
+    };
+    window.addEventListener("aidil:avatar-updated", onAvatarUpdated);
+    return () => window.removeEventListener("aidil:avatar-updated", onAvatarUpdated);
+  }, []);
 
   const bottomItems = [
     { href: "/", label: "Beranda", icon: "home" as const },
@@ -103,15 +114,18 @@ function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
             ) : profile ? (
               <div className="relative hidden sm:block">
                 <button onClick={() => setAccountOpen((v) => !v)} className="flex items-center gap-2 rounded-xl border border-app-border bg-app-surface px-2 py-1.5 transition hover:bg-app-inset">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-zinc-950">{initial}</span>
+                  <UserAvatar size={32} src={avatarUrl} name={name} ring={false} />
                   <span className="max-w-[110px] truncate text-sm font-bold text-app-text">{name}</span>
                   <span className="text-xs text-app-subtle">⌄</span>
                 </button>
                 {accountOpen && (
                   <div className="absolute right-0 mt-2 w-60 overflow-hidden rounded-2xl border border-app-border bg-app-surface p-2 shadow-2xl">
-                    <div className="border-b border-app-border px-3 py-3">
-                      <p className="text-sm font-black text-app-text">{name}</p>
-                      <p className="truncate text-xs text-app-subtle">{profile.email}</p>
+                    <div className="flex items-center gap-3 border-b border-app-border px-3 py-3">
+                      <UserAvatar size={40} src={avatarUrl} name={name} />
+                      <span className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-black text-app-text">{name}</p>
+                        <p className="truncate text-xs text-app-subtle">{profile.email}</p>
+                      </span>
                     </div>
                     {[["/profile", "👤 Profil Saya"], ["/wallet", "💰 Saldo & Top Up"], ["/transfer-uang", "📤 Transfer Saldo"], ["/split-bill", "🧾 Split Bill"], ["/diskusi", "Ruang Diskusi"], ["/orders", "📦 Pesanan Saya"], ["/transactions", "🧾 Transaksi"], ["/calculator", "🧮 Kalkulator"], ["/bantuan", "💬 Bantuan"]].map(([href, label]) => (
                       <Link key={href} href={href} onClick={() => setAccountOpen(false)} className="mt-1 block rounded-xl px-3 py-2.5 text-sm font-bold text-app-muted transition hover:bg-app-accent-soft hover:text-app-text">{label}</Link>

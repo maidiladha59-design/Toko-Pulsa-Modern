@@ -66,7 +66,7 @@ test('v89 RPC admin_update_business_profile: cek role, validasi PSE, audit', () 
 test('v89 preflight mendaftarkan migrasi dan definisi wajib', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v89_business_profile\.sql/);
-  assert.match(script, /88,89,90,93,94\]/);
+  assert.match(script, /88,89,90,93,94,97]/);
   assert.match(script, /admin_update_business_profile/);
   assert.match(script, /business-assets/);
 });

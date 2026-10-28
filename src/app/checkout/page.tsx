@@ -219,18 +219,18 @@ function CheckoutForm() {
       <div className="mb-5 flex items-start gap-3">
         <button type="button" onClick={() => router.back()} aria-label="Kembali" className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-surface text-lg text-app-text transition hover:border-gold-400/50 hover:text-app-kicker">←</button>
         <Image src="/aidil-logo.png" alt="Aidil Store" width={44} height={44} className="h-11 w-11 rounded-2xl object-cover" />
-        <div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">AIDIL STORE</p><h1 className="text-xl font-black text-app-text sm:text-2xl">Checkout Aman & Otomatis</h1><p className="text-sm text-app-muted">Bayar tanpa approve manual, lalu akses produk digital dari pesanan.</p></div>
+        <div className="min-w-0"><p className="text-xs font-black uppercase tracking-widest text-app-kicker">AIDIL STORE</p><h1 className="text-xl font-black text-app-text sm:text-2xl">Checkout Aman & Otomatis</h1><p className="text-sm text-app-muted">Bayar tanpa approve manual, lalu akses produk digital dari pesanan.</p></div>
       </div>
 
-      <div className="grid gap-5 lg:grid-cols-[1fr_360px]">
-        <div className="space-y-5">
+      <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="min-w-0 space-y-5">
           <div className="rounded-3xl border border-app-border bg-app-surface p-5">
             <div className="flex gap-4">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-app-inset">
                 {product.thumbnail_url ? <Image src={product.thumbnail_url} alt={product.name} width={96} height={96} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-3xl">🛍️</div>}
               </div>
               <div className="min-w-0">
-                <p className="font-black text-app-text">{product.name}</p>
+                <p className="break-words font-black text-app-text">{product.name}</p>
                 <p className="mt-1 text-sm text-app-muted">Jumlah: <span className="tabular-nums">{qty}</span></p>
                 <p className="mt-3 text-lg font-black tabular-nums text-app-kicker">{formatRupiah(product.price)} / item</p>
               </div>
@@ -250,7 +250,7 @@ function CheckoutForm() {
           {ppob && guide && (
             <div className="rounded-3xl border border-app-border bg-app-surface p-5">
               <div className="flex items-start justify-between gap-3">
-                <div><p className="font-black text-app-text">{guide.heading}</p><p className="mt-1 text-xs leading-5 text-app-muted">{guide.intro}</p></div>
+                <div className="min-w-0"><p className="font-black text-app-text">{guide.heading}</p><p className="mt-1 text-xs leading-5 text-app-muted">{guide.intro}</p></div>
                 <Badge tone={ppob.service_kind === "postpaid" ? "warning" : "success"}>{ppob.service_kind === "postpaid" ? "Cek tagihan dulu" : "Proses otomatis"}</Badge>
               </div>
               <div className="mt-4 grid gap-3 sm:grid-cols-2">
@@ -284,10 +284,10 @@ function CheckoutForm() {
                   {inquiry && (
                     <div className="mt-3 rounded-2xl border border-app-border bg-app-surface p-4">
                       <div className="flex items-center justify-between gap-3">
-                        <div><p className="text-xs font-bold text-app-muted">Pelanggan</p><p className="font-black text-app-text">{inquiry.customer_name || inquiry.customer_no || ppobTargets.customer_no}</p></div>
-                        <div className="text-right"><p className="text-xs font-bold text-app-muted">Total tagihan</p><p className="text-xl font-black tabular-nums text-app-kicker">{formatRupiah(Number(inquiry.quote_amount || inquiry.selling_price || 0))}</p></div>
+                        <div className="min-w-0"><p className="text-xs font-bold text-app-muted">Pelanggan</p><p className="break-words font-black text-app-text">{inquiry.customer_name || inquiry.customer_no || ppobTargets.customer_no}</p></div>
+                        <div className="shrink-0 text-right"><p className="text-xs font-bold text-app-muted">Total tagihan</p><p className="text-xl font-black tabular-nums text-app-kicker">{formatRupiah(Number(inquiry.quote_amount || inquiry.selling_price || 0))}</p></div>
                       </div>
-                      <div className="mt-3 grid gap-2 text-xs text-app-muted sm:grid-cols-3">
+                      <div className="mt-3 grid gap-2 text-xs text-app-muted sm:grid-cols-3 [&>*]:min-w-0 [&>*]:break-words">
                         <div className="rounded-xl bg-app-inset p-3">Tagihan pokok<br/><b className="tabular-nums text-app-text">{formatRupiah(Number(inquiry.price || 0))}</b></div>
                         <div className="rounded-xl bg-app-inset p-3">Biaya admin<br/><b className="tabular-nums text-app-text">{formatRupiah(Number(inquiry.admin || 0))}</b></div>
                         <div className="rounded-xl bg-app-inset p-3">Jatuh tempo/periode<br/><b className="text-app-text">{String(inquiry.periode || "-" )}</b></div>
@@ -330,9 +330,9 @@ function CheckoutForm() {
           </div>
         </div>
 
-        <aside className="h-fit rounded-3xl border border-app-border bg-app-surface p-6 lg:sticky lg:top-24">
+        <aside className="h-fit min-w-0 rounded-3xl border border-app-border bg-app-surface p-6 lg:sticky lg:top-24">
           <p className="text-xs font-black uppercase tracking-widest text-app-subtle">Ringkasan</p>
-          <p className="mt-3 truncate font-bold text-app-text">{product.name}</p>
+          <p className="mt-3 break-words font-bold text-app-text">{product.name}</p>
           <div className="mt-5 space-y-3 text-sm">
             <div className="flex justify-between"><span className="text-app-muted">Harga</span><b className="tabular-nums text-app-text">{formatRupiah(product.price)}</b></div>
             <div className="flex justify-between"><span className="text-app-muted">Jumlah</span><b className="tabular-nums text-app-text">{qty}</b></div>

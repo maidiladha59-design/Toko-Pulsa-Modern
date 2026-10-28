@@ -12,7 +12,7 @@ for (const file of files) {
   if (!byVersion.has(v)) byVersion.set(v, []);
   byVersion.get(v).push(file);
 }
-const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83,85,86,87,88,89,90,93,94];
+const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83,85,86,87,88,89,90,93,94,97];
 const missing = required.filter(v => !byVersion.has(v));
 const duplicateVersions = [...byVersion.entries()].filter(([, list]) => list.length > 1);
 const errors = [];
@@ -62,6 +62,7 @@ const checks = [
   ['v90', 'migrations_v90_app_ratings.sql', ['app_ratings', 'transaction_count_at_rating', 'is_published', 'rating_prompted_at', 'app_ratings_user_unique', 'app_ratings_select_own', 'app_ratings_insert_own', 'get_my_transaction_count', 'should_prompt_rating', 'submit_app_rating', 'mark_rating_prompted', 'get_rating_summary', 'get_published_ratings', 'admin_set_rating_published', 'rating.submit', 'rating.moderate', "status = 'completed'"]],
   ['v93', 'migrations_v93_manual_topup.sql', ['manual_topup_channels', 'manual_topup_requests', 'manual_topup_settings', 'channel_type', 'proof_image_url', 'manual_topup_proofs_insert_own', 'manual-topup-proofs', 'qris-images', 'submit_manual_topup_request', 'admin_process_manual_topup', 'manual_topup.approve', 'manual_topup.reject', 'manual_topup_request', "'TOPUP'", 'for update']],
   ['v94', 'migrations_v94_community_chat.sql', ['community_chat_messages', 'chat_user_status', 'is_deleted', 'deleted_reason', 'char_length(btrim(message)) between 1 and 1000', 'community_chat_messages_select_authenticated', 'supabase_realtime', 'community_chat_display_names', 'post_community_chat_message', 'CHAT_MUTED', 'CHAT_RATE_LIMIT', 'interval \'2 seconds\'', 'admin_delete_chat_message', 'chat.message_deleted', 'realtime.send', 'admin_set_chat_mute', 'chat.user_muted', 'chat.user_unmuted', 'REASON_REQUIRED', 'assert_account_active', 'for update']],
+  ['v97', 'migrations_v97_profile_avatars.sql', ['avatars', 'avatar_id', 'user_set_avatar', 'avatars_select_active', 'AVATAR_NOT_AVAILABLE', 'protect_default_avatar', 'DEFAULT_AVATAR_PROTECTED', 'on delete set null']],
 ];
 for (const [label, file, needles] of checks) {
   const p = path.join(dir, file);
