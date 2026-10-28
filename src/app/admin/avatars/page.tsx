@@ -24,6 +24,9 @@ type AvatarAdmin = {
 type Pending = { key: string; name: string; blob: Blob; preview: string };
 
 const MAX_BYTES = 1024 * 1024;
+// Badan permintaan ke function Vercel dibatasi ~4,5MB, jadi satu unggahan
+// dibatasi 4MB supaya tidak gagal diam-diam di platform.
+const MAX_TOTAL_BYTES = 4 * 1024 * 1024;
 const ALLOWED = ["image/png", "image/jpeg", "image/webp"];
 
 // Cropping 1:1 500x500 dilakukan di browser (canvas) karena proyek berjalan
@@ -113,6 +116,11 @@ export default function AdminAvatarsPage() {
 
   async function upload() {
     if (pending.length === 0) return;
+    const totalBytes = pending.reduce((sum, p) => sum + p.blob.size, 0);
+    if (totalBytes > MAX_TOTAL_BYTES) {
+      toast.show("Total gambar melebihi 4MB. Kurangi jumlahnya lalu unggah bertahap.", "error");
+      return;
+    }
     setUploading(true);
     const form = new FormData();
     form.append("label", label);

@@ -45,6 +45,9 @@ export async function loadActiveAvatars(supabase: SupabaseClient): Promise<Avata
 
 export const AVATAR_BUCKET = "avatars";
 export const MAX_AVATAR_BYTES = 1024 * 1024;
+// Badan permintaan ke function Vercel dibatasi ~4,5MB, jadi total satu unggahan
+// harus di bawah angka itu sebelum file dikirim.
+export const MAX_AVATAR_UPLOAD_TOTAL_BYTES = 4 * 1024 * 1024;
 export const AVATAR_TYPES = ["image/png", "image/jpeg", "image/webp"] as const;
 
 // Validasi tipe file di server memakai isi byte, bukan hanya header MIME yang

@@ -6,6 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import {
   AVATAR_BUCKET,
   MAX_AVATAR_BYTES,
+  MAX_AVATAR_UPLOAD_TOTAL_BYTES,
   AVATAR_TYPES,
   sniffAvatarType,
   type AvatarRow,
@@ -55,6 +56,7 @@ export async function GET() {
     .order("sort_order", { ascending: true })
     .order("created_at", { ascending: true });
   if (error) {
+    console.error("[avatars] baca koleksi avatar gagal", { code: error.code, message: error.message, details: error.details });
     return NextResponse.json(
       { message: "Koleksi foto profil belum tersedia. Pastikan migrasi v97 sudah dijalankan." },
       { status: 500 }
@@ -84,20 +86,26 @@ export async function POST(request: Request) {
   if (files.length > 12) return NextResponse.json({ message: "Maksimal 12 avatar per unggahan." }, { status: 400 });
 
   const admin = createAdminClient();
-  const { data: last } = await admin
+  const { data: last, error: orderError } = await admin
     .from("avatars")
     .select("sort_order")
     .order("sort_order", { ascending: false })
     .limit(1)
     .maybeSingle();
+  if (orderError) console.error("[avatars] gagal membaca sort_order terakhir", orderError);
   let nextOrder = Number(last?.sort_order || 0) + 10;
 
   const created: AvatarRow[] = [];
   const rejected: string[] = [];
+  let totalBytes = 0;
 
   for (const file of files) {
     if (file.size === 0) { rejected.push(`${file.name}: file kosong.`); continue; }
     if (file.size > MAX_AVATAR_BYTES) { rejected.push(`${file.name}: melebihi 1MB.`); continue; }
+    if (totalBytes + file.size > MAX_AVATAR_UPLOAD_TOTAL_BYTES) {
+      rejected.push(`${file.name}: total unggahan melebihi 4MB.`);
+      continue;
+    }
 
     const bytes = new Uint8Array(await file.arrayBuffer());
     const realType = sniffAvatarType(bytes);
@@ -105,6 +113,7 @@ export async function POST(request: Request) {
       rejected.push(`${file.name}: hanya PNG, JPG, atau WEBP.`);
       continue;
     }
+    totalBytes += bytes.length;
 
     const id = crypto.randomUUID();
     const path = `${id}.${EXT_BY_TYPE[realType]}`;
@@ -113,16 +122,26 @@ export async function POST(request: Request) {
       upsert: false,
     });
     if (uploadError) {
+      console.error("[avatars] unggah storage gagal", {
+        file: file.name,
+        name: uploadError.name,
+        message: uploadError.message,
+        statusCode: uploadError.statusCode,
+      });
       rejected.push(`${file.name}: gagal mengunggah ke storage.`);
       continue;
     }
 
-    const { data: publicUrl } = admin.storage.from(AVATAR_BUCKET).getPublicUrl(path);
+    // getPublicUrl mengembalikan { data: { publicUrl } } — mengambil `data` saja
+    // akan menyimpan objek JSON dan ditolak constraint avatars_image_url_format.
+    const { data: publicData } = admin.storage.from(AVATAR_BUCKET).getPublicUrl(path);
+    const imageUrl: string = publicData.publicUrl;
+
     const { data: row, error: insertError } = await admin
       .from("avatars")
       .insert({
         id,
-        image_url: publicUrl,
+        image_url: imageUrl,
         label,
         is_active: true,
         is_default: false,
@@ -132,6 +151,15 @@ export async function POST(request: Request) {
       .select("id,image_url,label,is_active,is_default,sort_order,created_at")
       .single();
     if (insertError || !row) {
+      console.error("[avatars] simpan baris avatar gagal", {
+        file: file.name,
+        id,
+        image_url: imageUrl,
+        code: insertError?.code,
+        message: insertError?.message,
+        details: insertError?.details,
+        hint: insertError?.hint,
+      });
       await admin.storage.from(AVATAR_BUCKET).remove([path]);
       rejected.push(`${file.name}: gagal menyimpan data avatar.`);
       continue;
@@ -142,12 +170,13 @@ export async function POST(request: Request) {
   }
 
   if (created.length > 0) {
-    await admin.from("audit_logs").insert({
+    const { error: auditError } = await admin.from("audit_logs").insert({
       actor_id: auth.user!.id,
       action: "avatar.create",
       target_type: "avatar",
       metadata: { count: created.length, ids: created.map((c) => c.id), label },
     });
+    if (auditError) console.error("[avatars] audit log gagal", { code: auditError.code, message: auditError.message, details: auditError.details });
   }
 
   if (created.length === 0) {

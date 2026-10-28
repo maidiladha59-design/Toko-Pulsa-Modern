@@ -60,6 +60,26 @@ test('v97 API admin: cek role di server, batas 1MB, tipe diverifikasi dari byte,
   assert.match(item, /move: z\.enum\(\["up", "down"\]\)/);
 });
 
+test('v97 API admin: URL publik bertipe string, error asli dicatat ke log, total unggahan dibatasi', () => {
+  const list = read('src/app/api/admin/avatars/route.ts');
+  const item = read('src/app/api/admin/avatars/[id]/route.ts');
+  const page = read('src/app/admin/avatars/page.tsx');
+  // Regresi: { data: publicUrl } mengambil objek { publicUrl } sehingga insert
+  // ditolak constraint avatars_image_url_format ("gagal menyimpan data avatar").
+  assert.match(list, /const \{ data: publicData \} = admin\.storage\.from\(AVATAR_BUCKET\)\.getPublicUrl\(path\);/);
+  assert.match(list, /const imageUrl: string = publicData\.publicUrl;/);
+  assert.doesNotMatch(list, /const \{ data: publicUrl \} =/);
+  assert.match(list, /console\.error\("\[avatars\] simpan baris avatar gagal"[\s\S]*?code: insertError\?\.code/);
+  assert.match(list, /details: insertError\?\.details/);
+  assert.match(list, /console\.error\("\[avatars\] unggah storage gagal"/);
+  assert.match(list, /MAX_AVATAR_UPLOAD_TOTAL_BYTES/);
+  assert.doesNotMatch(list, /NextResponse\.json\([^)]*error\.message/, 'detail teknis tidak boleh dikirim ke pengguna');
+  assert.match(item, /console\.error\("\[avatars\] update gagal"/);
+  assert.match(item, /console\.error\("\[avatars\] hapus gagal"/);
+  assert.match(page, /const MAX_TOTAL_BYTES = 4 \* 1024 \* 1024;/);
+  assert.match(page, /Total gambar melebihi 4MB/);
+});
+
 test('v97 hero beranda memakai foto profil + nama, tagline lama dihapus', () => {
   const home = read('src/app/page.tsx');
   const hero = read('src/components/HeroUser.tsx');

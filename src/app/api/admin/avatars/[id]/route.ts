@@ -61,7 +61,10 @@ export async function PATCH(request: Request, { params }: { params: { id: string
         ...(parsed.data.label === undefined ? {} : { label: parsed.data.label }),
       })
       .eq("id", target.id);
-    if (error) return NextResponse.json({ message: "Gagal memperbarui avatar." }, { status: 500 });
+    if (error) {
+      console.error("[avatars] update gagal", { id: target.id, payload: parsed.data, code: error.code, message: error.message, details: error.details });
+      return NextResponse.json({ message: "Gagal memperbarui avatar." }, { status: 500 });
+    }
   }
 
   if (parsed.data.move) {
@@ -133,6 +136,7 @@ export async function DELETE(_request: Request, { params }: { params: { id: stri
 
   const { error } = await admin.from("avatars").delete().eq("id", current.id);
   if (error) {
+    console.error("[avatars] hapus gagal", { id: current.id, code: error.code, message: error.message, details: error.details });
     return NextResponse.json(
       { message: (error.message || "").includes("DEFAULT_AVATAR_PROTECTED") ? "Avatar default toko tidak boleh dihapus." : "Gagal menghapus avatar." },
       { status: 500 }
@@ -140,7 +144,10 @@ export async function DELETE(_request: Request, { params }: { params: { id: stri
   }
 
   const objectPath = storagePathFromUrl(String(current.image_url || ""));
-  if (objectPath) await admin.storage.from(AVATAR_BUCKET).remove([objectPath]);
+  if (objectPath) {
+    const { error: removeError } = await admin.storage.from(AVATAR_BUCKET).remove([objectPath]);
+    if (removeError) console.error("[avatars] hapus objek storage gagal", { path: objectPath, message: removeError.message, statusCode: removeError.statusCode });
+  }
 
   await admin.from("audit_logs").insert({
     actor_id: auth.user!.id,
