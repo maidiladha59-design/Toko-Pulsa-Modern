@@ -1,7 +1,7 @@
 "use client";
 
 // Button standar Design System AIDIL STORE.
-// Varian: primary (emas flat glossy), secondary (hitam solid), outline, ghost,
+// Varian: primary (biru glossy), secondary (hijau muda/mint), outline, ghost,
 // destructive (merah). Ukuran sm/md/lg. Mendukung state loading & disabled.
 // Selalu pakai token tema (app-*) / token semantik supaya dual-mode aman.
 
@@ -11,7 +11,7 @@ export type ButtonSize = "sm" | "md" | "lg";
 const VARIANTS: Record<ButtonVariant, string> = {
   primary: "btn-gold",
   secondary:
-    "bg-zinc-950 text-zinc-50 hover:bg-zinc-800 dark:bg-zinc-800 dark:text-zinc-50 dark:hover:bg-zinc-700",
+    "bg-mint-400 text-zinc-950 hover:bg-mint-300 dark:bg-mint-400 dark:text-zinc-950 dark:hover:bg-mint-300",
   outline:
     "border border-app-border bg-transparent text-app-text hover:border-gold-400 hover:bg-app-accent-soft",
   ghost: "bg-transparent text-app-text hover:bg-app-inset",
@@ -48,7 +48,7 @@ export default function Button({
       {loading && (
         <span
           aria-hidden
-          className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950/25 border-t-zinc-950 dark:border-white/30 dark:border-t-white"
+          className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent"
         />
       )}
       {children}

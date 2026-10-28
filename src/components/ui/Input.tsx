@@ -2,7 +2,7 @@ import { useId } from "react";
 
 // Input standar Design System AIDIL STORE: label + field + pesan error/hint.
 // State error tegas (border & ring merah + pesan di bawah field),
-// state focus terlihat jelas (border & ring emas).
+// state focus terlihat jelas (border & ring biru brand).
 export type InputProps = React.InputHTMLAttributes<HTMLInputElement> & {
   label?: string;
   error?: string | null;

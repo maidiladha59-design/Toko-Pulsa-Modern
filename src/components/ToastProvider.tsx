@@ -22,7 +22,7 @@ const TITLES: Record<ToastKind, string> = {
 const ACCENTS: Record<ToastKind, { bg: string; fg: string; glow: string }> = {
   success: { bg: "#16A34A", fg: "#FFFFFF", glow: "0 12px 30px rgba(22, 163, 74, .35)" },
   error: { bg: "#DC2626", fg: "#FFFFFF", glow: "0 12px 30px rgba(220, 38, 38, .35)" },
-  info: { bg: "#C9A227", fg: "#09090B", glow: "0 12px 30px rgba(201, 162, 39, .35)" },
+  info: { bg: "#2E9EF5", fg: "#071F45", glow: "0 12px 30px rgba(46, 158, 245, .35)" },
 };
 
 function ToastIcon({ kind }: { kind: ToastKind }) {

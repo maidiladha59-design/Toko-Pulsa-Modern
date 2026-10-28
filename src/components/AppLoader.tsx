@@ -75,12 +75,12 @@ export default function AppLoader() {
             width={72}
             height={72}
             priority
-            className="app-loader-logo relative h-16 w-16 rounded-2xl object-cover shadow-[0_0_34px_rgba(201,162,39,0.4)]"
+            className="app-loader-logo relative h-16 w-16 rounded-2xl object-cover shadow-[0_0_34px_rgba(46,158,245,0.45)]"
           />
         </div>
         <p className="app-loader-word text-xs font-black uppercase tracking-[0.24em] text-gold-400">AIDIL STORE</p>
         <div className="h-[2px] w-40 overflow-hidden rounded-full bg-white/10">
-          <div className="app-loader-bar h-full w-full origin-left rounded-full bg-gradient-to-r from-gold-500 via-gold-300 to-gold-500" />
+          <div className="app-loader-bar h-full w-full origin-left rounded-full bg-gradient-to-r from-gold-600 via-gold-400 to-mint-400" />
         </div>
         <p className="sr-only">Memuat AIDIL STORE</p>
       </div>

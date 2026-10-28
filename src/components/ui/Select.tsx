@@ -1,7 +1,7 @@
 import { useId } from "react";
 
 // Select standar Design System AIDIL STORE — styling sama dengan Input
-// (label + state error + focus emas), dengan panah kustom konsisten.
+// (label + state error + focus biru brand), dengan panah kustom konsisten.
 export type SelectProps = React.SelectHTMLAttributes<HTMLSelectElement> & {
   label?: string;
   error?: string | null;

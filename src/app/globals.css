@@ -4,7 +4,8 @@
 
 /* =====================================================================
    ACUAN DESAIN AIDIL STORE (Design System) — gaya profesional-minimalis,
-   identitas hitam + emas tua (#C9A227). Rincian lengkap: src/components/ui/README.md
+   identitas gelap + biru listrik (#2E9EF5) + hijau muda (#8CD93A).
+   Rincian lengkap: src/components/ui/README.md
    ---------------------------------------------------------------------
    TIPOGRAFI (ukuran dibatasi xs–3xl, keluarga font mengikuti body):
    - Kicker/label kecil : text-xs font-black uppercase tracking-widest text-app-kicker
@@ -31,18 +32,25 @@
    - Pengecualian halaman auth (rounded-[2rem]) akan dinormalisasi saat
      halaman tersebut dimigrasikan ke design system.
    ---------------------------------------------------------------------
+   WARNA (dua aksen terpisah, jangan dicampur):
+   - Biru (token legacy `gold-*`) : aksi utama, CTA primer, fokus input, kicker.
+   - Hijau muda (`mint-*`)        : aksen sekunder, highlight, status aktif.
+   - Gradasi identitas            : bg-brand-gradient (diagonal biru → hijau),
+                                    untuk logo container/header/CTA terpenting.
    WARNA STATUS (token semantik di tailwind.config.ts, alias palet bawaan):
    - Berhasil  : success-* (emerald)   contoh badge: bg-success-100 text-success-800
                  dark:bg-success-500/15 dark:text-success-300
    - Gagal     : danger-*  (red)
    - Peringatan/Pending: warning-* (amber)
-   - Diproses/brand    : gold-*
-   JANGAN memakai warna acak per halaman untuk status transaksi.
+   - Diproses/brand    : gold-* (biru) · status aktif boleh mint-*
+   JANGAN memakai warna acak per halaman untuk status transaksi, dan JANGAN
+   memakai mint-* untuk status "Berhasil" — hijau brand berbeda dari emerald.
    ===================================================================== */
 
 /* Token tema AIDIL STORE. Nilai RGB (spasi) supaya bisa dipakai dengan alpha
-   oleh Tailwind (mis. bg-app-surface/60). Emas tua #C9A227 di kedua mode; kicker
-   dibuat lebih terang di mode gelap (#D9B73B) agar kontras teks tetap AA. */
+   oleh Tailwind (mis. bg-app-surface/60). Biru #2E9EF5 di kedua mode; kicker
+   dibuat lebih gelap di mode terang dan lebih terang di mode gelap agar
+   kontras teks tetap AA. */
 :root {
   --app-bg: 250 249 246;
   --app-surface: 255 255 255;
@@ -51,9 +59,9 @@
   --app-text: 24 24 27;
   --app-muted: 82 82 91;
   --app-subtle: 113 113 122;
-  --app-accent: 201 162 39;
-  --app-accent-soft: 251 247 233;
-  --app-kicker: 122 95 18;
+  --app-accent: 46 158 245;
+  --app-accent-soft: 239 248 255;
+  --app-kicker: 17 81 184;
 }
 .dark {
   --app-bg: 9 9 11;
@@ -63,17 +71,17 @@
   --app-text: 244 244 245;
   --app-muted: 161 161 170;
   --app-subtle: 113 113 122;
-  --app-accent: 201 162 39;
-  --app-accent-soft: 42 32 7;
-  --app-kicker: 217 183 59;
+  --app-accent: 46 158 245;
+  --app-accent-soft: 11 50 107;
+  --app-kicker: 124 201 252;
   color-scheme: dark;
 }
 
 html { scroll-behavior: smooth; }
 html, body { min-height: 100%; }
 body { @apply bg-app-bg text-app-text antialiased; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-::selection { @apply bg-zinc-950 text-[#F0D878]; }
-.dark ::selection { background: #C9A227; color: #09090b; }
+::selection { @apply bg-zinc-950 text-[#B6E0FF]; }
+.dark ::selection { background: #2E9EF5; color: #071F45; }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 
 @keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -95,17 +103,17 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .toast-icon-draw-2 { animation-delay: .3s; }
 .animate-page-in { animation: page-in .45s ease-out both; }
 
-/* Splash sesi (AppLoader): intro emas-hitam sekali per tab, tanpa spinner berputar. */
+/* Splash sesi (AppLoader): intro biru–hijau sekali per tab, tanpa spinner berputar. */
 @keyframes app-loader-rise { from { opacity: 0; transform: translateY(6px) scale(.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes app-loader-halo { 0%, 100% { opacity: .38; transform: scale(.9); } 50% { opacity: .12; transform: scale(1.1); } }
 @keyframes app-loader-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-.app-loader-aura { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 45%, rgba(201, 162, 39, .18), transparent 55%); }
+.app-loader-aura { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 45%, rgba(46, 158, 245, .2), transparent 55%); }
 .app-loader-logo { animation: app-loader-rise .5s ease-out both; }
 .app-loader-word { animation: app-loader-rise .6s .1s ease-out both; }
-.app-loader-halo { background: radial-gradient(circle, rgba(217, 183, 59, .6), transparent 62%); animation: app-loader-halo 1.2s ease-in-out infinite; }
+.app-loader-halo { background: radial-gradient(circle, rgba(140, 217, 58, .55), transparent 62%); animation: app-loader-halo 1.2s ease-in-out infinite; }
 .app-loader-bar { animation: app-loader-bar 1.15s cubic-bezier(.22, .61, .36, 1) both; }
 .dashboard-card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
-.dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 18px 35px rgba(9, 9, 11, .18); border-color: #C9A227; }
+.dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 18px 35px rgba(9, 9, 11, .18); border-color: #2E9EF5; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
@@ -113,80 +121,85 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
   .toast-error-shake { animation: none !important; }
 }
 
-.app-hero { position: relative; background: radial-gradient(circle at 80% 15%, rgba(201, 162, 39, .24), transparent 30%), radial-gradient(circle at 15% 100%, rgba(201, 162, 39, .12), transparent 38%), #09090b; box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }
-.app-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 0%, rgba(240,216,120,.06) 45%, transparent 70%); pointer-events: none; }
+.app-hero { position: relative; background: radial-gradient(circle at 80% 15%, rgba(46, 158, 245, .24), transparent 30%), radial-gradient(circle at 15% 100%, rgba(140, 217, 58, .12), transparent 38%), #09090b; box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }
+.app-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 0%, rgba(182,224,255,.06) 45%, transparent 70%); pointer-events: none; }
 .section-kicker { font-size: 10px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; color: rgb(var(--app-kicker)); }
 .section-title { margin-top: .25rem; font-size: 1.35rem; line-height: 1.25; font-weight: 900; color: rgb(var(--app-text)); }
 .app-panel { border: 1px solid rgb(var(--app-border)); border-radius: 1.5rem; background: rgb(var(--app-surface)); padding: 1rem; box-shadow: 0 8px 25px rgba(9,9,11,.06); }
 .service-tile { display: block; border: 1px solid rgb(var(--app-border)); border-radius: 1.25rem; background: rgb(var(--app-surface)); padding: 1rem; box-shadow: 0 5px 18px rgba(9,9,11,.04); transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
-.service-tile:hover { transform: translateY(-3px); border-color: #C9A227; box-shadow: 0 14px 28px rgba(9,9,11,.10); }
+.service-tile:hover { transform: translateY(-3px); border-color: #2E9EF5; box-shadow: 0 14px 28px rgba(9,9,11,.10); }
 .service-icon { display: flex; width: 3rem; height: 3rem; align-items: center; justify-content: center; border-radius: 1rem; background: rgb(var(--app-accent-soft)); font-size: 1.45rem; }
 .product-card { overflow: hidden; border: 1px solid rgb(var(--app-border)); border-radius: 1.25rem; background: rgb(var(--app-surface)); box-shadow: 0 5px 18px rgba(9,9,11,.04); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-.product-card:hover { transform: translateY(-3px); border-color: #C9A227; box-shadow: 0 16px 30px rgba(9,9,11,.10); }
+.product-card:hover { transform: translateY(-3px); border-color: #2E9EF5; box-shadow: 0 16px 30px rgba(9,9,11,.10); }
 .feature-card { display: flex; gap: .8rem; border: 1px solid rgb(var(--app-border)); border-radius: 1.25rem; background: rgb(var(--app-surface)); padding: 1rem; }
 .feature-card > span { display: flex; height: 2.7rem; width: 2.7rem; flex: 0 0 auto; align-items: center; justify-content: center; border-radius: .9rem; background: rgb(var(--app-accent-soft)); font-size: 1.2rem; }
 .app-footer { border-radius: 1.5rem; background: #09090b; padding: 1.25rem; color: #fff; }
 .brand-purple { color:#09090b; }
-.brand-yellow { color:#D9B73B; }
+.brand-yellow { color:#8CD93A; }
 .brand-card { border:1px solid rgb(var(--app-border)); background:rgb(var(--app-surface)); border-radius:1.5rem; box-shadow:0 12px 32px rgba(9,9,11,.10); }
 
-/* CTA emas flat glossy (kelas pusat, v92). Gradient tipis 135deg + satu lapis
-   highlight putih di paruh atas (blend overlay) memberi kesan mengkilat tanpa
-   emboss. Hanya satu shadow tipis, tanpa border/translateY. Teks gelap #1A1200
-   weight 800 menjaga kontras di mode terang maupun gelap. */
+/* Gradasi identitas AIDIL STORE (utility Tailwind `bg-brand-gradient`):
+   diagonal biru #2E9EF5 → biru dalam #1565E0 → hijau muda #5BBE1F.
+   Pakai hanya untuk branding penting (logo container, header, CTA terpenting). */
+
+/* CTA primer biru flat glossy (kelas pusat, nama legacy .btn-gold).
+   Gradient tipis 135deg + satu lapis highlight putih di paruh atas (blend overlay)
+   memberi kesan mengkilat tanpa emboss. Satu shadow tipis, tanpa border/translateY.
+   Teks putih #F8FAFC weight 800 menjaga kontras AA di seluruh gradasi. */
 .btn-gold {
   background-image:
-    linear-gradient(135deg, #F0D878 0%, #D4AF37 45%, #C9A227 100%),
-    linear-gradient(180deg, rgba(255, 255, 255, .35) 0%, rgba(255, 255, 255, 0) 50%);
+    linear-gradient(135deg, #1565E0 0%, #1151B8 100%),
+    linear-gradient(180deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, 0) 50%);
   background-blend-mode: overlay;
-  color: #1A1200;
+  color: #F8FAFC;
   font-weight: 800;
   border: none;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, .25);
+  box-shadow: 0 2px 8px rgba(7, 31, 69, .35);
   transition: filter .15s ease, box-shadow .15s ease;
 }
 .btn-gold:hover:not(:disabled) {
-  filter: brightness(1.08);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, .3);
+  filter: brightness(1.1);
+  box-shadow: 0 4px 12px rgba(7, 31, 69, .4);
 }
 .btn-gold:active:not(:disabled) {
   filter: brightness(.95);
 }
 .btn-gold:focus-visible {
-  outline: 2px solid #F0D878;
+  outline: 2px solid #7CC9FC;
   outline-offset: 3px;
 }
 .btn-gold:disabled {
-  background-image: linear-gradient(135deg, #F0D878 0%, #D4AF37 45%, #C9A227 100%);
+  background-image: linear-gradient(135deg, #1565E0 0%, #1151B8 100%);
   background-blend-mode: normal;
   filter: none;
   opacity: .5;
   cursor: not-allowed;
 }
 
-/* CTA emas metalik datar (kelas pusat). Dipakai kontrol emas sekunder/kompak
-   agar hierarki tetap: hanya CTA utama yang memakai .btn-gold glossy. */
+/* CTA sekunder hijau muda (nama legacy .btn-gold-metal, nilainya kini mint).
+   Dipakai kontrol sekunder/kompak agar hierarki tetap: hanya CTA utama yang
+   memakai .btn-gold biru glossy. Teks hijau-hitam memberi kontras AA. */
 .btn-gold-metal {
-  background-color: #C9A227;
-  background-image: linear-gradient(135deg, #C9A227 0%, #E8C766 50%, #C9A227 100%);
-  color: #1A1200;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .28), 0 4px 14px rgba(201, 162, 39, .22);
+  background-color: #8CD93A;
+  background-image: linear-gradient(135deg, #8CD93A 0%, #5BBE1F 100%);
+  color: #0B1A05;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .3), 0 4px 14px rgba(140, 217, 58, .22);
 }
 .btn-gold-metal:hover:not(:disabled) {
-  background-image: linear-gradient(135deg, #D9B73B 0%, #F0D878 50%, #D9B73B 100%);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .38), 0 6px 20px rgba(201, 162, 39, .32);
+  background-image: linear-gradient(135deg, #B8EE70 0%, #8CD93A 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .4), 0 6px 20px rgba(140, 217, 58, .32);
 }
 .btn-gold-metal:focus-visible {
-  outline: 2px solid #F0D878;
+  outline: 2px solid #B8EE70;
   outline-offset: 2px;
 }
 .btn-gold-metal:disabled {
   box-shadow: none;
 }
 
-.brand-button { background-color:#C9A227; background-image:linear-gradient(135deg,#C9A227,#E8C766 50%,#C9A227); color:#1A1200; font-weight:800; }
-.brand-button:hover { background-image:linear-gradient(135deg,#D9B73B,#F0D878 50%,#D9B73B); }
+.brand-button { background-color:#8CD93A; background-image:linear-gradient(135deg,#8CD93A,#5BBE1F 100%); color:#0B1A05; font-weight:800; }
+.brand-button:hover { background-image:linear-gradient(135deg,#B8EE70,#8CD93A 100%); }
 @media (min-width: 640px) { .app-panel { padding: 1.25rem; } .section-title { font-size: 1.5rem; } .app-footer { padding: 1.5rem; } }
 @media (max-width: 767px) { body { padding-bottom: 4.4rem; } }
 @media print {
@@ -200,16 +213,18 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .nav-link:hover { background:rgb(var(--app-accent-soft)); color:rgb(var(--app-text)); }
 .nav-link-active { background:rgb(var(--app-accent-soft)); color:rgb(var(--app-kicker)); }
 .mobile-link {
-  display:flex; flex-direction:column; align-items:center; gap:.2rem;
-  padding:.65rem .5rem; font-size:10px; font-weight:800; color:rgb(var(--app-subtle));
-  border-radius:.9rem; position:relative;
-  transition: color .18s ease, background-color .18s ease, transform .12s ease;
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.15rem;
+  min-height:48px; padding:.4rem .25rem .35rem;
+  font-size:12px; font-weight:500; line-height:1rem; color:rgb(var(--app-subtle));
+  border-radius:.75rem; position:relative;
+  transition: color .18s ease, transform .12s ease;
 }
-.mobile-link:active { transform: scale(.88); background-color:rgb(var(--app-accent-soft)); color:rgb(var(--app-kicker)); }
-.mobile-link-active { color:rgb(var(--app-kicker)); background-color:rgb(var(--app-accent-soft)); }
+.mobile-link svg { width:1.25rem; height:1.25rem; }
+.mobile-link:active { transform: scale(.94); color:rgb(var(--app-kicker)); }
+.mobile-link-active { color:rgb(var(--app-kicker)); }
 .mobile-link span { transition: color .18s ease; }
 
-/* Kanvas halaman pelanggan, mengikuti tema aktif (light: krem terang, dark: hitam-emas).
+/* Kanvas halaman pelanggan, mengikuti tema aktif (light: krem terang, dark: hitam-biru).
    Margin negatif menetralkan padding main (px-4 py-6 / sm:px-6 sm:py-8) agar full-bleed. */
 .customer-shell {
   margin: -1.5rem -1rem -8rem;
