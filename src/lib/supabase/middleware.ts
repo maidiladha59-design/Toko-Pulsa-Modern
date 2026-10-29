@@ -21,6 +21,20 @@ let maintenanceCache: {
   expiresAt: number;
 } | null = null;
 
+type ProfileActivity = {
+  last_activity_at: string | null;
+  account_status: string | null;
+};
+
+// Status blokir + aktivitas tetap dievaluasi di setiap request, tetapi hasil
+// bacanya dipakai ulang maksimal 60 detik. Tanpa ini setiap navigasi menambah
+// satu round-trip database (puluhan sampai ratusan ms) sebelum respons dimulai.
+const PROFILE_CACHE_TTL_MS = 60 * 1000;
+let profileCache = new Map<
+  string,
+  { value: ProfileActivity | null; expiresAt: number }
+>();
+
 // getSession() hanya membaca cookie lokal. Payload JWT dipakai untuk mengambil
 // sub tanpa menyentuh user object (yang memicu peringatan "insecure" di server).
 // Otorisasi sebenarnya tetap divalidasi ulang oleh halaman/layout via getUser().
@@ -228,11 +242,24 @@ export async function updateSession(request: NextRequest) {
   // last_activity_at is server-side, so the client cannot extend the session by
   // editing localStorage/cookies.
   if (authenticated && userId && !isApiRoute && !isNextAsset) {
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("last_activity_at, account_status")
-      .eq("id", userId)
-      .maybeSingle();
+    const cachedProfile = profileCache.get(userId);
+    let profile: ProfileActivity | null | undefined;
+    if (cachedProfile && cachedProfile.expiresAt > Date.now()) {
+      profile = cachedProfile.value;
+    } else {
+      const { data } = await supabase
+        .from("profiles")
+        .select("last_activity_at, account_status")
+        .eq("id", userId)
+        .maybeSingle();
+      profile = (data as ProfileActivity | null) ?? null;
+      // Map dibatasi supaya memori instance tidak tumbuh tanpa henti.
+      if (profileCache.size > 500) profileCache.clear();
+      profileCache.set(userId, {
+        value: profile,
+        expiresAt: Date.now() + PROFILE_CACHE_TTL_MS,
+      });
+    }
 
     // Akun diblokir tidak boleh mengakses halaman apa pun kecuali halaman
     // pemberitahuan blokir (yang juga berisi kontak CS).
@@ -264,10 +291,19 @@ export async function updateSession(request: NextRequest) {
     }
 
     if (!profileActivity || Date.now() - profileActivity >= ACTIVITY_WRITE_INTERVAL_MS) {
+      const nowIso = new Date().toISOString();
       await supabase
         .from("profiles")
-        .update({ last_activity_at: new Date().toISOString() })
+        .update({ last_activity_at: nowIso })
         .eq("id", userId);
+      // Cache ikut diperbarui agar request berikutnya tidak menulis ulang.
+      profileCache.set(userId, {
+        value: {
+          last_activity_at: nowIso,
+          account_status: profile?.account_status ?? null,
+        },
+        expiresAt: Date.now() + PROFILE_CACHE_TTL_MS,
+      });
     }
   }
 

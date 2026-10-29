@@ -255,3 +255,9 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 @media print {
   .customer-shell { margin: 0; padding: 0; min-height: auto; background: #fff; color: #000; }
 }
+/* Umpan balik sentuh: hilangkan kedipan tap dan tunda klik ganda di HP,
+   lalu beri reaksi instan (<100 ms) saat tombol/link ditekan. */
+html { -webkit-tap-highlight-color: transparent; }
+a[href], button { touch-action: manipulation; }
+a[href]:active, button:not(:disabled):active { opacity: .8; }
+@media print { a[href]:active, button:not(:disabled):active { opacity: 1; } }

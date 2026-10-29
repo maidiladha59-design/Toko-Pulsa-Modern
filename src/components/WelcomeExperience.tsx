@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import Icon from "@/components/icons/Icon";
 
@@ -117,9 +118,12 @@ export default function WelcomeExperience() {
           <div className="relative flex h-24 w-24 items-center justify-center">
             <span className="absolute h-full w-full animate-ping rounded-full bg-gold-400/20" />
             <span className="absolute h-full w-full rounded-full border-2 border-gold-400/30" />
-            <img
+            <Image
               src="/aidil-logo.png"
               alt="AIDIL STORE"
+              width={64}
+              height={64}
+              priority
               className="h-16 w-16 rounded-2xl object-cover shadow-[0_0_30px_rgba(46,158,245,0.45)]"
             />
           </div>
@@ -139,7 +143,7 @@ export default function WelcomeExperience() {
       {step === "welcome" && (
         <div className="relative w-full max-w-lg animate-page-in rounded-[28px] border border-white/10 bg-white/[0.04] p-6 shadow-[0_25px_80px_rgba(0,0,0,0.55)] backdrop-blur-xl sm:p-8">
           <div className="flex items-center gap-3">
-            <img src="/aidil-logo.png" alt="AIDIL STORE" className="h-11 w-11 rounded-xl object-cover" />
+            <Image src="/aidil-logo.png" alt="AIDIL STORE" width={44} height={44} className="h-11 w-11 rounded-xl object-cover" />
             <p className="text-lg font-black tracking-tight text-white">AIDIL STORE</p>
           </div>
 

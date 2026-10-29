@@ -1,6 +1,5 @@
 "use client";
 
-import * as Sentry from "@sentry/nextjs";
 import { useEffect } from "react";
 import { NetworkError } from "@/components/NetworkState";
 
@@ -12,7 +11,8 @@ export default function PPOBCategoryError({
   reset: () => void;
 }) {
   useEffect(() => {
-    Sentry.captureException(error);
+    // Sentry dimuat hanya saat ada error supaya SDK tidak masuk bundle awal semua halaman.
+    void import("@sentry/nextjs").then((Sentry) => Sentry.captureException(error)).catch(() => {});
   }, [error]);
 
   return (

@@ -19,6 +19,8 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     remotePatterns: [{ protocol: "https", hostname: "**.supabase.co" }],
+    // AVIF/WebP lebih kecil 25-50% dari JPEG/PNG pada ukuran tampil yang sama.
+    formats: ["image/avif", "image/webp"],
     // Bucket site-media/brand-logos mengizinkan upload SVG, dan optimizer next/image
     // menolak remote SVG (400) tanpa flag ini. CSP ketat + sandbox supaya SVG yang
     // diproses tidak bisa menjalankan script.

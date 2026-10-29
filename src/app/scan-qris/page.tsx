@@ -3,8 +3,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatRupiah, formatDate } from '@/lib/utils';
-import { BrowserMultiFormatReader } from '@zxing/browser';
-import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { parsePersonalQrPayload } from '@/lib/transfer/qr';
 import Icon from '@/components/icons/Icon';
 
@@ -103,7 +101,6 @@ function DetailRow({ label, value, mono, badge }: { label: string; value: string
 export default function ScanQRIS() {
   const router = useRouter();
   const videoRef = useRef<HTMLVideoElement>(null);
-  const readerRef = useRef<BrowserMultiFormatReader | null>(null);
   const controlsRef = useRef<{ stop: () => void } | null>(null);
 
   const [code, setCode] = useState('');
@@ -138,9 +135,7 @@ export default function ScanQRIS() {
       // Abaikan error cleanup kamera
     }
 
-    readerRef.current = null;
-    setCameraActive(false);
-  }
+    setCameraActive(false);  }
 
   async function startScanner() {
     setError('');
@@ -158,9 +153,17 @@ export default function ScanQRIS() {
     setBusy(true);
 
     try {
-      const permissionStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+      // Pustaka ZXing (~250 KB) dimuat saat tombol scan ditekan, bukan saat
+      // halaman dibuka, supaya halaman ini tidak memblokir navigasi.
+      const [permissionStream, zxingBrowser, zxingLibrary] = await Promise.all([
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false }),
+        import('@zxing/browser'),
+        import('@zxing/library'),
+      ]);
       permissionStream.getTracks().forEach((track) => track.stop());
       setCameraPermission('granted');
+      const { BrowserMultiFormatReader } = zxingBrowser;
+      const { BarcodeFormat, DecodeHintType } = zxingLibrary;
       const hints = new Map();
 
       hints.set(DecodeHintType.POSSIBLE_FORMATS, [
@@ -168,8 +171,6 @@ export default function ScanQRIS() {
       ]);
 
       const reader = new BrowserMultiFormatReader(hints);
-
-      readerRef.current = reader;
 
       const controls = await reader.decodeFromVideoDevice(
         undefined,

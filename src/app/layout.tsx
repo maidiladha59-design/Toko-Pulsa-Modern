@@ -3,6 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import AppLoader from "@/components/AppLoader";
 import Navbar from "@/components/Navbar";
+import RouteProgress from "@/components/RouteProgress";
 import ToastProvider from "@/components/ToastProvider";
 import WelcomeExperience from "@/components/WelcomeExperience";
 import { isFeatureEnabled } from "@/lib/features";
@@ -43,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ToastProvider>
+            <RouteProgress />
             <AppLoader />
             <WelcomeExperience />
             <Navbar scanQrisEnabled={scanQrisEnabled} />

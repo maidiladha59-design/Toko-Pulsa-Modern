@@ -1,7 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { createClient } from "@/lib/supabase/client";
 import { formatDate } from "@/lib/utils";
 import Icon from "@/components/icons/Icon";
 
@@ -11,24 +10,39 @@ type Notice = {
 };
 
 export default function NotificationBell() {
-  const supabase = createClient();
   const [items, setItems] = useState<Notice[]>([]);
   const [open, setOpen] = useState(false);
 
+  // API sudah memvalidasi sesi (401 bila belum login), jadi tidak perlu
+  // round-trip getUser() tambahan di setiap polling.
   async function load() {
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) { setItems([]); return; }
     const r = await fetch("/api/notifications", { cache: "no-store" });
+    if (r.status === 401) { setItems([]); return; }
     if (r.ok) {
       const d = await r.json();
       setItems(d.notifications || []);
     }
   }
 
+  // 60 detik + berhenti saat tab tidak terlihat: tab yang ditinggal di
+  // belakang tidak lagi menghabiskan kuota dan CPU ponsel.
   useEffect(() => {
-    load();
-    const t = window.setInterval(load, 20000);
-    return () => window.clearInterval(t);
+    let timer: number | undefined;
+    const stop = () => {
+      if (timer !== undefined) window.clearInterval(timer);
+      timer = undefined;
+    };
+    const start = () => {
+      stop();
+      timer = window.setInterval(load, 60000);
+    };
+    const sync = () => {
+      if (document.visibilityState === "visible") { load(); start(); }
+      else stop();
+    };
+    sync();
+    document.addEventListener("visibilitychange", sync);
+    return () => { stop(); document.removeEventListener("visibilitychange", sync); };
   }, []);
 
   const unread = items.filter(x => !x.is_read).length;

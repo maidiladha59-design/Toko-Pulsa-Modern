@@ -26,24 +26,32 @@ export default async function WalletPage() {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: wallet }, { data: pendingTopups }] = await Promise.all([
-    supabase.from("wallets").select("id, balance").eq("user_id", user.id).single(),
+  const { data: wallet } = await supabase
+    .from("wallets")
+    .select("id, balance")
+    .eq("user_id", user.id)
+    .single();
+
+  // Riwayat butuh wallet.id, jadi dua query sisanya dijalankan bersamaan
+  // (satu round-trip lebih sedikit daripada menunggu top up lalu riwayat).
+  const [{ data: pendingTopups }, { data: history }] = await Promise.all([
     supabase
       .from("topups")
       .select("id, amount, status, created_at")
       .eq("user_id", user.id)
       .in("status", ["PENDING", "VERIFYING"])
       .order("created_at", { ascending: false }),
+    wallet
+      ? supabase
+          .from("wallet_transactions")
+          .select("id, type, amount, balance_after, description, created_at")
+          .eq("wallet_id", wallet.id)
+          .order("created_at", { ascending: false })
+          .limit(20)
+      : Promise.resolve({ data: null }),
   ]);
 
-  const { data: history } = wallet
-    ? await supabase
-        .from("wallet_transactions")
-        .select("id, type, amount, balance_after, description, created_at")
-        .eq("wallet_id", wallet.id)
-        .order("created_at", { ascending: false })
-        .limit(20)
-    : { data: [] };
+  const historyRows = history || [];
 
   return (
     <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] animate-page-in">
@@ -91,9 +99,9 @@ export default async function WalletPage() {
         <h2 className="mt-1 text-base font-black text-app-text">Riwayat Saldo</h2>
       </section>
       <div className="mt-3 overflow-hidden rounded-3xl border border-app-border bg-app-surface">
-        {history && history.length > 0 ? (
+        {historyRows.length > 0 ? (
           <ul className="divide-y divide-app-border">
-            {history.map((h) => (
+            {historyRows.map((h) => (
               <li key={h.id} className="flex items-center gap-3 px-4 py-3.5">
                 <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-inset">
                   <Icon name={TX_ICON[h.type] ?? "card"} size={20} />
