@@ -36,7 +36,7 @@ export default function KycChip({
   tone?: "app" | "hero";
   className?: string;
 }) {
-  const base = `inline-flex max-w-full items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-4 ${TONES[tone][status]} ${className}`;
+  const base = `inline-flex min-h-6 max-w-full items-center gap-1 rounded-full border px-2.5 text-[11px] font-semibold leading-4 ${TONES[tone][status]} ${className}`;
   const content = (
     <>
       <Icon name={ICONS[status]} size={12} className="shrink-0" />

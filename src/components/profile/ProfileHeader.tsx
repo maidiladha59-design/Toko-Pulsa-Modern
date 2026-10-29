@@ -97,7 +97,7 @@ export default function ProfileHeader({
 
   return (
     <>
-      <div className="flex w-full min-w-0 max-w-full items-start gap-3 sm:gap-4">
+      <div className="flex w-full min-w-0 max-w-full flex-wrap items-start gap-3 sm:flex-nowrap sm:gap-4">
         <button
           type="button"
           onClick={() => setPickerOpen(true)}
@@ -120,30 +120,23 @@ export default function ProfileHeader({
           </span>
         </button>
 
-        <div className="min-w-0 flex-1 space-y-1">
+        <div className="min-w-0 flex-1">
           <GreetingText className="block text-xs font-semibold text-gold-200" />
-          <p className="block truncate text-[18px] font-semibold leading-6 text-white" title={name}>
-            {name}
-          </p>
+          <div className="mt-1 min-w-0">
+            <p className="block truncate text-[18px] font-semibold leading-6 text-white" title={name}>
+              {name}
+            </p>
+          </div>
 
-          {status ? (
-            <div className="pt-0.5">
-              <KycChip status={status} tone="hero" />
-            </div>
-          ) : null}
-
-          {status === "unverified" ? (
-            <p className="max-w-full text-[11px] leading-4 text-zinc-400">{KYC_VERIFY_HINT}</p>
-          ) : null}
-
-          <div className="flex flex-wrap items-center gap-1.5 pt-0.5">
+          <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
+            {status ? <KycChip status={status} tone="hero" /> : null}
             <LevelChip transactions={transactions} />
             {shortId ? (
               <button
                 type="button"
                 onClick={copyId}
                 aria-label={`Salin ID ${shortId}`}
-                className="inline-flex max-w-full items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2 py-0.5 text-[11px] font-semibold leading-4 text-zinc-200 transition hover:bg-white/15"
+                className="inline-flex h-6 max-w-full items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2.5 text-[11px] font-semibold leading-4 text-zinc-200 transition hover:bg-white/15"
               >
                 <span className="truncate tabular-nums">ID {shortId}</span>
                 <Icon name="copy" size={11} className="shrink-0" />
@@ -151,27 +144,37 @@ export default function ProfileHeader({
             ) : null}
           </div>
 
-          {balance === null ? (
-            <div className="h-5 w-28 animate-pulse rounded-full bg-white/10" aria-hidden />
-          ) : (
-            <div className="inline-flex max-w-full items-center gap-1 rounded-full border border-white/15 bg-white/10 py-0.5 pl-2.5 pr-1 text-[11px] font-semibold leading-4">
-              <Link href="/wallet" className="inline-flex min-w-0 items-center gap-1 text-white">
-                <span className="text-zinc-300">Saldo</span>
-                <span className="truncate tabular-nums">
-                  {hidden ? "Rp ••••" : formatRupiah(balance)}
-                </span>
-              </Link>
+          {status === "unverified" ? (
+            <p className="mt-1.5 max-w-full text-[11px] leading-4 text-zinc-400">{KYC_VERIFY_HINT}</p>
+          ) : null}
+        </div>
+
+        {balance === null ? (
+          <div className="w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 sm:w-48" aria-hidden>
+            <span className="block h-2.5 w-10 animate-pulse rounded bg-white/15" />
+            <span className="mt-2 block h-6 w-24 animate-pulse rounded bg-white/15" />
+          </div>
+        ) : (
+          <div className="w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 sm:w-48">
+            <div className="flex items-center justify-between gap-2 sm:justify-end">
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">Saldo</span>
               <button
                 type="button"
                 onClick={toggleBalance}
                 aria-label={hidden ? "Tampilkan saldo" : "Sembunyikan saldo"}
-                className="shrink-0 rounded-full p-1 text-zinc-300 transition hover:text-white"
+                className="-mr-1 shrink-0 rounded-full p-1 text-zinc-300 transition hover:text-white"
               >
                 <EyeToggle hidden={hidden} />
               </button>
             </div>
-          )}
-        </div>
+            <Link
+              href="/wallet"
+              className="mt-1 block truncate text-xl font-black leading-7 tabular-nums text-white sm:text-right sm:text-2xl"
+            >
+              {hidden ? "Rp ••••" : formatRupiah(balance)}
+            </Link>
+          </div>
+        )}
       </div>
 
       <AvatarPicker

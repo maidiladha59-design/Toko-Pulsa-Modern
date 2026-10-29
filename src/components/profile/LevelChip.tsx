@@ -30,7 +30,7 @@ export default function LevelChip({
       href="/ranking"
       title={hint}
       aria-label={`Level ${tier.label}. ${hint}`}
-      className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-[11px] font-semibold leading-4 transition hover:brightness-110 ${TIER_TONES[tier.key]} ${className}`}
+      className={`inline-flex h-6 items-center gap-1 rounded-full border px-2.5 text-[11px] font-semibold leading-4 transition hover:brightness-110 ${TIER_TONES[tier.key]} ${className}`}
     >
       <Icon name="star_fill" size={11} className="shrink-0" />
       <span className="whitespace-nowrap">Lv. {tier.label}</span>
