@@ -9,6 +9,7 @@ import { Card } from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import UserAvatar from "@/components/UserAvatar";
+import Icon from "@/components/icons/Icon";
 
 type AvatarAdmin = {
   id: string;
@@ -233,8 +234,8 @@ export default function AdminAvatarsPage() {
                     <button
                       onClick={() => { URL.revokeObjectURL(p.preview); setPending((prev) => prev.filter((x) => x.key !== p.key)); }}
                       aria-label={`Batalkan ${p.name}`}
-                      className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-danger-600 text-xs font-black text-white"
-                    >✕</button>
+                      className="absolute -right-1 -top-1 flex h-6 w-6 items-center justify-center rounded-full bg-danger-600 font-black text-white"
+                    ><Icon name="close" size={12} /></button>
                   </div>
                   <p className="mt-1 truncate text-[11px] text-app-subtle" title={p.name}>{p.name}</p>
                 </div>
@@ -258,7 +259,7 @@ export default function AdminAvatarsPage() {
         <Card><p className="text-sm font-bold text-danger-600 dark:text-danger-400">{error}</p></Card>
       ) : items.length === 0 ? (
         <EmptyState
-          icon="🖼️"
+          icon="image"
           title="Belum ada foto profil"
           description="Unggah gambar pertama di atas. Avatar default toko tetap tersedia sebagai cadangan."
         />

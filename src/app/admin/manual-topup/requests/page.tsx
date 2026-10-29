@@ -8,6 +8,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
 import ErrorState from "@/components/ui/ErrorState";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import Icon from "@/components/icons/Icon";
 import { useToast } from "@/components/ToastProvider";
 import { formatDate, formatRupiah } from "@/lib/utils";
 
@@ -173,7 +174,7 @@ export default function AdminManualTopupRequestsPage() {
           href="/admin/manual-topup/channels"
           className="inline-flex items-center justify-center gap-2 rounded-xl border border-app-border bg-transparent px-4 py-2.5 text-sm font-bold text-app-text transition hover:border-gold-400 hover:bg-app-accent-soft"
         >
-          ⚙️ Kelola Channel &amp; Nominal
+          <Icon name="settings" size={16} />Kelola Channel &amp; Nominal
         </Link>
       </div>
 
@@ -217,7 +218,7 @@ export default function AdminManualTopupRequestsPage() {
         <ErrorState title="Gagal memuat permintaan" description={loadError} onRetry={() => load(tab)} />
       ) : requests.length === 0 ? (
         <EmptyState
-          icon="🧾"
+          icon="receipt"
           title={tab === "PENDING" ? "Tidak ada permintaan menunggu" : "Belum ada permintaan"}
           description={
             tab === "PENDING"
@@ -272,8 +273,8 @@ export default function AdminManualTopupRequestsPage() {
                       alt={`Bukti transfer ${request.user_name}`}
                       className="h-16 w-16 rounded-xl object-cover"
                     />
-                    <span className="pr-2 text-xs font-bold text-app-kicker group-hover:underline">
-                      Perbesar bukti →
+                    <span className="inline-flex items-center gap-1.5 pr-2 text-xs font-bold text-app-kicker group-hover:underline">
+                      Perbesar bukti <Icon name="arrow_right" size={14} />
                     </span>
                   </button>
                 ) : (
@@ -285,14 +286,14 @@ export default function AdminManualTopupRequestsPage() {
                 {request.status === "PENDING" ? (
                   <div className="flex flex-wrap gap-2 sm:ml-auto">
                     <Button onClick={() => approve(request)} loading={actingId === request.id}>
-                      ✓ Setujui
+                      <Icon name="check" size={16} />Setujui
                     </Button>
                     <Button
                       variant="destructive"
                       onClick={() => openReject(request)}
                       disabled={actingId === request.id}
                     >
-                      ✕ Tolak
+                      <Icon name="close" size={16} />Tolak
                     </Button>
                   </div>
                 ) : request.admin_note ? (
@@ -324,9 +325,9 @@ export default function AdminManualTopupRequestsPage() {
               <button
                 type="button"
                 onClick={() => setProofPreview(null)}
-                className="rounded-xl bg-white/10 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-white/20"
+                className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-3 py-1.5 text-sm font-bold text-white transition hover:bg-white/20"
               >
-                Tutup ✕
+                Tutup <Icon name="close" size={16} />
               </button>
             </div>
             <img

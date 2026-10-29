@@ -138,6 +138,10 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .service-tile { display: block; border: 1px solid rgb(var(--app-border)); border-radius: 1.25rem; background: rgb(var(--app-surface)); padding: 1rem; box-shadow: 0 5px 18px rgba(9,9,11,.04); transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
 .service-tile:hover { transform: translateY(-3px); border-color: #2E9EF5; box-shadow: 0 14px 28px rgba(9,9,11,.10); }
 .service-icon { display: flex; width: 3rem; height: 3rem; align-items: center; justify-content: center; border-radius: 1rem; background: rgb(var(--app-accent-soft)); font-size: 1.45rem; }
+/* Kotak ikon layanan (src/components/icons/IconTile): radius 16px, gradasi brand
+   halus, ukuran kotak lewat inline style. Warna ikon dari currentColor (kelas text-*). */
+.icon-tile { display: flex; width: 3.5rem; height: 3.5rem; flex: 0 0 auto; align-items: center; justify-content: center; border-radius: 1rem; border: 1px solid rgb(var(--app-border)); background-image: linear-gradient(135deg, rgb(var(--app-accent-soft)), rgb(var(--app-surface))); }
+.icon-tile-hero { border-color: rgba(255, 255, 255, .14); background-image: linear-gradient(135deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .05)); }
 .product-card { overflow: hidden; border: 1px solid rgb(var(--app-border)); border-radius: 1.25rem; background: rgb(var(--app-surface)); box-shadow: 0 5px 18px rgba(9,9,11,.04); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
 .product-card:hover { transform: translateY(-3px); border-color: #2E9EF5; box-shadow: 0 16px 30px rgba(9,9,11,.10); }
 .feature-card { display: flex; gap: .8rem; border: 1px solid rgb(var(--app-border)); border-radius: 1.25rem; background: rgb(var(--app-surface)); padding: 1rem; }

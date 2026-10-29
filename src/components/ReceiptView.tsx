@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { useState } from "react";
 import { printReceiptBluetooth, receiptToText, type ReceiptData } from "@/lib/receipt-print";
+import Icon from "@/components/icons/Icon";
 
 type Props = ReceiptData & { backHref?: string };
 
@@ -65,7 +66,7 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
         style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}
       >
         <div className="no-print flex items-center justify-between rounded-t-3xl bg-zinc-950 px-5 pb-5 pt-[calc(env(safe-area-inset-top)+16px)] text-gold-400">
-          <button type="button" onClick={goBack} aria-label="Kembali" className="text-2xl font-black leading-none">←</button>
+          <button type="button" onClick={goBack} aria-label="Kembali" className="font-black leading-none"><Icon name="arrow_left" size={24} /></button>
           <span className="text-xs font-black uppercase tracking-widest">Struk Digital</span>
         </div>
         <div
@@ -110,14 +111,14 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
               onClick={printBluetooth}
               className={`rounded-xl px-4 py-3 text-sm font-black ${busy ? "animate-pulse bg-gold-100 text-zinc-900" : "bg-zinc-950 text-gold-400"}`}
             >
-              {busy ? "Menghubungkan..." : "🖨️ Cetak via Bluetooth"}
+              {busy ? "Menghubungkan..." : <span className="inline-flex items-center gap-1.5"><Icon name="printer" size={16} />Cetak via Bluetooth</span>}
             </button>
             <button type="button" onClick={() => window.print()} className="rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-black hover:bg-gold-300">
-              🖨️ Cetak / Simpan PDF
+              <span className="inline-flex items-center gap-1.5"><Icon name="printer" size={16} />Cetak / Simpan PDF</span>
             </button>
           </div>
           <button type="button" onClick={share} className="w-full rounded-xl border border-app-border px-4 py-3 text-sm font-black text-app-text transition hover:border-gold-400/60 hover:bg-app-accent-soft">
-            📤 Bagikan Struk
+            <span className="inline-flex items-center gap-1.5"><Icon name="send" size={16} />Bagikan Struk</span>
           </button>
           {message && (
             <p className={`rounded-xl px-4 py-3 text-xs font-bold leading-5 ${message.ok ? "bg-app-accent-soft text-app-text" : "bg-danger-500/10 text-danger-600 dark:text-danger-400"}`}>

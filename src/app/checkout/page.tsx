@@ -10,6 +10,7 @@ import { formatRupiah } from "@/lib/utils";
 import { guideFor } from "@/lib/ppob/target-guide";
 import { Skeleton } from "@/components/ui/LoadingSkeleton";
 import Badge from "@/components/ui/Badge";
+import Icon from "@/components/icons/Icon";
 
 type Product = { id: string; name: string; price: number; thumbnail_url: string | null; product_type?: string };
 type PPOBService = { id: string; provider: string; provider_sku: string; service_kind: "prepaid" | "postpaid"; category: string; brand: string | null; target_schema: { fields?: Array<{ name: string; label: string; type?: string; required?: boolean; placeholder?: string }> } | null };
@@ -217,7 +218,7 @@ function CheckoutForm() {
   return (
     <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] animate-page-in pb-28 lg:max-w-5xl lg:pb-0">
       <div className="mb-5 flex items-start gap-3">
-        <button type="button" onClick={() => router.back()} aria-label="Kembali" className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-surface text-lg text-app-text transition hover:border-gold-400/50 hover:text-app-kicker">←</button>
+        <button type="button" onClick={() => router.back()} aria-label="Kembali" className="mt-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-surface text-app-text transition hover:border-gold-400/50 hover:text-app-kicker"><Icon name="arrow_left" size={18} /></button>
         <Image src="/aidil-logo.png" alt="Aidil Store" width={44} height={44} className="h-11 w-11 rounded-2xl object-cover" />
         <div className="min-w-0"><h1 className="text-xl font-black text-app-text sm:text-2xl">Pembayaran</h1><p className="text-sm text-app-muted">Bayar tanpa approve manual, lalu akses produk digital dari pesanan.</p></div>
       </div>
@@ -227,7 +228,7 @@ function CheckoutForm() {
           <div className="rounded-3xl border border-app-border bg-app-surface p-5">
             <div className="flex gap-4">
               <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-app-inset">
-                {product.thumbnail_url ? <Image src={product.thumbnail_url} alt={product.name} width={96} height={96} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-3xl">🛍️</div>}
+                {product.thumbnail_url ? <Image src={product.thumbnail_url} alt={product.name} width={96} height={96} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center"><Icon name="bag" size={30} /></div>}
               </div>
               <div className="min-w-0">
                 <p className="break-words font-black text-app-text">{product.name}</p>
@@ -243,7 +244,7 @@ function CheckoutForm() {
               <p className="mt-1 text-xs leading-5 text-app-muted">Masukkan link/catatan atau file yang dibutuhkan agar pesanan dapat diproses.</p>
               <textarea value={targetText} onChange={(e) => setTargetText(e.target.value)} rows={4} placeholder="Link, username, catatan, atau detail pesanan..." className="mt-3 w-full rounded-2xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20" />
               <input type="file" onChange={(e) => chooseTargetFile(e.target.files?.[0])} className="mt-3 block w-full text-sm text-app-text file:mr-3 file:rounded-xl file:border-0 file:bg-app-inset file:px-3 file:py-2 file:text-xs file:font-black file:text-app-text" />
-              {targetFile && <p className="mt-2 text-xs font-bold text-success-600 dark:text-success-400">✓ {targetFile.name}</p>}
+              {targetFile && <p className="mt-2 flex items-center gap-1.5 text-xs font-bold text-success-600 dark:text-success-400"><Icon name="check" size={16} />{targetFile.name}</p>}
             </div>
           )}
 
@@ -273,7 +274,7 @@ function CheckoutForm() {
                   </label>
                 ))}
               </div>
-              {targetDetected && !targetError && <p className="mt-3 text-xs font-black text-success-600 dark:text-success-400">✓ {targetDetected}</p>}
+              {targetDetected && !targetError && <p className="mt-3 flex items-center gap-1.5 text-xs font-black text-success-600 dark:text-success-400"><Icon name="check" size={16} />{targetDetected}</p>}
               {hasTargetInput && targetError && <p className="mt-3 rounded-xl bg-danger-500/10 px-3 py-2 text-xs font-bold leading-5 text-danger-600 dark:text-danger-400">{targetError}</p>}
               <ul className="mt-4 space-y-1.5 rounded-2xl bg-app-inset/60 p-3 text-xs leading-5 text-app-muted">
                 {guide.tips.map((tip) => <li key={tip}>• {tip}</li>)}
@@ -307,7 +308,7 @@ function CheckoutForm() {
             </div>
 
             <div className="mt-4 rounded-2xl border border-gold-400/60 bg-app-accent-soft p-4">
-              <span className="text-2xl">💰</span>
+              <Icon name="wallet" size={24} />
               <p className="mt-2 font-black text-app-text">Saldo Wallet AIDIL STORE</p>
               <p className="mt-1 text-xs text-app-muted"><span className="font-bold tabular-nums text-app-kicker">{formatRupiah(balance)}</span> tersedia</p>
               <p className="mt-3 text-xs leading-5 text-app-muted">Untuk saat ini, semua transaksi pembelian produk hanya dapat dibayar menggunakan saldo akun. Jika saldo belum cukup, silakan top up terlebih dahulu.</p>
@@ -340,7 +341,7 @@ function CheckoutForm() {
           </div>
 
           <div className={`sticky bottom-[76px] z-30 -mx-6 -mb-6 mt-5 space-y-2 border-t border-app-border bg-app-surface/95 px-6 pb-5 pt-4 backdrop-blur lg:static lg:border-0 lg:bg-transparent lg:px-0 lg:pb-0 lg:pt-0 lg:backdrop-blur-none`}>
-            <div className={`rounded-2xl p-3 text-xs font-bold ${enoughBalance ? "bg-success-500/10 text-success-600 dark:text-success-400" : "bg-danger-500/10 text-danger-600 dark:text-danger-400"}`}>{enoughBalance ? "✓ Saldo mencukupi." : "Saldo kurang, silakan top up terlebih dahulu."}</div>
+            <div className={`flex items-center gap-1.5 rounded-2xl p-3 text-xs font-bold ${enoughBalance ? "bg-success-500/10 text-success-600 dark:text-success-400" : "bg-danger-500/10 text-danger-600 dark:text-danger-400"}`}>{enoughBalance ? <><Icon name="check" size={16} />Saldo mencukupi.</> : "Saldo kurang, silakan top up terlebih dahulu."}</div>
             <button type="button" onClick={payWallet} disabled={confirming || !enoughBalance || (ppob?.service_kind === "postpaid" && !inquiryId)} className="btn-gold flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50">
               {confirming && <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" />}Bayar dengan Saldo
             </button>
@@ -348,9 +349,9 @@ function CheckoutForm() {
           </div>
 
           <div className="mt-5 space-y-2 text-xs leading-5 text-app-subtle">
-            <p>🔒 Pembayaran saldo diproses instan & aman.</p>
-            <p>📥 Produk digital yang lunas langsung tersedia di Pesanan.</p>
-            <p>🚫 Tidak perlu upload bukti transfer atau menunggu approve admin.</p>
+            <p className="flex items-center gap-1.5"><Icon name="lock" size={16} />Pembayaran saldo diproses instan & aman.</p>
+            <p className="flex items-center gap-1.5"><Icon name="inbox" size={16} />Produk digital yang lunas langsung tersedia di Pesanan.</p>
+            <p className="flex items-center gap-1.5"><Icon name="ban" size={16} />Tidak perlu upload bukti transfer atau menunggu approve admin.</p>
           </div>
         </aside>
       </div>

@@ -50,7 +50,7 @@ test('v98 preflight mengenal migrasi site_settings', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v98_info_ticker\.sql/);
   assert.match(script, /site_settings_public_read/);
-  assert.match(script, /97,98\]/);
+  assert.match(script, /97,98,99\]/);
 });
 
 test('v98 lib murni: default, rentang, dan aturan link', () => {
@@ -60,7 +60,7 @@ test('v98 lib murni: default, rentang, dan aturan link', () => {
   assert.match(lib, /export const TICKER_SPEED_MAX = 120;/);
   assert.match(lib, /export const TICKER_GAP_MIN = 16;/);
   assert.match(lib, /export const TICKER_GAP_MAX = 160;/);
-  assert.match(lib, /export type TickerIcon = "megaphone" \| "bell" \| "star" \| "none";/);
+  assert.match(lib, /export type TickerIcon = IconName \| "none";/);
   assert.match(lib, /export type TickerStyle = "default" \| "emas" \| "peringatan";/);  assert.match(lib, /if \(value === ""\) return true;/);
   assert.match(lib, /startsWith\("\/\/"\)\) return false;/);
   // Path internal menolak backslash (\ / karakter kontrol URL) — ditulis tanpa
@@ -176,7 +176,7 @@ test('v98 hero beranda: avatar > judul > pemisah > menu cepat > pemisah > ticker
   // Kartu "Info AIDIL STORE" terpisah tidak boleh ada lagi.
   assert.doesNotMatch(home, /Info AIDIL STORE/);
   assert.doesNotMatch(home, /site_announcements/);
-  assert.doesNotMatch(home, /📢/);
+  assert.doesNotMatch(home, /\u{1F4E2}/u);
   assert.doesNotMatch(home, /overflow-x-hidden/);
   assert.match(home, /import\{getInfoTicker,tickerShouldRender\}from'@\/lib\/site-settings'/);
 });
@@ -220,7 +220,7 @@ test('v98 panel admin Info Berjalan: fields lengkap, pratinjau 360px, simpan non
   assert.match(page, /<option value="right">Kanan<\/option>/);
   assert.match(page, /min=\{TICKER_GAP_MIN\}/);
   assert.match(page, /Jeda saat disentuh atau ditunjuk/);
-  assert.match(page, /<option value="megaphone">Pengeras suara<\/option>/);
+  assert.match(page, /<IconPicker allowNone label="Ikon" value=\{form\.icon\}/);
   assert.match(page, /<option value="peringatan">Peringatan \(kuning\)<\/option>/);
   assert.match(page, /type="datetime-local"/);
   assert.match(page, /disabled=\{!dirty \|\| Boolean\(linkError\)\}/);
@@ -235,7 +235,7 @@ test('v98 panel admin Info Berjalan: fields lengkap, pratinjau 360px, simpan non
   assert.doesNotMatch(page, /overflow-x-hidden/);
 
   const sidebar = read('src/app/admin/AdminSidebar.tsx');
-  assert.match(sidebar, /\["\/admin\/info-ticker", "🌀", "Info Berjalan"\]/);
+  assert.match(sidebar, /\["\/admin\/info-ticker", "ticker", "Info Berjalan"\]/);
 });
 
 test('v98 pembayaran, saldo, PIN, dan routing transaksi tidak tersentuh', () => {

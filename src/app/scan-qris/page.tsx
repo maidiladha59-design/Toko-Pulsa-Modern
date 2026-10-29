@@ -6,6 +6,7 @@ import { formatRupiah, formatDate } from '@/lib/utils';
 import { BrowserMultiFormatReader } from '@zxing/browser';
 import { BarcodeFormat, DecodeHintType } from '@zxing/library';
 import { parsePersonalQrPayload } from '@/lib/transfer/qr';
+import Icon from '@/components/icons/Icon';
 
 type QRISData = {
   raw: string;
@@ -288,8 +289,8 @@ export default function ScanQRIS() {
               {!cameraActive && (
                 <div className="flex aspect-square items-center justify-center bg-slate-950">
                   <div className="text-center text-white">
-                    <div className="mx-auto mb-3 text-5xl">
-                      📷
+                    <div className="mx-auto mb-3 flex justify-center">
+                      <Icon name="camera" size={48} />
                     </div>
 
                     <p className="text-sm text-slate-300">
@@ -301,7 +302,7 @@ export default function ScanQRIS() {
             </div>
 
             <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4 text-sm text-zinc-950">
-              <p className="font-black">🔐 Izin kamera diperlukan</p>
+              <p className="flex items-center gap-1.5 font-black"><Icon name="lock" size={16} /> Izin kamera diperlukan</p>
               <p className="mt-1 text-xs leading-5">AIDIL STORE hanya menggunakan kamera untuk membaca QRIS. Tekan tombol di bawah dan pilih <b>Izinkan</b> saat browser meminta akses kamera.</p>
               {cameraPermission === 'denied' && <p className="mt-2 font-bold text-red-700">Akses kamera ditolak. Aktifkan izin Kamera pada pengaturan browser/perangkat lalu coba lagi.</p>}
             </div>
@@ -311,13 +312,13 @@ export default function ScanQRIS() {
               type="button"
               onClick={startScanner}
               disabled={busy}
-              className="btn-gold w-full rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
+              className="btn-gold inline-flex w-full items-center justify-center gap-1.5 rounded-2xl px-5 py-3 font-semibold transition disabled:cursor-not-allowed disabled:opacity-50"
             >
               {busy
                 ? 'Memproses...'
                 : cameraActive
                   ? 'Scan Ulang'
-                  : cameraPermission === 'granted' ? '📷 Mulai Scan Kamera' : '🔐 Izinkan Kamera & Mulai Scan'}
+                  : cameraPermission === 'granted' ? <><Icon name="camera" size={16} />{'Mulai Scan Kamera'}</> : <><Icon name="lock" size={16} />{'Izinkan Kamera & Mulai Scan'}</>}
             </button>
 
             {/* Error */}
@@ -348,13 +349,13 @@ export default function ScanQRIS() {
           <div className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white shadow-2xl sm:max-w-md sm:rounded-3xl">
             <div className="sticky top-0 z-10 flex items-center justify-between gap-3 rounded-t-3xl bg-slate-950 px-6 py-5 text-white">
               <div className="flex items-center gap-2">
-                <span className="text-xl">✅</span>
+                <Icon name="check_circle" size={18} />
                 <div>
                   <p className="text-[10px] font-black uppercase tracking-[.2em] text-emerald-300">QRIS berhasil dibaca</p>
                   <h2 className="text-lg font-black">Detail Pembayaran QRIS</h2>
                 </div>
               </div>
-              <button type="button" onClick={clearResult} aria-label="Tutup" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 text-lg font-bold hover:bg-white/20">✕</button>
+              <button type="button" onClick={clearResult} aria-label="Tutup" className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-white/10 hover:bg-white/20"><Icon name="close" size={16} /></button>
             </div>
 
             <div className="space-y-4 p-6">
@@ -406,16 +407,16 @@ export default function ScanQRIS() {
                 <button
                   type="button"
                   onClick={goToPayment}
-                  className="btn-gold w-full rounded-2xl px-4 py-3.5 text-sm font-black transition"
+                  className="btn-gold inline-flex w-full items-center justify-center gap-1.5 rounded-2xl px-4 py-3.5 text-sm font-black transition"
                 >
-                  💳 Lanjutkan ke Pembayaran
+                  <Icon name="card" size={16} /> Lanjutkan ke Pembayaran
                 </button>
                 <button
                   type="button"
                   onClick={startScanner}
-                  className="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50"
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50"
                 >
-                  🔄 Scan Ulang
+                  <Icon name="refresh" size={16} /> Scan Ulang
                 </button>
                 <button
                   type="button"

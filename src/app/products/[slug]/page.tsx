@@ -3,6 +3,7 @@ import Image from "next/image";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatRupiah } from "@/lib/utils";
+import Icon from "@/components/icons/Icon";
 
 export default async function ProductDetailPage({ params }: { params: { slug: string } }) {
   const supabase = createClient();
@@ -12,10 +13,10 @@ export default async function ProductDetailPage({ params }: { params: { slug: st
   const isDigital = product.product_type === "digital";
   return (
     <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] animate-page-in md:max-w-3xl">
-      <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-app-muted transition hover:text-app-kicker">← Kembali ke toko</Link>
+      <Link href="/" className="inline-flex items-center gap-2 text-sm font-bold text-app-muted transition hover:text-app-kicker"><Icon name="chevron_left" size={16} />Kembali ke toko</Link>
       <div className="mt-5 grid overflow-hidden rounded-3xl border border-app-border bg-app-surface md:grid-cols-2">
         <div className="relative aspect-square overflow-hidden bg-app-inset">
-          {product.thumbnail_url ? <Image src={product.thumbnail_url} alt={product.name} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 hover:scale-105" /> : <div className="flex h-full items-center justify-center text-7xl">🛍️</div>}
+          {product.thumbnail_url ? <Image src={product.thumbnail_url} alt={product.name} fill sizes="(min-width: 768px) 50vw, 100vw" className="object-cover transition duration-700 hover:scale-105" /> : <div className="flex h-full items-center justify-center"><Icon name="bag" size={72} /></div>}
           <div className="absolute left-5 top-5 rounded-full bg-zinc-950/80 px-3 py-1.5 text-xs font-black text-gold-400 ring-1 ring-gold-400/40 backdrop-blur">{isDigital ? "PRODUK DIGITAL" : "JASA / PRODUK"}</div>
         </div>
         <div className="p-6 sm:p-8">

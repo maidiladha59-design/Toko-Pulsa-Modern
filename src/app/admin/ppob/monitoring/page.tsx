@@ -6,6 +6,7 @@ import { Card, CardTitle } from "@/components/ui/Card";
 import Badge, { statusTone } from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import Icon from "@/components/icons/Icon";
 
 type Tx={id:string;order_id:string;order_number:string;customer_no:string;product_name:string;status:string;provider_status:string|null;response_code:string|null;serial_number:string|null;provider_message:string|null;attempt_count:number;created_at:string;next_retry_at:string|null};
 export default function Monitoring(){const [rows,setRows]=useState<Tx[]>([]);const [loading,setLoading]=useState(true);const [busy,setBusy]=useState<string|null>(null);const [filter,setFilter]=useState('ALL');
@@ -20,15 +21,15 @@ export default function Monitoring(){const [rows,setRows]=useState<Tx[]>([]);con
     </div>
 
     <div className="grid grid-cols-3 gap-3">
-      {[['PROCESSING','🔄 Diproses'],['SUCCESS','✅ Berhasil'],['FAILED','❌ Gagal']].map(([s,l])=><button key={s} onClick={()=>setFilter(filter===s?'ALL':s)} className={`rounded-3xl border p-4 text-left shadow-sm transition ${filter===s?'border-gold-400 bg-app-accent-soft':'border-app-border bg-app-surface'}`}><p className="text-xs font-bold text-app-subtle">{l}</p><p className="mt-1 text-2xl font-black tabular-nums text-app-text">{counts[s]||0}</p></button>)}
+      {[['PROCESSING','refresh','Diproses'],['SUCCESS','check_circle','Berhasil'],['FAILED','close_circle','Gagal']].map(([s,ic,l])=><button key={s} onClick={()=>setFilter(filter===s?'ALL':s)} className={`rounded-3xl border p-4 text-left shadow-sm transition ${filter===s?'border-gold-400 bg-app-accent-soft':'border-app-border bg-app-surface'}`}><p className="flex items-center gap-1.5 text-xs font-bold text-app-subtle"><Icon name={ic} size={12} />{l}</p><p className="mt-1 text-2xl font-black tabular-nums text-app-text">{counts[s]||0}</p></button>)}
     </div>
 
     <Card className="p-0">
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-app-border p-5">
         <CardTitle>Transaksi PPOB {filter!=='ALL'&&`• ${filter}`}</CardTitle>
-        <Button size="sm" variant="outline" onClick={load}>↻ Refresh</Button>
+        <Button size="sm" variant="outline" onClick={load}><Icon name="refresh" size={16} />Refresh</Button>
       </div>
-      {loading?<div className="p-5"><LoadingSkeleton rows={5} /></div>:shown.length===0?<EmptyState icon="🧾" title="Tidak ada transaksi." className="m-4" />:<div className="overflow-x-auto">
+      {loading?<div className="p-5"><LoadingSkeleton rows={5} /></div>:shown.length===0?<EmptyState icon="receipt" title="Tidak ada transaksi." className="m-4" />:<div className="overflow-x-auto">
         <table className="w-full min-w-[900px] text-sm">
           <thead><tr className="border-b border-app-border text-left text-xs font-bold uppercase tracking-widest text-app-subtle"><th className="px-4 py-3">Order</th><th className="px-4 py-3">Produk</th><th className="px-4 py-3">Tujuan</th><th className="px-4 py-3">Status</th><th className="px-4 py-3">Provider</th><th className="px-4 py-3">Percobaan</th><th className="px-4 py-3 text-right">Aksi</th></tr></thead>
           <tbody>{shown.map(x=><tr key={x.id} className="border-b border-app-border last:border-0">

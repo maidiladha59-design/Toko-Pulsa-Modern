@@ -8,6 +8,7 @@ import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import Icon from "@/components/icons/Icon";
 import { humanizeError } from "@/lib/utils";
 
 type Category = { id: string; name: string; slug: string; created_at: string };
@@ -182,7 +183,7 @@ export default function AdminCategoriesPage() {
             <LoadingSkeleton rows={5} />
           </div>
         ) : categories.length === 0 ? (
-          <EmptyState icon="🗂️" title="Belum ada kategori" className="m-4" />
+          <EmptyState icon="office" title="Belum ada kategori" className="m-4" />
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full min-w-[560px] text-sm">

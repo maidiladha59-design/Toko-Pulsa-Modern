@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { formatDate } from "@/lib/utils";
+import Icon from "@/components/icons/Icon";
 
 type Notice = {
   id: string; type: string; title: string; subtitle?: string;
@@ -59,9 +60,9 @@ export default function NotificationBell() {
     <div className="sm:relative">
       <button
         onClick={() => setOpen(!open)}
-        className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-surface text-lg text-app-muted transition hover:bg-app-inset"
+        className="relative flex h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-surface text-app-muted transition hover:bg-app-inset"
       >
-        🔔
+        <Icon name="bell" size={18} />
         {unread > 0 && (
           <span className="absolute -right-1 -top-1 min-w-5 rounded-full bg-red-500 px-1 text-center text-[10px] font-black leading-5 text-white">
             {unread > 9 ? "9+" : unread}

@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import Button from "@/components/Button";
 import { humanizeError } from "@/lib/utils";
+import Icon from "@/components/icons/Icon";
 
 function LoginForm() {
   const supabase = createClient();
@@ -123,8 +124,8 @@ function LoginForm() {
           </div>
 
           <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-            <p className="text-sm font-black text-gold-200">
-              📖 Panduan Login
+            <p className="inline-flex items-center gap-1.5 text-sm font-black text-gold-200">
+              <Icon name="book" size={16} /> Panduan Login
             </p>
 
             <div className="mt-4 space-y-3">
@@ -296,9 +297,9 @@ function LoginForm() {
 
           <Link
             href="/register"
-            className="btn-gold-metal mt-4 flex w-full items-center justify-center rounded-xl px-4 py-3 text-sm font-black transition"
+            className="btn-gold-metal mt-4 flex w-full items-center justify-center gap-1.5 rounded-xl px-4 py-3 text-sm font-black transition"
           >
-            ✨ Buat Akun Sekarang
+            <Icon name="sparkle" size={16} /> Buat Akun Sekarang
           </Link>
         </div>
 

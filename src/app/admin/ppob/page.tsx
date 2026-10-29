@@ -6,6 +6,7 @@ import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import { formatRupiah } from "@/lib/utils";
+import Icon from "@/components/icons/Icon";
 
 type SyncResult = {
   fetched: number;
@@ -82,7 +83,7 @@ export default function AdminPPOBPage() {
             <input type="checkbox" checked={activate} onChange={(e) => setActivate(e.target.checked)} className="h-4 w-4 accent-gold-400" />
             Aktifkan SKU yang aktif di provider
           </label>
-          <Button onClick={sync} loading={loading}>{loading ? "Sinkronisasi..." : "🔄 Sync PPOB"}</Button>
+          <Button onClick={sync} loading={loading}>{loading ? "Sinkronisasi..." : <><Icon name="refresh" size={16} />Sync PPOB</>}</Button>
         </div>
         <div className="mt-5 grid gap-3 sm:grid-cols-3">
           <div className="rounded-xl bg-app-accent-soft p-4">
@@ -144,7 +145,7 @@ export default function AdminPPOBPage() {
       </Card>}
 
       <div className="rounded-3xl border border-warning-500/30 bg-warning-500/10 p-5 text-sm leading-6 text-warning-800 dark:text-warning-300">
-        <p className="font-black">⚠️ Sebelum transaksi nyata</p>
+        <p className="flex items-center gap-1.5 font-black"><Icon name="warning" size={16} />Sebelum transaksi nyata</p>
         <ul className="mt-2 list-disc space-y-1 pl-5">
           <li>Isi <code>DIGIFLAZZ_USERNAME</code> dan <code>DIGIFLAZZ_API_KEY</code> hanya di environment server.</li>
           <li>Uji dahulu dengan <code>DIGIFLAZZ_TESTING=true</code>.</li>

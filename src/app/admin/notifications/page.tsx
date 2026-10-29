@@ -132,7 +132,7 @@ export default function AdminNotifications() {
               </div>
             </div>
           ))}
-          {!loading && !items.length && <EmptyState icon="📣" title="Belum ada broadcast." />}
+          {!loading && !items.length && <EmptyState icon="megaphone" title="Belum ada broadcast." />}
         </div>
       </Card>
     </div>

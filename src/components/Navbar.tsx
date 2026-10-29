@@ -8,11 +8,25 @@ import { useToast } from "./ToastProvider";
 import NotificationBell from "./NotificationBell";
 import ThemeToggle from "./ThemeToggle";
 import NavIcon from "./NavIcon";
+import Icon from "@/components/icons/Icon";
 import UserAvatar from "./UserAvatar";
 import { resolveAvatarUrl } from "@/lib/avatar";
 import { Skeleton } from "./ui/LoadingSkeleton";
 
 type Profile = { full_name: string | null; email: string; role: string; avatar_id: string | null };
+
+// [href, nama ikon registry, label] — label tidak boleh mengandung emoji.
+const ACCOUNT_LINKS: [string, string, string][] = [
+  ["/profile", "user", "Profil Saya"],
+  ["/wallet", "wallet", "Saldo & Top Up"],
+  ["/transfer-uang", "money_send", "Transfer Saldo"],
+  ["/split-bill", "receipt", "Split Bill"],
+  ["/diskusi", "chat", "Ruang Diskusi"],
+  ["/orders", "box", "Pesanan Saya"],
+  ["/transactions", "doc", "Transaksi"],
+  ["/calculator", "calculator", "Kalkulator"],
+  ["/bantuan", "help", "Bantuan"],
+];
 
 export default function Navbar({ scanQrisEnabled = true }: { scanQrisEnabled?: boolean }) {
   const pathname = usePathname();
@@ -84,9 +98,24 @@ function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
         ? pathname === "/layanan" || pathname.startsWith("/ppob")
         : pathname.startsWith(href);
 
+  const drawerLinks: [string, string, string][] = [
+    ["/", "home", "Beranda"],
+    ["/layanan", "bag", "Layanan"],
+    ...(profile
+      ? ([["/transfer-uang", "money_send", "Transfer Saldo"], ["/transfer-uang/qr", "qris", "QR Pribadi"], ["/split-bill", "receipt", "Split Bill"], ["/diskusi", "chat", "Ruang Diskusi"]] as [string, string, string][])
+      : []),
+    ...(scanQrisEnabled ? ([["/scan-qris", "scan", "Scan QRIS"]] as [string, string, string][]) : []),
+    ["/kyc", "id_card", "Verifikasi Akun"],
+    ["/notifications", "bell", "Pemberitahuan"],
+    ["/referral", "gift", "Undang Teman"],
+    ["/missions", "target", "Misi & Hadiah"],
+    ["/settings", "settings", "Pengaturan"],
+    ["/bantuan", "help", "Bantuan"],
+  ];
+
   return (
     <>
-      {offline && <div role="alert" className="fixed inset-x-0 top-0 z-[100] bg-danger-600 px-4 py-2 text-center text-xs font-black text-white shadow-lg">📶 Koneksi internet terputus</div>}
+      {offline && <div role="alert" className="fixed inset-x-0 top-0 z-[100] flex items-center justify-center gap-2 bg-danger-600 px-4 py-2 text-center text-xs font-black text-white shadow-lg"><Icon name="signal_off" size={14} />Koneksi internet terputus</div>}
       <header className="sticky top-0 z-50 border-b border-app-border bg-app-bg/90 text-app-text shadow-sm backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6">
           <Link href="/" className="group flex shrink-0 items-center gap-3">
@@ -104,7 +133,7 @@ function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
             {profile && <Link href="/wallet" className={`nav-link ${pathname.startsWith("/wallet") ? "nav-link-active" : ""}`}>Saldo</Link>}
             {profile && <Link href="/orders" className={`nav-link ${pathname.startsWith("/orders") ? "nav-link-active" : ""}`}>Pesanan</Link>}
             {profile && <Link href="/diskusi" className={`nav-link ${pathname.startsWith("/diskusi") ? "nav-link-active" : ""}`}>Diskusi</Link>}
-            <Link href="/calculator" className={`rounded-xl px-3 py-2 text-sm font-black text-app-kicker transition ${pathname === "/calculator" ? "bg-gold-400/20" : "bg-gold-400/10 hover:bg-gold-400/20"}`}>🧮 Kalkulator</Link>
+            <Link href="/calculator" className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-black text-app-kicker transition ${pathname === "/calculator" ? "bg-gold-400/20" : "bg-gold-400/10 hover:bg-gold-400/20"}`}><Icon name="calculator" size={16} />Kalkulator</Link>
           </nav>
           <div className="ml-auto flex shrink-0 items-center gap-2 lg:ml-0">
             {profile && <NotificationBell />}
@@ -116,7 +145,7 @@ function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
                 <button onClick={() => setAccountOpen((v) => !v)} className="flex items-center gap-2 rounded-xl border border-app-border bg-app-surface px-2 py-1.5 transition hover:bg-app-inset">
                   <UserAvatar size={32} src={avatarUrl} name={name} ring={false} />
                   <span className="max-w-[110px] truncate text-sm font-bold text-app-text">{name}</span>
-                  <span className="text-xs text-app-subtle">⌄</span>
+                  <span className="text-app-subtle"><Icon name="chevron_down" size={14} /></span>
                 </button>
                 {accountOpen && (
                   <div className="absolute right-0 mt-2 w-60 overflow-hidden rounded-2xl border border-app-border bg-app-surface p-2 shadow-2xl">
@@ -127,11 +156,11 @@ function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
                         <p className="truncate text-xs text-app-subtle">{profile.email}</p>
                       </span>
                     </div>
-                    {[["/profile", "👤 Profil Saya"], ["/wallet", "💰 Saldo & Top Up"], ["/transfer-uang", "📤 Transfer Saldo"], ["/split-bill", "🧾 Split Bill"], ["/diskusi", "Ruang Diskusi"], ["/orders", "📦 Pesanan Saya"], ["/transactions", "🧾 Transaksi"], ["/calculator", "🧮 Kalkulator"], ["/bantuan", "💬 Bantuan"]].map(([href, label]) => (
-                      <Link key={href} href={href} onClick={() => setAccountOpen(false)} className="mt-1 block rounded-xl px-3 py-2.5 text-sm font-bold text-app-muted transition hover:bg-app-accent-soft hover:text-app-text">{label}</Link>
+                    {ACCOUNT_LINKS.map(([href, icon, label]) => (
+                      <Link key={href} href={href} onClick={() => setAccountOpen(false)} className="mt-1 flex items-center gap-2.5 rounded-xl px-3 py-2.5 text-sm font-bold text-app-muted transition hover:bg-app-accent-soft hover:text-app-text"><Icon name={icon} size={16} />{label}</Link>
                     ))}
-                    {isAdmin && <Link href="/admin" onClick={() => setAccountOpen(false)} className="mt-1 block rounded-xl bg-gold-400/10 px-3 py-2.5 text-sm font-black text-app-kicker">🛠️ Panel Admin</Link>}
-                    <button onClick={logout} className="mt-1 w-full rounded-xl border-t border-app-border px-3 py-2.5 text-left text-sm font-black text-danger-600 transition hover:bg-danger-500/10 dark:text-danger-400">🚪 Keluar</button>
+                    {isAdmin && <Link href="/admin" onClick={() => setAccountOpen(false)} className="mt-1 flex items-center gap-2.5 rounded-xl bg-gold-400/10 px-3 py-2.5 text-sm font-black text-app-kicker"><Icon name="tools" size={16} />Panel Admin</Link>}
+                    <button onClick={logout} className="mt-1 flex w-full items-center gap-2.5 rounded-xl border-t border-app-border px-3 py-2.5 text-left text-sm font-black text-danger-600 transition hover:bg-danger-500/10 dark:text-danger-400"><Icon name="logout" size={16} />Keluar</button>
                   </div>
                 )}
               </div>
@@ -141,7 +170,7 @@ function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
                 <Link href="/register" className="btn-gold-metal hidden rounded-xl px-4 py-2.5 text-sm font-black transition sm:block">Daftar</Link>
               </>
             )}
-            <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-surface text-lg text-app-muted transition hover:bg-app-inset lg:hidden" onClick={() => setMenuOpen((v) => !v)} aria-label="Buka menu">{menuOpen ? "✕" : "☰"}</button>
+            <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-surface text-app-muted transition hover:bg-app-inset lg:hidden" onClick={() => setMenuOpen((v) => !v)} aria-label={menuOpen ? "Tutup menu" : "Buka menu"}><Icon name={menuOpen ? "close" : "menu"} size={18} /></button>
           </div>
         </div>
       </header>
@@ -165,13 +194,13 @@ function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
         <div className="fixed inset-x-0 bottom-0 top-[69px] z-[56] bg-black/40 lg:hidden" onClick={() => setMenuOpen(false)}>
           <div onClick={(e) => e.stopPropagation()} className="max-h-[calc(100dvh-69px-80px)] overflow-y-auto rounded-b-3xl border-b border-app-border bg-app-surface px-4 py-4 shadow-2xl">
             <div className="grid grid-cols-2 gap-2 text-sm">
-              {[["/", "🏠 Beranda"], ["/layanan", "🛍️ Layanan"], ...(profile ? [["/transfer-uang", "📤 Transfer Saldo"], ["/transfer-uang/qr", "📥 QR Pribadi"], ["/split-bill","🧾 Split Bill"], ["/diskusi", "Ruang Diskusi"]] : []), ...(scanQrisEnabled ? [["/scan-qris", "▣ Scan QRIS"]] : []), ["/kyc", "🪪 Verifikasi Akun"], ["/notifications", "🔔 Pemberitahuan"], ["/referral", "🎁 Undang Teman"], ["/settings", "⚙️ Pengaturan"], ["/bantuan", "💬 Bantuan"]].map(([href, label]) => (
-                <Link key={href} href={href} onClick={() => setMenuOpen(false)} className="rounded-xl border border-app-border bg-app-inset px-3 py-3 font-bold text-app-text transition hover:border-gold-400/40 hover:text-app-kicker">{label}</Link>
+              {drawerLinks.map(([href, icon, label]) => (
+                <Link key={href} href={href} onClick={() => setMenuOpen(false)} className="flex items-center gap-2 rounded-xl border border-app-border bg-app-inset px-3 py-3 font-bold text-app-text transition hover:border-gold-400/40 hover:text-app-kicker"><Icon name={icon} size={16} /><span className="min-w-0 break-words">{label}</span></Link>
               ))}
-              {profile && <Link href="/orders" onClick={() => setMenuOpen(false)} className="rounded-xl border border-app-border bg-app-inset px-3 py-3 font-bold text-app-text transition hover:border-gold-400/40 hover:text-app-kicker">📦 Pesanan</Link>}
-              {isAdmin && <Link href="/admin" onClick={() => setMenuOpen(false)} className="rounded-xl border border-gold-400/25 bg-gold-400/10 px-3 py-3 font-black text-app-kicker">🛠️ Panel Admin</Link>}
+              {profile && <Link href="/orders" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 rounded-xl border border-app-border bg-app-inset px-3 py-3 font-bold text-app-text transition hover:border-gold-400/40 hover:text-app-kicker"><Icon name="box" size={16} />Pesanan</Link>}
+              {isAdmin && <Link href="/admin" onClick={() => setMenuOpen(false)} className="flex items-center gap-2 rounded-xl border border-gold-400/25 bg-gold-400/10 px-3 py-3 font-black text-app-kicker"><Icon name="tools" size={16} />Panel Admin</Link>}
               {profile ? (
-                <button onClick={logout} className="rounded-xl bg-danger-500/10 px-3 py-3 text-left font-black text-danger-600 dark:text-danger-400">🚪 Keluar</button>
+                <button onClick={logout} className="flex items-center gap-2 rounded-xl bg-danger-500/10 px-3 py-3 text-left font-black text-danger-600 dark:text-danger-400"><Icon name="logout" size={16} />Keluar</button>
               ) : (
                 <>
                   <Link href="/login" className="rounded-xl border border-app-border bg-app-surface px-3 py-3 text-center font-black text-app-text">Masuk</Link>

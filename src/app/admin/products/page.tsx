@@ -9,6 +9,7 @@ import Badge from "@/components/ui/Badge";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import EmptyState from "@/components/ui/EmptyState";
+import Icon from "@/components/icons/Icon";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import { formatRupiah, humanizeError } from "@/lib/utils";
 
@@ -346,12 +347,12 @@ export default function AdminProductsPage() {
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={imagePreview} alt="Preview produk" className="h-full w-full object-cover" />
                 ) : (
-                  <><span className="text-4xl">🖼️</span><span className="mt-2 px-4 text-xs text-app-muted">Klik untuk pilih gambar</span></>
+                  <><Icon name="image" size={36} className="text-app-subtle" /><span className="mt-2 px-4 text-xs text-app-muted">Klik untuk pilih gambar</span></>
                 )}
                 <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={(e) => chooseImage(e.target.files?.[0])} />
               </label>
               <div className="mt-2 flex gap-2">
-                {imageFile && <span className="truncate text-xs text-success-600 dark:text-success-400">✓ {imageFile.name}</span>}
+                {imageFile && <span className="inline-flex min-w-0 items-center gap-1 text-xs text-success-600 dark:text-success-400"><Icon name="check" size={12} className="shrink-0" /><span className="truncate">{imageFile.name}</span></span>}
                 {!imageFile && editingId && products.find((p) => p.id === editingId)?.thumbnail_url && <button type="button" onClick={() => { const p = products.find((x) => x.id === editingId); if (p) removeThumbnail(p); }} className="text-xs font-bold text-danger-600 dark:text-danger-400">Hapus gambar</button>}
               </div>
             </div>
@@ -363,8 +364,8 @@ export default function AdminProductsPage() {
               <Select label="Kategori" value={form.category_id} onChange={(e) => setForm({ ...form, category_id: e.target.value })} className="bg-app-inset"><option value="">Tanpa kategori</option>{categories.map((c) => <option key={c.id} value={c.id}>{c.name}</option>)}</Select>
               <Input label="Stok" min="0" type="number" value={form.stock} onChange={(e) => setForm({ ...form, stock: e.target.value })} hint="Kosong = unlimited" className="bg-app-inset" placeholder="Unlimited" />
               <Select label="Tipe Produk" value={form.product_type} onChange={(e) => setForm({ ...form, product_type: e.target.value })} hint="Jasa cocok untuk subscribe channel, joki, request custom, dll." className="bg-app-inset">
-                <option value="digital">📥 Ambil Produk (Digital) — file langsung diunduh pembeli</option>
-                <option value="jasa">🎯 Upload Target (Jasa) — pembeli kirim link/file, dikerjakan admin</option>
+                <option value="digital">Ambil Produk (Digital) — file langsung diunduh pembeli</option>
+                <option value="jasa">Upload Target (Jasa) — pembeli kirim link/file, dikerjakan admin</option>
               </Select>
               <label className="text-sm font-bold text-app-text sm:col-span-2">Deskripsi<textarea rows={4} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="mt-2 w-full rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle/60 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20" placeholder="Jelaskan isi, format file, lisensi, dan informasi penting produk..." /></label>
 
@@ -373,7 +374,7 @@ export default function AdminProductsPage() {
                 <p className="mt-1 text-xs text-app-muted">{form.product_type === "jasa" ? "Untuk produk Jasa, file di sini opsional (misal contoh hasil). Target pesanan dikirim pembeli sendiri saat checkout." : "File disimpan privat dan hanya dapat diakses pembeli yang berhak melalui link aman."}</p>
                 <div className="mt-2 flex flex-wrap items-center gap-3">
                   <input type="file" onChange={(e) => chooseDigitalFile(e.target.files?.[0])} className="block w-full text-sm text-app-text sm:max-w-md" />
-                  {digitalFile && <span className="text-xs font-bold text-success-600 dark:text-success-400">✓ {digitalFile.name}</span>}
+                  {digitalFile && <span className="inline-flex min-w-0 items-center gap-1 text-xs font-bold text-success-600 dark:text-success-400"><Icon name="check" size={12} className="shrink-0" /><span className="truncate">{digitalFile.name}</span></span>}
                   {editingId && products.find((p) => p.id === editingId)?.digital_file_path && <button type="button" onClick={() => { const p = products.find((x) => x.id === editingId); if (p) removeDigitalFile(p); }} className="text-xs font-bold text-danger-600 dark:text-danger-400">Hapus file tersimpan</button>}
                 </div>
               </div>
@@ -392,21 +393,21 @@ export default function AdminProductsPage() {
           <div><CardTitle>Daftar Produk</CardTitle><p className="mt-1 text-xs text-app-muted">{products.length} produk tersimpan</p></div>
           <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari produk..." className="sm:w-64" />
         </div>
-        {loading ? <div className="p-4"><LoadingSkeleton rows={5} /></div> : filteredProducts.length === 0 ? <EmptyState icon="📦" title="Belum ada produk" description="Tambahkan produk pertama lewat formulir di atas." className="m-4" /> : (
+        {loading ? <div className="p-4"><LoadingSkeleton rows={5} /></div> : filteredProducts.length === 0 ? <EmptyState icon="box" title="Belum ada produk" description="Tambahkan produk pertama lewat formulir di atas." className="m-4" /> : (
           <div className="divide-y divide-app-border">
             {filteredProducts.map((p) => (
               <div key={p.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
                 <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-app-inset">
-                  {p.thumbnail_url ? <img src={p.thumbnail_url} alt={p.name} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center text-2xl">🛍️</div>}
+                  {p.thumbnail_url ? <img src={p.thumbnail_url} alt={p.name} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center"><Icon name="bag" size={26} className="text-app-subtle" /></div>}
                 </div>
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="truncate font-bold text-app-text">{p.name}</p>
-                    <Badge tone={p.product_type === "jasa" ? "warning" : "gold"}>{p.product_type === "jasa" ? "🎯 Jasa" : "📥 Digital"}</Badge>
+                    <Badge tone={p.product_type === "jasa" ? "warning" : "gold"} className="inline-flex items-center gap-1">{p.product_type === "jasa" ? <><Icon name="target" size={12} /> Jasa</> : <><Icon name="inbox" size={12} /> Digital</>}</Badge>
                     <Badge tone={p.is_active ? "success" : "neutral"}>{p.is_active ? "Aktif" : "Nonaktif"}</Badge>
                   </div>
                   <p className="mt-1 text-sm font-black tabular-nums text-app-kicker">{formatRupiah(p.price)}</p>
-                  <p className="text-xs text-app-subtle">/{p.slug} · {p.product_type === "jasa" ? "Target dikirim pembeli saat checkout" : p.digital_file_path ? "✓ File digital" : "Belum ada file"}</p>
+                  <p className="text-xs text-app-subtle">/{p.slug} · {p.product_type === "jasa" ? "Target dikirim pembeli saat checkout" : p.digital_file_path ? <span className="inline-flex items-center gap-1"><Icon name="check" size={12} /> File digital</span> : "Belum ada file"}</p>
                 </div>
                 <div className="flex flex-wrap gap-2 sm:justify-end">
                   <Button variant="outline" size="sm" onClick={() => startEdit(p)}>Edit</Button>

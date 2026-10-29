@@ -6,6 +6,7 @@ import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { NetworkEmpty } from "@/components/NetworkState";
 import EmptyState from "@/components/ui/EmptyState";
+import Icon from "@/components/icons/Icon";
 
 type Service = {
   id: string;
@@ -18,25 +19,22 @@ type Service = {
 };
 
 const CATEGORY_ICON: Record<string, string> = {
-  "top-up-game": "🎮",
-  "e-wallet": "💳",
-  pln: "⚡",
-  pulsa: "📱",
+  "top-up-game": "game",
+  "e-wallet": "card",
+  pln: "bolt",
+  pulsa: "pulsa",
 };
 
+// Operator memakai logo aslinya (brand_media); tanpa logo, fallback memakai
+// ikon kartu/SIM netral agar tidak berpura-pura menjadi identitas brand.
 function brandIcon(brand: string) {
   const b = brand.toLowerCase();
-  if (b.includes("telkomsel")) return "🔴";
-  if (b.includes("indosat") || b.includes("im3")) return "🟡";
-  if (b.includes("tri") || b === "3") return "🟣";
-  if (b.includes("xl") || b.includes("axis")) return "🔵";
-  if (b.includes("smartfren")) return "⚫";
-  if (b.includes("by.u") || b.includes("byu")) return "🟢";
-  if (b.includes("free fire")) return "🔥";
-  if (b.includes("mobile legend") || b === "ml") return "⚔️";
-  if (b.includes("genshin")) return "✨";
-  if (b.includes("pubg")) return "🎯";
-  return "📦";
+  if (b.includes("free fire")) return "flame";
+  if (b.includes("mobile legend") || b === "ml") return "game";
+  if (b.includes("genshin")) return "sparkle";
+  if (b.includes("pubg")) return "target";
+  if (["pulsa", "paket-data", "e-wallet", "pln"].some((key) => b.includes(key))) return "sim_card";
+  return "box";
 }
 
 function groupByBrand(services: Service[]) {
@@ -95,7 +93,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
   if (!services.length) {
     return (
       <EmptyState
-        icon="📡"
+        icon="signal"
         title="Layanan belum tersedia"
         description="Admin perlu melakukan sinkronisasi SKU PPOB dan mengaktifkan produk terlebih dahulu."
         action={<Link href="/" className="btn-gold inline-flex min-h-[44px] items-center rounded-xl px-4 py-2.5 text-sm font-black transition">Kembali ke Beranda</Link>}
@@ -103,14 +101,14 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
     );
   }
 
-  const fallbackIcon = CATEGORY_ICON[category] || "📦";
+  const fallbackIcon = CATEGORY_ICON[category] || "box";
   const grouped = groupByBrand(filtered);
 
   return (
     <div className="space-y-5">
       <div className="flex flex-col gap-2 rounded-2xl border border-app-border bg-app-surface p-3 sm:flex-row sm:items-center">
         <div className="relative flex-1">
-          <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-app-subtle">🔍</span>
+          <span className="pointer-events-none absolute left-3 top-1/2 flex -translate-y-1/2 text-app-subtle"><Icon name="search" size={16} /></span>
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -138,11 +136,11 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
       {grouped.map(([brand, items]) => (
         <section key={brand} className="overflow-hidden rounded-3xl border border-app-border bg-app-surface">
           <div className="flex items-center gap-3 border-b border-app-border bg-app-inset px-4 py-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gold-400 text-base text-zinc-950">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gold-400 text-zinc-950">
               {logoMap[brand.trim().toLowerCase()] ? (
                 <Image src={logoMap[brand.trim().toLowerCase()]} alt={`Logo ${brand}`} width={36} height={36} className="h-full w-full object-cover" />
               ) : (
-                brandIcon(brand)
+                <Icon name={brandIcon(brand)} size={20} />
               )}
             </div>
             <div className="min-w-0">
@@ -165,7 +163,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
                     {p.thumbnail_url ? (
                       <Image src={p.thumbnail_url} alt={p.name} width={44} height={44} className="h-full w-full object-cover" />
                     ) : (
-                      <span className="text-app-kicker">{fallbackIcon}</span>
+                      <span className="text-app-kicker"><Icon name={fallbackIcon} size={22} /></span>
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
@@ -178,7 +176,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
                     <span className="text-sm font-black tabular-nums text-app-kicker">
                       {new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", maximumFractionDigits: 0 }).format(p.price)}
                     </span>
-                    <span className="text-app-kicker transition group-hover:translate-x-0.5">›</span>
+                    <span className="text-app-kicker transition group-hover:translate-x-0.5"><Icon name="chevron_right" size={16} /></span>
                   </div>
                 </Link>
               );

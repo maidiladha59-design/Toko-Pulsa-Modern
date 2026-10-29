@@ -519,7 +519,7 @@ export default function AdminManualTopupChannelsPage() {
             {channels.length === 0 ? (
               <div className="mt-4">
                 <EmptyState
-                  icon="🏦"
+                  icon="bank"
                   title="Belum ada channel manual"
                   description="Tambahkan minimal satu channel agar pelanggan dapat melakukan Top Up Manual."
                 />

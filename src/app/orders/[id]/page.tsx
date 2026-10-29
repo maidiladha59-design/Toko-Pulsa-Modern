@@ -11,6 +11,7 @@ import PPOBReceiptButton from "@/components/PPOBReceiptButton";
 import PPOBStatusPoller from "@/components/PPOBStatusPoller";
 import { renderQrImage } from "@/lib/qr-image";
 import { paymentMethodLabel, statusLabel, GENERIC_ERRORS } from "@/lib/labels";
+import Icon from "@/components/icons/Icon";
 
 const ORDER_MESSAGE: Record<string, string> = {
   PENDING: "Pesanan Anda sedang menunggu pembayaran.",
@@ -105,7 +106,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
 
             {ppobTransactions && ppobTransactions.length > 0 && (
               <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold-400/25 bg-app-accent-soft p-4 text-app-kicker">
-                <div><p className="font-black text-app-text">🧾 Struk Transaksi</p><p className="mt-1 text-xs text-app-kicker/80">Nomor tujuan, status, dan kode SN tersedia di struk.</p></div>
+                <div><p className="flex items-center gap-1.5 font-black text-app-text"><Icon name="receipt" size={16} />Struk Transaksi</p><p className="mt-1 text-xs text-app-kicker/80">Nomor tujuan, status, dan kode SN tersedia di struk.</p></div>
                 <div><PPOBReceiptButton orderId={order.id} />{ppobTransactions.some((tx) => ["WAITING", "PROCESSING"].includes(tx.status)) && <PPOBStatusPoller active />}</div>
               </div>
             )}
@@ -118,7 +119,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
 
                   {order.status === "COMPLETED" && (item.products as any)?.product_type === "digital" && (
                     <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-success-500/10 p-4 text-success-600 dark:text-success-400">
-                      <div><p className="font-black">✓ Produk siap diambil</p><p className="text-xs text-success-600/80 dark:text-success-400/80">Link download dibuat aman dan sementara.</p></div>
+                      <div><p className="flex items-center gap-1.5 font-black"><Icon name="check" size={16} />Produk siap diambil</p><p className="text-xs text-success-600/80 dark:text-success-400/80">Link download dibuat aman dan sementara.</p></div>
                       <DownloadButton productId={item.product_id} />
                     </div>
                   )}
@@ -131,7 +132,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                     const untung = cost !== undefined ? Math.max(0, hargaJual - cost * item.quantity) : null;
                     return (
                       <div className="mt-4 rounded-2xl border border-gold-400/25 bg-app-accent-soft p-4 text-app-kicker">
-                        <div className="flex items-center justify-between gap-3"><p className="font-black text-app-text">⚡ Rincian Transaksi</p></div>
+                        <div className="flex items-center justify-between gap-3"><p className="flex items-center gap-1.5 font-black text-app-text"><Icon name="bolt" size={16} />Rincian Transaksi</p></div>
                         <div className="mt-3 space-y-1.5 text-sm">
                           <div className="flex justify-between gap-3"><span className="text-app-muted">Nomor Pelanggan</span><b className="text-app-text">{target?.customer_no || tx?.customer_no || "-"}</b></div>
                           <div className="flex justify-between gap-3"><span className="text-app-muted">Status</span><b className="text-app-text">{statusLabel(tx?.status)}</b></div>
@@ -146,9 +147,9 @@ export default async function OrderDetailPage({ params }: { params: { id: string
 
                   {(item.products as any)?.product_type === "jasa" && (
                     <div className="mt-4 rounded-2xl border border-gold-400/25 bg-app-accent-soft p-4 text-app-kicker">
-                      <p className="font-black">🎯 Status jasa: {order.status === "PROCESSING" ? "sedang dikerjakan" : order.status === "COMPLETED" ? "selesai" : "menunggu diproses"}</p>
+                      <p className="flex items-center gap-1.5 font-black"><Icon name="target" size={16} />Status jasa: {order.status === "PROCESSING" ? "sedang dikerjakan" : order.status === "COMPLETED" ? "selesai" : "menunggu diproses"}</p>
                       {submission?.target_text && <p className="mt-2 text-xs text-app-kicker/80">Target: {submission.target_text}</p>}
-                      {submission?.target_file_path && <p className="mt-1 text-xs text-app-kicker/80">📎 File target sudah dikirim.</p>}
+                      {submission?.target_file_path && <p className="mt-1 flex items-center gap-1.5 text-xs text-app-kicker/80"><Icon name="paperclip" size={14} />File target sudah dikirim.</p>}
                       <Link href="/bantuan" className="mt-2 inline-block text-xs font-bold underline">Butuh bantuan terkait pesanan ini?</Link>
                     </div>
                   )}
@@ -167,7 +168,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
               <div className="flex justify-between border-t border-app-border pt-4"><span className="text-app-subtle">Subtotal produk</span><b className="tabular-nums text-app-text">{formatRupiah(order.total_amount)}</b></div>
               <div className="flex justify-between text-lg"><span className="font-black text-app-text">Total dibayar</span><b className="tabular-nums text-app-kicker">{formatRupiah(order.gateway_total_payment || order.total_amount)}</b></div>
             </div>
-            {order.status === "COMPLETED" && <div className="mt-5 rounded-2xl bg-success-500/10 p-4 text-xs font-bold text-success-600 dark:text-success-400">📥 Produk digital yang tersedia sudah bisa diambil dari kartu produk di atas.</div>}
+            {order.status === "COMPLETED" && <div className="mt-5 flex items-center gap-1.5 rounded-2xl bg-success-500/10 p-4 text-xs font-bold text-success-600 dark:text-success-400"><Icon name="inbox" size={14} />Produk digital yang tersedia sudah bisa diambil dari kartu produk di atas.</div>}
           </aside>
         </div>
       </div>

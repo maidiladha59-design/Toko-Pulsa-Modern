@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useToast } from "@/components/ToastProvider";
 import { calcTransferFee } from "@/lib/transfer/utils";
 import { formatRupiah } from "@/lib/utils";
+import Icon from "@/components/icons/Icon";
 
 type Settings = {
   enabled: boolean;
@@ -245,7 +246,7 @@ export default function TransferForm({ initialQr, initialAmount }: { initialQr: 
     return (
       <section className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm">
         <div className="flex items-center gap-3">
-          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-2xl">✅</span>
+          <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50"><Icon name="check_circle" size={24} /></span>
           <div>
             <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Transfer Berhasil</p>
             <h2 className="text-xl font-black text-slate-900">{result.message}</h2>
@@ -261,9 +262,9 @@ export default function TransferForm({ initialQr, initialAmount }: { initialQr: 
         </div>
 
         <div className="mt-4 grid gap-2 sm:grid-cols-3">
-          <button type="button" onClick={copyReceipt} className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-black text-white">📋 Salin Bukti</button>
-          <button type="button" onClick={() => setResult(null)} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">🔄 Transfer Lagi</button>
-          <Link href="/wallet" className="btn-gold-metal rounded-2xl px-4 py-3 text-center text-sm font-black">💰 Lihat Saldo</Link>
+          <button type="button" onClick={copyReceipt} className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-black text-white"><Icon name="clipboard" size={16} /> Salin Bukti</button>
+          <button type="button" onClick={() => setResult(null)} className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50"><Icon name="refresh" size={16} /> Transfer Lagi</button>
+          <Link href="/wallet" className="btn-gold-metal inline-flex items-center justify-center gap-1.5 rounded-2xl px-4 py-3 text-center text-sm font-black"><Icon name="wallet" size={16} /> Lihat Saldo</Link>
         </div>
       </section>
     );
@@ -321,11 +322,11 @@ export default function TransferForm({ initialQr, initialAmount }: { initialQr: 
                         <button
                           type="button"
                           onClick={() => setRecipient({ recipient_id: c.contact_user_id, display_name: c.alias || c.display_name, via: "contact" })}
-                          className="px-3 py-2 text-xs font-black text-slate-800 hover:bg-gold-50"
+                          className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-black text-slate-800 hover:bg-gold-50"
                         >
-                          ⭐ {c.alias || c.display_name}
+                          <Icon name="star_fill" size={16} /> {c.alias || c.display_name}
                         </button>
-                        <button type="button" onClick={() => removeContact(c.contact_user_id)} aria-label="Hapus kontak" className="border-l border-gold-100 px-2 py-2 text-xs font-bold text-slate-400 hover:bg-red-50 hover:text-red-600">✕</button>
+                        <button type="button" onClick={() => removeContact(c.contact_user_id)} aria-label="Hapus kontak" className="border-l border-gold-100 px-2 py-2 text-xs font-bold text-slate-400 hover:bg-red-50 hover:text-red-600"><Icon name="close" size={14} /></button>
                       </span>
                     ))}
                   </div>
@@ -410,8 +411,8 @@ export default function TransferForm({ initialQr, initialAmount }: { initialQr: 
           )}
 
           {recipient && recipient.via !== "contact" && !savedFavorite && (
-            <button type="button" onClick={saveFavorite} className="rounded-xl border border-gold-200 bg-gold-50 px-4 py-2.5 text-xs font-black text-gold-700 hover:bg-gold-100">
-              ⭐ Simpan {recipient.display_name} ke Kontak Favorit
+            <button type="button" onClick={saveFavorite} className="inline-flex items-center gap-1.5 rounded-xl border border-gold-200 bg-gold-50 px-4 py-2.5 text-xs font-black text-gold-700 hover:bg-gold-100">
+              <Icon name="star_fill" size={16} /> Simpan {recipient.display_name} ke Kontak Favorit
             </button>
           )}
 

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useToast } from "@/components/ToastProvider";
 import { calcTransferFee, type TransferFeeType } from "@/lib/transfer/utils";
 import {formatRupiah, formatDateOnly} from "@/lib/utils";
+import Icon from "@/components/icons/Icon";
 
 type Bill = {
   id: string;
@@ -224,7 +225,7 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
       {payResult && (
         <section className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm">
           <div className="flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50 text-2xl">✅</span>
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50"><Icon name="check_circle" size={24} /></span>
             <div>
               <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Pembayaran Berhasil</p>
               <h2 className="text-xl font-black text-slate-900">{payResult.message}</h2>
@@ -279,9 +280,9 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
             <button
               type="submit"
               disabled={payBusy || (settings ? !settings.enabled : false)}
-              className="btn-gold w-full rounded-2xl px-4 py-3.5 text-sm font-black disabled:opacity-50"
+              className="btn-gold inline-flex w-full items-center justify-center gap-1.5 rounded-2xl px-4 py-3.5 text-sm font-black disabled:opacity-50"
             >
-              {payBusy ? "Memproses..." : `💰 Bayar ${formatRupiah(shareNumber)}`}
+              {payBusy ? "Memproses..." : <><Icon name="wallet" size={16} /> Bayar {formatRupiah(shareNumber)}</>}
             </button>
           </form>
         </section>
@@ -304,7 +305,7 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
             return (
               <div key={p.user_id} className={`flex items-center gap-3 rounded-2xl border p-3 ${paid ? "border-emerald-200 bg-emerald-50/60" : "border-slate-200 bg-white"}`}>
                 <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black ${paid ? "bg-emerald-100 text-emerald-700" : "bg-slate-950 text-gold-200"}`}>
-                  {paid ? "✓" : p.display_name.charAt(0).toUpperCase()}
+                  {paid ? <Icon name="check" size={18} /> : p.display_name.charAt(0).toUpperCase()}
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-black text-slate-900">
@@ -319,13 +320,13 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
                     type="button"
                     onClick={() => remind(p)}
                     disabled={reminding === p.user_id || cooldownLeft > 0}
-                    className="shrink-0 rounded-xl border border-gold-200 bg-gold-50 px-3 py-2 text-xs font-black text-gold-700 hover:bg-gold-100 disabled:opacity-60"
+                    className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gold-200 bg-gold-50 px-3 py-2 text-xs font-black text-gold-700 hover:bg-gold-100 disabled:opacity-60"
                   >
                     {reminding === p.user_id
                       ? "Mengirim..."
                       : cooldownLeft > 0
                         ? `Tunggu ${Math.ceil(cooldownLeft / 60000)} mnt`
-                        : "🔔 Ingatkan"}
+                        : <><Icon name="bell" size={16} /> Ingatkan</>}
                   </button>
                 )}
               </div>

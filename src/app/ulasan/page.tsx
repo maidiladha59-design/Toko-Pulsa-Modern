@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { getPublishedRatings, getRatingSummary } from "@/lib/ratings";
 import { formatDateOnly } from "@/lib/utils";
+import Icon from "@/components/icons/Icon";
+import StarRating from "@/components/icons/StarRating";
 
 export const metadata: Metadata = {
   title: "Ulasan Pelanggan — AIDIL STORE",
@@ -23,8 +25,8 @@ export default async function UlasanPage() {
           admin yang ditampilkan.
         </p>
         <div className="mt-5 flex flex-wrap items-end gap-x-3 gap-y-1">
-          <p className="inline-flex text-5xl font-black leading-none whitespace-nowrap">
-            <span aria-hidden>⭐</span>&nbsp;{summary.average.toFixed(1)}
+          <p className="inline-flex gap-1.5 text-5xl font-black leading-none whitespace-nowrap">
+            <Icon name="star_fill" size={36} className="text-gold-400" />{summary.average.toFixed(1)}
           </p>
           <p className="pb-1 text-sm font-bold text-white/70">
             dari {summary.totalCount} ulasan
@@ -34,9 +36,7 @@ export default async function UlasanPage() {
 
       {ratings.length === 0 ? (
         <div className="rounded-3xl border border-app-border bg-app-surface p-8 text-center">
-          <p className="text-3xl" aria-hidden>
-            ⭐
-          </p>
+          <Icon name="star_fill" size={30} className="mx-auto text-gold-400" />
           <p className="mt-3 font-black text-app-text">Belum ada ulasan yang ditampilkan</p>
           <p className="mt-1 text-sm text-app-muted">
             Ulasan akan muncul di sini setelah disetujui admin.
@@ -50,10 +50,7 @@ export default async function UlasanPage() {
               className="rounded-3xl border border-app-border bg-app-surface p-5 shadow-sm"
             >
               <div className="flex flex-wrap items-center justify-between gap-2">
-                <p className="text-lg tracking-wide text-app-kicker" aria-label={`${review.rating} dari 5 bintang`}>
-                  {"★".repeat(review.rating)}
-                  <span className="text-app-border">{"★".repeat(Math.max(0, 5 - review.rating))}</span>
-                </p>
+                <StarRating value={review.rating} size={18} />
                 {review.createdAt ? (
                   <time className="text-xs text-app-subtle" dateTime={review.createdAt}>
                     {formatDateOnly(review.createdAt)}

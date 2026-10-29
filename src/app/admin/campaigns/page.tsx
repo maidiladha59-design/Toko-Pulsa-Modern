@@ -7,6 +7,7 @@ import Badge from "@/components/ui/Badge";
 import Input from "@/components/ui/Input";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import Icon from "@/components/icons/Icon";
 
 type Campaign = { key: string; title: string; message: string; url: string; min_days: number; cooldown_days: number; enabled: boolean };
 
@@ -71,7 +72,7 @@ export default function AdminCampaignsPage() {
         </div>
       )}
 
-      {loading ? <LoadingSkeleton rows={5} /> : items.length === 0 ? <EmptyState icon="📣" title="Belum ada kampanye" description="Belum ada kampanye otomatis yang tersedia." /> : (
+      {loading ? <LoadingSkeleton rows={5} /> : items.length === 0 ? <EmptyState icon="megaphone" title="Belum ada kampanye" description="Belum ada kampanye otomatis yang tersedia." /> : (
         <div className="space-y-3">
           {items.map((c) => {
             const info = INFO[c.key] || { name: c.key, desc: "", daysLabel: "Hari" };
@@ -114,7 +115,7 @@ export default function AdminCampaignsPage() {
       <Card>
         <CardTitle>Kirim sekarang</CardTitle>
         <CardDescription>Jadwal otomatis berjalan sekali sehari. Tombol ini menjalankan kampanye aktif saat itu juga (maksimal 200 pengguna per kampanye per proses).</CardDescription>
-        <Button disabled={busy === "run" || !ready} onClick={runNow} className="mt-4">{busy === "run" ? "Mengirim..." : "🚀 Jalankan sekarang"}</Button>
+        <Button disabled={busy === "run" || !ready} onClick={runNow} className="mt-4">{busy === "run" ? "Mengirim..." : <><Icon name="rocket" size={16} />Jalankan sekarang</>}</Button>
       </Card>
     </div>
   );

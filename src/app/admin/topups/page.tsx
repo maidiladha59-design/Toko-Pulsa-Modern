@@ -12,6 +12,7 @@ import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import { formatRupiah, formatDate } from "@/lib/utils";
+import Icon from "@/components/icons/Icon";
 
 type FeeConfig = { enabled: boolean; fee_type: "FIXED" | "PERCENTAGE"; fee_value: number; min_topup: number; max_topup: number; deadline_minutes: number; updated_at?: string };
 type FeeTier = { id: string; min_amount: number; max_amount: number | null; fee_amount: number; is_active: boolean; sort_order: number; updated_at?: string };
@@ -129,12 +130,12 @@ export default function AdminTopupsPage() {
         </div>
         <div className="mt-5 flex flex-wrap items-center gap-2">
           <Button onClick={saveFee} loading={savingFee}>Simpan Pengaturan</Button>
-          <Link href="/admin/platform" className="inline-flex items-center justify-center gap-2 rounded-xl border border-app-border bg-transparent px-4 py-2.5 text-sm font-bold text-app-text transition hover:border-gold-400 hover:bg-app-accent-soft">⚙️ Biaya QRIS / Bank / Bank Digital</Link>
+          <Link href="/admin/platform" className="inline-flex items-center justify-center gap-2 rounded-xl border border-app-border bg-transparent px-4 py-2.5 text-sm font-bold text-app-text transition hover:border-gold-400 hover:bg-app-accent-soft"><Icon name="settings" size={16} />Biaya QRIS / Bank / Bank Digital</Link>
         </div>
       </Card>
 
       <Card>
-        <div className="flex flex-wrap items-center justify-between gap-3"><div><CardTitle>Biaya Admin Top Up Bertingkat</CardTitle><CardDescription>Biaya tetap per rentang nominal (inklusif). Nominal yang tidak cocok tier aktif mana pun memakai pengaturan &quot;Biaya Top Up&quot; di atas sebagai cadangan.</CardDescription></div><Button variant="outline" size="sm" onClick={loadTiers}>↻ Muat ulang</Button></div>
+        <div className="flex flex-wrap items-center justify-between gap-3"><div><CardTitle>Biaya Admin Top Up Bertingkat</CardTitle><CardDescription>Biaya tetap per rentang nominal (inklusif). Nominal yang tidak cocok tier aktif mana pun memakai pengaturan &quot;Biaya Top Up&quot; di atas sebagai cadangan.</CardDescription></div><Button variant="outline" size="sm" onClick={loadTiers}><Icon name="refresh" size={16} />Muat ulang</Button></div>
         {tiersLoading ? <div className="mt-5"><LoadingSkeleton rows={4} /></div> : tiers.length === 0 ? <p className="mt-5 rounded-2xl border border-dashed border-app-border bg-app-inset p-4 text-sm text-app-muted">Belum ada tier. Semua nominal memakai pengaturan Biaya Top Up di atas.</p> : <div className="mt-5 overflow-x-auto">
           <table className="w-full min-w-[560px] text-left text-sm">
             <thead><tr className="border-b border-app-border text-xs font-bold uppercase tracking-widest text-app-subtle"><th className="px-3 py-2">Rentang nominal</th><th className="px-3 py-2">Biaya admin</th><th className="px-3 py-2">Urutan</th><th className="px-3 py-2">Status</th><th className="px-3 py-2 text-right">Aksi</th></tr></thead>
@@ -162,8 +163,8 @@ export default function AdminTopupsPage() {
         </div>
       </Card>
 
-      <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-xl font-black text-app-text">Riwayat Top Up</h2><p className="mt-1 text-sm text-app-muted">Top Up Midtrans yang sudah lunas masuk otomatis tanpa approve manual.</p></div><Button variant="outline" size="sm" onClick={load}>↻ Refresh</Button></div>
-      {loading ? <LoadingSkeleton rows={5} /> : topups.length === 0 ? <EmptyState icon="💰" title="Belum ada transaksi Top Up" description="Transaksi baru akan muncul di sini." /> : <div className="space-y-3">{topups.map((t) => { const automatic = t.provider === "midtrans" || t.provider === "fr3newera"; return (
+      <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-xl font-black text-app-text">Riwayat Top Up</h2><p className="mt-1 text-sm text-app-muted">Top Up Midtrans yang sudah lunas masuk otomatis tanpa approve manual.</p></div><Button variant="outline" size="sm" onClick={load}><Icon name="refresh" size={16} />Refresh</Button></div>
+      {loading ? <LoadingSkeleton rows={5} /> : topups.length === 0 ? <EmptyState icon="wallet" title="Belum ada transaksi Top Up" description="Transaksi baru akan muncul di sini." /> : <div className="space-y-3">{topups.map((t) => { const automatic = t.provider === "midtrans" || t.provider === "fr3newera"; return (
         <Card key={t.id}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div><p className="font-bold text-app-text">{t.profiles?.full_name || t.profiles?.email || "Pengguna"}</p><p className="mt-1 text-xs text-app-muted">{t.profiles?.email || ""} · {formatDate(t.created_at)}</p></div>
@@ -175,8 +176,8 @@ export default function AdminTopupsPage() {
             <div><p className="text-xs text-app-subtle">Biaya gateway</p><p className="mt-1 font-black tabular-nums text-app-text">{formatRupiah(t.gateway_fee ?? 0)}</p></div>
             <div><p className="text-xs text-app-subtle">Total dibayar</p><p className="mt-1 font-black tabular-nums text-app-kicker">{formatRupiah(t.gateway_total_payment ?? t.payment_amount ?? t.amount)}</p></div>
           </div>
-          {proofUrls[t.id] && <a href={proofUrls[t.id]} target="_blank" rel="noreferrer" className="mt-3 inline-block text-sm font-bold text-app-kicker">Lihat bukti pembayaran →</a>}
-          {!automatic && (t.status === "PENDING" || t.status === "VERIFYING") && <div className="mt-3 flex flex-wrap gap-2"><Button onClick={() => handleApprove(t.id)} loading={actingId === t.id}>✓ Approve</Button><Button variant="destructive" onClick={() => setRejectingId(rejectingId === t.id ? null : t.id)}>✕ Reject</Button></div>}
+          {proofUrls[t.id] && <a href={proofUrls[t.id]} target="_blank" rel="noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-sm font-bold text-app-kicker">Lihat bukti pembayaran <Icon name="arrow_right" size={14} /></a>}
+          {!automatic && (t.status === "PENDING" || t.status === "VERIFYING") && <div className="mt-3 flex flex-wrap gap-2"><Button onClick={() => handleApprove(t.id)} loading={actingId === t.id}><Icon name="check" size={16} />Approve</Button><Button variant="destructive" onClick={() => setRejectingId(rejectingId === t.id ? null : t.id)}><Icon name="close" size={16} />Reject</Button></div>}
           {!automatic && rejectingId === t.id && <div className="mt-3 flex flex-wrap items-center gap-2 rounded-2xl border border-danger-500/30 bg-danger-500/10 p-3"><Input value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Alasan penolakan..." className="min-w-0 flex-1 bg-app-surface" /><Button variant="destructive" onClick={() => handleReject(t.id)} loading={actingId === t.id}>Kirim</Button></div>}
         </Card>
       ); })}</div>}

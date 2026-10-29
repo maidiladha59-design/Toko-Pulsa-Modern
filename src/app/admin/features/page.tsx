@@ -52,7 +52,7 @@ export default function AdminFeaturesPage() {
         </div>
       )}
 
-      {loading ? <LoadingSkeleton rows={5} /> : features.length === 0 ? <EmptyState icon="🧩" title="Belum ada fitur" description="Belum ada feature flag yang tersedia untuk diatur." /> : (
+      {loading ? <LoadingSkeleton rows={5} /> : features.length === 0 ? <EmptyState icon="puzzle" title="Belum ada fitur" description="Belum ada feature flag yang tersedia untuk diatur." /> : (
         <div className="space-y-3">
           {features.map((f) => (
             <Card key={f.key} className="p-4">

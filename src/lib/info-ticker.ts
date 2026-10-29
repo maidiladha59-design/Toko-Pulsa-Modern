@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { ICON_NAMES, type IconName } from "@/components/icons/registry";
 
 // Bagian murni dari pengaturan situs (tabel public.site_settings, migrasi v98)
 // yang aman dipakai komponen client maupun server: konstanta, tipe, default,
@@ -21,9 +22,12 @@ export const TICKER_GAP_MIN = 16;
 export const TICKER_GAP_MAX = 160;
 export const TICKER_GAP_DEFAULT = 48;
 
-export type TickerIcon = "megaphone" | "bell" | "star" | "none";
+export type TickerIcon = IconName | "none";
 export type TickerStyle = "default" | "emas" | "peringatan";
 export type TickerDirection = "left" | "right";
+
+/** "none" selalu di depan agar nilai default tidak berubah bila ikon registry bertambah. */
+const TICKER_ICON_VALUES = ["none", ...ICON_NAMES] as [TickerIcon, ...TickerIcon[]];
 
 export type InfoTickerSettings = {
   enabled: boolean;
@@ -95,7 +99,9 @@ export const infoTickerInputSchema = z
       .max(TICKER_GAP_MAX, { message: `Jarak antar teks maksimal ${TICKER_GAP_MAX} px.` })
       .default(TICKER_GAP_DEFAULT),
     link_url: optionalLink.default(null),
-    icon: z.enum(["megaphone", "bell", "star", "none"]).default(DEFAULT_INFO_TICKER.icon),
+    icon: z.enum(TICKER_ICON_VALUES, {
+      errorMap: () => ({ message: "Ikon harus dipilih dari daftar ikon yang tersedia." }),
+    }).default(DEFAULT_INFO_TICKER.icon),
     style: z.enum(["default", "emas", "peringatan"]).default(DEFAULT_INFO_TICKER.style),
     start_at: optionalDate.default(null),
     end_at: optionalDate.default(null),

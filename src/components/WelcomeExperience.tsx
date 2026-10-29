@@ -3,30 +3,31 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Icon from "@/components/icons/Icon";
 
 const STORAGE_KEY = "aidilstore_welcome_seen_v1";
 
 const FEATURES = [
   {
-    icon: "🛍️",
+    icon: "bag",
     title: "Belanja Produk Digital",
     desc: "Voucher, akun premium, dan produk digital lain — langsung dikirim otomatis.",
     tint: "bg-gold-400/15 text-gold-300",
   },
   {
-    icon: "⚡",
+    icon: "bolt",
     title: "QRIS Otomatis",
     desc: "Bayar pakai QRIS — status terverifikasi real-time.",
     tint: "bg-emerald-400/15 text-emerald-300",
   },
   {
-    icon: "🔍",
+    icon: "search",
     title: "Cek Status Transaksi",
     desc: "Pantau setiap pesanan dari pending sampai selesai, lengkap dengan riwayatnya.",
     tint: "bg-sky-400/15 text-sky-300",
   },
   {
-    icon: "💰",
+    icon: "wallet",
     title: "Saldo Real-time",
     desc: "Top up saldo kapan saja dan pantau mutasi saldo Anda secara langsung.",
     tint: "bg-violet-400/15 text-violet-300",
@@ -143,7 +144,7 @@ export default function WelcomeExperience() {
           </div>
 
           <h1 className="mt-6 text-2xl font-black leading-tight text-white sm:text-3xl">
-            Selamat datang di <span className="text-gold-400">AIDIL STORE</span> 👋
+            Selamat datang di <span className="text-gold-400">AIDIL STORE</span> <Icon name="default" size={16} className="inline" />
           </h1>
           <p className="mt-3 text-sm leading-relaxed text-slate-300">
             Marketplace digital dengan pembayaran QRIS otomatis, status transaksi real-time,
@@ -153,7 +154,7 @@ export default function WelcomeExperience() {
           <div className="mt-6 grid grid-cols-2 gap-3">
             {FEATURES.map((f) => (
               <div key={f.title} className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-                <div className={`flex h-9 w-9 items-center justify-center rounded-xl text-lg ${f.tint}`}>{f.icon}</div>
+                <div className={`flex h-9 w-9 items-center justify-center rounded-xl ${f.tint}`}><Icon name={f.icon} size={18} /></div>
                 <p className="mt-3 text-sm font-black text-white">{f.title}</p>
                 <p className="mt-1 text-xs leading-relaxed text-slate-400">{f.desc}</p>
               </div>
@@ -172,7 +173,7 @@ export default function WelcomeExperience() {
               onClick={dismiss}
               className="flex-1 rounded-2xl border border-white/15 bg-white/[0.03] px-5 py-3 text-center text-sm font-black text-white transition active:scale-[0.98]"
             >
-              📖 Pusat Bantuan
+              <span className="inline-flex items-center gap-1.5"><Icon name="book" size={16} />Pusat Bantuan</span>
             </Link>
           </div>
         </div>

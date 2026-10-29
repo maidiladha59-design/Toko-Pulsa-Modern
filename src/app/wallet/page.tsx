@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import StatusBadge from "@/components/StatusBadge";
+import Icon from "@/components/icons/Icon";
 
 const TX_LABEL: Record<string, string> = {
   TOPUP: "Top Up",
@@ -13,11 +14,11 @@ const TX_LABEL: Record<string, string> = {
 };
 
 const TX_ICON: Record<string, string> = {
-  TOPUP: "＋",
-  PURCHASE: "🛍️",
-  REFUND: "↩️",
-  ADJUSTMENT: "⚙️",
-  TRANSFER: "🔁",
+  TOPUP: "plus",
+  PURCHASE: "bag",
+  REFUND: "undo",
+  ADJUSTMENT: "settings",
+  TRANSFER: "transfer",
 };
 
 export default async function WalletPage() {
@@ -58,15 +59,15 @@ export default async function WalletPage() {
           </Link>
           <Link
             href="/transfer-uang"
-            className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-zinc-700 px-4 py-3 text-sm font-bold text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400"
+            className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-zinc-700 px-4 py-3 text-sm font-bold text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400"
           >
-            📤 Transfer
+            <Icon name="send" size={16} /> Transfer
           </Link>
           <Link
             href="/transfer-uang/qr"
-            className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-zinc-700 px-4 py-3 text-sm font-bold text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400"
+            className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-zinc-700 px-4 py-3 text-sm font-bold text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400"
           >
-            📥 Terima Saldo
+            <Icon name="inbox" size={16} /> Terima Saldo
           </Link>
         </div>
       </section>
@@ -94,8 +95,8 @@ export default async function WalletPage() {
           <ul className="divide-y divide-app-border">
             {history.map((h) => (
               <li key={h.id} className="flex items-center gap-3 px-4 py-3.5">
-                <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-inset text-base">
-                  {TX_ICON[h.type] || "💳"}
+                <span aria-hidden className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-inset">
+                  <Icon name={TX_ICON[h.type] ?? "card"} size={20} />
                 </span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-bold text-app-text">{TX_LABEL[h.type] || h.type}</p>
@@ -112,7 +113,7 @@ export default async function WalletPage() {
           </ul>
         ) : (
           <div className="px-4 py-12 text-center">
-            <p aria-hidden className="text-3xl">🪙</p>
+            <Icon name="coin" size={30} />
             <p className="mt-2 text-sm font-bold text-app-text">Belum ada riwayat</p>
             <p className="mt-1 text-xs text-app-subtle">Riwayat saldo Anda akan muncul di sini.</p>
           </div>

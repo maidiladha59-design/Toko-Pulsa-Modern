@@ -76,7 +76,7 @@ test('v77 halaman admin: daftar brand, upload via /api/admin/media folder brand-
   assert.match(p, /brand\.logo_url\?\(brand\.logo_url\.toLowerCase\(\)\.endsWith\('\.pdf'\)/);
   assert.match(p, /<img src=\{brand\.logo_url\} alt=\{brand\.brand_name\}/);
   assert.match(p, /Jaringan gagal/);
-  assert.match(p, /🖼️/);
+  assert.match(p, /<Icon name="image" size=\{20\} \/>/);
 });
 
 test('v77 upload media menerima JPG/PNG/WEBP/SVG/PDF, maks 5MB, Storage tidak berubah', () => {
@@ -93,23 +93,24 @@ test('v77 halaman platform: accept baru, ikon PDF banner, indikator Mengunggah',
   const p = read(PLATFORM);
   assert.match(p, /accept="image\/jpeg,image\/png,image\/webp,image\/svg\+xml,application\/pdf"/);
   assert.match(p, /uploading&&<span className="ml-3 text-xs font-black text-gold-600 dark:text-gold-300">Mengunggah\.\.\.<\/span>/);
-  assert.match(p, /b\.file_type==='pdf'\?'📄 PDF':'🖼️ Gambar'/);
+  assert.match(p, /<Icon name="doc" size=\{12\}\/> PDF/);
+  assert.match(p, /<Icon name="image" size=\{12\}\/> Gambar/);
   assert.match(p, /Jaringan gagal\. Periksa koneksi internet lalu coba lagi\./);
   assert.match(p, /file_type:f\.type==='application\/pdf'\?'pdf':'image'/);
 });
 
 test('v77 menu "Logo Brand" terpasang di AdminSidebar', () => {
   const s = read(SIDEBAR);
-  assert.match(s, new RegExp(esc('["/admin/brand-media", "🖼️", "Logo Brand"]')));
+  assert.match(s, new RegExp(esc('["/admin/brand-media", "image", "Logo Brand"]')));
 });
 
-test('v77 PPOBServiceGrid membaca brand_media (client publik) dan fallback emoji tetap ada', () => {
+test('v77 PPOBServiceGrid membaca brand_media (client publik) dan fallback ikon tetap ada', () => {
   const g = read(GRID);
   assert.match(g, /import \{ createClient \} from "@\/lib\/supabase\/client";/);
   assert.match(g, /from\("brand_media"\)/);
   assert.match(g, /select\("brand_key,logo_url"\)/);
   assert.match(g, /logoMap\[brand\.trim\(\)\.toLowerCase\(\)\]/);
-  // Fallback emoji tidak hilang
+  // Fallback ikon tidak hilang
   assert.match(g, /brandIcon\(brand\)/);
   assert.match(g, /function brandIcon\(brand: string\)/);
   // Logic checkout/PPOB tidak berubah

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
+import IconTile from "@/components/icons/IconTile";
 
 type MediaItem = { category_key: string; icon_url: string | null };
 type TabKey = "semua" | "layanan" | "tagihan" | "hiburan";
@@ -15,16 +16,16 @@ const TABS: { key: TabKey; label: string }[] = [
 ];
 
 const ITEMS: { icon: string; label: string; slug: string; tab: Exclude<TabKey, "semua"> }[] = [
-  { icon: "📱", label: "Pulsa", slug: "pulsa", tab: "layanan" },
-  { icon: "🌐", label: "Data", slug: "paket-data", tab: "layanan" },
-  { icon: "🎮", label: "Game", slug: "top-up-game", tab: "hiburan" },
-  { icon: "💳", label: "E-Wallet", slug: "e-wallet", tab: "layanan" },
-  { icon: "⚡", label: "PLN", slug: "pln", tab: "tagihan" },
-  { icon: "🎟️", label: "Voucher", slug: "voucher", tab: "hiburan" },
-  { icon: "▶️", label: "Streaming", slug: "streaming", tab: "hiburan" },
-  { icon: "📺", label: "TV", slug: "tv", tab: "tagihan" },
-  { icon: "🔥", label: "Gas", slug: "gas", tab: "tagihan" },
-  { icon: "📣", label: "Sosmed", slug: "media-sosial", tab: "hiburan" },
+  { icon: "pulsa", label: "Pulsa", slug: "pulsa", tab: "layanan" },
+  { icon: "data", label: "Data", slug: "paket-data", tab: "layanan" },
+  { icon: "game", label: "Game", slug: "top-up-game", tab: "hiburan" },
+  { icon: "card", label: "E-Wallet", slug: "e-wallet", tab: "layanan" },
+  { icon: "bolt", label: "PLN", slug: "pln", tab: "tagihan" },
+  { icon: "voucher", label: "Voucher", slug: "voucher", tab: "hiburan" },
+  { icon: "streaming", label: "Streaming", slug: "streaming", tab: "hiburan" },
+  { icon: "tv", label: "TV", slug: "tv", tab: "tagihan" },
+  { icon: "gas", label: "Gas", slug: "gas", tab: "tagihan" },
+  { icon: "megaphone", label: "Sosmed", slug: "media-sosial", tab: "hiburan" },
 ];
 
 export default function HomeServiceMenu({ media }: { media: MediaItem[] }) {
@@ -75,13 +76,13 @@ export default function HomeServiceMenu({ media }: { media: MediaItem[] }) {
               href={`/ppob/${item.slug}`}
               className="flex min-h-[76px] flex-col items-center rounded-xl px-1 py-1 text-center transition active:scale-95 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400"
             >
-              <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-app-inset text-[22px]">
-                {iconUrl ? (
+              {iconUrl ? (
+                <span className="flex h-12 w-12 items-center justify-center overflow-hidden rounded-2xl bg-app-inset">
                   <Image src={iconUrl} alt={item.label} width={48} height={48} className="h-full w-full object-contain" />
-                ) : (
-                  item.icon
-                )}
-              </span>
+                </span>
+              ) : (
+                <IconTile name={item.icon} size={48} iconSize={24} />
+              )}
               <span className="mt-1.5 flex min-h-[2.4rem] items-start justify-center text-[13px] font-medium leading-[1.15rem] text-app-muted">
                 {item.label}
               </span>

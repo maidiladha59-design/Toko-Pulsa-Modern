@@ -1,5 +1,5 @@
 'use client';
-import {useEffect,useState} from 'react';import Button from '@/components/ui/Button';import { Card } from '@/components/ui/Card';import Input from '@/components/ui/Input';import EmptyState from '@/components/ui/EmptyState';import LoadingSkeleton from '@/components/ui/LoadingSkeleton';import {useToast} from '@/components/ToastProvider';
+import {useEffect,useState} from 'react';import Button from '@/components/ui/Button';import { Card } from '@/components/ui/Card';import Input from '@/components/ui/Input';import EmptyState from '@/components/ui/EmptyState';import LoadingSkeleton from '@/components/ui/LoadingSkeleton';import {useToast} from '@/components/ToastProvider';import Icon from '@/components/icons/Icon';
 
 type Brand = {brand_key:string;brand_name:string;logo_url:string|null;updated_at:string|null;product_count:number};
 
@@ -54,13 +54,13 @@ export default function AdminBrandMedia(){
       <Input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Cari brand..." className="bg-app-inset"/>
     </Card>
 
-    {loading?<LoadingSkeleton rows={5} />:filtered.length===0?<EmptyState icon="🖼️" title="Tidak ada brand PPOB yang cocok" description="Brand muncul otomatis dari SKU PPOB yang tersinkron." />:(
+    {loading?<LoadingSkeleton rows={5} />:filtered.length===0?<EmptyState icon="image" title="Tidak ada brand PPOB yang cocok" description="Brand muncul otomatis dari SKU PPOB yang tersinkron." />:(
       <div className="space-y-3">
         {filtered.map(brand=>(
           <Card key={brand.brand_key} className="p-4">
             <div className="flex flex-wrap items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-zinc-950 text-lg">
-                {brand.logo_url?(brand.logo_url.toLowerCase().endsWith('.pdf')?<a href={brand.logo_url} target="_blank" rel="noreferrer" title="Buka file PDF" className="flex h-full w-full flex-col items-center justify-center leading-none text-gold-400"><span className="text-base">📄</span><span className="mt-0.5 text-[8px] font-black">PDF</span></a>:<img src={brand.logo_url} alt={brand.brand_name} className="h-full w-full object-contain"/>):<span className="text-gold-400">🖼️</span>}
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-zinc-950">
+                {brand.logo_url?(brand.logo_url.toLowerCase().endsWith('.pdf')?<a href={brand.logo_url} target="_blank" rel="noreferrer" title="Buka file PDF" className="flex h-full w-full flex-col items-center justify-center leading-none text-gold-400"><Icon name="doc" size={16} /><span className="mt-0.5 text-[8px] font-black">PDF</span></a>:<img src={brand.logo_url} alt={brand.brand_name} className="h-full w-full object-contain"/>):<span className="text-gold-400"><Icon name="image" size={20} /></span>}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-black text-app-text">{brand.brand_name}</p>

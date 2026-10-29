@@ -3,6 +3,7 @@ import Link from "next/link";
 import { getBusinessIdentity } from "@/lib/business";
 import { formatDateOnly } from "@/lib/utils";
 import RatingBadge from "@/components/RatingBadge";
+import Icon from "@/components/icons/Icon";
 
 const pseLabel: Record<string, string> = {
   REGISTERED: "Terdaftar PSE",
@@ -47,7 +48,7 @@ export default async function BusinessIdentityCard({ compact = false }: { compac
           {pseText}
         </span>
         <Link href="/identitas-usaha" className="mt-2 block text-[11px] font-black text-gold-400 hover:underline">
-          Lihat identitas lengkap →
+          <span className="inline-flex items-center gap-1">Lihat identitas lengkap <Icon name="arrow_right" size={12} /></span>
         </Link>
       </div>
     );
@@ -77,8 +78,7 @@ export default async function BusinessIdentityCard({ compact = false }: { compac
       </div>
       {!biz.isConfigured && (
         <p className="mt-3 rounded-xl border border-rose-200 bg-rose-50 p-3 text-xs font-semibold text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">
-          Data identitas usaha belum lengkap. Pemilik usaha dapat melengkapinya melalui Panel Admin →
-          Identitas Usaha.
+          Data identitas usaha belum lengkap. Pemilik usaha dapat melengkapinya melalui <span className="inline-flex items-center gap-1">Panel Admin<Icon name="arrow_right" size={14} />Identitas Usaha.</span>
         </p>
       )}
       <dl className="mt-5 grid gap-3 text-sm sm:grid-cols-2">
@@ -116,7 +116,7 @@ export default async function BusinessIdentityCard({ compact = false }: { compac
                 rel="noopener noreferrer"
                 className="font-bold text-gold-700 underline hover:text-gold-600 dark:text-gold-300"
               >
-                Lihat dokumen legal (NIB/SIUP) →
+                <span className="inline-flex items-center gap-1">Lihat dokumen legal (NIB/SIUP) <Icon name="arrow_right" size={12} /></span>
               </a>
             </dd>
           </div>

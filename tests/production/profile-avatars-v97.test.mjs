@@ -101,7 +101,7 @@ test('v97 pemilih avatar: judul, grid 3 kolom, hanya aktif, simpan sampai beruba
   assert.match(picker, /grid grid-cols-3 gap-3/);
   assert.match(picker, /loadActiveAvatars\(supabase\)/);
   assert.match(picker, /ring-4 ring-gold-400/);
-  assert.match(picker, /✓/);
+  assert.match(picker, /<Icon name="check" size=\{16\} \/>/);
   assert.match(picker, /disabled=\{!changed\}/);
   assert.match(picker, /Simpan/);
   assert.match(picker, /toast\.show\("Foto profil diperbarui\.", "success"\)/);
@@ -129,7 +129,7 @@ test('v97 komponen UserAvatar dipakai di beranda, profil, dan navbar', () => {
   assert.match(avatar, /rounded-full/);
 
   const sidebar = read('src/app/admin/AdminSidebar.tsx');
-  assert.match(sidebar, /\["\/admin\/avatars", "🙂", "Foto Profil"\]/);
+  assert.match(sidebar, /\["\/admin\/avatars", "user", "Foto Profil"\]/);
   assert.match(read('src/app/admin/avatars/page.tsx'), /accept="image\/png,image\/jpeg,image\/webp"/);
   assert.match(read('src/app/admin/avatars/page.tsx'), /Pratinjau \(dipotong 1:1, 500×500\)/);
 });
@@ -154,5 +154,5 @@ test('v97 pemilih avatar: portal ke body, overlay full viewport, scroll terkunci
 test('v97 preflight mewajibkan migrasi v97', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v97_profile_avatars\.sql/);
-  assert.match(script, /90,93,94,97,98\]/);
+  assert.match(script, /90,93,94,97,98,99\]/);
 });

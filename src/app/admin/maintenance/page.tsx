@@ -4,6 +4,7 @@ import Button from "@/components/ui/Button";
 import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import Icon from "@/components/icons/Icon";
 
 const DEFAULTS = { enabled:false, title:"AIDIL STORE sedang dalam pemeliharaan", message:"Kami sedang melakukan perbaikan dan peningkatan sistem. Silakan coba kembali beberapa saat lagi.", starts_at:"", ends_at:"", allow_admin_bypass:true };
 function toInputDate(value?: string|null){if(!value)return "";const d=new Date(value);if(Number.isNaN(d.getTime()))return "";const p=(n:number)=>String(n).padStart(2,"0");return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}`;}
@@ -16,7 +17,7 @@ export default function MaintenanceAdmin(){
  return <div className="space-y-5">
   <div className="rounded-3xl bg-gradient-to-r from-zinc-900 via-gold-700 to-black p-6 text-white shadow-lg shadow-gold-500/15"><p className="text-xs font-black uppercase tracking-widest text-gold-100">System Control</p><h1 className="mt-2 text-2xl font-black sm:text-3xl">Maintenance Mode</h1><p className="mt-1 text-sm text-gold-100">Nyalakan halaman pemeliharaan dari Admin tanpa mengubah kode. Admin tetap dapat mengakses dashboard.</p></div>
   <Card>
-   <div className="flex flex-wrap items-center justify-between gap-4 border-b border-app-border pb-5"><div><CardTitle>Status sistem</CardTitle><CardDescription>Pengunjung biasa akan diarahkan ke halaman maintenance saat status aktif.</CardDescription></div><Button variant={form.enabled?"destructive":"outline"} onClick={()=>setForm({...form,enabled:!form.enabled})}>{form.enabled?"🔴 MAINTENANCE ON":"🟢 MAINTENANCE OFF"}</Button></div>
+   <div className="flex flex-wrap items-center justify-between gap-4 border-b border-app-border pb-5"><div><CardTitle>Status sistem</CardTitle><CardDescription>Pengunjung biasa akan diarahkan ke halaman maintenance saat status aktif.</CardDescription></div><Button variant={form.enabled?"destructive":"outline"} onClick={()=>setForm({...form,enabled:!form.enabled})}>{form.enabled?<><Icon name="dot" size={12} />MAINTENANCE ON</>:<><Icon name="dot" size={12} className="text-success-600 dark:text-success-400" />MAINTENANCE OFF</>}</Button></div>
    <div className="mt-5 grid gap-3 md:grid-cols-2">
     <Input label="Judul" value={form.title} onChange={e=>setForm({...form,title:e.target.value})} className="bg-app-inset"/>
     <Input label="Mulai (opsional)" type="datetime-local" value={form.starts_at} onChange={e=>setForm({...form,starts_at:e.target.value})} className="bg-app-inset"/>
@@ -28,6 +29,6 @@ export default function MaintenanceAdmin(){
    {msg&&<p className="mt-4 rounded-xl bg-app-inset p-3 text-sm font-bold text-app-text">{msg}</p>}
    <Button disabled={saving} onClick={save} className="mt-5">{saving?"Menyimpan...":"Simpan Pengaturan"}</Button>
   </Card>
-  <Card><CardTitle>Pratinjau</CardTitle><div className="mt-4 rounded-2xl bg-zinc-900 p-6 text-white"><div className="mx-auto max-w-lg text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-400 text-2xl">🛠️</div><p className="mt-4 text-xs font-black uppercase tracking-widest text-gold-300">AIDIL STORE</p><h3 className="mt-2 text-xl font-black">{form.title}</h3><p className="mt-2 text-sm leading-6 text-white/60">{form.message}</p></div></div></Card>
+  <Card><CardTitle>Pratinjau</CardTitle><div className="mt-4 rounded-2xl bg-zinc-900 p-6 text-white"><div className="mx-auto max-w-lg text-center"><div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gold-400"><Icon name="tools" size={24} /></div><p className="mt-4 text-xs font-black uppercase tracking-widest text-gold-300">AIDIL STORE</p><h3 className="mt-2 text-xl font-black">{form.title}</h3><p className="mt-2 text-sm leading-6 text-white/60">{form.message}</p></div></div></Card>
  </div>;
 }

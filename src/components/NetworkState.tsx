@@ -7,6 +7,8 @@
  * - NetworkEmpty: status kosong "Belum ada data"
  */
 
+import Icon from "@/components/icons/Icon";
+
 export function NetworkSkeleton({ rows = 4, className = "" }: { rows?: number; className?: string }) {
   return (
     <div
@@ -44,8 +46,8 @@ export function NetworkError({
       className="rounded-3xl border border-dashed border-app-border bg-app-surface p-8 text-center"
       role="alert"
     >
-      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-app-accent-soft text-3xl">
-        📡
+      <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-app-accent-soft">
+        <Icon name="signal_off" size={30} />
       </div>
       <h2 className="mt-4 text-lg font-black text-app-text">{title}</h2>
       <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-app-muted">{description}</p>

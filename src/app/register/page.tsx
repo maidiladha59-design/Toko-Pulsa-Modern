@@ -7,6 +7,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Button from "@/components/Button";
 import { humanizeError } from "@/lib/utils";
 import { useToast } from "@/components/ToastProvider";
+import Icon from "@/components/icons/Icon";
 
 const TERMS_SHORT =
   "AIDIL STORE menyediakan produk digital, PPOB, saldo, pembayaran dan layanan terkait. Pengguna wajib memberikan data yang benar, menjaga akun dan mengikuti ketentuan provider.";
@@ -63,7 +64,7 @@ function InfoModal({
             className="rounded-lg px-2 py-1 text-sm font-bold text-white/50 hover:bg-white/10"
             aria-label="Tutup"
           >
-            ✕
+            <Icon name="close" size={14} />
           </button>
         </div>
         <p className="mt-4 whitespace-pre-line text-sm leading-6 text-white/70">
@@ -335,7 +336,7 @@ function RegisterForm() {
           {emailVerified && (
             <div className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
               <div>
-                <p className="text-sm font-black text-emerald-800">✓ Email terverifikasi</p>
+                <p className="inline-flex items-center gap-1.5 text-sm font-black text-emerald-800"><Icon name="check" size={16} /> Email terverifikasi</p>
                 <p className="mt-1 text-xs text-emerald-700">Email ini sudah berhasil diverifikasi.</p>
               </div>
               <button type="button" onClick={() => { setEmailVerified(false); setEmail(""); resetEmailVerification(); }} className="text-xs font-bold text-emerald-700 hover:underline">Ganti</button>
@@ -357,7 +358,7 @@ function RegisterForm() {
 
           <div className="rounded-2xl border border-gold-400/25 bg-white/5 p-4">
             <div className="flex items-center justify-between gap-3">
-              <b className="text-sm text-white">📋 Ketentuan Layanan</b>
+              <b className="inline-flex items-center gap-1.5 text-sm text-white"><Icon name="clipboard" size={16} /> Ketentuan Layanan</b>
               <button
                 type="button"
                 onClick={() => setActiveModal("terms")}
@@ -371,7 +372,7 @@ function RegisterForm() {
 
           <div className="rounded-2xl border border-gold-400/25 bg-white/5 p-4">
             <div className="flex items-center justify-between gap-3">
-              <b className="text-sm text-white">🔐 Kebijakan Privasi</b>
+              <b className="inline-flex items-center gap-1.5 text-sm text-white"><Icon name="lock" size={16} /> Kebijakan Privasi</b>
               <button
                 type="button"
                 onClick={() => setActiveModal("privacy")}
@@ -411,7 +412,7 @@ function RegisterForm() {
             <p className="mt-5 text-sm leading-6 text-zinc-300">Dengan akun AIDIL STORE, Anda dapat mengakses berbagai layanan digital dalam satu tempat.</p>
           </div>
           <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
-            <p className="text-sm font-black text-gold-200">📖 Panduan Pendaftaran</p>
+            <p className="inline-flex items-center gap-1.5 text-sm font-black text-gold-200"><Icon name="book" size={16} /> Panduan Pendaftaran</p>
             <div className="mt-4 space-y-4">
               <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">1</span><div><p className="text-sm font-bold text-white">Isi data akun</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan nama, email, nomor WhatsApp dan password.</p></div></div>
               <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">2</span><div><p className="text-sm font-bold text-white">Verifikasi email</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan OTP 6 digit yang berlaku selama 5 menit.</p></div></div>

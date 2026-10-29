@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import PersonalQrClient from "./PersonalQrClient";
+import Icon from "@/components/icons/Icon";
 
 export default async function PersonalQrPage() {
   const supabase = createClient();
@@ -19,7 +20,7 @@ export default async function PersonalQrPage() {
         <p className="mt-2 text-sm leading-6 text-amber-900">
           Jalankan migration <code className="rounded bg-white px-1.5 py-0.5 text-xs font-bold">supabase/migrations_v75_wallet_transfer_qr.sql</code> di Supabase, lalu muat ulang halaman ini.
         </p>
-        <Link href="/transfer-uang" className="mt-4 inline-block rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white">← Kembali ke Transfer</Link>
+        <Link href="/transfer-uang" className="mt-4 inline-flex items-center gap-1.5 rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white"><Icon name="arrow_left" size={16} /> Kembali ke Transfer</Link>
       </div>
     );
   }

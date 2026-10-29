@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Icon from "@/components/icons/Icon";
 
 const STAR_LABELS = ["Sangat buruk", "Buruk", "Cukup", "Bagus", "Luar biasa"];
 const MAX_COMMENT = 1000;
@@ -119,8 +120,8 @@ export default function RatingPrompt() {
       <div className="w-full max-w-md rounded-t-3xl border border-app-border bg-app-surface p-5 shadow-2xl sm:rounded-3xl sm:p-6">
         {submitted ? (
           <div className="py-6 text-center">
-            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gold-400/15 text-3xl">
-              ⭐
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-gold-400/15">
+              <Icon name="star_fill" size={30} className="text-gold-400" />
             </div>
             <h2 id="rating-modal-title" className="mt-4 text-xl font-black text-app-text">
               Terima kasih!
@@ -147,9 +148,9 @@ export default function RatingPrompt() {
                 onClick={dismiss}
                 disabled={submitting}
                 aria-label="Tutup"
-                className="shrink-0 rounded-full px-2 py-1 text-lg leading-none text-app-subtle transition hover:bg-app-inset hover:text-app-text disabled:opacity-50"
+                className="shrink-0 rounded-full px-2 py-1 leading-none text-app-subtle transition hover:bg-app-inset hover:text-app-text disabled:opacity-50"
               >
-                ✕
+                <Icon name="close" size={18} />
               </button>
             </div>
 
@@ -173,13 +174,13 @@ export default function RatingPrompt() {
                       onFocus={() => setHovered(star)}
                       onBlur={() => setHovered(0)}
                       onClick={() => setRating(star)}
-                      className={`flex h-12 w-12 items-center justify-center rounded-2xl border text-2xl transition ${
+                      className={`flex h-12 w-12 items-center justify-center rounded-2xl border transition ${
                         active
                           ? "border-gold-400 bg-gold-400/15 text-gold-500 dark:text-gold-300"
                           : "border-app-border bg-app-inset text-app-subtle hover:border-gold-400/60"
                       }`}
                     >
-                      ★
+                      <Icon name="star_fill" size={24} />
                     </button>
                   );
                 })}

@@ -6,7 +6,7 @@ import path from 'node:path';
 const root = process.cwd();
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
-test('v95 token warna baru: gold-* biru, mint-* hijau muda, gradient biru→mint', () => {
+test('v95 token warna baru: gold-* biru, mint-* hijau muda, gradient biru ke mint', () => {
   const cfg = read('tailwind.config.ts');
   // Biru menempati token legacy gold-* (tanpa rename class di halaman).
   assert.match(cfg, /gold: \{[\s\S]*?DEFAULT: "#2E9EF5"/);

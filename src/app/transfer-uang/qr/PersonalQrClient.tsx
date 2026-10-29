@@ -6,6 +6,7 @@ import Link from "next/link";
 import QRCode from "qrcode";
 import { useToast } from "@/components/ToastProvider";
 import { buildPersonalQrPayload } from "@/lib/transfer/qr";
+import Icon from "@/components/icons/Icon";
 
 export default function PersonalQrClient({ token: initialToken, displayName }: { token: string; displayName: string }) {
   const toast = useToast();
@@ -113,7 +114,7 @@ export default function PersonalQrClient({ token: initialToken, displayName }: {
               className="w-full bg-transparent px-2 py-2.5 text-lg font-black text-slate-900 outline-none"
             />
             {amount && (
-              <button type="button" onClick={() => setAmount("")} aria-label="Hapus nominal" className="text-xs font-bold text-slate-400 hover:text-red-600">✕</button>
+              <button type="button" onClick={() => setAmount("")} aria-label="Hapus nominal" className="text-xs font-bold text-slate-400 hover:text-red-600"><Icon name="close" size={14} /></button>
             )}
           </div>
           <p className="mt-1 text-[11px] leading-5 text-slate-400">
@@ -124,11 +125,11 @@ export default function PersonalQrClient({ token: initialToken, displayName }: {
         </div>
 
         <div className="mt-4 grid grid-cols-2 gap-2">
-          <button type="button" onClick={downloadQr} disabled={!qrDataUrl} className="rounded-2xl bg-slate-950 px-4 py-3 text-sm font-black text-white disabled:opacity-50">⬇️ Unduh PNG</button>
-          <button type="button" onClick={copyLink} disabled={!payload} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50">🔗 Salin Link</button>
-          <button type="button" onClick={shareLink} disabled={!payload} className="rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50">📤 Bagikan</button>
-          <button type="button" onClick={regenerate} disabled={regenerating} className="rounded-2xl border border-red-200 px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-50">
-            {regenerating ? "Memproses..." : "♻️ Buat Ulang QR"}
+          <button type="button" onClick={downloadQr} disabled={!qrDataUrl} className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-black text-white disabled:opacity-50"><Icon name="download" size={16} /> Unduh PNG</button>
+          <button type="button" onClick={copyLink} disabled={!payload} className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"><Icon name="link" size={16} /> Salin Link</button>
+          <button type="button" onClick={shareLink} disabled={!payload} className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"><Icon name="share" size={16} /> Bagikan</button>
+          <button type="button" onClick={regenerate} disabled={regenerating} className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-red-200 px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-50">
+            {regenerating ? "Memproses..." : <><Icon name="refresh" size={16} /> Buat Ulang QR</>}
           </button>
         </div>
 
@@ -140,7 +141,7 @@ export default function PersonalQrClient({ token: initialToken, displayName }: {
       </section>
 
       <section className="rounded-3xl border border-gold-200 bg-gold-50 p-5 text-sm text-zinc-950">
-        <p className="font-black">🔐 QR ini aman dibagikan</p>
+        <p className="flex items-center gap-1.5 font-black"><Icon name="lock" size={16} /> QR ini aman dibagikan</p>
         <ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-5">
           <li>QR hanya berisi token publik acak — tanpa email, nomor HP, saldo, atau data pribadi.</li>
           <li>Penerima harus punya akun dan login AIDIL STORE untuk melanjutkan transfer.</li>
@@ -149,8 +150,8 @@ export default function PersonalQrClient({ token: initialToken, displayName }: {
       </section>
 
       <div className="grid gap-2 sm:grid-cols-2">
-        <Link href="/transfer-uang" className="btn-gold px-4 py-3 text-center text-sm font-black">📤 Kirim Saldo</Link>
-        <Link href="/wallet" className="rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-bold text-slate-700 hover:bg-slate-50">💰 Lihat Saldo</Link>
+        <Link href="/transfer-uang" className="btn-gold inline-flex items-center justify-center gap-1.5 px-4 py-3 text-center text-sm font-black"><Icon name="send" size={16} /> Kirim Saldo</Link>
+        <Link href="/wallet" className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-bold text-slate-700 hover:bg-slate-50"><Icon name="wallet" size={16} /> Lihat Saldo</Link>
       </div>
     </div>
   );

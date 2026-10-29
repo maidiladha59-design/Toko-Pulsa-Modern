@@ -103,7 +103,7 @@ export default function Referral() {
               </div>
             ))
           ) : (
-            <EmptyState icon="👥" title="Belum ada teman" description="Bagikan link referral di atas untuk mulai mengundang." />
+            <EmptyState icon="users" title="Belum ada teman" description="Bagikan link referral di atas untuk mulai mengundang." />
           )}
         </div>
       </Card>

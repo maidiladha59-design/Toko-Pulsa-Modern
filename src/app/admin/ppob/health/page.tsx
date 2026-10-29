@@ -5,6 +5,7 @@ import { Card, CardTitle, CardDescription } from "@/components/ui/Card";
 import Badge, { statusTone } from "@/components/ui/Badge";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import Icon from "@/components/icons/Icon";
 
 type Health = { provider:string; configured:boolean; testing:boolean; services:{total:number;active:number;inactive:number}; processing:number; lastSync:any };
 export default function ProviderHealthPage(){
@@ -49,7 +50,7 @@ export default function ProviderHealthPage(){
           <CardTitle>Koneksi provider</CardTitle>
           <CardDescription>Tes request pricelist tanpa mengubah produk atau saldo.</CardDescription>
         </div>
-        <Button onClick={check} loading={checking}>{checking?'Mengecek...':'🔌 Test Provider'}</Button>
+        <Button onClick={check} loading={checking}>{checking?'Mengecek...':<><Icon name="plug" size={16} />Test Provider</>}</Button>
       </div>
       {message&&<div className="mt-4 rounded-xl bg-app-inset p-3 text-sm font-bold text-app-text">{message}</div>}
     </Card>

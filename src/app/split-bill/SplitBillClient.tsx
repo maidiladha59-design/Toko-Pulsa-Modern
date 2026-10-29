@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ToastProvider";
 import { calcEqualShares, equalSplitRemainder, type SplitMode } from "@/lib/splitbill/utils";
 import { formatRupiah } from "@/lib/utils";
+import Icon from "@/components/icons/Icon";
 
 type Bill = {
   id: string;
@@ -181,16 +182,16 @@ export default function SplitBillClient() {
               <button
                 type="button"
                 onClick={() => setMode("EQUAL")}
-                className={`rounded-xl border px-3 py-2.5 text-sm font-black ${mode === "EQUAL" ? "border-gold-500 bg-gold-50 text-gold-700" : "border-slate-200 bg-white text-slate-600"}`}
+                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-black ${mode === "EQUAL" ? "border-gold-500 bg-gold-50 text-gold-700" : "border-slate-200 bg-white text-slate-600"}`}
               >
-                ⚖️ Dibagi Rata
+                <Icon name="scales" size={16} /> Dibagi Rata
               </button>
               <button
                 type="button"
                 onClick={() => setMode("CUSTOM")}
-                className={`rounded-xl border px-3 py-2.5 text-sm font-black ${mode === "CUSTOM" ? "border-gold-500 bg-gold-50 text-gold-700" : "border-slate-200 bg-white text-slate-600"}`}
+                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-black ${mode === "CUSTOM" ? "border-gold-500 bg-gold-50 text-gold-700" : "border-slate-200 bg-white text-slate-600"}`}
               >
-                ✏️ Nominal Custom
+                <Icon name="edit" size={16} /> Nominal Custom
               </button>
             </div>
             {mode === "EQUAL" && remainder > 0 && selected.length > 0 && (
@@ -210,9 +211,9 @@ export default function SplitBillClient() {
                       key={c.contact_user_id}
                       type="button"
                       onClick={() => addParticipant(c.contact_user_id, c.alias || c.display_name)}
-                      className="rounded-xl border border-gold-200 bg-white px-3 py-2 text-xs font-black text-slate-800 hover:bg-gold-50"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-gold-200 bg-white px-3 py-2 text-xs font-black text-slate-800 hover:bg-gold-50"
                     >
-                      ⭐ {c.alias || c.display_name}
+                      <Icon name="star_fill" size={16} /> {c.alias || c.display_name}
                     </button>
                   ))}
                 </div>
@@ -289,7 +290,7 @@ export default function SplitBillClient() {
                         aria-label="Hapus peserta"
                         className="shrink-0 rounded-lg px-2 py-2 text-xs font-bold text-slate-400 hover:bg-red-50 hover:text-red-600"
                       >
-                        ✕
+                        <Icon name="close" size={14} />
                       </button>
                     </div>
                   ))}
@@ -312,9 +313,9 @@ export default function SplitBillClient() {
           <button
             type="submit"
             disabled={busy}
-            className="btn-gold w-full rounded-2xl px-4 py-3.5 text-sm font-black disabled:opacity-50"
+            className="btn-gold inline-flex w-full items-center justify-center gap-1.5 rounded-2xl px-4 py-3.5 text-sm font-black disabled:opacity-50"
           >
-            {busy ? "Membuat tagihan..." : "🧾 Buat Tagihan Patungan"}
+            {busy ? "Membuat tagihan..." : <><Icon name="receipt" size={16} /> Buat Tagihan Patungan</>}
           </button>
         </form>
       </section>

@@ -6,6 +6,7 @@ import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import Icon from "@/components/icons/Icon";
 
 type PseStatus = "BELUM_TERDAFTAR" | "DALAM_PROSES" | "TERDAFTAR";
 
@@ -365,7 +366,7 @@ export default function AdminIdentitasUsaha() {
             {logoUrl ? (
               <img src={logoUrl} alt="Pratinjau logo usaha" className="h-full w-full object-contain p-2" />
             ) : (
-              <span className="text-3xl text-app-subtle">🏢</span>
+              <Icon name="building" size={30} className="text-app-subtle" />
             )}
           </div>
           <div className="flex flex-wrap items-center gap-2">

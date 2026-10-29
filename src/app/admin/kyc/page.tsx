@@ -1,5 +1,5 @@
 'use client';
-import{useEffect,useState}from'react';import Button from'@/components/ui/Button';import{Card}from'@/components/ui/Card';import Badge from'@/components/ui/Badge';import EmptyState from'@/components/ui/EmptyState';import LoadingSkeleton from'@/components/ui/LoadingSkeleton';import{useToast}from'@/components/ToastProvider';
+import{useEffect,useState}from'react';import Button from'@/components/ui/Button';import{Card}from'@/components/ui/Card';import Badge from'@/components/ui/Badge';import EmptyState from'@/components/ui/EmptyState';import LoadingSkeleton from'@/components/ui/LoadingSkeleton';import{useToast}from'@/components/ToastProvider';import Icon from'@/components/icons/Icon';
 export default function AdminKYC(){const toast=useToast();const[rows,setRows]=useState<any[]>([]);const[loading,setLoading]=useState(true);async function load(){setLoading(true);const r=await fetch('/api/admin/kyc');const j=await r.json();if(r.ok)setRows(j.kyc||[]);else toast.show(j.message||'Gagal memuat KYC','error');setLoading(false)}useEffect(()=>{load()},[]);async function review(user_id:string,status:'VERIFIED'|'REJECTED',rejected_stage?:'KTP'|'SELFIE'|null){let reason='',review_note='';if(status==='REJECTED'){reason=prompt('Alasan penolakan KYC:')||'';if(reason.trim().length<3)return}else review_note=prompt('Catatan pemeriksaan admin (opsional):')||'';const r=await fetch('/api/admin/kyc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id,status,reason,review_note,rejected_stage})});const j=await r.json();if(!r.ok){toast.show(j.message||'Gagal memproses KYC','error');return}toast.show(status==='VERIFIED'?'KYC diverifikasi dan notifikasi Reseller dikirim.':'KYC ditolak dan notifikasi dikirim.','success');load()}
 const proofClass="inline-flex items-center rounded-xl border border-app-border bg-app-inset px-3 py-2 text-app-text transition hover:border-gold-400 hover:bg-app-accent-soft";
 return (
@@ -12,7 +12,7 @@ return (
     {loading ? (
       <LoadingSkeleton rows={5} />
     ) : !rows.length ? (
-      <EmptyState icon="🪪" title="Belum ada pengajuan KYC" description="Pengajuan verifikasi identitas pelanggan akan muncul di sini." />
+      <EmptyState icon="id_card" title="Belum ada pengajuan KYC" description="Pengajuan verifikasi identitas pelanggan akan muncul di sini." />
     ) : (
       <div className="space-y-3">
         {rows.map((x) => (
@@ -35,7 +35,7 @@ return (
                 </div>
               </div>
               <div className="flex flex-wrap gap-2">
-                {x.status !== 'VERIFIED' && <Button onClick={() => review(x.user_id, 'VERIFIED')}>✓ Verifikasi</Button>}
+                {x.status !== 'VERIFIED' && <Button onClick={() => review(x.user_id, 'VERIFIED')}><Icon name="check" size={16} />Verifikasi</Button>}
                 {x.status !== 'REJECTED' && <Button variant="destructive" onClick={() => review(x.user_id, 'REJECTED', 'KTP')}>Tolak KTP saja</Button>}
                 {x.status !== 'REJECTED' && <Button variant="destructive" onClick={() => review(x.user_id, 'REJECTED', 'SELFIE')}>Tolak wajah saja</Button>}
                 {x.status !== 'REJECTED' && <Button variant="destructive" onClick={() => review(x.user_id, 'REJECTED', null)}>Tolak keduanya</Button>}

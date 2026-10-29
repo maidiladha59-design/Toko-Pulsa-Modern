@@ -8,6 +8,7 @@ import { loadActiveAvatars, type AvatarRow } from "@/lib/avatar";
 import { useToast } from "@/components/ToastProvider";
 import { Skeleton } from "@/components/ui/LoadingSkeleton";
 import Button from "@/components/ui/Button";
+import Icon from "@/components/icons/Icon";
 
 export default function AvatarPicker({
   open,
@@ -108,7 +109,7 @@ export default function AvatarPicker({
       >
         <div className="flex items-start justify-between gap-3">
           <h2 className="min-w-0 break-words text-base font-black text-app-text">{heading}</h2>
-          <button onClick={onClose} aria-label="Tutup" className="shrink-0 rounded-lg px-2 py-1 text-lg leading-none text-app-muted transition hover:bg-app-inset hover:text-app-text">✕</button>
+          <button onClick={onClose} aria-label="Tutup" className="shrink-0 rounded-lg px-2 py-1 leading-none text-app-muted transition hover:bg-app-inset hover:text-app-text"><Icon name="close" size={18} /></button>
         </div>
 
         {loading ? (
@@ -118,7 +119,7 @@ export default function AvatarPicker({
         ) : items.length === 0 ? (
           <div className="mt-4 rounded-2xl border border-dashed border-app-border bg-app-inset p-6 text-center">
             <p className="text-sm font-bold text-app-text">Belum ada foto profil tersedia</p>
-            <p className="mt-1 text-xs leading-5 text-app-muted">Admin dapat menambahkannya lewat Panel Admin ▸ Foto Profil.</p>
+            <p className="mt-1 text-xs leading-5 text-app-muted">Admin dapat menambahkannya lewat Panel Admin <span className="inline-flex items-center gap-1"><Icon name="chevron_right" size={14} />Foto Profil.</span></p>
           </div>
         ) : (
           <div className="mt-4 grid grid-cols-3 gap-3 p-1.5">
@@ -137,7 +138,7 @@ export default function AvatarPicker({
                   <Image src={a.image_url} alt={a.label || "Avatar"} width={140} height={140} className="h-full w-full object-cover" />
                   {active && (
                     <span className="absolute inset-0 flex items-center justify-center bg-black/35">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gold-400 text-sm font-black text-zinc-950">✓</span>
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gold-400 font-black text-zinc-950"><Icon name="check" size={16} /></span>
                     </span>
                   )}
                 </button>

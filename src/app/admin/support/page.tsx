@@ -42,7 +42,7 @@ export default function AdminSupportPage(){const supabase=createClient();const t
     </div>
     <div className="grid gap-5 lg:grid-cols-[380px_1fr]">
       <Card>
-        {loading ? <LoadingSkeleton rows={5} /> : tickets.length===0 ? <EmptyState icon="🎫" title="Tidak ada tiket" /> : (
+        {loading ? <LoadingSkeleton rows={5} /> : tickets.length===0 ? <EmptyState icon="voucher" title="Tidak ada tiket" /> : (
           <div className="space-y-2">
             {tickets.map(t=><button key={t.id} onClick={()=>open(t)} className={`w-full rounded-2xl border p-3 text-left ${selected?.id===t.id?"border-gold-300 bg-app-accent-soft":"border-app-border hover:bg-app-inset"}`}>
               <div className="flex justify-between gap-2"><b className="text-app-text">{t.ticket_number}</b><span className="rounded-full bg-app-inset px-2 py-0.5 text-xs font-bold">{t.priority}</span></div>

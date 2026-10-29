@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import StatusBadge from "@/components/StatusBadge";
+import Icon from "@/components/icons/Icon";
 
 export default async function OrdersPage() {
   const supabase = createClient();
@@ -27,8 +28,8 @@ export default async function OrdersPage() {
             <div className="divide-y divide-app-border">
               {orders.map((o) => (
                 <Link key={o.id} href={`/orders/${o.id}`} className="group flex items-center gap-3 px-4 py-3.5 transition hover:bg-app-inset">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-inset text-lg">
-                    🧾
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-app-border bg-app-inset">
+                    <Icon name="receipt" size={18} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-sm font-bold text-app-text transition group-hover:text-app-kicker">{o.order_number}</p>
@@ -43,7 +44,7 @@ export default async function OrdersPage() {
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2 px-6 py-12 text-center">
-              <span className="text-3xl">📦</span>
+              <Icon name="box" size={30} />
               <p className="text-sm font-bold text-app-text">Belum ada pesanan</p>
               <p className="text-xs leading-5 text-app-muted">Pesanan yang Anda buat akan muncul di sini.</p>
             </div>

@@ -8,6 +8,7 @@ import Select from "@/components/ui/Select";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import { Card, CardDescription, CardTitle } from "@/components/ui/Card";
 import InfoTicker from "@/components/InfoTicker";
+import IconPicker from "@/components/icons/IconPicker";
 import { useToast } from "@/components/ToastProvider";
 import { formatDate } from "@/lib/utils";
 import {
@@ -219,12 +220,7 @@ export default function AdminInfoTickerPage() {
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
-                  <Select label="Ikon" value={form.icon} onChange={(e) => set("icon", e.target.value as InfoTickerSettings["icon"])}>
-                    <option value="megaphone">Pengeras suara</option>
-                    <option value="bell">Lonceng</option>
-                    <option value="star">Bintang</option>
-                    <option value="none">Tanpa ikon</option>
-                  </Select>
+                  <IconPicker allowNone label="Ikon" value={form.icon} onChange={(name) => set("icon", name)} />
                   <Select label="Gaya" value={form.style} onChange={(e) => set("style", e.target.value as InfoTickerSettings["style"])}>
                     <option value="default">Default (putih)</option>
                     <option value="emas">Emas (biru terang)</option>

@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import RatingBadgeLive from "@/components/RatingBadgeLive";
+import Icon from "@/components/icons/Icon";
 
 export default function Welcome() {
   const [banners, setBanners] = useState<any[]>([]);
@@ -107,11 +108,11 @@ export default function Welcome() {
 
             {banners.length > 1 && (
               <div className="mt-6 flex items-center gap-2">
-                <button onClick={prev} aria-label="Banner sebelumnya" className="rounded-full bg-white/10 px-3 py-2 text-sm font-black hover:bg-white/20">←</button>
+                <button onClick={prev} aria-label="Banner sebelumnya" className="inline-flex items-center justify-center rounded-full bg-white/10 px-3 py-2 text-sm font-black hover:bg-white/20"><Icon name="arrow_left" size={16} /></button>
                 {banners.map((x, i) => (
                   <button key={x.id} aria-label={`Slide ${i + 1}`} onClick={() => setIndex(i)} className={`h-2 rounded-full transition ${i === index ? "w-9 bg-amber-300" : "w-2 bg-white/35"}`} />
                 ))}
-                <button onClick={next} aria-label="Banner berikutnya" className="rounded-full bg-white/10 px-3 py-2 text-sm font-black hover:bg-white/20">→</button>
+                <button onClick={next} aria-label="Banner berikutnya" className="inline-flex items-center justify-center rounded-full bg-white/10 px-3 py-2 text-sm font-black hover:bg-white/20"><Icon name="arrow_right" size={16} /></button>
               </div>
             )}
             {loading && <p className="mt-4 text-xs text-white/40">Memuat promosi...</p>}

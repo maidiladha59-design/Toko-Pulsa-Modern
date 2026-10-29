@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { formatRupiah } from "@/lib/utils";
 import { isValidQrToken } from "@/lib/transfer/qr";
 import TransferForm from "./TransferForm";
+import Icon from "@/components/icons/Icon";
 
 export default async function TransferPage({ searchParams }: { searchParams: { [key: string]: string | string[] | undefined } }) {
   const supabase = createClient();
@@ -40,8 +41,8 @@ export default async function TransferPage({ searchParams }: { searchParams: { [
         <h1 className="mt-2 text-2xl font-black">Transfer Saldo Sesama Pengguna</h1>
         <p className="mt-2 text-sm text-white/60">Kirim saldo ke pengguna AIDIL STORE lain lewat QR Pribadi, kontak favorit, atau pencarian akun.</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <Link href="/transfer-uang/qr" className="btn-gold-metal rounded-xl px-4 py-2.5 text-sm font-black">📥 Terima Saldo (QR Saya)</Link>
-          <Link href="/wallet" className="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/20">💰 Lihat Saldo</Link>
+          <Link href="/transfer-uang/qr" className="btn-gold-metal inline-flex items-center gap-1.5 rounded-xl px-4 py-2.5 text-sm font-black"><Icon name="inbox" size={16} /> Terima Saldo (QR Saya)</Link>
+          <Link href="/wallet" className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/20"><Icon name="wallet" size={16} /> Lihat Saldo</Link>
         </div>
       </div>
 
@@ -56,7 +57,7 @@ export default async function TransferPage({ searchParams }: { searchParams: { [
               {banks.map((x) => (
                 <div key={x.id} className="rounded-2xl border border-slate-200 bg-white p-4">
                   <div className="flex items-center gap-3">
-                    {x.logo_url ? <Image src={x.logo_url} alt="" width={44} height={44} className="h-11 w-11 rounded-xl object-contain" /> : <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100">🏦</div>}
+                    {x.logo_url ? <Image src={x.logo_url} alt="" width={44} height={44} className="h-11 w-11 rounded-xl object-contain" /> : <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100"><Icon name="bank" size={22} /></div>}
                     <b className="min-w-0 break-words">{x.name}</b>
                   </div>
                   <p className="mt-3 text-sm text-slate-500">{x.description || "Transfer bank."}</p>

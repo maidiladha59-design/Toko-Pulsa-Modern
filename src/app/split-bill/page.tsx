@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import SplitBillClient from "./SplitBillClient";
+import Icon from "@/components/icons/Icon";
 
 export default async function SplitBillPage() {
   const supabase = createClient();
@@ -17,8 +18,8 @@ export default async function SplitBillPage() {
         <h1 className="mt-2 text-2xl font-black">Split Bill</h1>
         <p className="mt-2 text-sm text-white/60">Buat tagihan patungan, pilih peserta dari kontak favorit atau cari lewat email/nomor HP. Setiap peserta membayar bagiannya langsung ke Anda lewat transfer saldo.</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <Link href="/transfer-uang" className="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/20">📤 Transfer Saldo</Link>
-          <Link href="/wallet" className="rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/20">💰 Lihat Saldo</Link>
+          <Link href="/transfer-uang" className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/20"><Icon name="send" size={16} /> Transfer Saldo</Link>
+          <Link href="/wallet" className="inline-flex items-center gap-1.5 rounded-xl bg-white/10 px-4 py-2.5 text-sm font-bold text-white hover:bg-white/20"><Icon name="wallet" size={16} /> Lihat Saldo</Link>
         </div>
       </div>
 

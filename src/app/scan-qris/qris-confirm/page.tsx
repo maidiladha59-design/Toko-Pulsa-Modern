@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { formatRupiah } from '@/lib/utils';
+import Icon from '@/components/icons/Icon';
 
 type PendingPayment = {
   raw: string;
@@ -73,8 +74,8 @@ export default function QrisConfirmPage() {
     return (
       <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
         <div className="w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-xl">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 text-3xl">
-            ✅
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <Icon name="check_circle" size={30} />
           </div>
           <h1 className="text-xl font-black text-slate-900">Pembayaran Berhasil</h1>
           <p className="mt-2 text-sm text-slate-500">

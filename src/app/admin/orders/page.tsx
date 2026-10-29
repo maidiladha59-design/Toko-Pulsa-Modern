@@ -10,6 +10,7 @@ import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import Button from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
+import Icon from "@/components/icons/Icon";
 import Select from "@/components/ui/Select";
 
 const STATUSES = ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "CANCELLED", "REFUNDED"] as const;
@@ -54,9 +55,9 @@ export default function AdminOrdersPage() {
           <h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Kelola Pesanan</h1>
           <p className="mt-1 text-sm text-app-muted">Tandai pesanan selesai, gagal, dibatalkan, atau refund bila diperlukan.</p>
         </div>
-        <Button variant="outline" onClick={load}>↻ Refresh</Button>
+        <Button variant="outline" onClick={load}><Icon name="refresh" size={16} />Refresh</Button>
       </div>
-      {loading ? <LoadingSkeleton rows={6} /> : orders.length === 0 ? <EmptyState icon="🧾" title="Belum ada order" /> : (
+      {loading ? <LoadingSkeleton rows={6} /> : orders.length === 0 ? <EmptyState icon="receipt" title="Belum ada order" /> : (
         <div className="space-y-3">
           {orders.map((o) => (
             <Card key={o.id}>
@@ -64,7 +65,7 @@ export default function AdminOrdersPage() {
                 <div>
                   <div className="flex flex-wrap items-center gap-2">
                     <p className="font-black text-app-text">{o.order_number}</p>
-                    <Badge tone={o.payment_method === "QRIS" ? "gold" : "neutral"} className="px-2 py-0.5">{o.payment_method === "QRIS" ? "📱 QRIS" : "💰 Saldo"}</Badge>
+                    <Badge tone={o.payment_method === "QRIS" ? "gold" : "neutral"} className="px-2 py-0.5">{o.payment_method === "QRIS" ? <><Icon name="qris" size={12} />QRIS</> : <><Icon name="wallet" size={12} />Saldo</>}</Badge>
                   </div>
                   <p className="mt-1 text-xs text-app-muted">{o.profiles?.full_name || o.profiles?.email || "Pengguna"} · {formatDate(o.created_at)}</p>
                 </div>
@@ -73,7 +74,7 @@ export default function AdminOrdersPage() {
                   <Badge tone={statusTone(o.status)}>{statusLabel(o.status)}</Badge>
                 </div>
               </div>
-              <button onClick={() => toggleDetail(o.id)} className="mt-3 text-xs font-bold text-app-kicker hover:underline">{expanded === o.id ? "Sembunyikan detail ▲" : "Lihat detail pesanan ▼"}</button>
+              <button onClick={() => toggleDetail(o.id)} className="mt-3 inline-flex items-center gap-1.5 text-xs font-bold text-app-kicker hover:underline">{expanded === o.id ? <>Sembunyikan detail <Icon name="chevron_up" size={12} /></> : <>Lihat detail pesanan <Icon name="chevron_down" size={12} /></>}</button>
               {expanded === o.id && (
                 <div className="mt-2 rounded-2xl bg-app-inset p-3 text-sm">
                   {detailLoading === o.id ? <p className="text-app-muted">Memuat detail...</p> : (
@@ -86,9 +87,9 @@ export default function AdminOrdersPage() {
                       ))}
                       {detail[o.id]?.submission && (detail[o.id]?.submission?.target_text || detail[o.id]?.submission?.target_file_path) && (
                         <div className="mt-3 rounded-xl border border-warning-500/30 bg-warning-500/10 p-3">
-                          <p className="text-xs font-bold text-warning-800 dark:text-warning-300">🎯 Target dari pelanggan:</p>
+                          <p className="flex items-center gap-1.5 text-xs font-bold text-warning-800 dark:text-warning-300"><Icon name="target" size={14} />Target dari pelanggan:</p>
                           {detail[o.id]?.submission?.target_text && <p className="mt-1 text-sm text-app-text">{detail[o.id]?.submission?.target_text}</p>}
-                          {detail[o.id]?.fileUrl && <a href={detail[o.id]?.fileUrl} target="_blank" rel="noreferrer" className="mt-1 inline-block text-xs font-bold text-app-kicker underline">📎 Buka file yang dikirim pelanggan</a>}
+                          {detail[o.id]?.fileUrl && <a href={detail[o.id]?.fileUrl} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1.5 text-xs font-bold text-app-kicker underline"><Icon name="paperclip" size={14} />Buka file yang dikirim pelanggan</a>}
                         </div>
                       )}
                     </>
@@ -101,7 +102,7 @@ export default function AdminOrdersPage() {
               </div>
               {o.status !== "REFUNDED" && (
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button size="sm" onClick={() => updateStatus(o.id, "COMPLETED")} loading={acting === o.id}>✓ Tandai Selesai</Button>
+                  <Button size="sm" onClick={() => updateStatus(o.id, "COMPLETED")} loading={acting === o.id}><Icon name="check" size={16} />Tandai Selesai</Button>
                   {o.status !== "FAILED" && <Button size="sm" variant="destructive" onClick={() => updateStatus(o.id, "FAILED")}>Gagal</Button>}
                   {o.status !== "CANCELLED" && <Button size="sm" variant="outline" onClick={() => updateStatus(o.id, "CANCELLED")}>Batalkan</Button>}
                   {o.status !== "COMPLETED" && <Button size="sm" variant="outline" onClick={() => updateStatus(o.id, "REFUNDED")}>Refund</Button>}

@@ -7,6 +7,8 @@ import Badge from "@/components/ui/Badge";
 import { Card } from "@/components/ui/Card";
 import EmptyState from "@/components/ui/EmptyState";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import Icon from "@/components/icons/Icon";
+import StarRating from "@/components/icons/StarRating";
 
 type RatingRow = {
   id: string;
@@ -31,13 +33,7 @@ type Summary = {
 type Filter = "ALL" | 1 | 2 | 3 | 4 | 5;
 
 function Stars({ rating }: { rating: number }) {
-  const filled = Math.max(0, Math.min(5, Math.round(rating)));
-  return (
-    <span aria-label={`${filled} dari 5 bintang`} className="text-base tracking-wide">
-      <span className="text-app-kicker">{"★".repeat(filled)}</span>
-      <span className="text-app-border">{"★".repeat(5 - filled)}</span>
-    </span>
-  );
+  return <StarRating value={rating} total={5} size={16} />;
 }
 
 export default function AdminRatingsPage() {
@@ -143,8 +139,8 @@ export default function AdminRatingsPage() {
           <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             <Card className="p-4">
               <p className="text-xs font-bold text-app-muted">Rata-rata</p>
-              <p className="mt-1 text-2xl font-black tabular-nums text-app-kicker">
-                ⭐ {Number(summary?.average || 0).toFixed(1)}
+              <p className="mt-1 flex items-center gap-1.5 text-2xl font-black tabular-nums text-app-kicker">
+                <Icon name="star_fill" size={24} />{Number(summary?.average || 0).toFixed(1)}
               </p>
               <p className="mt-1 text-[11px] text-app-subtle">Dari semua rating masuk</p>
             </Card>
@@ -192,13 +188,13 @@ export default function AdminRatingsPage() {
                   type="button"
                   aria-pressed={filter === star}
                   onClick={() => setFilter(star as Filter)}
-                  className={`rounded-xl border px-3 py-2 text-xs font-black transition ${
+                  className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-black transition ${
                     filter === star
                       ? "border-gold-400 bg-gold-400/15 text-app-kicker"
                       : "border-app-border bg-app-inset text-app-muted hover:border-gold-400/60 hover:text-app-text"
                   }`}
                 >
-                  {star} ★ ({count})
+                  {star} <Icon name="star_fill" size={14} />({count})
                 </button>
               ))}
             </div>
@@ -206,7 +202,7 @@ export default function AdminRatingsPage() {
 
           {filtered.length === 0 ? (
             <EmptyState
-              icon="⭐"
+              icon="star_fill"
               title={rows.length === 0 ? "Belum ada rating masuk" : "Tidak ada rating pada filter ini"}
               description={
                 rows.length === 0

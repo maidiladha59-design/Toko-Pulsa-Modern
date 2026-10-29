@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Icon from "@/components/icons/Icon";
 
 type Props = { receiptText?: string; shareTitle?: string };
 const COMMON_PRINTER_SERVICES = [
@@ -68,13 +69,13 @@ export default function PrintButton({ receiptText = "AIDIL STORE\nStruk Transaks
         onClick={connectAndPrint}
         className={`w-full rounded-xl px-4 py-3 text-sm font-black ${busy ? "animate-pulse bg-gold-400/50 text-zinc-950" : "border border-zinc-700 bg-zinc-950 text-gold-400 hover:border-gold-400/60"}`}
       >
-        {busy ? "Menghubungkan..." : bluetooth ? "✓ Cetak Bluetooth Berhasil" : "🖨️ Cetak via Bluetooth"}
+        {busy ? "Menghubungkan..." : <span className="inline-flex items-center gap-1.5">{bluetooth ? <><Icon name="check" size={16} />Cetak Bluetooth Berhasil</> : <><Icon name="printer" size={16} />Cetak via Bluetooth</>}</span>}
       </button>
       <button type="button" onClick={() => window.print()} className="btn-gold w-full rounded-xl px-4 py-3 text-sm font-black">
-        🖨️ Cetak / Simpan PDF
+        <span className="inline-flex items-center gap-1.5"><Icon name="printer" size={16} />Cetak / Simpan PDF</span>
       </button>
       <button type="button" onClick={share} className="w-full rounded-xl border border-app-border px-4 py-3 text-sm font-black text-app-text transition hover:border-gold-400/60 hover:text-app-kicker">
-        📤 Bagikan Struk
+        <span className="inline-flex items-center gap-1.5"><Icon name="send" size={16} />Bagikan Struk</span>
       </button>
       {message && <p className="rounded-xl bg-app-accent-soft p-3 text-xs leading-5 text-app-kicker">{message}</p>}
     </div>

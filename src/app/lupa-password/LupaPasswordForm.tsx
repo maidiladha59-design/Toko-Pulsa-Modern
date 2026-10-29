@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
+import Icon from "@/components/icons/Icon";
 import Button from "@/components/Button";
 import Input from "@/components/ui/Input";
 import {
@@ -110,9 +111,9 @@ export default function LupaPasswordForm() {
 
           <Link
             href="/login"
-            className="mt-5 block text-center text-sm font-bold text-app-kicker hover:underline"
+            className="mt-5 flex items-center justify-center gap-1.5 text-center text-sm font-bold text-app-kicker hover:underline"
           >
-            ← Kembali ke Login
+            <Icon name="arrow_left" size={16} /> Kembali ke Login
           </Link>
         </div>
       </div>

@@ -52,6 +52,7 @@ export async function notifyUser(input: NotificationPayload) {
   if (template.in_app_enabled) {
     const { error } = await admin.from('notifications').insert({
       user_id: input.userId, type: 'INFO', title, subtitle, message,
+      icon: template.icon ?? 'bell',
       reference_type: input.referenceType || 'notification_event',
       reference_id: input.referenceId || null, is_read: false,
     });

@@ -6,6 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import PrintButton from "@/components/PrintButton";
 import { paymentMethodLabel, receiptStatusText, GENERIC_ERRORS } from "@/lib/labels";
+import Icon from "@/components/icons/Icon";
 
 const labels: Record<string, string> = {
   SUCCESS: "OK", PROCESSING: "DIPROSES", FAILED: "GAGAL",
@@ -76,7 +77,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
     <div className="customer-shell">
     <main className="mx-auto max-w-md animate-page-in pb-8 print:max-w-none print:pb-0" style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}>
       <div className="no-print flex items-center justify-between rounded-t-3xl bg-zinc-950 px-5 pb-5 pt-4 text-gold-400">
-        <Link href={`/orders/${order.id}`} aria-label="Kembali" className="text-2xl font-black leading-none">←</Link>
+        <Link href={`/orders/${order.id}`} aria-label="Kembali" className="flex leading-none"><Icon name="arrow_left" size={24} /></Link>
         <span className="text-xs font-black uppercase tracking-widest">Struk Digital</span>
       </div>
       <div

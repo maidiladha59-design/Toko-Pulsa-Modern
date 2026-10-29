@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import Button from "@/components/Button";
+import Icon from "@/components/icons/Icon";
 import Input from "@/components/ui/Input";
 import { friendlyPasswordResetError } from "@/lib/password-reset";
 
@@ -139,9 +140,9 @@ export default function ResetPasswordForm() {
               </Link>
               <Link
                 href="/login"
-                className="mt-3 block text-sm font-bold text-app-kicker hover:underline"
+                className="mt-3 flex items-center gap-1.5 text-sm font-bold text-app-kicker hover:underline"
               >
-                ← Kembali ke Login
+                <Icon name="arrow_left" size={16} /> Kembali ke Login
               </Link>
             </div>
           )}
@@ -188,9 +189,9 @@ export default function ResetPasswordForm() {
 
               <Link
                 href="/login"
-                className="mt-5 block text-center text-sm font-bold text-app-kicker hover:underline"
+                className="mt-5 flex items-center justify-center gap-1.5 text-center text-sm font-bold text-app-kicker hover:underline"
               >
-                ← Kembali ke Login
+                <Icon name="arrow_left" size={16} /> Kembali ke Login
               </Link>
             </>
           )}

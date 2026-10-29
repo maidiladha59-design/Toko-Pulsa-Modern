@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import Icon from "@/components/icons/Icon";
 
 function urlBase64ToUint8Array(base64String: string) {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
@@ -62,7 +63,7 @@ export default function PushNotificationPrompt() {
   return (
     <button type="button" onClick={enablePush} disabled={busy}
       className="rounded-xl border border-gold-200 bg-gold-50 px-3 py-2 text-xs font-bold text-gold-700 hover:bg-gold-100 disabled:opacity-60">
-      {busy ? "Mengaktifkan..." : "🔔 Aktifkan Notifikasi"}
+      {busy ? "Mengaktifkan..." : <span className="inline-flex items-center gap-1.5"><Icon name="bell" size={16} />Aktifkan Notifikasi</span>}
     </button>
   );
 }

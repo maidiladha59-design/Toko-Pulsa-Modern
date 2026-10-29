@@ -66,7 +66,7 @@ test('v89 RPC admin_update_business_profile: cek role, validasi PSE, audit', () 
 test('v89 preflight mendaftarkan migrasi dan definisi wajib', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v89_business_profile\.sql/);
-  assert.match(script, /88,89,90,93,94,97,98]/);
+  assert.match(script, /88,89,90,93,94,97,98,99]/);
   assert.match(script, /admin_update_business_profile/);
   assert.match(script, /business-assets/);
 });
@@ -111,7 +111,7 @@ test('v89 halaman admin identitas usaha lengkap + menu sidebar', () => {
   assert.match(page, /\/api\/admin\/business-profile\/upload/);
 
   const sidebar = read('src/app/admin/AdminSidebar.tsx');
-  assert.match(sidebar, /\["\/admin\/identitas-usaha", "🏢", "Identitas Usaha"\]/);
+  assert.match(sidebar, /\["\/admin\/identitas-usaha", "office", "Identitas Usaha"\]/);
 });
 
 test('v89 UI publik dinamis: badge PSE 3 status, pemilik, logo, dokumen legal', () => {

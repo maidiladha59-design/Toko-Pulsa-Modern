@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
+import Icon from "@/components/icons/Icon";
 import { isImageTooBlurry } from "@/lib/blur-check";
 import { statusLabel } from "@/lib/labels";
 
@@ -61,7 +62,7 @@ function StepDots({ stage }: { stage: Stage }) {
   return (
     <div className="mt-4 flex items-center justify-center gap-2 text-xs font-black">
       <span className={`flex h-7 w-7 items-center justify-center rounded-full ${stage === "ktp" ? "bg-gold-600 text-white" : "bg-emerald-500 text-white"}`}>
-        {stage === "ktp" ? "1" : "✓"}
+        {stage === "ktp" ? "1" : "check"}
       </span>
       <span className={`h-0.5 w-8 ${stage === "selfie" ? "bg-emerald-500" : "bg-slate-200"}`} />
       <span className={`flex h-7 w-7 items-center justify-center rounded-full ${stage === "selfie" ? "bg-gold-600 text-white" : "bg-slate-200 text-slate-500"}`}>
@@ -304,9 +305,12 @@ export default function KYC() {
       {!locked && <StepDots stage={stage} />}
 
       {!locked && (
-        <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 p-3 text-xs font-bold leading-5 text-red-700">
-          ⚠️ Pastikan foto tidak blur/buram. Foto yang terdeteksi blur akan otomatis ditolak sistem dan tidak akan diterima.
-          {stage === "ktp" && " Sistem juga mengecek apakah foto terbaca seperti KTP (NIK/kata kunci KTP) sebelum disimpan."}
+        <div className="mt-4 flex items-start gap-2 rounded-2xl border border-red-200 bg-red-50 p-3 text-xs font-bold leading-5 text-red-700">
+          <Icon name="warning" size={16} className="mt-0.5 shrink-0" />
+          <span className="min-w-0 break-words">
+            Pastikan foto tidak blur/buram. Foto yang terdeteksi blur akan otomatis ditolak sistem dan tidak akan diterima.
+            {stage === "ktp" && " Sistem juga mengecek apakah foto terbaca seperti KTP (NIK/kata kunci KTP) sebelum disimpan."}
+          </span>
         </div>
       )}
 
@@ -344,15 +348,15 @@ export default function KYC() {
           {stage === "ktp" ? <KtpPoseGuide /> : <FacePoseGuide />}
 
           <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4">
-            <p className="font-black text-zinc-950">🔐 Izin kamera</p>
+            <p className="flex items-center gap-2 font-black text-zinc-950"><Icon name="lock" size={16} /> Izin kamera</p>
             <p className="mt-1 text-xs leading-5 text-zinc-900">
               {stage === "ktp"
                 ? "Ikuti panduan di atas: letakkan KTP rata di dalam bingkai, pastikan 4 sudut terlihat dan tidak silau."
                 : "Ikuti panduan di atas: posisikan wajah tepat di dalam oval, lihat lurus ke kamera, pencahayaan cukup."}
             </p>
             {!cameraReady && (
-              <button type="button" onClick={() => requestCamera(stage)} className="btn-gold mt-3 rounded-xl px-4 py-3 text-sm font-black">
-                📷 Izinkan Kamera & Mulai
+              <button type="button" onClick={() => requestCamera(stage)} className="btn-gold mt-3 inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-black">
+                <Icon name="camera" size={16} /> Izinkan Kamera &amp; Mulai
               </button>
             )}
             {cameraDenied && <p className="mt-2 text-xs font-bold text-red-700">Akses kamera ditolak. Aktifkan izin Kamera pada pengaturan browser/perangkat.</p>}
@@ -374,8 +378,9 @@ export default function KYC() {
               <button type="button" onClick={stopCamera} className="rounded-xl bg-white px-4 py-3 font-black">Batal</button>
             </div>
             {busy && (
-              <p className="mt-2 text-center text-xs font-bold text-white">
-                ⏳ {busyLabel} {busyLabel === "Memindai KTP..." && "(bisa sampai ±10 detik, mohon tunggu)"}
+              <p className="mt-2 flex items-center justify-center gap-2 text-center text-xs font-bold text-white">
+                <Icon name="hourglass" size={14} />
+                <span>{busyLabel} {busyLabel === "Memindai KTP..." && "(bisa sampai ±10 detik, mohon tunggu)"}</span>
               </p>
             )}
           </div>

@@ -2,13 +2,14 @@
 import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { createClient } from "@/lib/supabase/client";
+import Icon from "@/components/icons/Icon";
 
 type Mode = "light" | "dark" | "system";
 
 const OPTIONS: { value: Mode; label: string; icon: string }[] = [
-  { value: "light", label: "Terang", icon: "☀️" },
-  { value: "dark", label: "Gelap", icon: "🌙" },
-  { value: "system", label: "Sistem", icon: "🖥️" },
+  { value: "light", label: "Terang", icon: "sun" },
+  { value: "dark", label: "Gelap", icon: "moon" },
+  { value: "system", label: "Sistem", icon: "monitor" },
 ];
 
 const isMode = (v: unknown): v is Mode => v === "light" || v === "dark" || v === "system";
@@ -77,7 +78,7 @@ export default function ThemeToggle({ variant = "compact" }: { variant?: "compac
                 : "border-app-border bg-app-inset text-app-muted hover:border-gold-400/50"
             }`}
           >
-            <span className="text-xl leading-none">{o.icon}</span>
+            <Icon name={o.icon} size={22} />
             <span>{o.label}</span>
           </button>
         ))}
@@ -93,7 +94,7 @@ export default function ThemeToggle({ variant = "compact" }: { variant?: "compac
         title="Ganti tema"
         className="flex h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-surface text-lg text-app-muted transition hover:bg-app-accent-soft"
       >
-        {mounted ? OPTIONS.find(o => o.value === current)?.icon : "◐"}
+        <Icon name={mounted ? OPTIONS.find(o => o.value === current)?.icon ?? "monitor" : "monitor"} size={18} />
       </button>
       {open && (
         <div className="absolute right-0 top-full z-[90] mt-2 w-44 overflow-hidden rounded-2xl border border-app-border bg-app-surface p-1.5 shadow-2xl">
@@ -107,9 +108,9 @@ export default function ThemeToggle({ variant = "compact" }: { variant?: "compac
                   : "text-app-muted hover:bg-app-accent-soft hover:text-app-text"
               }`}
             >
-              <span className="text-base leading-none">{o.icon}</span>
+              <Icon name={o.icon} size={16} />
               <span className="flex-1">{o.label}</span>
-              {mounted && current === o.value && <span className="text-app-kicker">✓</span>}
+              {mounted && current === o.value && <span className="text-app-kicker"><Icon name="check" size={14} /></span>}
             </button>
           ))}
         </div>

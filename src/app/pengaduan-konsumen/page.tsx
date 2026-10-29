@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Icon from "@/components/icons/Icon";
 import { getBusinessIdentity } from "@/lib/business";
 
 export const metadata: Metadata = {
@@ -71,9 +72,9 @@ export default async function PengaduanKonsumenPage() {
 
         <Link
           href="/bantuan?kategori=PENGADUAN"
-          className="mt-6 inline-flex rounded-xl bg-rose-600 px-5 py-3 text-sm font-black text-white"
+          className="mt-6 inline-flex items-center gap-2 rounded-xl bg-rose-600 px-5 py-3 text-sm font-black text-white"
         >
-          ⚠️ Ajukan Pengaduan Sekarang
+          <Icon name="warning" size={16} /> Ajukan Pengaduan Sekarang
         </Link>
       </article>
     </div>

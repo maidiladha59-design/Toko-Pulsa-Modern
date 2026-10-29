@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { formatRupiah } from "@/lib/utils";
+import Icon from "@/components/icons/Icon";
 
 type Props = {
   orderId: string;
@@ -55,7 +56,7 @@ export default function QrisPayment({ orderId, qrisImage, amount, expiredAt, onS
   if (status === "COMPLETED" || status === "PROCESSING") {
     return (
       <div className="rounded-3xl border border-success-500/30 bg-success-500/10 p-8 text-center">
-        <div className="text-5xl">✓</div>
+        <div><Icon name="check_circle" size={48} /></div>
         <p className="mt-3 text-xl font-black text-success-600 dark:text-success-400">Pembayaran Berhasil!</p>
         <p className="mt-1 text-sm text-success-600/80 dark:text-success-400/80">Mengarahkan ke halaman pesanan...</p>
       </div>
@@ -65,7 +66,7 @@ export default function QrisPayment({ orderId, qrisImage, amount, expiredAt, onS
   if (status === "FAILED" || expired) {
     return (
       <div className="rounded-3xl border border-danger-500/30 bg-danger-500/10 p-8 text-center">
-        <div className="text-4xl">⌛</div>
+        <div><Icon name="hourglass" size={36} /></div>
         <p className="mt-3 text-lg font-black text-danger-600 dark:text-danger-400">QRIS Kadaluarsa / Gagal</p>
         <p className="mt-1 text-sm text-danger-600/80 dark:text-danger-400/80">Silakan buat pesanan baru untuk mendapatkan QR code lagi.</p>
       </div>
