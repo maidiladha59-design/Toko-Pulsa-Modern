@@ -1,16 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import Icon from "@/components/icons/Icon";
 import { isImageTooBlurry } from "@/lib/blur-check";
 import { statusLabel } from "@/lib/labels";
+import { useCamera, type CameraErrorKind } from "@/hooks/useCamera";
 
 type Status = "PENDING" | "KTP_SUBMITTED" | "SUBMITTED" | "VERIFIED" | "REJECTED";
 type Stage = "ktp" | "selfie";
 type RejectedStage = "KTP" | "SELFIE" | null;
+
+const CAMERA_ERROR_TEXT: Record<CameraErrorKind, string> = {
+  denied: "Izin kamera ditolak. Aktifkan izin kamera di pengaturan browser, lalu coba lagi.",
+  unavailable: "Kamera tidak ditemukan atau sedang dipakai aplikasi lain. Tutup aplikasi lain, lalu coba lagi.",
+  insecure: "Kamera hanya bisa dipakai lewat koneksi aman (HTTPS). Buka halaman ini lewat HTTPS, lalu coba lagi.",
+};
 
 /** Ilustrasi panduan posisi KTP: kartu diletakkan rata di dalam bingkai, 4 sudut terlihat. */
 function KtpPoseGuide() {
@@ -83,10 +90,7 @@ export default function KYC() {
   const [busy, setBusy] = useState(false);
   const [busyLabel, setBusyLabel] = useState("Menyimpan...");
 
-  const [cameraReady, setCameraReady] = useState(false);
-  const [cameraDenied, setCameraDenied] = useState(false);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const streamRef = useRef<MediaStream | null>(null);
+  const camera = useCamera();
 
   useEffect(() => {
     (async () => {
@@ -102,43 +106,18 @@ export default function KYC() {
         setRejectedStage((data.rejected_stage as RejectedStage) || null);
       }
     })();
-    return () => stopCamera();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function stopCamera() {
-    streamRef.current?.getTracks().forEach((t) => t.stop());
-    streamRef.current = null;
-    setCameraReady(false);
-  }
-
-  async function requestCamera(stage: Stage) {
-    try {
-      stopCamera();
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: stage === "selfie" ? "user" : "environment" },
-        audio: false,
-      });
-      streamRef.current = stream;
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        await videoRef.current.play();
-      }
-      setCameraDenied(false);
-      setCameraReady(true);
-    } catch {
-      setCameraDenied(true);
-      toast.show("Akses kamera diperlukan untuk proses verifikasi. Aktifkan izin Kamera lalu coba lagi.", "error");
-    }
-  }
-
   function capture(stage: Stage): Promise<File | null> {
     return new Promise((resolve) => {
-      if (!videoRef.current) return resolve(null);
-      const video = videoRef.current;
+      const video = camera.videoRef.current;
+      if (!video) return resolve(null);
       const canvas = document.createElement("canvas");
       canvas.width = video.videoWidth || 720;
       canvas.height = video.videoHeight || 960;
+      // Video preview depan di-mirror lewat CSS, tetapi piksel hasil jepretan
+      // diambil apa adanya dari elemen video — jadi foto tidak ikut terbalik.
       canvas.getContext("2d")?.drawImage(video, 0, 0, canvas.width, canvas.height);
       canvas.toBlob((blob) => {
         if (!blob) return resolve(null);
@@ -195,7 +174,7 @@ export default function KYC() {
     setBusyLabel("Mengambil foto...");
     const file = await capture(stage);
     if (!file) { setBusy(false); return; }
-    stopCamera();
+    camera.stop();
     setBusyLabel("Memeriksa kualitas foto...");
     const blurry = await isImageTooBlurry(file);
     if (blurry) {
@@ -354,28 +333,72 @@ export default function KYC() {
                 ? "Ikuti panduan di atas: letakkan KTP rata di dalam bingkai, pastikan 4 sudut terlihat dan tidak silau."
                 : "Ikuti panduan di atas: posisikan wajah tepat di dalam oval, lihat lurus ke kamera, pencahayaan cukup."}
             </p>
-            {!cameraReady && (
-              <button type="button" onClick={() => requestCamera(stage)} className="btn-gold mt-3 inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-black">
-                <Icon name="camera" size={16} /> Izinkan Kamera &amp; Mulai
+            {!camera.active && !camera.switching && (
+              <button
+                type="button"
+                onClick={() => void camera.start(stage === "selfie" ? "user" : "environment")}
+                disabled={camera.starting}
+                className="btn-gold mt-3 inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-black disabled:opacity-50"
+              >
+                <Icon name="camera" size={16} /> {camera.starting ? "Menyalakan kamera..." : "Izinkan Kamera & Mulai"}
               </button>
             )}
-            {cameraDenied && <p className="mt-2 text-xs font-bold text-red-700">Akses kamera ditolak. Aktifkan izin Kamera pada pengaturan browser/perangkat.</p>}
+            {camera.error && (
+              <div role="alert" className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3">
+                <p className="text-xs font-bold leading-5 text-red-700">{CAMERA_ERROR_TEXT[camera.error]}</p>
+                <button
+                  type="button"
+                  onClick={() => void camera.start(stage === "selfie" ? "user" : "environment")}
+                  disabled={camera.starting}
+                  className="mt-2 rounded-lg bg-red-600 px-3 py-2 text-xs font-black text-white disabled:opacity-50"
+                >
+                  Coba Lagi
+                </button>
+              </div>
+            )}
           </div>
 
-          <div className={`overflow-hidden rounded-2xl border bg-black p-3 ${cameraReady ? "" : "hidden"}`}>
+          <div className={`overflow-hidden rounded-2xl border bg-black p-3 ${camera.active || camera.switching ? "" : "hidden"}`}>
             <div className="relative">
-              <video ref={videoRef} playsInline muted className="aspect-video w-full rounded-xl object-cover" />
+              <video
+                ref={camera.videoRef}
+                playsInline
+                muted
+                autoPlay
+                // Hanya preview kamera depan yang dicerminkan; hasil jepretan tidak.
+                style={{ transform: camera.facing === "user" ? "scaleX(-1)" : undefined }}
+                className="aspect-video w-full rounded-xl object-cover"
+              />
               {stage === "selfie" && (
                 <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
                   <div className="aspect-[3/4] h-[70%] rounded-[50%] border-2 border-dashed border-emerald-400" />
                 </div>
               )}
+              {camera.hasMultipleCameras && (
+                <button
+                  type="button"
+                  onClick={() => void camera.switchCamera()}
+                  disabled={camera.switching}
+                  aria-label="Ganti kamera"
+                  title="Ganti kamera"
+                  className="absolute right-2 top-2 z-10 flex h-11 w-11 items-center justify-center rounded-full border border-white/25 bg-black/60 text-white shadow-lg backdrop-blur transition active:scale-95 disabled:opacity-60"
+                >
+                  <Icon name="camera_switch" size={20} />
+                </button>
+              )}
+              {camera.switching && (
+                <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center rounded-xl bg-black/55">
+                  <span className="flex items-center gap-2 text-xs font-bold text-white">
+                    <Icon name="hourglass" size={14} /> Mengganti kamera...
+                  </span>
+                </div>
+              )}
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2">
-              <button type="button" onClick={() => handleCaptureAndSave(stage)} disabled={busy} className="btn-gold rounded-xl px-4 py-3 font-black disabled:opacity-50">
+              <button type="button" onClick={() => handleCaptureAndSave(stage)} disabled={busy || camera.switching} className="btn-gold rounded-xl px-4 py-3 font-black disabled:opacity-50">
                 {busy ? busyLabel : "Ambil & Simpan Foto"}
               </button>
-              <button type="button" onClick={stopCamera} className="rounded-xl bg-white px-4 py-3 font-black">Batal</button>
+              <button type="button" onClick={camera.stop} className="rounded-xl bg-white px-4 py-3 font-black">Batal</button>
             </div>
             {busy && (
               <p className="mt-2 flex items-center justify-center gap-2 text-center text-xs font-bold text-white">

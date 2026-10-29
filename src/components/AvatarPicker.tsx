@@ -9,16 +9,20 @@ import { useToast } from "@/components/ToastProvider";
 import { Skeleton } from "@/components/ui/LoadingSkeleton";
 import Button from "@/components/ui/Button";
 import Icon from "@/components/icons/Icon";
+import AvatarRing, { type AvatarRingStatus } from "@/components/profile/AvatarRing";
 
 export default function AvatarPicker({
   open,
   onClose,
   currentAvatarId,
+  kycStatus = "unverified",
   onSaved,
 }: {
   open: boolean;
   onClose: () => void;
   currentAvatarId: string | null;
+  /** Cincin pratinjau mengikuti status verifikasi akun, sama seperti di hero. */
+  kycStatus?: AvatarRingStatus;
   onSaved?: (payload: { avatar_id: string | null; image_url: string }) => void;
 }) {
   const supabase = createClient();
@@ -30,6 +34,7 @@ export default function AvatarPicker({
   const dialogRef = useRef<HTMLDivElement>(null);
 
   const changed = selected !== currentAvatarId;
+  const currentUrl = items.find((item) => item.id === currentAvatarId)?.image_url ?? null;
 
   useEffect(() => {
     if (!open) return;
@@ -111,6 +116,16 @@ export default function AvatarPicker({
           <h2 className="min-w-0 break-words text-base font-black text-app-text">{heading}</h2>
           <button onClick={onClose} aria-label="Tutup" className="shrink-0 rounded-lg px-2 py-1 leading-none text-app-muted transition hover:bg-app-inset hover:text-app-text"><Icon name="close" size={18} /></button>
         </div>
+
+        {!loading && (
+          <div className="mt-4 flex items-center gap-3 rounded-2xl border border-app-border bg-app-inset p-3">
+            <AvatarRing size={40} src={currentUrl} status={kycStatus} name="Foto profil saat ini" />
+            <div className="min-w-0">
+              <p className="text-xs font-bold text-app-text">Foto saat ini</p>
+              <p className="truncate text-[11px] text-app-muted">Ketuk foto lain di bawah, lalu simpan.</p>
+            </div>
+          </div>
+        )}
 
         {loading ? (
           <div className="mt-4 grid grid-cols-3 gap-3 p-1.5">

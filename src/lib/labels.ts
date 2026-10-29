@@ -82,6 +82,51 @@ export function statusLabel(status: string | null | undefined, fallback = "Belum
   return containsInternalTerm(humanized) ? fallback : humanized;
 }
 
+// --- Status verifikasi akun (KYC) -------------------------------------------
+// Sumber data: public.kyc_verifications.status, nilainya
+// PENDING | KTP_SUBMITTED | SUBMITTED | VERIFIED | REJECTED.
+// Pengguna tanpa baris = belum pernah mengajukan (UNVERIFIED).
+// null berarti status gagal dimuat, jadi cincin tampil polos tanpa chip.
+
+export type KycUiStatus = "verified" | "unverified" | "pending" | "rejected";
+
+export function kycUiStatus(status: string | null | undefined): KycUiStatus | null {
+  const raw = String(status ?? "").trim().toUpperCase();
+  if (!raw) return null;
+  if (raw === "VERIFIED") return "verified";
+  if (raw === "SUBMITTED" || raw === "KTP_SUBMITTED") return "pending";
+  if (raw === "REJECTED") return "rejected";
+  return "unverified";
+}
+
+export const KYC_UI_LABELS: Record<KycUiStatus, string> = {
+  verified: "Terverifikasi",
+  unverified: "Akun belum terverifikasi",
+  pending: "Verifikasi diproses",
+  rejected: "Verifikasi ditolak. Ajukan ulang",
+};
+
+export const KYC_VERIFY_HINT =
+  "Verifikasi untuk membuka cincin warna-warni dan keamanan lebih baik";
+
+// --- Sapaan beranda ---------------------------------------------------------
+export const GREETING = {
+  pagi: "Selamat pagi,",
+  siang: "Selamat siang,",
+  sore: "Selamat sore,",
+  malam: "Selamat malam,",
+  welcome: "Selamat datang,",
+} as const;
+
+/** Sapaan dari jam WIB (0–23): 04–10 pagi, 11–14 siang, 15–17 sore, sisanya malam. */
+export function greetingForHour(hour: number): string {
+  const value = Number.isFinite(hour) ? Math.trunc(hour) : 0;
+  if (value >= 4 && value < 11) return GREETING.pagi;
+  if (value >= 11 && value < 15) return GREETING.siang;
+  if (value >= 15 && value < 18) return GREETING.sore;
+  return GREETING.malam;
+}
+
 /** Versi huruf besar untuk struk, tetap tanpa istilah internal. */
 export function receiptStatusText(status: string | null | undefined): string {
   const label = statusLabel(status, "Diproses");

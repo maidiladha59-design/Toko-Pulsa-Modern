@@ -88,9 +88,9 @@ test('v99 setiap emoji lama dipetakan ke nama ikon yang ada di registry', () => 
   assert.deepEqual(unknown, [], "ikon hasil peta harus ada di registry");
 });
 
-test('v99 registry ikon: 123 nama unik, default tersedia, gaya SVG konsisten', () => {
+test('v99 registry ikon: 124 nama unik, default tersedia, gaya SVG konsisten', () => {
   const names = registryNames();
-  assert.equal(names.length, 123, "jumlah ikon registry berubah tanpa memperbarui dokumentasi");
+  assert.equal(names.length, 124, "jumlah ikon registry berubah tanpa memperbarui dokumentasi");
   assert.equal(new Set(names).size, names.length, "nama ikon duplikat");
   assert.ok(names.includes("default"), "fallback default wajib ada");
   assert.ok(names.includes("heart_fill"), "ikon hati terisi untuk tombol favorit");

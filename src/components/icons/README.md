@@ -63,9 +63,9 @@ belanja & layanan: bag, box, tag, gift, ticket, voucher, streaming, game, tv, ho
 hospital, water, car, building, bank, office, id_card, lock, shield, key, eye, scales,
 calculator, book, chat, help, warning, info, edit, link, copy, trash, hourglass, timer,
 alarm, sparkle, party, trophy, medal, crown, flame, gas, phone, pulsa, sim_card, data,
-sosmed, bolt, pln, camera, image, dot, default
+sosmed, bolt, pln, camera, camera_switch, image, dot, default
 
-`default` selalu ada sebagai fallback. Registry berisi 123 nama (termasuk `default`).
+`default` selalu ada sebagai fallback. Registry berisi 124 nama (termasuk `default`).
 Data lama (kolom emoji di database) dipetakan lewat `emoji-map.ts` (125 token) dan
 migrasi `supabase/migrations_v99_icon_registry.sql`; kedua daftar itu harus tetap sinkron.
 Logo operator/brand (Telkomsel, DANA, dll.) tidak termasuk sini — mereka memakai file

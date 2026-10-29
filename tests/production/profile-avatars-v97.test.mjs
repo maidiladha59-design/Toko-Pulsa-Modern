@@ -83,16 +83,17 @@ test('v97 API admin: URL publik bertipe string, error asli dicatat ke log, total
 test('v97 hero beranda memakai foto profil + nama, tagline lama dihapus', () => {
   const home = read('src/app/page.tsx');
   const hero = read('src/components/HeroUser.tsx');
+  const header = read('src/components/profile/ProfileHeader.tsx');
   assert.doesNotMatch(home, /Pulsa • Game • Tagihan • Saldo/);
-  assert.match(home, /<HeroUser name=\{accountData\.name\} avatarId=\{accountData\.avatarId\} avatarUrl=\{accountData\.avatarUrl\}\/>/);
+  assert.match(home, /<HeroUser name=\{accountData\.name\}/);
   assert.match(home, /Masuk \/ Daftar/);
-  assert.match(hero, /Halo,/);
-  assert.match(hero, /text-\[18px\] font-semibold/);
-  assert.match(hero, /<UserAvatar size=\{60\} src=\{current\.url\} name=\{name\} priority \/>/);
-  assert.match(hero, /✎/);
-  assert.match(hero, /className="block truncate text-\[18px\]/);
-  assert.match(hero, /min-w-0 flex-1/);
-  assert.doesNotMatch(hero, /overflow-x-hidden/, 'overflow harus diperbaiki dari akar, bukan ditutup');
+  assert.match(hero, /<ProfileHeader/);
+  assert.match(header, /<AvatarRing/);
+  assert.match(header, /text-\[18px\] font-semibold/);
+  assert.match(header, /className="block truncate text-\[18px\]/);
+  assert.match(header, /min-w-0 flex-1/);
+  assert.match(header, /<Icon name="edit" size=\{13\} \/>/);
+  assert.doesNotMatch(header, /overflow-x-hidden/, 'overflow harus diperbaiki dari akar, bukan ditutup');
 });
 
 test('v97 pemilih avatar: judul, grid 3 kolom, hanya aktif, simpan sampai berubah, toast', () => {
@@ -115,9 +116,10 @@ test('v97 pemilih avatar: judul, grid 3 kolom, hanya aktif, simpan sampai beruba
   assert.match(lib, /export const DEFAULT_AVATAR_URL = "\/avatars\/default\.png";/);
 });
 
-test('v97 komponen UserAvatar dipakai di beranda, profil, dan navbar', () => {
-  assert.match(read('src/app/profile/page.tsx'), /<UserAvatar size=\{64\} src=\{avatarUrl\} name=\{p\.full_name\|\|'Pengguna'\}\/>/);
+test('v97 komponen UserAvatar dipakai di navbar, AvatarRing + KycChip di profil', () => {
+  assert.match(read('src/app/profile/page.tsx'), /<AvatarRing size=\{64\} src=\{avatarUrl\} name=\{p\.full_name\|\|'Pengguna'\} status=\{kycUi\?\?'unverified'\}\/>/);
   assert.match(read('src/app/profile/page.tsx'), /<AvatarPicker/);
+  assert.match(read('src/app/profile/page.tsx'), /<KycChip status=\{kycUi\}\/>/);
   assert.match(read('src/components/Navbar.tsx'), /<UserAvatar size=\{32\} src=\{avatarUrl\} name=\{name\} ring=\{false\} \/>/);
   assert.match(read('src/components/Navbar.tsx'), /<UserAvatar size=\{40\} src=\{avatarUrl\} name=\{name\} \/>/);
   assert.match(read('src/components/Navbar.tsx'), /select\("full_name,email,role,avatar_id"\)/);

@@ -62,6 +62,7 @@
   --app-accent: 46 158 245;
   --app-accent-soft: 239 248 255;
   --app-kicker: 17 81 184;
+  --app-hero-bg: 9 9 11;
 }
 .dark {
   --app-bg: 9 9 11;
@@ -74,6 +75,7 @@
   --app-accent: 46 158 245;
   --app-accent-soft: 11 50 107;
   --app-kicker: 124 201 252;
+  --app-hero-bg: 9 9 11;
   color-scheme: dark;
 }
 
@@ -130,8 +132,26 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
   .toast-error-shake { animation: none !important; }
 }
 
-.app-hero { position: relative; background: radial-gradient(circle at 80% 15%, rgba(46, 158, 245, .24), transparent 30%), radial-gradient(circle at 15% 100%, rgba(140, 217, 58, .12), transparent 38%), #09090b; box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }
+.app-hero { position: relative; background: radial-gradient(circle at 80% 15%, rgba(46, 158, 245, .24), transparent 30%), radial-gradient(circle at 15% 100%, rgba(140, 217, 58, .12), transparent 38%), rgb(var(--app-hero-bg)); box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }
 .app-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 0%, rgba(182,224,255,.06) 45%, transparent 70%); pointer-events: none; }
+
+/* Cincin avatar terverifikasi: hanya lapisan gradasi yang berputar (5 detik
+   per putaran, linear) — foto di dalamnya tidak ikut bergerak. Satu-satunya
+   warna literal di sini adalah gradasi cincin; sisanya memakai token tema.
+   rotate() pada pseudo-layer dipakai agar tetap jalan di browser mobile lama
+   yang belum mendukung animasi @property. */
+@keyframes avatar-ring-spin { to { transform: rotate(360deg); } }
+.avatar-ring-verified {
+  background: conic-gradient(from 0deg, #f87171, #fb923c, #facc15, #4ade80, #22d3ee, #3b82f6, #a855f7, #f87171);
+}
+.avatar-ring-spin {
+  animation: avatar-ring-spin 5s linear infinite;
+  will-change: transform;
+}
+.avatar-ring-glow { box-shadow: 0 0 14px rgb(var(--app-accent) / .38); }
+@media (prefers-reduced-motion: reduce) {
+  .avatar-ring-spin { animation: none !important; }
+}
 .section-kicker { font-size: 10px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; color: rgb(var(--app-kicker)); }
 .section-title { margin-top: .25rem; font-size: 1.35rem; line-height: 1.25; font-weight: 900; color: rgb(var(--app-text)); }
 .app-panel { border: 1px solid rgb(var(--app-border)); border-radius: 1.5rem; background: rgb(var(--app-surface)); padding: 1rem; box-shadow: 0 8px 25px rgba(9,9,11,.06); }
