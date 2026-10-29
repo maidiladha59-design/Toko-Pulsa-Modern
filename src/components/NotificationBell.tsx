@@ -32,6 +32,11 @@ export default function NotificationBell() {
 
   const unread = items.filter(x => !x.is_read).length;
 
+  // Bagikan ke komponen lain (badge menu cepat di hero beranda).
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("aidil:notifications-updated", { detail: { unread } }));
+  }, [unread]);
+
   async function readAll() {
     if (!unread) return;
     await fetch("/api/notifications", {

@@ -126,7 +126,7 @@ test('v94 preflight mendaftarkan file, versi 94, dan definisi wajib', () => {
   const script = read('scripts/migration-preflight.mjs');
 
   assert.match(script, /migrations_v94_community_chat\.sql/);
-  assert.match(script, /90,93,94,97]/);
+  assert.match(script, /90,93,94,97,98]/);
   for (const keyword of [
     'community_chat_messages',
     'chat_user_status',

@@ -103,6 +103,15 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .toast-icon-draw-2 { animation-delay: .3s; }
 .animate-page-in { animation: page-in .45s ease-out both; }
 
+/* Baris info berjalan (InfoTicker) di hero beranda. Track berisi dua salinan
+   teks identik; menggeser -50% membuat loop terasa tanpa jahitan. Durasi
+   dihitung dari lebar teks (px / kecepatan px per detik) lewat ResizeObserver.
+   Mask gradient hanya mengatur alpha tepi, bukan warna palet. */
+@keyframes info-ticker-left { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+@keyframes info-ticker-right { from { transform: translateX(-50%); } to { transform: translateX(0); } }
+.info-ticker-track { animation-timing-function: linear; animation-iteration-count: infinite; will-change: transform; }
+.info-ticker-viewport { -webkit-mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent); mask-image: linear-gradient(90deg, transparent, black 6%, black 94%, transparent); }
+
 /* Splash sesi (AppLoader): intro biru–hijau sekali per tab, tanpa spinner berputar. */
 @keyframes app-loader-rise { from { opacity: 0; transform: translateY(6px) scale(.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes app-loader-halo { 0%, 100% { opacity: .38; transform: scale(.9); } 50% { opacity: .12; transform: scale(1.1); } }

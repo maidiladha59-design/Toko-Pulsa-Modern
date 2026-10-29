@@ -84,7 +84,7 @@ test('v90 agregat publik + daftar approved + moderasi admin diaudit', () => {
 test('v90 preflight mendaftarkan migrasi dan definisi wajib', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v90_app_ratings\.sql/);
-  assert.match(script, /89,90,93,94,97]/);
+  assert.match(script, /89,90,93,94,97,98]/);
   assert.match(script, /get_my_transaction_count/);
   assert.match(script, /admin_set_rating_published/);
   assert.match(script, /rating_prompted_at/);

@@ -90,7 +90,7 @@ test('v88 semua RPC transaksi memanggil assert_account_active + guard debit wall
 test('v88 migrasi terdaftar di preflight dan pin versi v86 diperbarui', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v88_admin_user_controls\.sql/);
-  assert.match(script, /83,85,86,87,88,89,90,93,94,97]/);
+  assert.match(script, /83,85,86,87,88,89,90,93,94,97,98]/);
 
   const v86 = read('tests/production/topup-va-methods-v86.test.mjs');
   assert.ok(v86.includes('83,85,86,87,88'), 'pin versi v86 harus mencakup v88');
