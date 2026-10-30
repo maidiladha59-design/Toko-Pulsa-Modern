@@ -15,9 +15,9 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className="mx-auto max-w-lg animate-page-in rounded-3xl border bg-white p-8 text-center shadow-sm">
-      <h1 className="text-xl font-black">Halaman ini mengalami kendala</h1>
-      <p className="mt-2 text-sm text-slate-500">
+    <div className="mx-auto max-w-lg animate-page-in rounded-3xl border border-app-border bg-app-surface p-8 text-center text-app-text shadow-sm">
+      <h1 className="text-xl font-black text-app-text">Halaman ini mengalami kendala</h1>
+      <p className="mt-2 text-sm text-app-muted">
         Laporan error sudah terkirim otomatis ke tim teknis. Silakan coba lagi.
       </p>
       <button

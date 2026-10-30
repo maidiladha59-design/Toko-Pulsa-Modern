@@ -271,7 +271,7 @@ export default function ManualTopupForm() {
       <div className="overflow-hidden rounded-3xl border border-app-border bg-app-surface">
         <div className="border-b border-app-border p-6">
           <h1 className="text-2xl font-black text-app-text">Top Up Manual</h1>
-          <p className="mt-2 text-sm leading-6 text-app-text/65">
+          <p className="mt-2 text-sm leading-6 text-app-muted">
             Bayar sesuai nomor tujuan di bawah, lalu unggah bukti transfer. Admin memverifikasi
             maksimal 1x24 jam.
           </p>

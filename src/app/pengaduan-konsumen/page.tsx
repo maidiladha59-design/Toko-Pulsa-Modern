@@ -32,9 +32,9 @@ export default async function PengaduanKonsumenPage() {
   const biz = await getBusinessIdentity();
   return (
     <div className="mx-auto max-w-3xl animate-page-in space-y-5">
-      <article className="rounded-3xl border bg-white p-6 shadow-sm">
-        <h1 className="text-3xl font-black">Pengaduan Konsumen</h1>
-        <p className="mt-3 text-sm leading-6 text-slate-600">
+      <article className="rounded-3xl border border-app-border bg-app-surface p-6 text-app-text shadow-sm">
+        <h1 className="text-3xl font-black text-app-text">Pengaduan Konsumen</h1>
+        <p className="mt-3 text-sm leading-6 text-app-muted">
           Halaman ini adalah jalur pengaduan konsumen formal — berbeda dari Pusat Bantuan biasa —
           khusus untuk keluhan transaksional serius, misalnya <b>saldo terpotong tetapi pulsa, token,
           atau produk digital tidak diterima</b>, kesalahan penagihan, atau dugaan penyalahgunaan akun.
@@ -42,29 +42,29 @@ export default async function PengaduanKonsumenPage() {
           berdasarkan Peraturan Menteri Perdagangan No. 50 Tahun 2020 dan UU Perlindungan Konsumen.
         </p>
 
-        <h2 className="mt-6 text-xl font-black">Proses penanganan</h2>
+        <h2 className="mt-6 text-xl font-black text-app-text">Proses penanganan</h2>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           {steps.map((s) => (
-            <div key={s.title} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-              <p className="text-sm font-black text-slate-800">{s.title}</p>
-              <p className="mt-1 text-xs leading-5 text-slate-600">{s.body}</p>
+            <div key={s.title} className="rounded-2xl border border-app-border bg-app-inset p-4">
+              <p className="text-sm font-black text-app-text">{s.title}</p>
+              <p className="mt-1 text-xs leading-5 text-app-muted">{s.body}</p>
             </div>
           ))}
         </div>
 
-        <h2 className="mt-6 text-xl font-black">Jika belum ada penyelesaian</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
+        <h2 className="mt-6 text-xl font-black text-app-text">Jika belum ada penyelesaian</h2>
+        <p className="mt-2 text-sm leading-6 text-app-muted">
           Jika pengaduan tidak mendapat tanggapan yang memadai melalui tiket, konsumen berhak
           melanjutkan pengaduan ke Kementerian Perdagangan (SIAPIK Kemendag), Kementerian Komunikasi dan
           Digital (Kominfo), atau lembaga penyelesaian sengketa konsumen (BPSK) sesuai domisili konsumen.
         </p>
 
-        <h2 className="mt-6 text-xl font-black">Kontak resmi pelaku usaha</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600">
+        <h2 className="mt-6 text-xl font-black text-app-text">Kontak resmi pelaku usaha</h2>
+        <p className="mt-2 text-sm leading-6 text-app-muted">
           {biz.legalName}
           {biz.email ? ` · ${biz.email}` : ""}
           {biz.phone ? ` · ${biz.phone}` : ""}. Lihat detail lengkap di{" "}
-          <Link href="/identitas-usaha" className="font-bold text-gold-700 underline">
+          <Link href="/identitas-usaha" className="font-bold text-app-kicker underline">
             halaman Identitas Usaha
           </Link>
           .

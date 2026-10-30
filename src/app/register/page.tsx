@@ -61,7 +61,7 @@ function InfoModal({
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-2 py-1 text-sm font-bold text-white/50 hover:bg-white/10"
+            className="rounded-lg px-2 py-1 text-sm font-bold text-white/70 hover:bg-white/10"
             aria-label="Tutup"
           >
             <Icon name="close" size={14} />
@@ -295,7 +295,7 @@ function RegisterForm() {
         <div className="mb-6">
           <p className="text-xs font-black uppercase tracking-[.18em] text-gold-400">AIDIL STORE</p>
           <h1 className="mt-2 text-2xl font-black text-white sm:text-3xl">Buat akun baru</h1>
-          <p className="mt-2 text-sm leading-6 text-white/50">
+          <p className="mt-2 text-sm leading-6 text-white/65">
             Yuk buat akun AIDIL STORE dan mulai gunakan berbagai layanan digital dengan mudah.
           </p>
         </div>
@@ -303,20 +303,20 @@ function RegisterForm() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <label className="block">
             <span className="text-sm font-bold text-white/80">Nama Lengkap</span>
-            <input required value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" placeholder="Masukkan nama lengkap" className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20" />
+            <input required value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" placeholder="Masukkan nama lengkap" className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/55 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20" />
           </label>
 
           <label className="block">
             <span className="text-sm font-bold text-white/80">Email</span>
             <div className="mt-2 flex gap-2">
-              <input type="email" required value={email} onChange={(e) => handleEmailChange(e.target.value)} disabled={emailVerified} autoComplete="email" placeholder="nama@email.com" className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20 disabled:bg-emerald-500/10" />
+              <input type="email" required value={email} onChange={(e) => handleEmailChange(e.target.value)} disabled={emailVerified} autoComplete="email" placeholder="nama@email.com" className="min-w-0 flex-1 rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/55 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20 disabled:bg-emerald-500/10" />
               {!emailVerified && (
                 <button type="button" onClick={sendOtp} disabled={sendingOtp || resendRemaining > 0 || !email.trim()} className="btn-gold-metal shrink-0 rounded-xl px-3 py-3 text-xs font-black transition disabled:cursor-not-allowed disabled:opacity-50 sm:px-4">
                   {sendingOtp ? "Mengirim..." : resendRemaining > 0 ? `${resendRemaining}s` : otpSent ? "Kirim Lagi" : "Kirim OTP"}
                 </button>
               )}
             </div>
-            <p className="mt-1.5 text-xs text-white/40">OTP 6 digit berlaku 5 menit.</p>
+            <p className="mt-1.5 text-xs text-white/70">OTP 6 digit berlaku 5 menit.</p>
           </label>
 
           {otpSent && !emailVerified && (
@@ -329,30 +329,30 @@ function RegisterForm() {
               <button type="button" onClick={verifyOtp} disabled={verifyingOtp || otp.length !== 6} className="btn-gold-metal mt-3 w-full rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50">
                 {verifyingOtp ? "Memverifikasi..." : "Verifikasi OTP"}
               </button>
-              <p className="mt-2 text-center text-xs text-white/50">Resend tersedia {resendRemaining > 0 ? `dalam ${resendRemaining} detik` : "sekarang"}.</p>
+              <p className="mt-2 text-center text-xs text-white/65">Resend tersedia {resendRemaining > 0 ? `dalam ${resendRemaining} detik` : "sekarang"}.</p>
             </div>
           )}
 
           {emailVerified && (
-            <div className="flex items-center justify-between rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+            <div className="flex items-center justify-between rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3">
               <div>
-                <p className="inline-flex items-center gap-1.5 text-sm font-black text-emerald-800"><Icon name="check" size={16} /> Email terverifikasi</p>
-                <p className="mt-1 text-xs text-emerald-700">Email ini sudah berhasil diverifikasi.</p>
+                <p className="inline-flex items-center gap-1.5 text-sm font-black text-emerald-200"><Icon name="check" size={16} /> Email terverifikasi</p>
+                <p className="mt-1 text-xs text-emerald-300">Email ini sudah berhasil diverifikasi.</p>
               </div>
-              <button type="button" onClick={() => { setEmailVerified(false); setEmail(""); resetEmailVerification(); }} className="text-xs font-bold text-emerald-700 hover:underline">Ganti</button>
+              <button type="button" onClick={() => { setEmailVerified(false); setEmail(""); resetEmailVerification(); }} className="text-xs font-bold text-emerald-300 hover:underline">Ganti</button>
             </div>
           )}
 
           <label className="block">
             <span className="text-sm font-bold text-white/80">Nomor WhatsApp</span>
-            <input required value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" placeholder="08xxxxxxxxxx" className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20" />
+            <input required value={phone} onChange={(e) => setPhone(e.target.value)} inputMode="tel" placeholder="08xxxxxxxxxx" className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/55 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20" />
           </label>
 
           <label className="block">
             <span className="text-sm font-bold text-white/80">Password</span>
             <span className="relative mt-2 block">
-              <input type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="Minimal 6 karakter" className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 pr-20 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20" />
-              <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Sembunyikan password" : "Lihat password"} aria-pressed={showPassword} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-white/60 transition hover:bg-white/10 hover:text-gold-300"><svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>{showPassword ? <><path d="M3 3l18 18" strokeLinecap="round" /><path d="M10.6 6.2A9.9 9.9 0 0 1 12 6c5 0 9 4.5 9 6 0 .7-.6 1.9-1.7 3.1M6.4 8.1C4.1 9.7 3 11.4 3 12c0 1.5 4 6 9 6 1.6 0 3-.4 4.2-1" strokeLinecap="round" strokeLinejoin="round" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></> : <><path d="M3 12c0-1.5 4-6 9-6s9 4.5 9 6-4 6-9 6-9-4.5-9-6Z" strokeLinejoin="round" /><circle cx="12" cy="12" r="2.6" /></>}</svg></button>
+              <input type={showPassword ? "text" : "password"} required value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" placeholder="Minimal 6 karakter" className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 pr-20 text-sm text-white outline-none transition placeholder:text-white/55 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20" />
+              <button type="button" onClick={() => setShowPassword((v) => !v)} aria-label={showPassword ? "Sembunyikan password" : "Lihat password"} aria-pressed={showPassword} className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-white/75 transition hover:bg-white/10 hover:text-gold-300"><svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>{showPassword ? <><path d="M3 3l18 18" strokeLinecap="round" /><path d="M10.6 6.2A9.9 9.9 0 0 1 12 6c5 0 9 4.5 9 6 0 .7-.6 1.9-1.7 3.1M6.4 8.1C4.1 9.7 3 11.4 3 12c0 1.5 4 6 9 6 1.6 0 3-.4 4.2-1" strokeLinecap="round" strokeLinejoin="round" /><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2" /></> : <><path d="M3 12c0-1.5 4-6 9-6s9 4.5 9 6-4 6-9 6-9-4.5-9-6Z" strokeLinejoin="round" /><circle cx="12" cy="12" r="2.6" /></>}</svg></button>
             </span>
           </label>
 
@@ -433,7 +433,7 @@ function RegisterForm() {
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-sm text-slate-400">Memuat...</div>}>
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center text-sm text-app-muted">Memuat...</div>}>
       <RegisterForm />
     </Suspense>
   );

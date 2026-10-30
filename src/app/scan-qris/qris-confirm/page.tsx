@@ -72,13 +72,13 @@ export default function QrisConfirmPage() {
 
   if (success) {
     return (
-      <main className="flex min-h-screen items-center justify-center bg-slate-100 px-4">
-        <div className="w-full max-w-md rounded-3xl bg-white p-8 text-center shadow-xl">
-          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+      <main className="flex min-h-screen items-center justify-center bg-app-bg px-4">
+        <div className="w-full max-w-md rounded-3xl bg-app-surface p-8 text-center shadow-xl">
+          <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-success-100 text-success-700 dark:bg-success-500/15 dark:text-success-300">
             <Icon name="check_circle" size={30} />
           </div>
-          <h1 className="text-xl font-black text-slate-900">Pembayaran Berhasil</h1>
-          <p className="mt-2 text-sm text-slate-500">
+          <h1 className="text-xl font-black text-app-text">Pembayaran Berhasil</h1>
+          <p className="mt-2 text-sm text-app-muted">
             Pembayaran ke {payment.merchantName} sebesar Rp{' '}
             {formatRupiah(Number(payment.amount))} berhasil diproses.
           </p>
@@ -95,9 +95,9 @@ export default function QrisConfirmPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-8">
+    <main className="min-h-screen bg-app-bg px-4 py-8">
       <div className="mx-auto max-w-lg">
-        <div className="overflow-hidden rounded-3xl bg-white shadow-xl">
+        <div className="overflow-hidden rounded-3xl bg-app-surface shadow-xl">
           <div className="bg-slate-950 px-6 py-6 text-white">
             <h1 className="text-2xl font-bold">Konfirmasi Pembayaran</h1>
             <p className="mt-1 text-sm text-slate-300">
@@ -106,30 +106,30 @@ export default function QrisConfirmPage() {
           </div>
 
           <div className="space-y-5 p-6">
-            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
-              <p className="text-xs font-medium uppercase text-slate-400">Merchant</p>
-              <p className="mt-1 text-lg font-bold text-slate-900">{payment.merchantName}</p>
+            <div className="rounded-2xl border border-app-border bg-app-inset p-5">
+              <p className="text-xs font-medium uppercase text-app-muted">Merchant</p>
+              <p className="mt-1 text-lg font-bold text-app-text">{payment.merchantName}</p>
 
-              <p className="mt-4 text-xs font-medium uppercase text-slate-400">
+              <p className="mt-4 text-xs font-medium uppercase text-app-muted">
                 Total Pembayaran
               </p>
-              <p className="mt-1 text-3xl font-black text-slate-900">
+              <p className="mt-1 text-3xl font-black text-app-text">
                 {formatRupiah(Number(payment.amount))}
               </p>
 
               {payment.isStatic && (
-                <p className="mt-2 text-xs text-slate-500">
+                <p className="mt-2 text-xs text-app-muted">
                   Nominal ini Anda masukkan sendiri (QRIS statis).
                 </p>
               )}
             </div>
 
-            <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4 text-xs text-slate-600">
+            <div className="rounded-2xl border border-gold-400/40 bg-app-accent-soft p-4 text-xs text-app-muted">
               Pembayaran akan dipotong langsung dari saldo AIDIL STORE Anda.
             </div>
 
             {error && (
-              <div className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              <div className="rounded-xl border border-danger-500/30 bg-danger-500/10 p-3 text-sm text-danger-700 dark:text-danger-300">
                 {error}
               </div>
             )}
@@ -146,7 +146,7 @@ export default function QrisConfirmPage() {
             <button
               type="button"
               onClick={() => router.push('/scan-qris')}
-              className="w-full rounded-2xl border border-slate-200 px-5 py-3 text-sm font-semibold text-slate-500 hover:bg-slate-50"
+              className="w-full rounded-2xl border border-app-border px-5 py-3 text-sm font-semibold text-app-muted hover:bg-app-inset"
             >
               Batal
             </button>

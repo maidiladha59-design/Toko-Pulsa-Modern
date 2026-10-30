@@ -30,7 +30,7 @@ export default function Input({
         id={inputId}
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
-        className={`w-full rounded-xl border bg-app-surface px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle/60 disabled:cursor-not-allowed disabled:opacity-60 focus:ring-4 ${
+        className={`w-full rounded-xl border bg-app-surface px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle disabled:cursor-not-allowed disabled:opacity-60 focus:ring-4 ${
           error
             ? "border-danger-400 focus:border-danger-500 focus:ring-danger-500/20"
             : "border-app-border focus:border-gold-400 focus:ring-gold-400/20"

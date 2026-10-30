@@ -189,7 +189,7 @@ function LoginForm() {
             Masuk ke akun Anda
           </h2>
 
-          <p className="mt-1 text-sm text-white/50">
+          <p className="mt-1 text-sm text-white/65">
             Gunakan email dan password yang sudah terdaftar.
           </p>
         </div>
@@ -217,7 +217,7 @@ function LoginForm() {
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="email"
               placeholder="nama@email.com"
-              className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20"
+              className="mt-2 w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-white outline-none transition placeholder:text-white/55 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20"
             />
           </label>
 
@@ -241,7 +241,7 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 autoComplete="current-password"
                 placeholder="Masukkan password"
-                className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 pr-14 text-sm text-white outline-none transition placeholder:text-white/30 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20"
+                className="w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 pr-14 text-sm text-white outline-none transition placeholder:text-white/55 focus:border-gold-400 focus:bg-white/10 focus:ring-4 focus:ring-gold-400/20"
               />
 
               {/* Ikon mata, bukan teks "Lihat"/"Sembunyi" — label terbaca oleh screen reader. */}
@@ -250,7 +250,7 @@ function LoginForm() {
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? "Sembunyikan password" : "Lihat password"}
                 aria-pressed={showPassword}
-                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-white/60 transition hover:bg-white/10 hover:text-gold-300"
+                className="absolute right-2 top-1/2 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-lg text-white/75 transition hover:bg-white/10 hover:text-gold-300"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden>
                   {showPassword ? (
@@ -290,7 +290,7 @@ function LoginForm() {
             Belum punya akun?
           </p>
 
-          <p className="mt-1 text-xs leading-5 text-white/60">
+          <p className="mt-1 text-xs leading-5 text-white/70">
             Yuk buat akun AIDIL STORE dan nikmati pengalaman
             menggunakan layanan digital dengan lebih mudah.
           </p>
@@ -303,7 +303,7 @@ function LoginForm() {
           </Link>
         </div>
 
-        <p className="mt-5 text-center text-xs text-white/40">
+        <p className="mt-5 text-center text-xs text-white/70">
           Dengan login, Anda dapat mengakses fitur akun dan
           layanan AIDIL STORE.
         </p>

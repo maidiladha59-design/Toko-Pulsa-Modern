@@ -145,73 +145,73 @@ export default function SplitBillClient() {
 
   return (
     <div className="space-y-5">
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-lg font-black text-slate-900">Buat Tagihan Patungan</h2>
-        <p className="mt-1 text-sm text-slate-500">Setiap peserta menerima permintaan bayar ke Anda dan membayar lewat transfer saldo (dengan PIN, biaya admin, dan limit transfer).</p>
+      <section className="rounded-3xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6">
+        <h2 className="text-lg font-black text-app-text">Buat Tagihan Patungan</h2>
+        <p className="mt-1 text-sm text-app-muted">Setiap peserta menerima permintaan bayar ke Anda dan membayar lewat transfer saldo (dengan PIN, biaya admin, dan limit transfer).</p>
 
         <form onSubmit={submit} className="mt-4 space-y-4">
           <div>
-            <label className="text-xs font-black uppercase tracking-wide text-slate-400">Judul Tagihan</label>
+            <label className="text-xs font-black uppercase tracking-wide text-app-muted">Judul Tagihan</label>
             <input
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               maxLength={100}
               placeholder="Contoh: Makan malam tim, Sewa lapangan..."
-              className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-sm"
+              className="mt-2 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5 text-sm text-app-text outline-none placeholder:text-app-subtle focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20"
             />
           </div>
 
           <div>
-            <label className="text-xs font-black uppercase tracking-wide text-slate-400">Total Tagihan</label>
-            <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3">
-              <span className="text-sm font-bold text-slate-400">Rp</span>
+            <label className="text-xs font-black uppercase tracking-wide text-app-muted">Total Tagihan</label>
+            <div className="mt-2 flex items-center rounded-xl border border-app-border bg-app-inset px-3">
+              <span className="text-sm font-bold text-app-muted">Rp</span>
               <input
                 type="text"
                 inputMode="numeric"
                 value={total ? Number(total).toLocaleString("id-ID") : ""}
                 onChange={(e) => setTotal(e.target.value.replace(/\D/g, "").slice(0, 12))}
                 placeholder="0"
-                className="w-full bg-transparent px-2 py-2.5 text-lg font-black text-slate-900 outline-none"
+                className="w-full bg-transparent px-2 py-2.5 text-lg font-black text-app-text outline-none"
               />
             </div>
           </div>
 
           <div>
-            <label className="text-xs font-black uppercase tracking-wide text-slate-400">Cara Pembagian</label>
+            <label className="text-xs font-black uppercase tracking-wide text-app-muted">Cara Pembagian</label>
             <div className="mt-2 grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setMode("EQUAL")}
-                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-black ${mode === "EQUAL" ? "border-gold-500 bg-gold-50 text-gold-700" : "border-slate-200 bg-white text-slate-600"}`}
+                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-black ${mode === "EQUAL" ? "border-gold-500 bg-app-accent-soft text-app-kicker" : "border-app-border bg-app-surface text-app-muted"}`}
               >
                 <Icon name="scales" size={16} /> Dibagi Rata
               </button>
               <button
                 type="button"
                 onClick={() => setMode("CUSTOM")}
-                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-black ${mode === "CUSTOM" ? "border-gold-500 bg-gold-50 text-gold-700" : "border-slate-200 bg-white text-slate-600"}`}
+                className={`inline-flex items-center gap-1.5 rounded-xl border px-3 py-2.5 text-sm font-black ${mode === "CUSTOM" ? "border-gold-500 bg-app-accent-soft text-app-kicker" : "border-app-border bg-app-surface text-app-muted"}`}
               >
                 <Icon name="edit" size={16} /> Nominal Custom
               </button>
             </div>
             {mode === "EQUAL" && remainder > 0 && selected.length > 0 && (
-              <p className="mt-2 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-800">
+              <p className="mt-2 rounded-xl border border-warning-500/30 bg-warning-500/10 px-3 py-2 text-xs font-bold text-warning-700 dark:text-warning-300">
                 Total tidak habis dibagi rata — sisa {formatRupiah(remainder)} dibebankan ke peserta pertama dalam daftar.
               </p>
             )}
           </div>
 
-          <div className="space-y-3 rounded-2xl border border-slate-200 bg-slate-50 p-4">
+          <div className="space-y-3 rounded-2xl border border-app-border bg-app-inset p-4">
             {contacts.length > 0 && (
               <div>
-                <p className="text-xs font-black uppercase tracking-wide text-slate-400">Kontak Favorit</p>
+                <p className="text-xs font-black uppercase tracking-wide text-app-muted">Kontak Favorit</p>
                 <div className="mt-2 flex flex-wrap gap-2">
                   {contacts.map((c) => (
                     <button
                       key={c.contact_user_id}
                       type="button"
                       onClick={() => addParticipant(c.contact_user_id, c.alias || c.display_name)}
-                      className="inline-flex items-center gap-1.5 rounded-xl border border-gold-200 bg-white px-3 py-2 text-xs font-black text-slate-800 hover:bg-gold-50"
+                      className="inline-flex items-center gap-1.5 rounded-xl border border-gold-400/40 bg-app-surface px-3 py-2 text-xs font-black text-app-text hover:bg-app-accent-soft"
                     >
                       <Icon name="star_fill" size={16} /> {c.alias || c.display_name}
                     </button>
@@ -221,25 +221,25 @@ export default function SplitBillClient() {
             )}
 
             <div>
-              <p className="text-xs font-black uppercase tracking-wide text-slate-400">Cari Peserta (email / nomor HP)</p>
+              <p className="text-xs font-black uppercase tracking-wide text-app-muted">Cari Peserta (email / nomor HP)</p>
               <div className="mt-2 flex gap-2">
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); handleSearch(); } }}
                   placeholder="email@contoh.com atau 0812xxxxxxx"
-                  className="min-w-0 flex-1 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm"
+                  className="min-w-0 flex-1 rounded-xl border border-app-border bg-app-surface px-3 py-2.5 text-sm text-app-text outline-none placeholder:text-app-subtle focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20"
                 />
                 <button type="button" onClick={handleSearch} disabled={searching} className="shrink-0 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white disabled:opacity-50">
                   {searching ? "Mencari..." : "Cari"}
                 </button>
               </div>
-              {searchError && <p className="mt-2 text-xs font-bold text-red-600">{searchError}</p>}
+              {searchError && <p className="mt-2 text-xs font-bold text-danger-600 dark:text-danger-400">{searchError}</p>}
               {searchResult && (
-                <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-gold-200 bg-gold-50 p-3">
+                <div className="mt-3 flex items-center justify-between gap-3 rounded-2xl border border-gold-400/40 bg-app-accent-soft p-3">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-black text-slate-900">{searchResult.display_name_masked}</p>
-                    <p className="truncate text-xs text-slate-500">
+                    <p className="truncate text-sm font-black text-app-text">{searchResult.display_name_masked}</p>
+                    <p className="truncate text-xs text-app-muted">
                       {searchResult.email_masked}{searchResult.phone_masked ? ` · ${searchResult.phone_masked}` : ""}
                     </p>
                   </div>
@@ -256,31 +256,31 @@ export default function SplitBillClient() {
 
             {selected.length > 0 && (
               <div>
-                <p className="text-xs font-black uppercase tracking-wide text-slate-400">Peserta ({selected.length})</p>
+                <p className="text-xs font-black uppercase tracking-wide text-app-muted">Peserta ({selected.length})</p>
                 <div className="mt-2 space-y-2">
                   {selected.map((p, i) => (
-                    <div key={p.user_id} className="flex items-center gap-3 rounded-xl border border-slate-200 bg-white p-3">
+                    <div key={p.user_id} className="flex items-center gap-3 rounded-xl border border-app-border bg-app-surface p-3">
                       <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-slate-950 text-xs font-black text-gold-200">
                         {p.display_name.charAt(0).toUpperCase()}
                       </span>
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-black text-slate-900">{p.display_name}</p>
-                        <p className="text-[11px] font-bold text-slate-400">
+                        <p className="truncate text-sm font-black text-app-text">{p.display_name}</p>
+                        <p className="text-[11px] font-bold text-app-muted">
                           {mode === "EQUAL"
                             ? shares.length > 0 ? `Bagian: ${formatRupiah(shares[i] || 0)}${i === 0 && remainder > 0 ? " (termasuk sisa pembagian)" : ""}` : "Bagian dihitung setelah total diisi"
                             : "Nominal custom"}
                         </p>
                       </div>
                       {mode === "CUSTOM" && (
-                        <div className="flex shrink-0 items-center rounded-lg border border-slate-200 bg-slate-50 px-2">
-                          <span className="text-[11px] font-bold text-slate-400">Rp</span>
+                        <div className="flex shrink-0 items-center rounded-lg border border-app-border bg-app-inset px-2">
+                          <span className="text-[11px] font-bold text-app-muted">Rp</span>
                           <input
                             type="text"
                             inputMode="numeric"
                             value={p.share ? Number(p.share).toLocaleString("id-ID") : ""}
                             onChange={(e) => setSelected((prev) => prev.map((q, j) => (j === i ? { ...q, share: e.target.value.replace(/\D/g, "").slice(0, 12) } : q)))}
                             placeholder="0"
-                            className="w-24 bg-transparent px-1 py-1.5 text-sm font-black text-slate-900 outline-none"
+                            className="w-24 bg-transparent px-1 py-1.5 text-sm font-black text-app-text outline-none placeholder:text-app-subtle"
                           />
                         </div>
                       )}
@@ -288,7 +288,7 @@ export default function SplitBillClient() {
                         type="button"
                         onClick={() => setSelected((prev) => prev.filter((_, j) => j !== i))}
                         aria-label="Hapus peserta"
-                        className="shrink-0 rounded-lg px-2 py-2 text-xs font-bold text-slate-400 hover:bg-red-50 hover:text-red-600"
+                        className="shrink-0 rounded-lg px-2 py-2 text-xs font-bold text-app-muted hover:bg-danger-500/10 hover:text-danger-600 dark:hover:text-danger-400"
                       >
                         <Icon name="close" size={14} />
                       </button>
@@ -296,7 +296,7 @@ export default function SplitBillClient() {
                   ))}
                 </div>
                 {mode === "CUSTOM" && (
-                  <p className={`mt-2 rounded-xl px-3 py-2 text-xs font-bold ${customRemaining === 0 ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-800"}`}>
+                  <p className={`mt-2 rounded-xl px-3 py-2 text-xs font-bold ${customRemaining === 0 ? "bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-300" : "bg-warning-500/10 text-warning-700 dark:text-warning-300"}`}>
                     {customRemaining === 0
                       ? "Semua bagian teralokasi — jumlahnya sama dengan total tagihan."
                       : customRemaining > 0
@@ -308,7 +308,7 @@ export default function SplitBillClient() {
             )}
           </div>
 
-          {error && <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700">{error}</div>}
+          {error && <div className="rounded-2xl border border-danger-500/30 bg-danger-500/10 p-4 text-sm font-bold text-danger-700 dark:text-danger-300">{error}</div>}
 
           <button
             type="submit"
@@ -320,12 +320,12 @@ export default function SplitBillClient() {
         </form>
       </section>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-lg font-black text-slate-900">Tagihan Saya</h2>
-        {billsError && <div className="mt-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-bold text-red-700">{billsError}</div>}
-        {!bills && !billsError && <div className="mt-4 animate-pulse rounded-2xl bg-slate-100 p-6 text-sm text-slate-400">Memuat tagihan...</div>}
+      <section className="rounded-3xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6">
+        <h2 className="text-lg font-black text-app-text">Tagihan Saya</h2>
+        {billsError && <div className="mt-3 rounded-2xl border border-danger-500/30 bg-danger-500/10 p-4 text-sm font-bold text-danger-700 dark:text-danger-300">{billsError}</div>}
+        {!bills && !billsError && <div className="mt-4 animate-pulse rounded-2xl bg-app-inset p-6 text-sm text-app-muted">Memuat tagihan...</div>}
         {bills && bills.length === 0 && (
-          <p className="mt-4 rounded-2xl bg-slate-50 p-4 text-sm text-slate-500">Belum ada tagihan patungan. Buat tagihan pertama Anda di atas.</p>
+          <p className="mt-4 rounded-2xl bg-app-inset p-4 text-sm text-app-muted">Belum ada tagihan patungan. Buat tagihan pertama Anda di atas.</p>
         )}
         {bills && bills.length > 0 && (
           <div className="mt-4 space-y-3">
@@ -335,27 +335,27 @@ export default function SplitBillClient() {
                 <Link
                   key={b.id}
                   href={`/split-bill/${b.id}`}
-                  className="block rounded-2xl border border-slate-200 bg-white p-4 hover:border-gold-300 hover:bg-gold-50/40"
+                  className="block rounded-2xl border border-app-border bg-app-surface p-4 hover:border-gold-300 hover:bg-app-accent-soft"
                 >
                   <div className="flex items-start justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-black text-slate-900">{b.title}</p>
-                      <p className="mt-0.5 text-[11px] font-bold text-slate-400">
+                      <p className="truncate text-sm font-black text-app-text">{b.title}</p>
+                      <p className="mt-0.5 text-[11px] font-bold text-app-muted">
                         {b.bill_number} · {b.is_creator ? "Anda pembuat" : "Anda peserta"}
                       </p>
                     </div>
-                    <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-black uppercase ${b.status === "COMPLETED" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+                    <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-black uppercase ${b.status === "COMPLETED" ? "bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-300" : "bg-warning-500/10 text-warning-700 dark:text-warning-300"}`}>
                       {b.status === "COMPLETED" ? "Selesai" : "Aktif"}
                     </span>
                   </div>
                   <div className="mt-3 flex items-end justify-between">
                     <div>
-                      <p className="text-[11px] font-black uppercase tracking-wide text-slate-400">Terkumpul</p>
-                      <p className="text-sm font-black text-slate-900">{formatRupiah(b.collected_amount)} <span className="text-xs font-bold text-slate-400">/ {formatRupiah(b.total_amount)}</span></p>
+                      <p className="text-[11px] font-black uppercase tracking-wide text-app-muted">Terkumpul</p>
+                      <p className="text-sm font-black text-app-text">{formatRupiah(b.collected_amount)} <span className="text-xs font-bold text-app-muted">/ {formatRupiah(b.total_amount)}</span></p>
                     </div>
-                    <p className="text-xs font-bold text-slate-500">{b.paid_count}/{b.participant_count} bayar</p>
+                    <p className="text-xs font-bold text-app-muted">{b.paid_count}/{b.participant_count} bayar</p>
                   </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100">
+                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-app-inset">
                     <div className="h-full rounded-full bg-gold-500" style={{ width: `${progress}%` }} />
                   </div>
                 </Link>

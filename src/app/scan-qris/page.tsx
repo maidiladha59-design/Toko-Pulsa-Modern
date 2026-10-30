@@ -87,12 +87,12 @@ function shortRef(raw: string) {
 
 function DetailRow({ label, value, mono, badge }: { label: string; value: string; mono?: boolean; badge?: 'success' }) {
   return (
-    <div className="flex items-center justify-between gap-3 bg-white px-4 py-3">
-      <span className="text-xs font-bold uppercase tracking-wide text-slate-400">{label}</span>
+    <div className="flex items-center justify-between gap-3 bg-app-surface px-4 py-3">
+      <span className="text-xs font-bold uppercase tracking-wide text-app-muted">{label}</span>
       {badge === 'success' ? (
-        <span className="rounded-full bg-emerald-50 px-3 py-1 text-xs font-black text-emerald-700">{value}</span>
+        <span className="rounded-full bg-success-50 px-3 py-1 text-xs font-black text-success-700 dark:bg-success-500/10 dark:text-success-300">{value}</span>
       ) : (
-        <span className={`text-right text-sm font-black text-slate-900 ${mono ? 'font-mono text-xs' : ''}`}>{value}</span>
+        <span className={`text-right text-sm font-black text-app-text ${mono ? 'font-mono text-xs' : ''}`}>{value}</span>
       )}
     </div>
   );
@@ -263,9 +263,9 @@ export default function ScanQRIS() {
   }, []);
 
   return (
-    <main className="min-h-screen bg-slate-100 px-4 py-8">
+    <main className="min-h-screen bg-app-bg px-4 py-8">
       <div className="mx-auto max-w-lg">
-        <div className="overflow-hidden rounded-3xl bg-white shadow-xl">
+        <div className="overflow-hidden rounded-3xl bg-app-surface shadow-xl">
           {/* Header */}
           <div className="bg-slate-950 px-6 py-6 text-white">
             <h1 className="text-2xl font-bold">
@@ -302,10 +302,10 @@ export default function ScanQRIS() {
               )}
             </div>
 
-            <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4 text-sm text-zinc-950">
+            <div className="rounded-2xl border border-gold-400/40 bg-app-accent-soft p-4 text-sm text-app-text">
               <p className="flex items-center gap-1.5 font-black"><Icon name="lock" size={16} /> Izin kamera diperlukan</p>
               <p className="mt-1 text-xs leading-5">AIDIL STORE hanya menggunakan kamera untuk membaca QRIS. Tekan tombol di bawah dan pilih <b>Izinkan</b> saat browser meminta akses kamera.</p>
-              {cameraPermission === 'denied' && <p className="mt-2 font-bold text-red-700">Akses kamera ditolak. Aktifkan izin Kamera pada pengaturan browser/perangkat lalu coba lagi.</p>}
+              {cameraPermission === 'denied' && <p className="mt-2 font-bold text-danger-700 dark:text-danger-300">Akses kamera ditolak. Aktifkan izin Kamera pada pengaturan browser/perangkat lalu coba lagi.</p>}
             </div>
 
             {/* Camera button */}
@@ -324,7 +324,7 @@ export default function ScanQRIS() {
 
             {/* Error */}
             {error && (
-              <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+              <div className="rounded-2xl border border-danger-500/30 bg-danger-500/10 p-4 text-sm text-danger-700 dark:text-danger-300">
                 <div className="font-semibold">
                   Gagal membaca QRIS
                 </div>
@@ -347,7 +347,7 @@ export default function ScanQRIS() {
           aria-modal="true"
           onClick={(e) => { if (e.target === e.currentTarget) clearResult(); }}
         >
-          <div className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-white shadow-2xl sm:max-w-md sm:rounded-3xl">
+          <div className="max-h-[92vh] w-full overflow-y-auto rounded-t-3xl bg-app-surface shadow-2xl sm:max-w-md sm:rounded-3xl">
             <div className="sticky top-0 z-10 flex items-center justify-between gap-3 rounded-t-3xl bg-slate-950 px-6 py-5 text-white">
               <div className="flex items-center gap-2">
                 <Icon name="check_circle" size={18} />
@@ -361,14 +361,14 @@ export default function ScanQRIS() {
 
             <div className="space-y-4 p-6">
               {/* Nominal - paling atas & menonjol */}
-              <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4 text-center">
-                <p className="text-xs font-black uppercase tracking-widest text-gold-700">Total Nominal</p>
+              <div className="rounded-2xl border border-gold-400/40 bg-app-accent-soft p-4 text-center">
+                <p className="text-xs font-black uppercase tracking-widest text-app-kicker">Total Nominal</p>
                 {qris.amount ? (
-                  <p className="mt-1 text-3xl font-black text-slate-900">{formatRupiah(Number(qris.amount))}</p>
+                  <p className="mt-1 text-3xl font-black text-app-text">{formatRupiah(Number(qris.amount))}</p>
                 ) : (
                   <>
-                    <div className="mx-auto mt-2 flex max-w-[220px] items-center rounded-xl border border-gold-300 bg-white px-3">
-                      <span className="text-sm font-semibold text-slate-500">Rp</span>
+                    <div className="mx-auto mt-2 flex max-w-[220px] items-center rounded-xl border border-gold-400 bg-app-surface px-3">
+                      <span className="text-sm font-semibold text-app-muted">Rp</span>
                       <input
                         type="text"
                         inputMode="numeric"
@@ -376,16 +376,16 @@ export default function ScanQRIS() {
                         value={manualAmount ? Number(manualAmount).toLocaleString('id-ID') : ''}
                         onChange={(e) => setManualAmount(e.target.value.replace(/\D/g, ''))}
                         placeholder="0"
-                        className="w-full bg-transparent px-2 py-2.5 text-center text-lg font-black text-slate-900 outline-none"
+                        className="w-full bg-transparent px-2 py-2.5 text-center text-lg font-black text-app-text outline-none placeholder:text-app-subtle"
                       />
                     </div>
-                    <p className="mt-2 text-[11px] font-semibold text-gold-700">QRIS statis · nominal diisi manual</p>
+                    <p className="mt-2 text-[11px] font-semibold text-app-kicker">QRIS statis · nominal diisi manual</p>
                   </>
                 )}
               </div>
 
               {/* Detail rapi */}
-              <div className="divide-y divide-slate-100 overflow-hidden rounded-2xl border border-slate-200">
+              <div className="divide-y divide-app-border overflow-hidden rounded-2xl border border-app-border">
                 <DetailRow label="Nama Merchant" value={qris.merchantName || 'Tidak diketahui'} />
                 {qris.merchantCity && <DetailRow label="Kota Merchant" value={qris.merchantCity} />}
                 {qris.postalCode && <DetailRow label="Kode Pos" value={qris.postalCode} />}
@@ -398,9 +398,9 @@ export default function ScanQRIS() {
               </div>
 
               <div>
-                <p className="mb-1 text-xs font-bold uppercase text-slate-400">Data mentah QR</p>
-                <div className="max-h-24 overflow-auto rounded-xl bg-slate-50 p-3">
-                  <p className="break-all text-[11px] leading-5 text-slate-500">{code}</p>
+                <p className="mb-1 text-xs font-bold uppercase text-app-muted">Data mentah QR</p>
+                <div className="max-h-24 overflow-auto rounded-xl bg-app-inset p-3">
+                  <p className="break-all text-[11px] leading-5 text-app-muted">{code}</p>
                 </div>
               </div>
 
@@ -415,14 +415,14 @@ export default function ScanQRIS() {
                 <button
                   type="button"
                   onClick={startScanner}
-                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-600 hover:bg-slate-50"
+                  className="inline-flex w-full items-center justify-center gap-1.5 rounded-2xl border border-app-border bg-app-surface px-4 py-3 text-sm font-bold text-app-muted hover:bg-app-inset"
                 >
                   <Icon name="refresh" size={16} /> Scan Ulang
                 </button>
                 <button
                   type="button"
                   onClick={clearResult}
-                  className="w-full rounded-2xl px-4 py-2 text-xs font-semibold text-slate-400 hover:text-slate-600"
+                  className="w-full rounded-2xl px-4 py-2 text-xs font-semibold text-app-muted hover:text-app-muted"
                 >
                   Batalkan
                 </button>

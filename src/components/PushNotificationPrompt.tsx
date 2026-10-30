@@ -62,7 +62,7 @@ export default function PushNotificationPrompt() {
 
   return (
     <button type="button" onClick={enablePush} disabled={busy}
-      className="rounded-xl border border-gold-200 bg-gold-50 px-3 py-2 text-xs font-bold text-gold-700 hover:bg-gold-100 disabled:opacity-60">
+      className="rounded-xl border border-gold-400/40 bg-app-accent-soft px-3 py-2 text-xs font-bold text-app-kicker hover:border-gold-400 disabled:opacity-60">
       {busy ? "Mengaktifkan..." : <span className="inline-flex items-center gap-1.5"><Icon name="bell" size={16} />Aktifkan Notifikasi</span>}
     </button>
   );

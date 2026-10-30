@@ -69,8 +69,8 @@ const REMINDER_COOLDOWN_MS = 60 * 60 * 1000;
 function Row({ label, value, strong }: { label: string; value: string; strong?: boolean }) {
   return (
     <div className="flex items-center justify-between py-1.5">
-      <span className="text-xs font-bold text-slate-500">{label}</span>
-      <span className={`text-sm font-black ${strong ? "text-gold-700" : "text-slate-900"}`}>{value}</span>
+      <span className="text-xs font-bold text-app-muted">{label}</span>
+      <span className={`text-sm font-black ${strong ? "text-app-kicker" : "text-app-text"}`}>{value}</span>
     </div>
   );
 }
@@ -178,78 +178,78 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
 
   if (error && !detail) {
     return (
-      <section className="rounded-3xl border border-red-200 bg-red-50 p-6">
-        <p className="text-sm font-black text-red-700">{error}</p>
+      <section className="rounded-3xl border border-danger-500/30 bg-danger-500/10 p-6">
+        <p className="text-sm font-black text-danger-700 dark:text-danger-300">{error}</p>
         <Link href="/split-bill" className="mt-4 inline-flex rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-black text-white">Kembali ke daftar tagihan</Link>
       </section>
     );
   }
 
   if (!detail || !bill) {
-    return <div className="animate-pulse rounded-3xl bg-slate-100 p-6 text-sm text-slate-400">Memuat tagihan...</div>;
+    return <div className="animate-pulse rounded-3xl bg-app-inset p-6 text-sm text-app-muted">Memuat tagihan...</div>;
   }
 
   const progress = bill.total_amount > 0 ? Math.min(Math.round((detail.collected_amount / bill.total_amount) * 100), 100) : 0;
 
   return (
     <div className="space-y-5">
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
+      <section className="rounded-3xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6">
         <div className="flex flex-wrap items-start justify-between gap-2">
           <div className="min-w-0">
-            <h2 className="text-lg font-black text-slate-900">{bill.title}</h2>
-            <p className="mt-0.5 text-[11px] font-bold text-slate-400">{bill.bill_number} · Dibuat oleh {bill.is_creator ? "Anda" : bill.creator_name}</p>
+            <h2 className="text-lg font-black text-app-text">{bill.title}</h2>
+            <p className="mt-0.5 text-[11px] font-bold text-app-muted">{bill.bill_number} · Dibuat oleh {bill.is_creator ? "Anda" : bill.creator_name}</p>
           </div>
-          <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-black uppercase ${bill.status === "COMPLETED" ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+          <span className={`shrink-0 rounded-full px-3 py-1 text-[11px] font-black uppercase ${bill.status === "COMPLETED" ? "bg-success-50 text-success-700 dark:bg-success-500/10 dark:text-success-300" : "bg-warning-500/10 text-warning-700 dark:text-warning-300"}`}>
             {bill.status === "COMPLETED" ? "Selesai" : "Aktif"}
           </span>
         </div>
 
-        <div className="mt-4 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-slate-50 px-4">
+        <div className="mt-4 divide-y divide-app-border rounded-2xl border border-app-border bg-app-inset px-4">
           <Row label="Total Tagihan" value={formatRupiah(bill.total_amount)} strong />
           <Row label="Sudah Terkumpul" value={formatRupiah(detail.collected_amount)} />
           <Row label="Peserta Membayar" value={`${detail.paid_count}/${detail.participant_count}`} />
           <Row label="Pembagian" value={bill.split_mode === "EQUAL" ? "Dibagi rata" : "Nominal custom"} />
         </div>
 
-        <div className="mt-3 h-2 overflow-hidden rounded-full bg-slate-100">
+        <div className="mt-3 h-2 overflow-hidden rounded-full bg-app-inset">
           <div className="h-full rounded-full bg-gold-500" style={{ width: `${progress}%` }} />
         </div>
 
         {bill.status === "COMPLETED" && (
-          <p className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-bold text-emerald-700">
+          <p className="mt-3 rounded-2xl border border-success-500/30 bg-success-500/10 p-3 text-xs font-bold text-success-700 dark:text-success-300">
             Semua peserta sudah membayar — tagihan otomatis ditandai SELESAI.
           </p>
         )}
       </section>
 
       {payResult && (
-        <section className="rounded-3xl border border-emerald-200 bg-white p-6 shadow-sm">
+        <section className="rounded-3xl border border-success-500/30 bg-app-surface p-6 shadow-sm">
           <div className="flex items-center gap-3">
-            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-50"><Icon name="check_circle" size={24} /></span>
+            <span className="flex h-12 w-12 items-center justify-center rounded-2xl bg-success-100 text-success-700 dark:bg-success-500/15 dark:text-success-300"><Icon name="check_circle" size={24} /></span>
             <div>
-              <p className="text-xs font-black uppercase tracking-widest text-emerald-600">Pembayaran Berhasil</p>
-              <h2 className="text-xl font-black text-slate-900">{payResult.message}</h2>
+              <p className="text-xs font-black uppercase tracking-widest text-success-600 dark:text-success-400">Pembayaran Berhasil</p>
+              <h2 className="text-xl font-black text-app-text">{payResult.message}</h2>
             </div>
           </div>
-          <div className="mt-4 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-slate-50 px-4">
+          <div className="mt-4 divide-y divide-app-border rounded-2xl border border-app-border bg-app-inset px-4">
             <Row label="No. Referensi" value={payResult.transfer_number || "-"} />
             <Row label="Nominal" value={formatRupiah(payResult.amount)} />
             <Row label="Biaya Admin" value={formatRupiah(payResult.fee || 0)} />
             <Row label="Total" value={formatRupiah(payResult.total ?? payResult.amount)} strong />
           </div>
           {payResult.completed && (
-            <p className="mt-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-bold text-emerald-700">Semua peserta sudah membayar — tagihan ini selesai.</p>
+            <p className="mt-3 rounded-2xl border border-success-500/30 bg-success-500/10 p-3 text-xs font-bold text-success-700 dark:text-success-300">Semua peserta sudah membayar — tagihan ini selesai.</p>
           )}
-          <button type="button" onClick={() => setPayResult(null)} className="mt-4 w-full rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50">Tutup</button>
+          <button type="button" onClick={() => setPayResult(null)} className="mt-4 w-full rounded-2xl border border-app-border px-4 py-3 text-sm font-bold text-app-muted hover:bg-app-inset">Tutup</button>
         </section>
       )}
 
       {canPay && (
-        <section className="rounded-3xl border border-gold-200 bg-white p-5 shadow-sm sm:p-6">
-          <h2 className="text-lg font-black text-slate-900">Bayar Bagian Anda</h2>
-          <p className="mt-1 text-sm text-slate-500">Saldo dikirim langsung ke {bill.creator_name} lewat transfer saldo dengan PIN transaksi.</p>
+        <section className="rounded-3xl border border-gold-400/40 bg-app-surface p-5 shadow-sm sm:p-6">
+          <h2 className="text-lg font-black text-app-text">Bayar Bagian Anda</h2>
+          <p className="mt-1 text-sm text-app-muted">Saldo dikirim langsung ke {bill.creator_name} lewat transfer saldo dengan PIN transaksi.</p>
 
-          <div className="mt-4 divide-y divide-slate-100 rounded-2xl border border-slate-200 bg-slate-50 px-4">
+          <div className="mt-4 divide-y divide-app-border rounded-2xl border border-app-border bg-app-inset px-4">
             <Row label="Bagian Anda" value={formatRupiah(shareNumber)} strong />
             <Row label="Perkiraan Biaya Admin" value={feeEstimate > 0 ? formatRupiah(feeEstimate) : "Gratis"} />
             <Row label="Perkiraan Total" value={formatRupiah(shareNumber + feeEstimate)} />
@@ -257,15 +257,15 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
           </div>
 
           {settings && !settings.enabled && (
-            <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-bold text-amber-800">Transfer saldo sedang dinonaktifkan sementara — pembayaran tagihan tertunda.</p>
+            <p className="mt-3 rounded-xl border border-warning-500/30 bg-warning-500/10 px-3 py-2 text-xs font-bold text-warning-700 dark:text-warning-300">Transfer saldo sedang dinonaktifkan sementara — pembayaran tagihan tertunda.</p>
           )}
           {settings && shareNumber + feeEstimate > settings.balance && (
-            <p className="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700">Saldo tidak mencukupi (termasuk biaya admin). Top up terlebih dahulu.</p>
+            <p className="mt-3 rounded-xl border border-danger-500/30 bg-danger-500/10 px-3 py-2 text-xs font-bold text-danger-700 dark:text-danger-300">Saldo tidak mencukupi (termasuk biaya admin). Top up terlebih dahulu.</p>
           )}
 
           <form onSubmit={payMyShare} className="mt-4 space-y-3">
             <div>
-              <label className="text-xs font-black uppercase tracking-wide text-slate-400">PIN Transaksi</label>
+              <label className="text-xs font-black uppercase tracking-wide text-app-muted">PIN Transaksi</label>
               <input
                 type="password"
                 value={pin}
@@ -273,10 +273,10 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
                 inputMode="numeric"
                 maxLength={6}
                 placeholder="••••••"
-                className="mt-2 w-full rounded-xl border border-slate-200 bg-slate-50 px-3 py-2.5 text-center text-lg font-black tracking-[.4em] outline-none"
+                className="mt-2 w-full rounded-xl border border-app-border bg-app-inset px-3 py-2.5 text-center text-lg font-black tracking-[.4em] text-app-text outline-none placeholder:text-app-subtle focus:border-gold-400 focus:ring-2 focus:ring-gold-400/20"
               />
             </div>
-            {payError && <p className="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-xs font-bold text-red-700">{payError}</p>}
+            {payError && <p className="rounded-xl border border-danger-500/30 bg-danger-500/10 px-3 py-2 text-xs font-bold text-danger-700 dark:text-danger-300">{payError}</p>}
             <button
               type="submit"
               disabled={payBusy || (settings ? !settings.enabled : false)}
@@ -289,29 +289,29 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
       )}
 
       {myShare && myShare.status === "PAID" && !bill.is_creator && (
-        <section className="rounded-3xl border border-emerald-200 bg-emerald-50 p-5">
-          <p className="text-sm font-black text-emerald-800">Bagian Anda sudah dibayar. Terima kasih!</p>
-          <p className="mt-1 text-xs font-bold text-emerald-700">No. permintaan: {myShare.request_number}</p>
+        <section className="rounded-3xl border border-success-500/30 bg-success-500/10 p-5">
+          <p className="text-sm font-black text-success-700 dark:text-success-300">Bagian Anda sudah dibayar. Terima kasih!</p>
+          <p className="mt-1 text-xs font-bold text-success-700 dark:text-success-300">No. permintaan: {myShare.request_number}</p>
         </section>
       )}
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-lg font-black text-slate-900">Peserta ({detail.participant_count})</h2>
+      <section className="rounded-3xl border border-app-border bg-app-surface p-5 shadow-sm sm:p-6">
+        <h2 className="text-lg font-black text-app-text">Peserta ({detail.participant_count})</h2>
         <div className="mt-4 space-y-2">
           {detail.participants.map((p) => {
             const paid = p.status === "PAID";
             const cooldownEnd = p.last_reminded_at ? new Date(p.last_reminded_at).getTime() + REMINDER_COOLDOWN_MS : null;
             const cooldownLeft = cooldownEnd ? cooldownEnd - now : 0;
             return (
-              <div key={p.user_id} className={`flex items-center gap-3 rounded-2xl border p-3 ${paid ? "border-emerald-200 bg-emerald-50/60" : "border-slate-200 bg-white"}`}>
-                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black ${paid ? "bg-emerald-100 text-emerald-700" : "bg-slate-950 text-gold-200"}`}>
+              <div key={p.user_id} className={`flex items-center gap-3 rounded-2xl border p-3 ${paid ? "border-success-500/30 bg-success-500/10" : "border-app-border bg-app-surface"}`}>
+                <span className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-sm font-black ${paid ? "bg-success-100 text-success-700 dark:bg-success-500/15 dark:text-success-300" : "bg-slate-950 text-gold-200"}`}>
                   {paid ? <Icon name="check" size={18} /> : p.display_name.charAt(0).toUpperCase()}
                 </span>
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-black text-slate-900">
+                  <p className="truncate text-sm font-black text-app-text">
                     {p.display_name}{p.is_viewer ? " (Anda)" : ""}
                   </p>
-                  <p className="text-[11px] font-bold text-slate-400">
+                  <p className="text-[11px] font-bold text-app-muted">
                     {formatRupiah(p.share_amount)} · {paid ? `Dibayar ${p.paid_at ? formatDateOnly(p.paid_at) : ""}` : "Belum bayar"}
                   </p>
                 </div>
@@ -320,7 +320,7 @@ export default function SplitBillDetailClient({ billId }: { billId: string }) {
                     type="button"
                     onClick={() => remind(p)}
                     disabled={reminding === p.user_id || cooldownLeft > 0}
-                    className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gold-200 bg-gold-50 px-3 py-2 text-xs font-black text-gold-700 hover:bg-gold-100 disabled:opacity-60"
+                    className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded-xl border border-gold-400/40 bg-app-accent-soft px-3 py-2 text-xs font-black text-app-kicker hover:bg-app-accent-soft disabled:opacity-60"
                   >
                     {reminding === p.user_id
                       ? "Mengirim..."

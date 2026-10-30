@@ -39,7 +39,7 @@ export default function RankingPage() {
         <span className="inline-flex items-center gap-2 whitespace-nowrap">Peringkat Pengguna<Icon name="trophy" size={30} /></span>
       </h1>
       <p className="mt-2 text-sm text-white/70">Peringkat dihitung dari jumlah transaksi berhasil. Transaksi gagal, dibatalkan, dan refund tidak dihitung.</p>
-      {data?.me ? <div className="mt-5 rounded-2xl bg-white/10 p-4"><p className="text-xs text-white/60">Peringkat Anda</p><p className="mt-1 text-3xl font-black">#{data.me.rank}</p><p className="mt-1 text-sm text-white/70">{data.me.successful_transactions} transaksi berhasil · <span title={formatRupiah(data.me.successful_amount)}>{formatBalanceCompact(data.me.successful_amount)}</span></p></div> : <div className="mt-5 rounded-2xl bg-white/10 p-4 text-sm text-white/70">Anda belum punya transaksi berhasil, jadi belum masuk peringkat.</div>}
+      {data?.me ? <div className="mt-5 rounded-2xl bg-white/10 p-4"><p className="text-xs text-white/70">Peringkat Anda</p><p className="mt-1 text-3xl font-black">#{data.me.rank}</p><p className="mt-1 text-sm text-white/70">{data.me.successful_transactions} transaksi berhasil · <span title={formatRupiah(data.me.successful_amount)}>{formatBalanceCompact(data.me.successful_amount)}</span></p></div> : <div className="mt-5 rounded-2xl bg-white/10 p-4 text-sm text-white/70">Anda belum punya transaksi berhasil, jadi belum masuk peringkat.</div>}
     </section>
 
     {error && <div role="alert" className="rounded-2xl border border-danger-500/30 bg-danger-500/10 p-4 text-sm font-bold text-danger-600 dark:text-danger-400">{error}</div>}

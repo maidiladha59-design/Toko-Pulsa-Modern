@@ -89,35 +89,35 @@ export default function PersonalQrClient({ token: initialToken, displayName }: {
         <p className="mt-1 text-sm text-white/60">Tunjukkan QR ini agar pengguna lain bisa transfer saldo ke <b className="text-white">{displayName}</b>.</p>
       </div>
 
-      <section className="rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+      <section className="rounded-3xl border border-app-border bg-app-surface p-5 shadow-sm">
         <div className="mx-auto w-full max-w-[280px] rounded-2xl border border-slate-100 bg-white p-3 shadow-inner">
           {qrDataUrl ? (
             <Image src={qrDataUrl} alt="QR Pribadi AIDIL STORE" width={280} height={280} unoptimized className="h-auto w-full" />
           ) : (
-            <div className="flex aspect-square items-center justify-center rounded-xl bg-slate-50 text-sm font-bold text-slate-400">Membuat QR...</div>
+            <div className="flex aspect-square items-center justify-center rounded-xl bg-slate-50 text-sm font-bold text-slate-600">Membuat QR...</div>
           )}
         </div>
 
-        <p className="mt-3 text-center text-sm font-black text-slate-900">{displayName}</p>
-        <p className="text-center text-[11px] font-bold uppercase tracking-wide text-slate-400">AIDIL STORE · QR Transfer Saldo</p>
+        <p className="mt-3 text-center text-sm font-black text-app-text">{displayName}</p>
+        <p className="text-center text-[11px] font-bold uppercase tracking-wide text-app-muted">AIDIL STORE · QR Transfer Saldo</p>
 
         <div className="mt-4">
-          <label className="text-xs font-black uppercase tracking-wide text-slate-400">Nominal otomatis (opsional)</label>
-          <div className="mt-2 flex items-center rounded-xl border border-slate-200 bg-slate-50 px-3">
-            <span className="text-sm font-bold text-slate-400">Rp</span>
+          <label className="text-xs font-black uppercase tracking-wide text-app-muted">Nominal otomatis (opsional)</label>
+          <div className="mt-2 flex items-center rounded-xl border border-app-border bg-app-inset px-3">
+            <span className="text-sm font-bold text-app-muted">Rp</span>
             <input
               type="text"
               inputMode="numeric"
               value={amount ? Number(amount).toLocaleString("id-ID") : ""}
               onChange={(e) => setAmount(e.target.value.replace(/\D/g, "").slice(0, 12))}
               placeholder="0"
-              className="w-full bg-transparent px-2 py-2.5 text-lg font-black text-slate-900 outline-none"
+              className="w-full bg-transparent px-2 py-2.5 text-lg font-black text-app-text outline-none placeholder:text-app-subtle"
             />
             {amount && (
-              <button type="button" onClick={() => setAmount("")} aria-label="Hapus nominal" className="text-xs font-bold text-slate-400 hover:text-red-600"><Icon name="close" size={14} /></button>
+              <button type="button" onClick={() => setAmount("")} aria-label="Hapus nominal" className="text-xs font-bold text-app-muted hover:text-danger-600 dark:hover:text-danger-400"><Icon name="close" size={14} /></button>
             )}
           </div>
-          <p className="mt-1 text-[11px] leading-5 text-slate-400">
+          <p className="mt-1 text-[11px] leading-5 text-app-muted">
             {amountNumber > 0
               ? "QR ini meminta nominal tersebut; penerima tetap bisa mengubahnya di form transfer."
               : "Kosongkan agar penerima mengisi nominalnya sendiri."}
@@ -126,21 +126,21 @@ export default function PersonalQrClient({ token: initialToken, displayName }: {
 
         <div className="mt-4 grid grid-cols-2 gap-2">
           <button type="button" onClick={downloadQr} disabled={!qrDataUrl} className="inline-flex items-center justify-center gap-1.5 rounded-2xl bg-slate-950 px-4 py-3 text-sm font-black text-white disabled:opacity-50"><Icon name="download" size={16} /> Unduh PNG</button>
-          <button type="button" onClick={copyLink} disabled={!payload} className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"><Icon name="link" size={16} /> Salin Link</button>
-          <button type="button" onClick={shareLink} disabled={!payload} className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 px-4 py-3 text-sm font-bold text-slate-700 hover:bg-slate-50 disabled:opacity-50"><Icon name="share" size={16} /> Bagikan</button>
-          <button type="button" onClick={regenerate} disabled={regenerating} className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-red-200 px-4 py-3 text-sm font-bold text-red-600 hover:bg-red-50 disabled:opacity-50">
+          <button type="button" onClick={copyLink} disabled={!payload} className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-app-border px-4 py-3 text-sm font-bold text-app-muted hover:bg-app-inset disabled:opacity-50"><Icon name="link" size={16} /> Salin Link</button>
+          <button type="button" onClick={shareLink} disabled={!payload} className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-app-border px-4 py-3 text-sm font-bold text-app-muted hover:bg-app-inset disabled:opacity-50"><Icon name="share" size={16} /> Bagikan</button>
+          <button type="button" onClick={regenerate} disabled={regenerating} className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-danger-500/30 px-4 py-3 text-sm font-bold text-danger-600 hover:bg-danger-500/10 disabled:opacity-50 dark:text-danger-400">
             {regenerating ? "Memproses..." : <><Icon name="refresh" size={16} /> Buat Ulang QR</>}
           </button>
         </div>
 
         {payload && (
-          <div className="mt-3 overflow-hidden rounded-xl bg-slate-50 p-3">
-            <p className="break-all text-[11px] leading-5 text-slate-500">{payload}</p>
+          <div className="mt-3 overflow-hidden rounded-xl bg-app-inset p-3">
+            <p className="break-all text-[11px] leading-5 text-app-muted">{payload}</p>
           </div>
         )}
       </section>
 
-      <section className="rounded-3xl border border-gold-200 bg-gold-50 p-5 text-sm text-zinc-950">
+      <section className="rounded-3xl border border-gold-400/30 bg-app-accent-soft p-5 text-sm text-app-text">
         <p className="flex items-center gap-1.5 font-black"><Icon name="lock" size={16} /> QR ini aman dibagikan</p>
         <ul className="mt-2 list-disc space-y-1 pl-4 text-xs leading-5">
           <li>QR hanya berisi token publik acak — tanpa email, nomor HP, saldo, atau data pribadi.</li>
@@ -151,7 +151,7 @@ export default function PersonalQrClient({ token: initialToken, displayName }: {
 
       <div className="grid gap-2 sm:grid-cols-2">
         <Link href="/transfer-uang" className="btn-gold inline-flex items-center justify-center gap-1.5 px-4 py-3 text-center text-sm font-black"><Icon name="send" size={16} /> Kirim Saldo</Link>
-        <Link href="/wallet" className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-slate-200 bg-white px-4 py-3 text-center text-sm font-bold text-slate-700 hover:bg-slate-50"><Icon name="wallet" size={16} /> Lihat Saldo</Link>
+        <Link href="/wallet" className="inline-flex items-center justify-center gap-1.5 rounded-2xl border border-app-border bg-app-surface px-4 py-3 text-center text-sm font-bold text-app-muted hover:bg-app-inset"><Icon name="wallet" size={16} /> Lihat Saldo</Link>
       </div>
     </div>
   );

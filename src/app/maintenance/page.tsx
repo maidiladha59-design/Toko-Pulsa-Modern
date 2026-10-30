@@ -40,7 +40,7 @@ export default function MaintenancePage() {
           <div className="mt-7 flex justify-center">
             <button onClick={() => window.location.reload()} className="rounded-xl bg-gold-400 px-5 py-3 text-sm font-black text-black hover:bg-gold-300">↻ Coba Lagi</button>
           </div>
-          <p className="mt-7 text-xs text-white/35">Transaksi baru sementara dihentikan selama pemeliharaan.</p>
+          <p className="mt-7 text-xs text-white/60">Transaksi baru sementara dihentikan selama pemeliharaan.</p>
         </section>
       </div>
     </main>

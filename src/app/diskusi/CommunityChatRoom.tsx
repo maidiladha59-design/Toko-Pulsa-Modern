@@ -478,7 +478,7 @@ export default function CommunityChatRoom() {
                   rows={2}
                   disabled={sending}
                   placeholder="Tulis pesan untuk ruang diskusi..."
-                  className="w-full resize-none rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle/60 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20 disabled:opacity-60"
+                  className="w-full resize-none rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20 disabled:opacity-60"
                 />
                 {composerError && (
                   <p role="alert" className="mt-1.5 text-xs font-medium text-danger-600 dark:text-danger-400">
@@ -550,7 +550,7 @@ export default function CommunityChatRoom() {
             maxLength={500}
             rows={3}
             placeholder="Contoh: mengandung ujaran kebencian"
-            className="mt-2 w-full resize-none rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle/60 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
+            className="mt-2 w-full resize-none rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
           />
           <div className="mt-4 flex gap-2">
             <Button variant="outline" className="flex-1" onClick={() => setDeleteTarget(null)}>
@@ -586,7 +586,7 @@ export default function CommunityChatRoom() {
             maxLength={500}
             rows={3}
             placeholder="Alasan pembisuan wajib diisi"
-            className="mt-2 w-full resize-none rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle/60 focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
+            className="mt-2 w-full resize-none rounded-xl border border-app-border bg-app-inset px-4 py-3 text-sm text-app-text outline-none transition placeholder:text-app-subtle focus:border-gold-400 focus:ring-4 focus:ring-gold-400/20"
           />
           {muteReasonError && (
             <p role="alert" className="mt-1.5 text-xs font-medium text-danger-600 dark:text-danger-400">

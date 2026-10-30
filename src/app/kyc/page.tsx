@@ -71,8 +71,8 @@ function StepDots({ stage }: { stage: Stage }) {
       <span className={`flex h-7 w-7 items-center justify-center rounded-full ${stage === "ktp" ? "bg-gold-600 text-white" : "bg-emerald-500 text-white"}`}>
         {stage === "ktp" ? "1" : "check"}
       </span>
-      <span className={`h-0.5 w-8 ${stage === "selfie" ? "bg-emerald-500" : "bg-slate-200"}`} />
-      <span className={`flex h-7 w-7 items-center justify-center rounded-full ${stage === "selfie" ? "bg-gold-600 text-white" : "bg-slate-200 text-slate-500"}`}>
+      <span className={`h-0.5 w-8 ${stage === "selfie" ? "bg-emerald-500" : "bg-app-border"}`} />
+      <span className={`flex h-7 w-7 items-center justify-center rounded-full ${stage === "selfie" ? "bg-gold-600 text-white" : "bg-app-inset text-app-muted"}`}>
         2
       </span>
     </div>
@@ -277,14 +277,14 @@ export default function KYC() {
         </div>
       </div>
 
-      <p className="mt-3 text-sm leading-6 text-slate-500">
-        Status verifikasi: <b className="text-slate-800">{statusLabel(status)}</b>. Data ini hanya dipakai untuk memverifikasi akun Anda.
+      <p className="mt-3 text-sm leading-6 text-app-muted">
+        Status verifikasi: <b className="text-app-text">{statusLabel(status)}</b>. Data ini hanya dipakai untuk memverifikasi akun Anda.
       </p>
 
       {!locked && <StepDots stage={stage} />}
 
       {!locked && (
-        <div className="mt-4 flex items-start gap-2 rounded-2xl border border-red-200 bg-red-50 p-3 text-xs font-bold leading-5 text-red-700">
+        <div className="mt-4 flex items-start gap-2 rounded-2xl border border-danger-500/30 bg-danger-500/10 p-3 text-xs font-bold leading-5 text-danger-700 dark:text-danger-300">
           <Icon name="warning" size={16} className="mt-0.5 shrink-0" />
           <span className="min-w-0 break-words">
             Pastikan foto tidak blur/buram. Foto yang terdeteksi blur akan otomatis ditolak sistem dan tidak akan diterima.
@@ -294,17 +294,17 @@ export default function KYC() {
       )}
 
       {status === "SUBMITTED" && (
-        <div className="mt-4 rounded-2xl border border-gold-200 bg-gold-50 p-4 text-sm text-zinc-950">
+        <div className="mt-4 rounded-2xl border border-gold-400/40 bg-app-accent-soft p-4 text-sm text-app-text">
           <b>Sedang diperiksa.</b><br />Admin akan memeriksa KTP dan foto wajah yang sudah Anda kirim.
         </div>
       )}
       {status === "VERIFIED" && (
-        <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-800">
+        <div className="mt-4 rounded-2xl border border-success-500/30 bg-success-500/10 p-4 text-sm text-success-700 dark:text-success-300">
           <b>Verifikasi berhasil.</b><br />Akun Anda sudah terverifikasi.
         </div>
       )}
       {status === "REJECTED" && (
-        <div className="mt-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+        <div className="mt-4 rounded-2xl border border-warning-500/30 bg-warning-500/10 p-4 text-sm text-warning-700 dark:text-warning-300">
           <b>KYC belum disetujui.</b>{rejection && <><br />Alasan: {rejection}</>}
           <br />
           <span className="text-xs">
@@ -315,20 +315,20 @@ export default function KYC() {
         </div>
       )}
       {reviewNote && (status === "REJECTED" || status === "VERIFIED") && (
-        <p className="mt-2 text-xs text-slate-500">Catatan admin: {reviewNote}</p>
+        <p className="mt-2 text-xs text-app-muted">Catatan admin: {reviewNote}</p>
       )}
 
       {!locked && (
         <div className="mt-6 space-y-4">
-          <p className="text-center text-sm font-black text-slate-700">
+          <p className="text-center text-sm font-black text-app-text">
             {stage === "ktp" ? "Tahap 1 dari 2 — Scan KTP" : "Tahap 2 dari 2 — Verifikasi Wajah"}
           </p>
 
           {stage === "ktp" ? <KtpPoseGuide /> : <FacePoseGuide />}
 
-          <div className="rounded-2xl border border-gold-200 bg-gold-50 p-4">
-            <p className="flex items-center gap-2 font-black text-zinc-950"><Icon name="lock" size={16} /> Izin kamera</p>
-            <p className="mt-1 text-xs leading-5 text-zinc-900">
+          <div className="rounded-2xl border border-gold-400/40 bg-app-accent-soft p-4">
+            <p className="flex items-center gap-2 font-black text-app-text"><Icon name="lock" size={16} /> Izin kamera</p>
+            <p className="mt-1 text-xs leading-5 text-app-text">
               {stage === "ktp"
                 ? "Ikuti panduan di atas: letakkan KTP rata di dalam bingkai, pastikan 4 sudut terlihat dan tidak silau."
                 : "Ikuti panduan di atas: posisikan wajah tepat di dalam oval, lihat lurus ke kamera, pencahayaan cukup."}
@@ -344,8 +344,8 @@ export default function KYC() {
               </button>
             )}
             {camera.error && (
-              <div role="alert" className="mt-3 rounded-xl border border-red-200 bg-red-50 p-3">
-                <p className="text-xs font-bold leading-5 text-red-700">{CAMERA_ERROR_TEXT[camera.error]}</p>
+              <div role="alert" className="mt-3 rounded-xl border border-danger-500/30 bg-danger-500/10 p-3">
+                <p className="text-xs font-bold leading-5 text-danger-700 dark:text-danger-300">{CAMERA_ERROR_TEXT[camera.error]}</p>
                 <button
                   type="button"
                   onClick={() => void camera.start(stage === "selfie" ? "user" : "environment")}
@@ -398,7 +398,7 @@ export default function KYC() {
               <button type="button" onClick={() => handleCaptureAndSave(stage)} disabled={busy || camera.switching} className="btn-gold rounded-xl px-4 py-3 font-black disabled:opacity-50">
                 {busy ? busyLabel : "Ambil & Simpan Foto"}
               </button>
-              <button type="button" onClick={camera.stop} className="rounded-xl bg-white px-4 py-3 font-black">Batal</button>
+              <button type="button" onClick={camera.stop} className="rounded-xl bg-white px-4 py-3 font-black text-zinc-950">Batal</button>
             </div>
             {busy && (
               <p className="mt-2 flex items-center justify-center gap-2 text-center text-xs font-bold text-white">
@@ -409,20 +409,20 @@ export default function KYC() {
           </div>
 
           <label className="block text-sm font-bold">
-            atau pilih dari galeri <span className="text-xs font-normal text-slate-500">(pastikan tidak blur/buram)</span>
+            atau pilih dari galeri <span className="text-xs font-normal text-app-muted">(pastikan tidak blur/buram)</span>
             <input
               disabled={busy}
               type="file"
               accept="image/jpeg,image/png"
               capture={stage === "selfie" ? "user" : "environment"}
               onChange={(e) => handleFileInput(stage, e.target.files?.[0] || null)}
-              className="mt-2 block w-full rounded-xl border border-gold-100 bg-white p-3 disabled:opacity-50"
+              className="mt-2 block w-full rounded-xl border border-app-border bg-app-inset p-3 text-app-text disabled:opacity-50"
             />
           </label>
         </div>
       )}
 
-      <div className="mt-5 rounded-2xl border bg-slate-50 p-4 text-xs leading-5 text-slate-500">
+      <div className="mt-5 rounded-2xl border border-app-border bg-app-inset p-4 text-xs leading-5 text-app-muted">
         Dokumen KTP dan foto wajah disimpan pada penyimpanan privat dan tidak ditampilkan secara publik.
       </div>
     </div>

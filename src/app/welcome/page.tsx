@@ -115,14 +115,14 @@ export default function Welcome() {
                 <button onClick={next} aria-label="Banner berikutnya" className="inline-flex items-center justify-center rounded-full bg-white/10 px-3 py-2 text-sm font-black hover:bg-white/20"><Icon name="arrow_right" size={16} /></button>
               </div>
             )}
-            {loading && <p className="mt-4 text-xs text-white/40">Memuat promosi...</p>}
+            {loading && <p className="mt-4 text-xs text-white/70">Memuat promosi...</p>}
           </div>
         </div>
       </div>
       <div className="mt-4 flex justify-center">
         <RatingBadgeLive />
       </div>
-      <p className="mt-4 text-center text-xs text-slate-400">Geser banner di HP atau gunakan tombol panah. Konten promosi dapat dikelola admin.</p>
+      <p className="mt-4 text-center text-xs text-app-muted">Geser banner di HP atau gunakan tombol panah. Konten promosi dapat dikelola admin.</p>
     </main>
   );
 }
