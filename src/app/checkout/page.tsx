@@ -11,8 +11,16 @@ import { guideFor } from "@/lib/ppob/target-guide";
 import { Skeleton } from "@/components/ui/LoadingSkeleton";
 import Badge from "@/components/ui/Badge";
 import Icon from "@/components/icons/Icon";
+import ProductImage from "@/components/ProductImage";
 
-type Product = { id: string; name: string; price: number; thumbnail_url: string | null; product_type?: string };
+type Product = {
+  id: string;
+  name: string;
+  price: number;
+  thumbnail_url: string | null;
+  product_type?: string;
+  categories?: { slug: string } | { slug: string }[] | null;
+};
 type PPOBService = { id: string; provider: string; provider_sku: string; service_kind: "prepaid" | "postpaid"; category: string; brand: string | null; target_schema: { fields?: Array<{ name: string; label: string; type?: string; required?: boolean; placeholder?: string }> } | null };
 const MAX_TARGET_FILE_SIZE = 100 * 1024 * 1024;
 
@@ -35,6 +43,7 @@ function CheckoutForm() {
   const productId = searchParams.get("product");
   const parsedQty = Number(searchParams.get("qty") ?? "1");
   const qty = Number.isInteger(parsedQty) && parsedQty > 0 ? parsedQty : 0;
+  const initialTarget = searchParams.get("target") || "";
 
   const [product, setProduct] = useState<Product | null>(null);
   const [ppob, setPpob] = useState<PPOBService | null>(null);
@@ -47,6 +56,7 @@ function CheckoutForm() {
   const [confirming, setConfirming] = useState(false);
   const [targetText, setTargetText] = useState("");
   const [targetFile, setTargetFile] = useState<File | null>(null);
+  const [productImage, setProductImage] = useState<string | null>(null);
   const [pin, setPin] = useState("");
 
   const idempotencyKey = useMemo(
@@ -63,37 +73,63 @@ function CheckoutForm() {
   const targetDetected = guide?.detect ? guide.detect(ppobTargets) : null;
   const hasTargetInput = Object.values(ppobTargets).some((v) => String(v || "").trim());
 
-  // isi ulang kolom sesuai panduan produk
+  // isi ulang kolom sesuai panduan produk; target dari "Beli Lagi" hanya
+  // mengisi kolom utama dan tetap divalidasi ulang oleh panduan.
   useEffect(() => {
     if (!guide) return;
     setPpobTargets((prev) => {
       const next: Record<string, string> = {};
-      for (const f of guide.fields) next[f.name] = prev[f.name] || "";
+      for (const f of guide.fields) {
+        const seed = f.name === "customer_no" ? initialTarget : "";
+        next[f.name] = prev[f.name] || seed;
+      }
       return next;
     });
-  }, [guide]);
+  }, [guide, initialTarget]);
 
   useEffect(() => {
     async function load() {
       if (!productId || qty < 1) { setLoading(false); return; }
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        const target = `/checkout?product=${encodeURIComponent(productId)}&qty=${encodeURIComponent(String(qty))}`;
+        const target = `/checkout?product=${encodeURIComponent(productId)}&qty=${encodeURIComponent(String(qty))}${initialTarget ? `&target=${encodeURIComponent(initialTarget)}` : ""}`;
         router.push(`/login?redirectTo=${encodeURIComponent(target)}`);
         return;
       }
       const [{ data: p }, { data: wallet }, { data: ppobService }] = await Promise.all([
-        supabase.from("products").select("id, name, price, thumbnail_url, product_type").eq("id", productId).single(),
+        supabase.from("products").select("id, name, price, thumbnail_url, product_type, categories(slug)").eq("id", productId).single(),
         supabase.from("wallets").select("balance").eq("user_id", user.id).single(),
         supabase.from("ppob_services").select("id, provider, provider_sku, service_kind, category, brand, target_schema").eq("product_id", productId).eq("provider_active", true).maybeSingle(),
       ]);
       setProduct(p as Product);
       setPpob((ppobService as PPOBService | null) || null);
+
+      // Gambar yang sama dengan katalog: produk -> brand -> kategori -> ikon.
+      if (p) {
+        const row = p as Product;
+        const [{ data: ownImage }, { data: brandRows }, { data: categoryRows }] = await Promise.all([
+          supabase.from("product_images").select("image_url").eq("product_id", productId).maybeSingle(),
+          supabase.from("brand_media").select("brand_key,logo_url"),
+          supabase.from("category_media").select("category_key,icon_url"),
+        ]);
+        const brandKey = String((ppobService as PPOBService | null)?.brand || "").trim().toLowerCase();
+        const category = Array.isArray(row.categories) ? row.categories[0] : row.categories;
+        const categoryKey = String(category?.slug || "").toLowerCase();
+        setProductImage(
+          ownImage?.image_url ||
+            row.thumbnail_url ||
+            (brandRows || []).find((item) => item.brand_key === brandKey)?.logo_url ||
+            (categoryRows || []).find((item) => item.category_key === categoryKey)?.icon_url ||
+            null
+        );
+      } else {
+        setProductImage(null);
+      }
       setBalance(Number(wallet?.balance || 0));
       setLoading(false);
     }
     load();
-  }, [productId, qty, supabase, router]);
+  }, [productId, qty, supabase, router, initialTarget]);
 
   function chooseTargetFile(file: File | undefined) {
     if (!file) return;
@@ -227,9 +263,7 @@ function CheckoutForm() {
         <div className="min-w-0 space-y-5">
           <div className="rounded-3xl border border-app-border bg-app-surface p-5">
             <div className="flex gap-4">
-              <div className="h-24 w-24 shrink-0 overflow-hidden rounded-2xl bg-app-inset">
-                {product.thumbnail_url ? <Image src={product.thumbnail_url} alt={product.name} width={96} height={96} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center"><Icon name="bag" size={30} /></div>}
-              </div>
+              <ProductImage src={productImage} alt={product.name} className="h-24 w-24 shrink-0 rounded-2xl" iconSize={30} sizes="96px" />
               <div className="min-w-0">
                 <p className="break-words font-black text-app-text">{product.name}</p>
                 <p className="mt-1 text-sm text-app-muted">Jumlah: <span className="tabular-nums">{qty}</span></p>

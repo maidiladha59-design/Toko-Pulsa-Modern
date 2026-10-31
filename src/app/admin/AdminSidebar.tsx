@@ -42,6 +42,7 @@ const MENU = [
   ["/admin/ppob", "bolt", "PPOB"],
   ["/admin/ppob/monitoring", "terminal", "Monitoring PPOB"],
   ["/admin/ppob/health", "activity", "Provider Health"],
+  ["/admin/product-images", "image", "Gambar Produk & Brand"],
   ["/admin/brand-media", "image", "Logo Brand"],
   ["/admin/avatars", "user", "Foto Profil"],
   ["/admin/info-ticker", "ticker", "Info Berjalan"],

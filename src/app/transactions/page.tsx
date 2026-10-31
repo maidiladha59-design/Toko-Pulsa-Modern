@@ -1,62 +1,244 @@
 import { redirect } from "next/navigation";
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
-import { formatRupiah } from "@/lib/utils";
-import TransactionCenter from "@/components/TransactionCenter";
+import TransactionCenter, { type TransactionEntry } from "@/components/TransactionCenter";
+import { containsInternalTerm, safeProductName } from "@/lib/labels";
+import { maskTarget, transactionStatusKind } from "@/lib/transaction-view";
+import { normalizeBrandKey, normalizeCategoryKey, resolveProductImage } from "@/lib/product-image";
+
+type AnyRow = Record<string, any>;
+
+const WALLET_ICONS: Record<string, string> = {
+  TOPUP: "plus",
+  PURCHASE: "bag",
+  REFUND: "undo",
+  TRANSFER: "transfer",
+  ADJUSTMENT: "settings",
+};
+
+function categoryIcon(slug: string | null | undefined, fallback: string) {
+  const key = String(slug || "").toLowerCase();
+  if (key.includes("game")) return "game";
+  if (key.includes("voucher") || key.includes("tiket")) return "voucher";
+  if (key.includes("pln") || key.includes("listrik") || key.includes("token")) return "bolt";
+  if (key.includes("tv") || key.includes("streaming")) return "tv";
+  if (key.includes("data") || key.includes("internet")) return "data";
+  if (key.includes("pulsa") || key.includes("telepon") || key.includes("sms") || key.includes("hp")) return "phone";
+  if (key.includes("ewallet") || key.includes("e-money") || key.includes("dompet")) return "wallet";
+  if (key.includes("tagihan")) return "receipt";
+  return fallback;
+}
+
+function relation<T>(value: T | T[] | null | undefined): T | null {
+  if (Array.isArray(value)) return value[0] || null;
+  return value || null;
+}
 
 export default async function TransactionsPage() {
   const supabase = createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  const [{ data: orders }, { data: wallet }] = await Promise.all([
-    supabase.from("orders").select("id, order_number, total_amount, status, created_at, payment_method").eq("user_id", user.id).order("created_at", { ascending: false }).limit(100),
+  const [{ data: orderRows }, { data: wallet }] = await Promise.all([
+    supabase
+      .from("orders")
+      .select("id, order_number, total_amount, status, created_at, payment_method, order_items(id, product_id, product_name, unit_price, quantity, subtotal, products(thumbnail_url, categories(slug)))")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(120),
     supabase.from("wallets").select("id, balance").eq("user_id", user.id).maybeSingle(),
   ]);
-  const ids = (orders || []).map(o => o.id);
-  const [{ data: items }, { data: walletTx }, { data: ppob }] = await Promise.all([
-    ids.length ? supabase.from("order_items").select("id, order_id, product_name").in("order_id", ids) : Promise.resolve({ data: [] as any[] }),
-    wallet ? supabase.from("wallet_transactions").select("id, type, amount, reference_id, created_at").eq("wallet_id", wallet.id).order("created_at", { ascending: false }).limit(100) : Promise.resolve({ data: [] as any[] }),
-    ids.length ? supabase.from("ppob_transactions").select("id, order_item_id, customer_no, status").in("order_id", ids) : Promise.resolve({ data: [] as any[] }),
-  ]);
-  const itemMap = new Map((items || []).map(i => [i.id, i]));
-  const ppobMap = new Map((ppob || []).map(t => [t.order_item_id, t]));
 
-  const entries = (orders || []).map(o => {
-    const orderItems = (items || []).filter(i => i.order_id === o.id);
-    const tx = orderItems.map(i => ppobMap.get(i.id)).find(Boolean);
-    const product = orderItems[0]?.product_name || "Pesanan AIDIL STORE";
+  const orders = (orderRows || []) as AnyRow[];
+  const orderItems = orders.flatMap((order) => (Array.isArray(order.order_items) ? order.order_items : [])) as AnyRow[];
+  const orderIds = orders.map((order) => order.id);
+  const itemIds = orderItems.map((item) => item.id);
+  const productIds = Array.from(new Set(orderItems.map((item) => item.product_id).filter(Boolean)));
+
+  const [
+    { data: walletTxRows },
+    { data: ppobRows },
+    { data: targetRows },
+    { data: brandRows },
+    { data: ownImageRows },
+    { data: brandMediaRows },
+    { data: categoryMediaRows },
+  ] = await Promise.all([
+    wallet
+      ? supabase
+          .from("wallet_transactions")
+          .select("id, type, amount, reference_type, reference_id, description, created_at")
+          .eq("wallet_id", wallet.id)
+          .order("created_at", { ascending: false })
+          .limit(120)
+      : Promise.resolve({ data: [] as AnyRow[] }),
+    orderIds.length
+      ? supabase
+          .from("ppob_transactions")
+          .select("id, order_id, order_item_id, customer_no, status, serial_number")
+          .in("order_id", orderIds)
+      : Promise.resolve({ data: [] as AnyRow[] }),
+    itemIds.length
+      ? supabase.from("ppob_order_targets").select("order_item_id, customer_no").in("order_item_id", itemIds)
+      : Promise.resolve({ data: [] as AnyRow[] }),
+    productIds.length
+      ? supabase.from("ppob_services").select("product_id, brand").in("product_id", productIds)
+      : Promise.resolve({ data: [] as AnyRow[] }),
+    productIds.length
+      ? supabase.from("product_images").select("product_id, image_url").in("product_id", productIds)
+      : Promise.resolve({ data: [] as AnyRow[] }),
+    supabase.from("brand_media").select("brand_key, logo_url"),
+    supabase.from("category_media").select("category_key, icon_url"),
+  ]);
+
+  const walletTx = (walletTxRows || []) as AnyRow[];
+  const ppobByItem = new Map((ppobRows || []).map((row: AnyRow) => [row.order_item_id, row]));
+  const targetByItem = new Map((targetRows || []).map((row: AnyRow) => [row.order_item_id, row]));
+  const brandByProduct = new Map((brandRows || []).map((row: AnyRow) => [row.product_id, row.brand]));
+  const ownImageByProduct = new Map((ownImageRows || []).map((row: AnyRow) => [row.product_id, row.image_url]));
+  const brandLogoByKey = new Map(
+    (brandMediaRows || []).map((row: AnyRow) => [normalizeBrandKey(row.brand_key), row.logo_url])
+  );
+  const categoryImageByKey = new Map(
+    (categoryMediaRows || []).map((row: AnyRow) => [normalizeCategoryKey(row.category_key), row.icon_url])
+  );
+
+  const refundByOrder = new Map<string, AnyRow>();
+  for (const row of walletTx) {
+    if (row.type === "REFUND" && row.reference_type === "order" && row.reference_id) {
+      refundByOrder.set(row.reference_id, row);
+    }
+  }
+
+  function orderImage(item: AnyRow | null) {
+    if (!item) return { src: null as string | null, icon: "bag" };
+    const product = relation<AnyRow>(item.products);
+    const category = product ? relation<AnyRow>(product.categories) : null;
+    const rawBrand = String(brandByProduct.get(item.product_id) || "").trim();
+    const brand = rawBrand && !containsInternalTerm(rawBrand) ? rawBrand : "";
+    const resolved = resolveProductImage(
+      ownImageByProduct.get(item.product_id) || null,
+      product?.thumbnail_url || null,
+      brand ? brandLogoByKey.get(normalizeBrandKey(brand)) || null : null,
+      category?.slug ? categoryImageByKey.get(normalizeCategoryKey(category.slug)) || null : null
+    );
+    const fallback = Boolean(ppobByItem.get(item.id)) ? "bolt" : "bag";
+    return { src: resolved.src, icon: categoryIcon(category?.slug, fallback) };
+  }
+
+  const orderEntries: TransactionEntry[] = orders.map((order) => {
+    const items = (Array.isArray(order.order_items) ? order.order_items : []) as AnyRow[];
+    const first = items[0] || null;
+    const ppob = first ? ppobByItem.get(first.id) : null;
+    const target = first ? targetByItem.get(first.id)?.customer_no || ppob?.customer_no || "" : "";
+    const productType = first ? relation<AnyRow>(first.products)?.product_type : null;
+    const rawBrand = String(first ? brandByProduct.get(first.product_id) || "" : "").trim();
+    const brand = rawBrand && !containsInternalTerm(rawBrand) ? rawBrand : "";
+    const refund = refundByOrder.get(order.id);
+    const image = orderImage(first);
+    const title = safeProductName(
+      first?.product_name,
+      productType === "jasa" ? "Layanan jasa" : "Pembelian digital"
+    );
+    const subtitleParts: string[] = [];
+    if (target) subtitleParts.push(maskTarget(target));
+    if (brand) subtitleParts.push(brand);
+    if (items.length > 1) subtitleParts.push(`${items.length} produk`);
+    if (!subtitleParts.length) subtitleParts.push(productType === "jasa" ? "Layanan jasa" : "Produk digital");
+
     return {
-      id: o.id,
-      kind: "order" as const,
-      title: o.order_number,
-      subtitle: product,
-      amount: -Number(o.total_amount),
-      status: o.status,
-      date: o.created_at,
-      href: o.status === "PENDING" ? `/orders/${o.id}` : `/orders/${o.id}/receipt`,
-      target: tx?.customer_no,
+      id: order.id,
+      kind: "order",
+      title,
+      subtitle: subtitleParts.join(" · "),
+      target,
+      invoice: order.order_number,
+      amount: -Number(order.total_amount || 0),
+      status: refund ? "REFUNDED" : order.status,
+      date: order.created_at,
+      href: `/orders/${order.id}`,
+      image: image.src,
+      icon: image.icon,
+      refundAmount: refund ? Number(refund.amount || 0) : null,
     };
   });
 
-  const walletEntries = (walletTx || []).map(t => ({
-    id: t.id,
-    kind: "wallet" as const,
-    title: t.type === "TOPUP" ? "Top Up Saldo" : t.type === "REFUND" ? "Refund" : "Transaksi Wallet",
-    subtitle: t.reference_id ? `Ref: ${String(t.reference_id).slice(0, 8).toUpperCase()}` : "Saldo AIDIL STORE",
-    amount: Number(t.amount),
-    status: "SUCCESS",
-    date: t.created_at,
-    href: `/transactions/wallet/${t.id}`,
-  }));
+  const visibleOrderIds = new Set(orders.map((order) => order.id));
+  const referencedOrderIds = Array.from(
+    new Set(
+      walletTx
+        .filter((row) => row.reference_type === "order" && row.reference_id)
+        .map((row) => String(row.reference_id))
+    )
+  );
 
-  const allEntries = [...entries, ...walletEntries].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
-  const successCount = entries.filter(e => e.status === "COMPLETED").length;
-  const processingCount = entries.filter(e => ["PENDING", "PROCESSING"].includes(e.status)).length;
+  // Refund/pembelian saldo untuk order lama bisa berada di luar 120 order
+  // terbaru. Ambil hanya referensi yang belum ada agar nama produk tetap jelas.
+  const missingRefIds = referencedOrderIds.filter((id) => !visibleOrderIds.has(id));
+  const extraOrderMap = new Map<string, AnyRow>();
+  if (missingRefIds.length) {
+    const { data: extraOrders } = await supabase
+      .from("orders")
+      .select("id, order_number, order_items(product_name)")
+      .in("id", missingRefIds);
+    for (const order of (extraOrders || []) as AnyRow[]) {
+      extraOrderMap.set(order.id, order);
+    }
+  }
 
-  return <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] space-y-5 animate-page-in">
-    <div className="flex flex-col justify-between gap-4 sm:flex-row sm:items-end"><div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">Pusat Aktivitas</p><h1 className="mt-1 text-2xl font-black tracking-tight text-app-text sm:text-3xl">Riwayat Transaksi</h1><p className="mt-1 text-sm text-app-muted">Pantau pulsa, game, tagihan, pesanan, dan perubahan saldo dari satu halaman. Ketuk transaksi untuk melihat struk.</p></div><Link href="/orders" className="inline-flex min-h-[44px] items-center justify-center rounded-xl border border-app-border px-4 py-2.5 text-center text-sm font-black text-app-text transition hover:border-gold-400/60 hover:text-app-kicker">Lihat Pesanan</Link></div>
-    <div className="grid gap-3 sm:grid-cols-3"><div className="rounded-2xl border border-app-border bg-app-surface p-4"><p className="text-xs font-bold text-app-muted">Saldo sekarang</p><p className="mt-1 text-xl font-black tabular-nums text-app-kicker">{formatRupiah(Number(wallet?.balance || 0))}</p></div><div className="rounded-2xl border border-app-border bg-app-surface p-4"><p className="text-xs font-bold text-app-muted">Pesanan berhasil</p><p className="mt-1 text-xl font-black tabular-nums text-success-600 dark:text-success-400">{successCount}</p></div><div className="rounded-2xl border border-app-border bg-app-surface p-4"><p className="text-xs font-bold text-app-muted">Sedang diproses</p><p className="mt-1 text-xl font-black tabular-nums text-app-kicker">{processingCount}</p></div></div>
-    <TransactionCenter entries={allEntries} />
-  </div></div>;
+  const orderById = new Map<string, AnyRow>();
+  for (const order of orders) orderById.set(order.id, order);
+  for (const [id, order] of extraOrderMap) orderById.set(id, order);
+
+  const walletEntries: TransactionEntry[] = walletTx
+    .filter((row) => {
+      const linked = row.reference_type === "order" && row.reference_id && visibleOrderIds.has(row.reference_id);
+      return !(linked && (row.type === "PURCHASE" || row.type === "REFUND"));
+    })
+    .map((row) => {
+      const refOrder = row.reference_id ? orderById.get(row.reference_id) : null;
+      const refItems = refOrder && Array.isArray(refOrder.order_items) ? refOrder.order_items : [];
+      const refProduct = refItems[0]?.product_name ? safeProductName(refItems[0].product_name, "") : "";
+      const amount = Number(row.amount || 0);
+      let title = "Perubahan Saldo";
+      if (row.type === "TOPUP") title = "Top Up Saldo";
+      else if (row.type === "REFUND") title = refProduct ? `Refund: ${refProduct}` : "Pengembalian Dana";
+      else if (row.type === "PURCHASE") title = refProduct ? `Pembayaran saldo: ${refProduct}` : "Pembayaran Saldo";
+      else if (row.type === "TRANSFER") title = amount < 0 ? "Transfer Saldo Keluar" : "Transfer Saldo Masuk";
+      else if (row.type === "ADJUSTMENT") title = "Penyesuaian Saldo";
+
+      return {
+        id: row.id,
+        kind: "wallet",
+        title,
+        subtitle: "Saldo AIDIL STORE",
+        invoice: refOrder?.order_number || null,
+        amount,
+        status: "COMPLETED",
+        date: row.created_at,
+        href: `/transactions/wallet/${row.id}`,
+        icon: WALLET_ICONS[row.type] || "wallet",
+        walletType: row.type,
+      };
+    });
+
+  const entries = [...orderEntries, ...walletEntries].sort(
+    (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+  const successCount = entries.filter((entry) => transactionStatusKind(entry.status) === "success").length;
+  const processingCount = entries.filter((entry) => transactionStatusKind(entry.status) === "processing").length;
+  const hasTopup = walletTx.some((row) => row.type === "TOPUP");
+
+  return (
+    <div className="customer-shell">
+      <div className="mx-auto w-full max-w-[480px] animate-page-in">
+        <TransactionCenter
+          entries={entries}
+          balance={Number(wallet?.balance || 0)}
+          successCount={successCount}
+          processingCount={processingCount}
+          hasTopup={hasTopup}
+        />
+      </div>
+    </div>
+  );
 }

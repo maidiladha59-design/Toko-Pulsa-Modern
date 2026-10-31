@@ -12,7 +12,7 @@ for (const file of files) {
   if (!byVersion.has(v)) byVersion.set(v, []);
   byVersion.get(v).push(file);
 }
-const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83,85,86,87,88,89,90,93,94,97,98,99];
+const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83,85,86,87,88,89,90,93,94,97,98,99,100];
 const missing = required.filter(v => !byVersion.has(v));
 const duplicateVersions = [...byVersion.entries()].filter(([, list]) => list.length > 1);
 const errors = [];
@@ -65,6 +65,7 @@ const checks = [
   ['v97', 'migrations_v97_profile_avatars.sql', ['avatars', 'avatar_id', 'user_set_avatar', 'avatars_select_active', 'AVATAR_NOT_AVAILABLE', 'protect_default_avatar', 'DEFAULT_AVATAR_PROTECTED', 'on delete set null']],
   ['v98', 'migrations_v98_info_ticker.sql', ['site_settings', 'site_settings_key_format', 'site_settings_value_object', 'site_settings_public_read', 'site_settings_info_ticker_bounds', 'info_ticker', 'site_announcements', 'on conflict (key) do nothing']],
   ['v99', 'migrations_v99_icon_registry.sql', ['emoji_icon_map', 'icon_key_from_text', 'strip_pictographs', 'add column if not exists icon', 'notification_templates_icon_key', 'notifications_icon_key', 'site_settings_info_ticker_bounds', "^(none|[a-z][a-z0-9_]{1,23})$"]],
+  ['v100', 'migrations_v100_product_images.sql', ['product_images', 'product_images_select_all', 'product_images_admin_write', 'product_id uuid primary key', 'image_url text not null check', 'is_admin()', 'on delete cascade']],
 ];
 for (const [label, file, needles] of checks) {
   const p = path.join(dir, file);

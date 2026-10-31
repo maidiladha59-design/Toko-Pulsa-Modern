@@ -50,7 +50,7 @@ test('v98 preflight mengenal migrasi site_settings', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v98_info_ticker\.sql/);
   assert.match(script, /site_settings_public_read/);
-  assert.match(script, /97,98,99\]/);
+  assert.match(script, /97,98,99,100\]/);
 });
 
 test('v98 lib murni: default, rentang, dan aturan link', () => {

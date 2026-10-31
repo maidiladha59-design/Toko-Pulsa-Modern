@@ -11,7 +11,10 @@ import Select from "@/components/ui/Select";
 import EmptyState from "@/components/ui/EmptyState";
 import Icon from "@/components/icons/Icon";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import ProductImage from "@/components/ProductImage";
 import { formatRupiah, humanizeError } from "@/lib/utils";
+import { compressProductImage } from "@/lib/product-image-client";
+import { normalizeBrandKey, resolveProductImage } from "@/lib/product-image";
 
 type Product = {
   id: string;
@@ -25,9 +28,12 @@ type Product = {
   product_type: string;
   category_id: string | null;
   stock: number | null;
+  ppob_services?: { brand: string | null }[] | null;
 };
 
 type Category = { id: string; name: string };
+
+type BrandMedia = { brand_key: string; logo_url: string | null };
 
 type FormState = {
   name: string;
@@ -49,7 +55,7 @@ const emptyForm: FormState = {
   stock: "",
 };
 
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_IMAGE_SIZE = 2 * 1024 * 1024;
 const MAX_FILE_SIZE = 100 * 1024 * 1024;
 const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 
@@ -62,17 +68,28 @@ function slugify(value: string) {
     .replace(/-+/g, "-");
 }
 
-function extFromFile(file: File) {
-  const nameExt = file.name.split(".").pop()?.toLowerCase();
-  return nameExt || "bin";
+function brandLogoFor(
+  brandsByProduct: Record<string, string>,
+  brandLogos: Record<string, string>,
+  productId: string
+) {
+  const brand = brandsByProduct[productId];
+  return brand ? brandLogos[normalizeBrandKey(brand)] || null : null;
 }
 
-function storagePathFromUrl(url: string | null) {
-  if (!url) return null;
-  const marker = "/storage/v1/object/public/product-thumbnails/";
-  const index = url.indexOf(marker);
-  return index >= 0 ? decodeURIComponent(url.slice(index + marker.length)) : null;
+function resolveProductFor(
+  images: Record<string, string>,
+  brandsByProduct: Record<string, string>,
+  brandLogos: Record<string, string>,
+  product: Product
+) {
+  return resolveProductImage(
+    images[product.id],
+    product.thumbnail_url,
+    brandLogoFor(brandsByProduct, brandLogos, product.id)
+  );
 }
+
 
 export default function AdminProductsPage() {
   const supabase = createClient();
@@ -88,27 +105,69 @@ export default function AdminProductsPage() {
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [digitalFile, setDigitalFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [images, setImages] = useState<Record<string, string>>({});
+  const [brandsByProduct, setBrandsByProduct] = useState<Record<string, string>>({});
+  const [brandLogos, setBrandLogos] = useState<Record<string, string>>({});
+  const [missingOnly, setMissingOnly] = useState(false);
+  const [imageBusy, setImageBusy] = useState<string | null>(null);
   const [form, setForm] = useState<FormState>(emptyForm);
 
   const filteredProducts = useMemo(() => {
     const q = search.trim().toLowerCase();
-    if (!q) return products;
-    return products.filter((p) => `${p.name} ${p.slug}`.toLowerCase().includes(q));
-  }, [products, search]);
+    return products.filter((p) => {
+      const matches = !q || `${p.name} ${p.slug}`.toLowerCase().includes(q);
+      if (!matches) return false;
+      if (!missingOnly) return true;
+      return !resolveProductFor(images, brandsByProduct, brandLogos, p).src;
+    });
+  }, [products, search, missingOnly, images, brandsByProduct, brandLogos]);
+
+  const missingCount = useMemo(
+    () => products.filter((p) => !resolveProductFor(images, brandsByProduct, brandLogos, p).src).length,
+    [products, images, brandsByProduct, brandLogos]
+  );
 
   async function load() {
     setLoading(true);
-    const [{ data: productData, error: productError }, { data: categoryData }] = await Promise.all([
+    const [
+      { data: productData, error: productError },
+      { data: categoryData },
+      { data: imageData },
+      { data: mediaData },
+    ] = await Promise.all([
       supabase
         .from("products")
-        .select("id, name, slug, description, price, thumbnail_url, digital_file_path, is_active, product_type, category_id, stock")
+        .select("id, name, slug, description, price, thumbnail_url, digital_file_path, is_active, product_type, category_id, stock, ppob_services(brand)")
         .order("created_at", { ascending: false }),
       supabase.from("categories").select("id, name").order("name"),
+      supabase.from("product_images").select("product_id,image_url"),
+      supabase.from("brand_media").select("brand_key,logo_url"),
     ]);
 
     if (productError) toast.show(humanizeError(productError.message), "error");
-    setProducts((productData as Product[]) || []);
+    const productRows = (productData as Product[]) || [];
+    setProducts(productRows);
     setCategories((categoryData as Category[]) || []);
+
+    const imageMap: Record<string, string> = {};
+    for (const row of (imageData || []) as { product_id: string; image_url: string }[]) {
+      imageMap[row.product_id] = row.image_url;
+    }
+    setImages(imageMap);
+
+    const brandMap: Record<string, string> = {};
+    for (const product of productRows) {
+      const brand = product.ppob_services?.find((row) => row.brand)?.brand || null;
+      if (brand) brandMap[product.id] = brand;
+    }
+    setBrandsByProduct(brandMap);
+
+    const logoMap: Record<string, string> = {};
+    for (const row of (mediaData || []) as BrandMedia[]) {
+      if (row.logo_url) logoMap[row.brand_key] = row.logo_url;
+    }
+    setBrandLogos(logoMap);
+
     setLoading(false);
   }
 
@@ -138,7 +197,7 @@ export default function AdminProductsPage() {
     });
     setImageFile(null);
     setDigitalFile(null);
-    setImagePreview(product.thumbnail_url);
+    setImagePreview(images[product.id] || product.thumbnail_url);
     window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
@@ -149,7 +208,7 @@ export default function AdminProductsPage() {
       return;
     }
     if (file.size > MAX_IMAGE_SIZE) {
-      toast.show("Ukuran gambar maksimal 5 MB.", "error");
+      toast.show("Ukuran gambar maksimal 2 MB.", "error");
       return;
     }
     setImageFile(file);
@@ -165,17 +224,39 @@ export default function AdminProductsPage() {
     setDigitalFile(file);
   }
 
-  async function uploadThumbnail(productId: string, file: File) {
-    const path = `products/${productId}/${Date.now()}.${extFromFile(file)}`;
-    const { error } = await supabase.storage.from("product-thumbnails").upload(path, file, {
-      cacheControl: "3600",
-      upsert: false,
-      contentType: file.type,
-    });
-    if (error) throw error;
+  // Upload lewat API server: validasi magic bytes, WEBP 512, UUID, hapus file lama.
+  async function uploadProductImage(productId: string, file: File) {
+    const compressed = await compressProductImage(file);
+    const body = new FormData();
+    body.append("scope", "product");
+    body.append("ref", productId);
+    body.append("file", compressed);
+    const response = await fetch("/api/admin/product-images", { method: "POST", body });
+    const json = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(json.message || "Gagal mengunggah gambar.");
+    return String(json.image_url || "");
+  }
 
-    const { data } = supabase.storage.from("product-thumbnails").getPublicUrl(path);
-    return { url: data.publicUrl, path };
+  async function changeImage(product: Product, file: File | undefined) {
+    if (!file) return;
+    if (!IMAGE_TYPES.includes(file.type)) {
+      toast.show("Gambar harus JPG, PNG, atau WEBP.", "error");
+      return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+      toast.show("Ukuran gambar maksimal 2 MB.", "error");
+      return;
+    }
+    setImageBusy(product.id);
+    try {
+      await uploadProductImage(product.id, file);
+      toast.show("Gambar produk diperbarui.", "success");
+      await load();
+    } catch (error: any) {
+      toast.show(humanizeError(error?.message || "Gagal mengunggah gambar."), "error");
+    } finally {
+      setImageBusy(null);
+    }
   }
 
   async function uploadDigitalFile(productId: string, file: File) {
@@ -210,12 +291,10 @@ export default function AdminProductsPage() {
     setSaving(true);
     try {
       let productId = editingId;
-      let oldThumbnailUrl: string | null = null;
       let oldDigitalPath: string | null = null;
 
       if (editingId) {
         const old = products.find((p) => p.id === editingId);
-        oldThumbnailUrl = old?.thumbnail_url || null;
         oldDigitalPath = old?.digital_file_path || null;
 
         const { error } = await supabase
@@ -257,11 +336,8 @@ export default function AdminProductsPage() {
       const updates: Record<string, string> = {};
 
       if (imageFile) {
-        const uploaded = await uploadThumbnail(productId, imageFile);
-        updates.thumbnail_url = uploaded.url;
-
-        const oldPath = storagePathFromUrl(oldThumbnailUrl);
-        if (oldPath) await supabase.storage.from("product-thumbnails").remove([oldPath]);
+        const imageUrl = await uploadProductImage(productId, imageFile);
+        if (imageUrl) setImages((prev) => ({ ...prev, [productId!]: imageUrl }));
       }
 
       if (digitalFile) {
@@ -287,16 +363,21 @@ export default function AdminProductsPage() {
   }
 
   async function removeThumbnail(product: Product) {
-    if (!product.thumbnail_url) return;
-    if (!window.confirm(`Hapus gambar produk "${product.name}"?`)) return;
-    const path = storagePathFromUrl(product.thumbnail_url);
-    if (path) await supabase.storage.from("product-thumbnails").remove([path]);
-    const { error } = await supabase.from("products").update({ thumbnail_url: null, updated_at: new Date().toISOString() }).eq("id", product.id);
-    if (error) toast.show(humanizeError(error.message), "error");
-    else {
-      toast.show("Gambar produk dihapus.", "success");
+    if (!images[product.id] && !product.thumbnail_url) return;
+    const hasBrand = Boolean(brandsByProduct[product.id]);
+    if (!window.confirm(hasBrand ? `Hapus gambar khusus "${product.name}"? Produk akan memakai gambar brand.` : `Hapus gambar "${product.name}"?`)) return;
+    setImageBusy(product.id);
+    try {
+      const response = await fetch(`/api/admin/product-images?scope=product&ref=${product.id}`, { method: "DELETE" });
+      const json = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(json.message || "Gagal menghapus gambar.");
+      toast.show(hasBrand ? "Gambar produk dihapus. Produk memakai gambar brand." : "Gambar produk dihapus.", "success");
       if (editingId === product.id) setImagePreview(null);
-      load();
+      await load();
+    } catch (error: any) {
+      toast.show(humanizeError(error?.message || "Gagal menghapus gambar."), "error");
+    } finally {
+      setImageBusy(null);
     }
   }
 
@@ -334,7 +415,7 @@ export default function AdminProductsPage() {
           <div className="mb-5 flex items-center justify-between gap-3">
             <div>
               <CardTitle>{editingId ? "Edit Produk" : "Tambah Produk Baru"}</CardTitle>
-              <p className="mt-1 text-xs text-app-muted">Gambar JPG/PNG/WEBP maksimal 5 MB. File digital maksimal 100 MB.</p>
+              <p className="mt-1 text-xs text-app-muted">Gambar JPG/PNG/WEBP maksimal 2 MB, otomatis dipotong persegi dan dikompres WEBP. File digital maksimal 100 MB.</p>
             </div>
             {editingId && <Button type="button" variant="outline" size="sm" onClick={resetForm}>Batal Edit</Button>}
           </div>
@@ -353,7 +434,7 @@ export default function AdminProductsPage() {
               </label>
               <div className="mt-2 flex gap-2">
                 {imageFile && <span className="inline-flex min-w-0 items-center gap-1 text-xs text-success-600 dark:text-success-400"><Icon name="check" size={12} className="shrink-0" /><span className="truncate">{imageFile.name}</span></span>}
-                {!imageFile && editingId && products.find((p) => p.id === editingId)?.thumbnail_url && <button type="button" onClick={() => { const p = products.find((x) => x.id === editingId); if (p) removeThumbnail(p); }} className="text-xs font-bold text-danger-600 dark:text-danger-400">Hapus gambar</button>}
+                {!imageFile && editingId && products.find((p) => p.id === editingId && (images[p.id] || p.thumbnail_url)) && <button type="button" onClick={() => { const p = products.find((x) => x.id === editingId); if (p) removeThumbnail(p); }} className="text-xs font-bold text-danger-600 dark:text-danger-400">Hapus gambar</button>}
               </div>
             </div>
 
@@ -390,19 +471,27 @@ export default function AdminProductsPage() {
 
       <Card className="p-0">
         <div className="flex flex-col gap-3 border-b border-app-border p-4 sm:flex-row sm:items-center sm:justify-between">
-          <div><CardTitle>Daftar Produk</CardTitle><p className="mt-1 text-xs text-app-muted">{products.length} produk tersimpan</p></div>
-          <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari produk..." className="sm:w-64" />
+          <div><CardTitle>Daftar Produk</CardTitle><p className="mt-1 text-xs text-app-muted">{products.length} produk tersimpan · {missingCount} belum ada gambar</p></div>
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            <label className="inline-flex min-h-[40px] items-center gap-2 text-sm font-bold text-app-text">
+              <input type="checkbox" checked={missingOnly} onChange={(e) => setMissingOnly(e.target.checked)} className="h-4 w-4 rounded border-app-border accent-gold-500" />
+              Belum ada gambar
+            </label>
+            <Input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Cari produk..." className="sm:w-64" />
+          </div>
         </div>
-        {loading ? <div className="p-4"><LoadingSkeleton rows={5} /></div> : filteredProducts.length === 0 ? <EmptyState icon="box" title="Belum ada produk" description="Tambahkan produk pertama lewat formulir di atas." className="m-4" /> : (
+        {loading ? <div className="p-4"><LoadingSkeleton rows={5} /></div> : filteredProducts.length === 0 ? <EmptyState icon="box" title={missingOnly ? "Semua produk sudah ada gambar" : "Belum ada produk"} description={missingOnly ? "Matikan filter untuk melihat seluruh produk." : "Tambahkan produk pertama lewat formulir di atas."} className="m-4" /> : (
           <div className="divide-y divide-app-border">
-            {filteredProducts.map((p) => (
+            {filteredProducts.map((p) => {
+              const resolved = resolveProductFor(images, brandsByProduct, brandLogos, p);
+              const hasOwnImage = Boolean(images[p.id] || p.thumbnail_url);
+              const rowBusy = imageBusy === p.id;
+              return (
               <div key={p.id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center">
-                <div className="h-16 w-16 shrink-0 overflow-hidden rounded-xl bg-app-inset">
-                  {p.thumbnail_url ? <img src={p.thumbnail_url} alt={p.name} className="h-full w-full object-cover" /> : <div className="flex h-full items-center justify-center"><Icon name="bag" size={26} className="text-app-subtle" /></div>}
-                </div>
+                <ProductImage src={resolved.src} alt={p.name} className="h-16 w-16 shrink-0 rounded-xl" iconSize={26} sizes="64px" />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <p className="truncate font-bold text-app-text">{p.name}</p>
+                    <p className="line-clamp-2 break-words font-bold text-app-text">{p.name}</p>
                     <Badge tone={p.product_type === "jasa" ? "warning" : "gold"} className="inline-flex items-center gap-1">{p.product_type === "jasa" ? <><Icon name="target" size={12} /> Jasa</> : <><Icon name="inbox" size={12} /> Digital</>}</Badge>
                     <Badge tone={p.is_active ? "success" : "neutral"}>{p.is_active ? "Aktif" : "Nonaktif"}</Badge>
                   </div>
@@ -410,11 +499,29 @@ export default function AdminProductsPage() {
                   <p className="text-xs text-app-subtle">/{p.slug} · {p.product_type === "jasa" ? "Target dikirim pembeli saat checkout" : p.digital_file_path ? <span className="inline-flex items-center gap-1"><Icon name="check" size={12} /> File digital</span> : "Belum ada file"}</p>
                 </div>
                 <div className="flex flex-wrap gap-2 sm:justify-end">
+                  <label
+                    className={`inline-flex min-h-[32px] cursor-pointer items-center rounded-xl border border-app-border bg-app-surface px-3 text-xs font-bold text-app-text transition hover:border-gold-400/60 ${rowBusy ? "pointer-events-none opacity-60" : ""}`}
+                  >
+                    {rowBusy ? "Memproses..." : "Ubah gambar"}
+                    <input
+                      type="file"
+                      accept={IMAGE_TYPES.join(",")}
+                      className="hidden"
+                      disabled={rowBusy}
+                      onChange={(e) => { changeImage(p, e.target.files?.[0]); e.target.value = ""; }}
+                    />
+                  </label>
+                  {hasOwnImage && (
+                    <Button variant="outline" size="sm" disabled={rowBusy} onClick={() => removeThumbnail(p)}>
+                      {brandsByProduct[p.id] ? "Gunakan gambar brand" : "Hapus gambar"}
+                    </Button>
+                  )}
                   <Button variant="outline" size="sm" onClick={() => startEdit(p)}>Edit</Button>
                   <Button variant={p.is_active ? "destructive" : "secondary"} size="sm" onClick={() => toggleActive(p)}>{p.is_active ? "Nonaktifkan" : "Aktifkan"}</Button>
                 </div>
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </Card>

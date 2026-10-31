@@ -1,12 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { NetworkEmpty } from "@/components/NetworkState";
 import EmptyState from "@/components/ui/EmptyState";
 import Icon from "@/components/icons/Icon";
+import ProductImage from "@/components/ProductImage";
 
 type Service = {
   id: string;
@@ -60,23 +60,32 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
   const [query, setQuery] = useState("");
   const [sort, setSort] = useState<SortMode>("default");
   const [logoMap, setLogoMap] = useState<Record<string, string>>({});
+  const [categoryImage, setCategoryImage] = useState<string | null>(null);
 
   // brand_key = brand dalam huruf kecil; RLS brand_media mengizinkan semua orang SELECT.
+  // Gambar kategori dipakai sebagai tingkat fallback sebelum ikon bawaan.
   useEffect(() => {
     let mounted = true;
     (async () => {
       try {
-        const { data } = await createClient().from("brand_media").select("brand_key,logo_url");
-        if (!mounted || !data) return;
-        const map: Record<string, string> = {};
-        for (const row of data) if (row.logo_url) map[row.brand_key] = row.logo_url;
-        setLogoMap(map);
+        const supabase = createClient();
+        const [{ data }, { data: categoryData }] = await Promise.all([
+          supabase.from("brand_media").select("brand_key,logo_url"),
+          supabase.from("category_media").select("category_key,icon_url").eq("category_key", category).maybeSingle(),
+        ]);
+        if (!mounted) return;
+        if (data) {
+          const map: Record<string, string> = {};
+          for (const row of data) if (row.logo_url) map[row.brand_key] = row.logo_url;
+          setLogoMap(map);
+        }
+        setCategoryImage(categoryData?.icon_url || null);
       } catch {
-        /* fallback emoji tetap dipakai */
+        /* fallback ikon tetap dipakai */
       }
     })();
     return () => { mounted = false; };
-  }, []);
+  }, [category]);
 
   const showSizeSort = category === "paket-data" || category === "top-up-game" || category === "sms-telpon";
 
@@ -138,7 +147,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
           <div className="flex items-center gap-3 border-b border-app-border bg-app-inset px-4 py-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gold-400 text-zinc-950">
               {logoMap[brand.trim().toLowerCase()] ? (
-                <Image src={logoMap[brand.trim().toLowerCase()]} alt={`Logo ${brand}`} width={36} height={36} className="h-full w-full object-cover" />
+                <ProductImage src={logoMap[brand.trim().toLowerCase()]} alt={`Logo ${brand}`} className="h-full w-full" iconSize={20} fallbackIcon={brandIcon(brand)} fit="contain" sizes="36px" />
               ) : (
                 <Icon name={brandIcon(brand)} size={20} />
               )}
@@ -153,21 +162,24 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
             {items.map((service) => {
               const p = service.product;
               if (!p) return null;
+              const brandLogo = logoMap[(service.brand || "").trim().toLowerCase()] || null;
+              const rowImage = p.thumbnail_url || brandLogo || categoryImage;
               return (
                 <Link
                   key={service.id}
                   href={`/checkout?product=${encodeURIComponent(p.id)}&qty=1`}
                   className="group flex items-center gap-3 px-4 py-3.5 transition hover:bg-app-inset active:bg-app-accent-soft"
                 >
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-app-inset text-lg">
-                    {p.thumbnail_url ? (
-                      <Image src={p.thumbnail_url} alt={p.name} width={44} height={44} className="h-full w-full object-cover" />
-                    ) : (
-                      <span className="text-app-kicker"><Icon name={fallbackIcon} size={22} /></span>
-                    )}
-                  </div>
+                  <ProductImage
+                    src={rowImage}
+                    alt={p.name}
+                    className="h-11 w-11 shrink-0 rounded-xl text-lg"
+                    iconSize={22}
+                    fallbackIcon={fallbackIcon}
+                    sizes="44px"
+                  />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-bold text-app-text">{p.name}</p>
+                    <p className="line-clamp-2 break-words text-sm font-bold text-app-text">{p.name}</p>
                     <p className="mt-0.5 text-xs font-bold uppercase tracking-wide text-app-subtle">
                       {service.service_kind === "postpaid" ? "Pascabayar" : "Prabayar"}
                     </p>
