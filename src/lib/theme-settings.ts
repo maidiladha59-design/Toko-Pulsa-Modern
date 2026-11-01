@@ -695,12 +695,6 @@ function modeVariables(colors: ThemeColors): ModeVars {
   };
 }
 
-function variablesToCss(vars: ModeVars): string {
-  return Object.entries(vars)
-    .map(([name, value]) => `${name}: ${value};`)
-    .join(" ");
-}
-
 /**
  * Variabel hero diturunkan dari 5 warna hex tervalidasi. Glow/divider/chip
  * memakai alpha supaya tetap menyatu dengan latar gelap apa pun.
@@ -723,25 +717,61 @@ export function heroCssVariables(hero: ThemeHeroColors): Record<string, string> 
   };
 }
 
+function cardShadow(style: ThemeSettings["cardStyle"]): string {
+  return style === "flat" ? "none" : "0 8px 24px rgba(9, 9, 11, .08)";
+}
+
 /**
- * CSS yang disisipkan server pada <head>. Semua nilai berasal dari hex yang
- * sudah divalidasi dan font/radius dari enum; tidak ada input mentah.
+ * Petakan warna satu mode ke variabel perantara --theme-<mode>-<nama>.
+ * Nilai cadangannya adalah default "Biru Neon" sehingga halaman tetap benar
+ * bila style inline pada <html> belum sempat diterapkan.
+ */
+function paletteMapping(vars: ModeVars, mode: "light" | "dark"): string {
+  return Object.entries(vars)
+    .map(([name, value]) => `${name}: var(--theme-${mode}-${name.slice(2)}, ${value});`)
+    .join(" ");
+}
+
+const DEFAULT_LIGHT_VARS = modeVariables(DEFAULT_THEME_COLORS.light);
+const DEFAULT_DARK_VARS = modeVariables(DEFAULT_THEME_COLORS.dark);
+
+/**
+ * Satu-satunya nilai warna tema yang dikirim server: dipasang sebagai style
+ * inline pada <html> di root layout. Palet terang dan gelap dikirim sekaligus,
+ * lalu CSS memetakannya sesuai class mode aktif. Style inline tidak bisa
+ * ditimpa aturan .dark, jadi pemisahan per mode ini wajib.
+ */
+export function themeHtmlVariables(settings: ThemeSettings): Record<string, string> {
+  const font = THEME_FONTS.find((entry) => entry.key === settings.font) ?? THEME_FONTS[0];
+  const radius = THEME_RADII[settings.radius] ?? THEME_RADII.large;
+  const vars: Record<string, string> = {
+    ...heroCssVariables(settings.hero ?? DEFAULT_HERO_COLORS),
+    "--app-font": font.stack,
+    "--app-radius-card": radius.card,
+    "--app-radius-button": radius.button,
+    "--theme-card-shadow-light": cardShadow(settings.cardStyle),
+    "--theme-card-shadow-dark": "none",
+  };
+  for (const [mode, colors] of [["light", settings.light], ["dark", settings.dark]] as const) {
+    for (const [name, value] of Object.entries(modeVariables(colors))) {
+      vars[`--theme-${mode}-${name.slice(2)}`] = value;
+    }
+  }
+  return vars;
+}
+
+/**
+ * CSS struktural yang disisipkan server pada <head>. Isinya sengaja bebas dari
+ * nilai warna terbit: warna hanya dibaca lewat variabel perantara dari style
+ * inline <html>, sehingga payload navigasi yang lama tidak bisa mengubah palet.
+ * Semua nilai berasal dari enum font/radius; tidak ada input mentah.
  */
 export function buildThemeCss(settings: ThemeSettings): string {
   const font = THEME_FONTS.find((entry) => entry.key === settings.font) ?? THEME_FONTS[0];
   const radius = THEME_RADII[settings.radius] ?? THEME_RADII.large;
-  const shadow =
-    settings.cardStyle === "flat"
-      ? "none"
-      : "0 8px 24px rgba(9, 9, 11, .08)";
-  const shared = `--app-font: ${font.stack}; --app-radius-card: ${radius.card}; --app-radius-button: ${radius.button}; --app-card-shadow: ${shadow};`;
-  const hero = heroCssVariables(settings.hero ?? DEFAULT_HERO_COLORS);
-  // Mode gelap selalu memakai garis tipis tanpa bayangan agar tidak terlihat
-  // seperti kartu mengambang di atas latar gelap.
-  const darkShadow = "none";
   return [
-    `html:root { ${variablesToCss(modeVariables(settings.light))} ${variablesToCss(hero)} ${shared} }`,
-    `html.dark { ${variablesToCss(modeVariables(settings.dark))} --app-card-shadow: ${darkShadow}; }`,
+    `html:root { ${paletteMapping(DEFAULT_LIGHT_VARS, "light")} --app-font: ${font.stack}; --app-radius-card: ${radius.card}; --app-radius-button: ${radius.button}; --app-card-shadow: var(--theme-card-shadow-light, ${cardShadow(settings.cardStyle)}); }`,
+    `html.dark { ${paletteMapping(DEFAULT_DARK_VARS, "dark")} --app-card-shadow: var(--theme-card-shadow-dark, none); }`,
     `html body { font-family: var(--app-font); }`,
     `.theme-card { border-radius: var(--app-radius-card); box-shadow: var(--app-card-shadow); }`,
     // CTA utama: bidang warna utama + teks kontras; server mengalahkan fallback statis.

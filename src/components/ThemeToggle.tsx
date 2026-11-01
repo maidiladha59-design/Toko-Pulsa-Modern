@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { useTheme } from "next-themes";
 import { createClient } from "@/lib/supabase/client";
 import Icon from "@/components/icons/Icon";
+import { HEADER_ICON_BUTTON } from "@/components/ui/header-button";
 
 type Mode = "light" | "dark" | "system";
 
@@ -92,7 +93,7 @@ export default function ThemeToggle({ variant = "compact" }: { variant?: "compac
         onClick={() => setOpen(v => !v)}
         aria-label="Ganti tema"
         title="Ganti tema"
-        className="flex h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-surface text-lg text-app-muted transition hover:bg-app-accent-soft"
+        className={HEADER_ICON_BUTTON}
       >
         <Icon name={mounted ? OPTIONS.find(o => o.value === current)?.icon ?? "monitor" : "monitor"} size={18} />
       </button>

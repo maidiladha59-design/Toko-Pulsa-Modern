@@ -48,6 +48,16 @@ import {
   operatorSettingsPublishError,
 } from "@/lib/operator-settings";
 import {
+  BOTTOM_NAV_ADMIN_KEY,
+  BOTTOM_NAV_SHOP_KEY,
+  DEFAULT_BOTTOM_NAV_ADMIN,
+  DEFAULT_BOTTOM_NAV_SHOP,
+  bottomNavAdminInputSchema,
+  bottomNavShopInputSchema,
+  normalizeBottomNavAdmin,
+  normalizeBottomNavShop,
+} from "@/lib/bottom-nav";
+import {
   hexColorSchema,
   internalPathOrHttpsSchema,
   isInternalPathOrHttps,
@@ -176,6 +186,26 @@ export const MANAGED_SETTINGS = {
     extraTags: [SITE_SETTINGS_TAG],
     publicRead: true,
     validatePublish: operatorSettingsPublishError,
+  },
+  bottom_nav_shop: {
+    key: BOTTOM_NAV_SHOP_KEY,
+    label: "Navigasi Bawah Toko",
+    permission: "platform.manage",
+    defaults: DEFAULT_BOTTOM_NAV_SHOP,
+    schema: bottomNavShopInputSchema,
+    normalize: normalizeBottomNavShop,
+    extraTags: [SITE_SETTINGS_TAG],
+    publicRead: true,
+  },
+  bottom_nav_admin: {
+    key: BOTTOM_NAV_ADMIN_KEY,
+    label: "Navigasi Bawah Admin",
+    permission: "platform.manage",
+    defaults: DEFAULT_BOTTOM_NAV_ADMIN,
+    schema: bottomNavAdminInputSchema,
+    normalize: normalizeBottomNavAdmin,
+    extraTags: [SITE_SETTINGS_TAG],
+    publicRead: true,
   },
 } as const satisfies Record<string, ManagedSettingDefinition<any>>;
 

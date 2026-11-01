@@ -43,7 +43,7 @@ test("v108 migrasi hanya menambah permission export dan terdaftar di preflight",
 
   const preflight = read(PREFLIGHT);
   assert.match(preflight, /migrations_v108_admin_export\.sql/);
-  assert.match(preflight, /105,106,107,108,109]/);
+  assert.match(preflight, /105,106,107,108,109,110]/);
 });
 
 test("v108 rentang tanggal wajib, format WIB, dan maksimal 31 hari", async () => {

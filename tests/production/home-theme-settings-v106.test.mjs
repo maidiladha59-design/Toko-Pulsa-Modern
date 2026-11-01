@@ -50,7 +50,7 @@ test("v106 preflight mengenal migrasi dan urutan wajib berakhir di 106", () => {
   assert.match(script, /migrations_v106_home_theme_settings\.sql/);
   assert.match(script, /'settings-assets'/);
   assert.match(script, /site_settings_public_read/);
-  assert.match(script, /99,100,105,106,107,108,109\]/);
+  assert.match(script, /99,100,105,106,107,108,109,110\]/);
 });
 
 test("v106 pengaturan beranda: default dari config, normalisasi, banner terjadwal", () => {

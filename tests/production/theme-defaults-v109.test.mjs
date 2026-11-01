@@ -96,7 +96,7 @@ test("v109 penerapan ulang lewat admin adalah draf, bukan timpa terbit", () => {
 test("v109 preflight mewajibkan migrasi dan memeriksa klausa non-destruktif", () => {
   const script = read(PREFLIGHT);
   assert.match(script, /migrations_v109_theme_defaults\.sql/);
-  assert.match(script, /105,106,107,108,109\]/);
+  assert.match(script, /105,106,107,108,109,110\]/);
   assert.match(script, /'theme_settings'/);
   assert.match(script, /"primary": "#1573d1"/);
   assert.match(script, /value = '\{\}'::jsonb/);

@@ -12,7 +12,7 @@ for (const file of files) {
   if (!byVersion.has(v)) byVersion.set(v, []);
   byVersion.get(v).push(file);
 }
-const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83,85,86,87,88,89,90,93,94,97,98,99,100,105,106,107,108,109];
+const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83,85,86,87,88,89,90,93,94,97,98,99,100,105,106,107,108,109,110];
 const missing = required.filter(v => !byVersion.has(v));
 const duplicateVersions = [...byVersion.entries()].filter(([, list]) => list.length > 1);
 const errors = [];
@@ -71,6 +71,7 @@ const checks = [
   ['v107', 'migrations_v107_content_settings.sql', ['site_settings_public_read', "'pages_settings'", "'level_kyc_settings'", "'notification_templates'", "'operator_settings'", 'on conflict (key) do nothing']],
   ['v108', 'migrations_v108_admin_export.sql', ['admin_role_permissions', "'export'", 'on conflict (role, permission) do nothing', 'audit_logs']],
   ['v109', 'migrations_v109_theme_defaults.sql', ["'theme_settings'", '"primary": "#1573d1"', '"accent": "#7bd32a"', '"preset": "neon-blue"', 'on conflict (key) do update', "value = '{}'::jsonb", 'where public.site_settings.value is null', 'updated_at = timezone']],
+  ['v110', 'migrations_v110_bottom_nav.sql', ['site_settings_public_read', "'bottom_nav_shop'", "'bottom_nav_admin'", "'operator_settings'", "'pages_settings'", 'on conflict (key) do nothing']],
 ];
 for (const [label, file, needles] of checks) {
   const p = path.join(dir, file);

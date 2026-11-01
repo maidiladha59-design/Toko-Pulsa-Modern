@@ -54,7 +54,7 @@ test("v101 layout memfilter menu di server memakai admin_role_permissions", () =
   assert.match(layout, /\.eq\("role", profile\.role\)/);
   assert.match(layout, /filterAdminMenu\(ADMIN_MENU, allowed\)/);
   assert.match(layout, /verifyAdmin2FAToken/);
-  assert.match(layout, /<AdminShell groups=\{groups\} badges=\{badges\} adminId=\{user\.id\}>/);
+  assert.match(layout, /<AdminShell groups=\{groups\} badges=\{badges\} adminId=\{user\.id\} navSettings=\{navSettings\}>/);
 });
 
 test("v101 badge antrean memakai hitungan ringan tanpa query berat", () => {
@@ -96,11 +96,11 @@ test("v101 shell: header judul + Lihat Toko, drawer portal, bottom nav admin", (
   assert.match(shell, /setDrawerOpen\(false\)/);
   assert.match(shell, /event\.key === "Escape"/);
   assert.match(shell, /md:grid-cols-\[240px_1fr\]/);
-  assert.match(shell, /<FloatingNav/);
-  assert.match(shell, /\{ href: "\/admin", label: "Dashboard", icon: "chart_bar" \}/);
-  assert.match(shell, /\{ href: "\/admin\/orders", label: "Pesanan", icon: "receipt" \}/);
-  assert.match(shell, /\{ href: "\/admin\/users", label: "Pengguna", icon: "users" \}/);
-  assert.match(shell, /action=\{\{ label: "Menu", icon: "menu"/);
+  assert.match(shell, /<BottomNav/);
+  assert.match(shell, /settings=\{resolvedNavSettings\}/);
+  assert.match(shell, /pathname=\{pathname\}/);
+  assert.match(shell, /badges=\{navBadges\}/);
+  assert.match(shell, /onMenu=\{\(\) => setDrawerOpen\(true\)\}/);
   assert.match(shell, /ariaLabel="Navigasi admin"/);
   assert.match(shell, /md:hidden/);
 });

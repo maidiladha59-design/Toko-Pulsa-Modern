@@ -7,10 +7,12 @@ import { createClient } from "@/lib/supabase/client";
 import { useToast } from "./ToastProvider";
 import NotificationBell from "./NotificationBell";
 import ThemeToggle from "./ThemeToggle";
-import FloatingNav from "./FloatingNav";
+import BottomNav from "./BottomNav";
 import Icon from "@/components/icons/Icon";
+import { HEADER_ICON_BUTTON } from "@/components/ui/header-button";
 import UserAvatar from "./UserAvatar";
 import { resolveAvatarUrl } from "@/lib/avatar";
+import { visibleBottomNavItems, type BottomNavSettings } from "@/lib/bottom-nav";
 import { Skeleton } from "./ui/LoadingSkeleton";
 
 type Profile = { full_name: string | null; email: string; role: string; avatar_id: string | null };
@@ -33,15 +35,17 @@ export default function Navbar({
   brandName = "AIDIL STORE",
   logoLight = "",
   logoDark = "",
+  navSettings,
 }: {
   scanQrisEnabled?: boolean;
   brandName?: string;
   logoLight?: string;
   logoDark?: string;
+  navSettings: BottomNavSettings;
 }) {
   const pathname = usePathname();
   if (pathname === "/login" || pathname === "/register" || pathname === "/admin-login" || pathname.startsWith("/admin")) return null;
-  return <NavbarContent scanQrisEnabled={scanQrisEnabled} brandName={brandName} logoLight={logoLight} logoDark={logoDark} />;
+  return <NavbarContent scanQrisEnabled={scanQrisEnabled} brandName={brandName} logoLight={logoLight} logoDark={logoDark} navSettings={navSettings} />;
 }
 
 function NavbarContent({
@@ -49,11 +53,13 @@ function NavbarContent({
   brandName,
   logoLight,
   logoDark,
+  navSettings,
 }: {
   scanQrisEnabled: boolean;
   brandName: string;
   logoLight: string;
   logoDark: string;
+  navSettings: BottomNavSettings;
 }) {
   const pathname = usePathname();
   const supabase = createClient(), router = useRouter(), toast = useToast();
@@ -109,18 +115,16 @@ function NavbarContent({
     return () => window.removeEventListener("aidil:avatar-updated", onAvatarUpdated);
   }, []);
 
-  const bottomItems = [
-    { href: "/", label: "Beranda", icon: "home" as const },
-    { href: "/layanan", label: "Layanan", icon: "grid" as const },
-    { href: "/wallet", label: "Saldo", icon: "wallet" as const },
-    { href: "/transactions", label: "Transaksi", icon: "receipt" as const },
-  ];
-  const isBottomActive = (href: string) =>
-    href === "/"
-      ? pathname === "/"
-      : href === "/layanan"
-        ? pathname === "/layanan" || pathname.startsWith("/ppob")
-        : pathname.startsWith(href);
+  // Item login-only disembunyikan sampai profil termuat; bila semuanya
+  // login-only, nav tetap tampil agar tidak kosong di halaman publik.
+  const allowedBottomItems = visibleBottomNavItems(navSettings, { loggedIn: Boolean(profile) });
+  const resolvedNavSettings: BottomNavSettings = {
+    ...navSettings,
+    items:
+      allowedBottomItems.length > 0
+        ? allowedBottomItems
+        : navSettings.items.filter((item) => item.visible),
+  };
 
   const drawerLinks: [string, string, string][] = [
     ["/", "home", "Beranda"],
@@ -199,15 +203,16 @@ function NavbarContent({
                 <Link href="/register" className="btn-gold-metal hidden rounded-xl px-4 py-2.5 text-sm font-black transition sm:block">Daftar</Link>
               </>
             )}
-            <button className="flex h-10 w-10 items-center justify-center rounded-xl border border-app-border bg-app-surface text-app-muted transition hover:bg-app-inset lg:hidden" onClick={() => setMenuOpen((v) => !v)} aria-label={menuOpen ? "Tutup menu" : "Buka menu"}><Icon name={menuOpen ? "close" : "menu"} size={18} /></button>
+            <button className={`${HEADER_ICON_BUTTON} lg:hidden`} onClick={() => setMenuOpen((v) => !v)} aria-label={menuOpen ? "Tutup menu" : "Buka menu"}><Icon name={menuOpen ? "close" : "menu"} size={18} /></button>
           </div>
         </div>
       </header>
 
-      <FloatingNav
-        items={bottomItems}
-        isActive={isBottomActive}
-        action={{ label: "Lainnya", icon: "menu", active: menuOpen, ariaLabel: "Buka menu lainnya", onClick: () => setMenuOpen((v) => !v) }}
+      <BottomNav
+        settings={resolvedNavSettings}
+        pathname={pathname}
+        menuOpen={menuOpen}
+        onMenu={() => setMenuOpen((v) => !v)}
         hidden={pathname.startsWith("/checkout") || pathname.startsWith("/scan-qris/qris-confirm")}
       />
 

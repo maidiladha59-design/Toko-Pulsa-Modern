@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Nunito, Plus_Jakarta_Sans } from "next/font/google";
+import { unstable_noStore as noStore } from "next/cache";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import AppLoader from "@/components/AppLoader";
@@ -10,7 +11,8 @@ import WelcomeExperience from "@/components/WelcomeExperience";
 import LevelKycProvider from "@/components/settings/LevelKycProvider";
 import { isFeatureEnabled } from "@/lib/features";
 import { getSetting } from "@/lib/settings";
-import { DEFAULT_THEME_SETTINGS, THEME_SETTINGS_KEY, buildThemeCss } from "@/lib/theme-settings";
+import { getBottomNav } from "@/lib/site-settings";
+import { DEFAULT_THEME_SETTINGS, THEME_SETTINGS_KEY, buildThemeCss, themeHtmlVariables } from "@/lib/theme-settings";
 import { DEFAULT_LEVEL_KYC_SETTINGS, LEVEL_KYC_SETTINGS_KEY } from "@/lib/level-kyc-settings";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aidil-store.example.com";
@@ -58,16 +60,21 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const [scanQrisEnabled, theme, levelKyc] = await Promise.all([
+  // Tema terbit harus ikut berubah tanpa deploy. Tanpa ini layout bisa
+  // diprerender saat build dan menyimpan warna lama di shell rute statis.
+  noStore();
+  const [scanQrisEnabled, theme, levelKyc, navSettings] = await Promise.all([
     isFeatureEnabled("scan_qris"),
     getSetting(THEME_SETTINGS_KEY, DEFAULT_THEME_SETTINGS),
     getSetting(LEVEL_KYC_SETTINGS_KEY, DEFAULT_LEVEL_KYC_SETTINGS),
+    getBottomNav("shop"),
   ]);
   return (
     <html
       lang="id"
       suppressHydrationWarning
       className={`${jakarta.variable} ${inter.variable} ${nunito.variable}`}
+      style={themeHtmlVariables(theme) as React.CSSProperties}
     >
       <head>
         {/* Variabel tema dari server: tidak ada kilatan warna lama sebelum hidrasi. */}
@@ -85,6 +92,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 brandName={theme.identity.shopName}
                 logoLight={theme.identity.logoLight}
                 logoDark={theme.identity.logoDark}
+                navSettings={navSettings}
               />
               <main className="mx-auto min-h-[calc(100vh-80px)] max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
             </LevelKycProvider>

@@ -4,6 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ADMIN_2FA_COOKIE, verifyAdmin2FAToken } from "@/lib/security/admin-2fa";
 import { ADMIN_MENU, filterAdminMenu, flattenAdminMenu, type AdminBadgeCounts } from "@/lib/admin-menu";
+import { getBottomNav } from "@/lib/site-settings";
 import AdminShell from "./AdminShell";
 
 // Hitung antrean untuk badge menu. Gagal satu hitungan tidak boleh memblokir panel.
@@ -42,18 +43,19 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     : new Set(permissionRows.filter((row) => row.enabled).map((row) => String(row.permission)));
   const groups = filterAdminMenu(ADMIN_MENU, allowed);
 
-  const [orders, kyc, support, manualTopup] = await Promise.all([
+  const [orders, kyc, support, manualTopup, navSettings] = await Promise.all([
     safeCount(() => supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "PROCESSING")),
     // kyc_verifications hanya bisa dihitung lewat service role; klien dibuat di dalam
     // safeCount agar env yang belum diisi tidak menjatuhkan seluruh panel.
     safeCount(async () => createAdminClient().from("kyc_verifications").select("user_id", { count: "exact", head: true }).eq("status", "SUBMITTED")),
     safeCount(() => supabase.from("support_tickets").select("id", { count: "exact", head: true }).eq("status", "OPEN")),
     safeCount(() => supabase.from("manual_topup_requests").select("id", { count: "exact", head: true }).eq("status", "PENDING")),
+    getBottomNav("admin"),
   ]);
   const badges: AdminBadgeCounts = { orders, kyc, support, manualTopup };
 
   return (
-    <AdminShell groups={groups} badges={badges} adminId={user.id}>
+    <AdminShell groups={groups} badges={badges} adminId={user.id} navSettings={navSettings}>
       {children}
     </AdminShell>
   );

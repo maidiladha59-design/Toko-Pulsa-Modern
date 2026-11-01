@@ -192,7 +192,7 @@ test('v99 tidak ada emoji tersisa di src di luar file pemetaan', () => {
 
 test('v99 terdaftar di migration preflight', () => {
   const preflight = read("scripts/migration-preflight.mjs");
-  assert.match(preflight, /99,100,105,106,107,108,109\]/);
+  assert.match(preflight, /99,100,105,106,107,108,109,110\]/);
   assert.match(preflight, /migrations_v99_icon_registry\.sql/);
   assert.match(preflight, /emoji_icon_map/);
   assert.match(preflight, /icon_key_from_text/);

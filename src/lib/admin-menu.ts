@@ -71,6 +71,7 @@ export const ADMIN_MENU: AdminMenuGroup[] = [
     items: [
       { href: "/admin/pengaturan-beranda", icon: "home", label: "Pengaturan Beranda", permission: "platform.manage" },
       { href: "/admin/tema-branding", icon: "sun", label: "Tema & Branding", permission: "platform.manage" },
+      { href: "/admin/navigasi-bawah", icon: "sliders", label: "Navigasi Bawah", permission: "platform.manage" },
       { href: "/admin/teks-halaman", icon: "doc", label: "Teks & Halaman", permission: "platform.manage" },
       { href: "/admin/level-kyc", icon: "trophy", label: "Level & KYC", permission: "platform.manage" },
       {

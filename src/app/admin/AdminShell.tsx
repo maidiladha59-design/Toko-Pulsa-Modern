@@ -5,41 +5,51 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import Icon from "@/components/icons/Icon";
-import FloatingNav from "@/components/FloatingNav";
+import BottomNav from "@/components/BottomNav";
 import AdminSidebar from "./AdminSidebar";
 import {
-  adminActiveHref,
   adminPageTitle,
   type AdminBadgeCounts,
   type AdminMenuGroup,
 } from "@/lib/admin-menu";
+import {
+  BOTTOM_NAV_MENU_TARGET,
+  type BottomNavSettings,
+} from "@/lib/bottom-nav";
 
 type Props = {
   groups: AdminMenuGroup[];
   badges: AdminBadgeCounts;
   adminId: string;
+  navSettings: BottomNavSettings;
   children: React.ReactNode;
 };
 
-const BOTTOM_ITEMS = [
-  { href: "/admin", label: "Dashboard", icon: "chart_bar" },
-  { href: "/admin/orders", label: "Pesanan", icon: "receipt" },
-  { href: "/admin/users", label: "Pengguna", icon: "users" },
-];
-
-export default function AdminShell({ groups, badges, adminId, children }: Props) {
+export default function AdminShell({ groups, badges, adminId, navSettings, children }: Props) {
   const pathname = usePathname();
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
   const title = adminPageTitle(pathname);
-  const activeHref = adminActiveHref(pathname, groups);
   const allowedHrefs = new Set(groups.flatMap((group) => group.items.map((item) => item.href)));
-  const bottomItems = BOTTOM_ITEMS.filter((item) => allowedHrefs.has(item.href));
-  const navItems = bottomItems.map((item) => ({
-    ...item,
-    badge: item.href === "/admin/orders" ? badges.orders : item.href === "/admin/users" ? badges.kyc : undefined,
-  }));
+  // Item pengaturan hanya boleh menuju halaman yang memang diizinkan untuk
+  // peran ini; tujuan "menu" selalu tersedia dan membuka drawer sidebar.
+  const permittedItems = navSettings.items.filter(
+    (item) => item.visible && (item.target === BOTTOM_NAV_MENU_TARGET || allowedHrefs.has(item.target))
+  );
+  const resolvedNavSettings: BottomNavSettings = {
+    ...navSettings,
+    items:
+      permittedItems.length > 0
+        ? permittedItems
+        : navSettings.items.filter((item) => item.visible),
+  };
+  const navBadges: Record<string, number> = {
+    "/admin/orders": badges.orders,
+    "/admin/users": badges.kyc,
+    "/admin/support": badges.support,
+    "/admin/manual-topup/requests": badges.manualTopup,
+  };
 
   useEffect(() => {
     setMounted(true);
@@ -96,10 +106,12 @@ export default function AdminShell({ groups, badges, adminId, children }: Props)
         <section className="min-w-0">{children}</section>
       </div>
 
-      <FloatingNav
-        items={navItems}
-        isActive={(href) => activeHref === href}
-        action={{ label: "Menu", icon: "menu", active: drawerOpen, ariaLabel: "Buka menu admin", onClick: () => setDrawerOpen(true) }}
+      <BottomNav
+        settings={resolvedNavSettings}
+        pathname={pathname}
+        badges={navBadges}
+        menuOpen={drawerOpen}
+        onMenu={() => setDrawerOpen(true)}
         ariaLabel="Navigasi admin"
       />
 
