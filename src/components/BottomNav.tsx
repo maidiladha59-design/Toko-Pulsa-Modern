@@ -28,6 +28,8 @@ type Props = {
   onSelect?: (item: BottomNavItem) => void;
   /** Pratinjau di dalam bingkai: tidak fixed dan tetap tampil di layar lebar. */
   embedded?: boolean;
+  /** Kartu galeri yang sempit: label diperkecil agar tetap utuh, tanpa elipsis. */
+  compact?: boolean;
 };
 
 const HEIGHT_PX: Record<BottomNavSettings["height"], number> = {
@@ -97,6 +99,7 @@ export default function BottomNav({
   previewActive,
   onSelect,
   embedded = false,
+  compact = false,
 }: Props) {
   const keyboardOpen = useKeyboardOpen();
   const preview = typeof onSelect === "function";
@@ -213,6 +216,7 @@ export default function BottomNav({
         data-animate={settings.animate ? "true" : "false"}
         data-accent={settings.accent}
         data-embedded={embedded ? "true" : "false"}
+        data-compact={compact ? "true" : "false"}
         data-hidden={!embedded && (hidden || keyboardOpen) ? "true" : "false"}
         style={{ "--nav-height": `${height}px` } as CSSProperties}
       >

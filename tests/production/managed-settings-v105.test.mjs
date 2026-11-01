@@ -119,10 +119,21 @@ test("v105 getSetting: cache per request + unstable_cache 60 detik bertag, gagal
   assert.match(lib, /const readSettingOnce = cache\(async \(key: string\) => readerFor\(key\)\(\)\);/);
   assert.match(lib, /\["managed-setting", key\]/);
   assert.match(lib, /\{ revalidate: 60, tags \}/);
-  assert.match(lib, /if \(!raw\) return defaults;/);
-  assert.match(lib, /if \(!def\) return merged as T;/);
-  assert.match(lib, /if \(!parsed\.success\) return defaults;/);
-  assert.match(lib, /catch \{\s*return defaults;\s*\}/);
+  // Fallback tetap aman (tidak melempar), tetapi kini dicatat ke console.error
+  // supaya nilai default tidak pernah dipakai diam-diam.
+  assert.match(
+    lib,
+    /if \(!raw\) \{\s*logSettingFallback\(key, "nilai terbit tidak terbaca"\);\s*return defaults;\s*\}/
+  );
+  assert.match(
+    lib,
+    /if \(!def\) \{\s*logSettingFallback\(key, "pengaturan tidak terdaftar"\);\s*return merged as T;\s*\}/
+  );
+  assert.match(lib, /if \(!parsed\.success\) \{\s*logSettingFallback\(/);
+  assert.match(
+    lib,
+    /catch \(error\) \{\s*logSettingFallback\(key, "gagal menormalkan nilai terbit", error\);\s*return defaults;\s*\}/
+  );
   assert.match(lib, /NEXT_PUBLIC_SUPABASE_ANON_KEY/);
   assert.match(lib, /if \(!publicRead\) return null;/);
 

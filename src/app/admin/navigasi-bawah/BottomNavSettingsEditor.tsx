@@ -263,6 +263,7 @@ function VariantGallery({
               <BottomNav
                 settings={sample}
                 embedded
+                compact
                 previewActive={previewActive}
                 onSelect={() => undefined}
                 ariaLabel={`Contoh gaya ${option.label}`}

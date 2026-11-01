@@ -99,9 +99,18 @@ test('v98 pembaca server memakai cache 60 detik + tag revalidasi, gagal baca = d
   assert.match(settings, /NEXT_PUBLIC_SUPABASE_ANON_KEY/);
   assert.doesNotMatch(settings, /SUPABASE_SERVICE_ROLE_KEY/, 'pembacaan beranda tidak memakai service role');
   assert.match(settings, /\.eq\("key", key\)\s*\.maybeSingle\(\)/);
-  assert.match(settings, /if \(!raw\) return defaults;/);
-  assert.match(settings, /if \(error \|\| !data\?\.value\) return null;/);
-  assert.match(settings, /catch \{\s*return null;\s*\}/);
+  assert.match(
+    settings,
+    /if \(!raw\) \{\s*logSettingFallback\(key, "nilai terbit tidak terbaca"\);\s*return defaults;\s*\}/
+  );
+  assert.match(
+    settings,
+    /if \(error\) \{\s*console\.error\(`\[settings\] \$\{key\}: gagal membaca site_settings\.`, error\.message\);\s*return null;\s*\}/
+  );
+  assert.match(
+    settings,
+    /catch \(error\) \{\s*console\.error\(`\[settings\] \$\{key\}: gagal membaca site_settings\.`, error\);\s*return null;\s*\}/
+  );
 });
 
 test('v98 komponen ticker: dua salinan teks, -50%, ResizeObserver, mask, reduced motion, teks biasa', () => {

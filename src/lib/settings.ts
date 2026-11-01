@@ -20,6 +20,16 @@ import {
 
 const readers = new Map<string, () => Promise<Record<string, unknown> | null>>();
 
+// Fallback ke default tidak boleh terjadi diam-diam: tanpa log, nilai terbit
+// yang rusak/kosong terlihat sama dengan nilai default dan sulit dilacak.
+function logSettingFallback(key: string, reason: string, detail?: unknown): void {
+  if (detail === undefined) {
+    console.error(`[settings] ${key}: ${reason}. Memakai nilai default.`);
+  } else {
+    console.error(`[settings] ${key}: ${reason}. Memakai nilai default.`, detail);
+  }
+}
+
 function readerFor(key: string): () => Promise<Record<string, unknown> | null> {
   let reader = readers.get(key);
   if (!reader) {
@@ -43,9 +53,14 @@ function readerFor(key: string): () => Promise<Record<string, unknown> | null> {
             .select("value")
             .eq("key", key)
             .maybeSingle();
-          if (error || !data?.value) return null;
+          if (error) {
+            console.error(`[settings] ${key}: gagal membaca site_settings.`, error.message);
+            return null;
+          }
+          if (!data?.value) return null;
           return data.value as Record<string, unknown>;
-        } catch {
+        } catch (error) {
+          console.error(`[settings] ${key}: gagal membaca site_settings.`, error);
           return null;
         }
       },
@@ -65,15 +80,29 @@ const readSettingOnce = cache(async (key: string) => readerFor(key)());
  */
 export async function getAdminSetting<T>(key: string, defaults: T): Promise<T> {
   const def = getManagedSetting(key);
-  if (!def) return defaults;
+  if (!def) {
+    logSettingFallback(key, "pengaturan tidak terdaftar");
+    return defaults;
+  }
   const raw = await adminReaderFor(key)();
-  if (!raw) return defaults;
+  if (!raw) {
+    logSettingFallback(key, "nilai terbit tidak terbaca");
+    return defaults;
+  }
   try {
     const merged = { ...(defaults as Record<string, unknown>), ...raw };
     const parsed = def.schema.safeParse(merged);
-    if (!parsed.success) return defaults;
+    if (!parsed.success) {
+      logSettingFallback(
+        key,
+        "nilai terbit tidak lolos validasi",
+        parsed.error.issues.map((issue) => issue.message)
+      );
+      return defaults;
+    }
     return (def.normalize ? def.normalize(parsed.data) : parsed.data) as T;
-  } catch {
+  } catch (error) {
+    logSettingFallback(key, "gagal menormalkan nilai terbit", error);
     return defaults;
   }
 }
@@ -92,9 +121,14 @@ function adminReaderFor(key: string): () => Promise<Record<string, unknown> | nu
             .select("value")
             .eq("key", key)
             .maybeSingle();
-          if (error || !data?.value) return null;
+          if (error) {
+            console.error(`[settings] ${key}: gagal membaca site_settings.`, error.message);
+            return null;
+          }
+          if (!data?.value) return null;
           return data.value as Record<string, unknown>;
-        } catch {
+        } catch (error) {
+          console.error(`[settings] ${key}: gagal membaca site_settings.`, error);
           return null;
         }
       },
@@ -112,15 +146,29 @@ function adminReaderFor(key: string): () => Promise<Record<string, unknown> | nu
  */
 export async function getSetting<T>(key: string, defaults: T): Promise<T> {
   const raw = await readSettingOnce(key);
-  if (!raw) return defaults;
+  if (!raw) {
+    logSettingFallback(key, "nilai terbit tidak terbaca");
+    return defaults;
+  }
   const def = getManagedSetting(key);
   try {
     const merged = { ...(defaults as Record<string, unknown>), ...raw };
-    if (!def) return merged as T;
+    if (!def) {
+      logSettingFallback(key, "pengaturan tidak terdaftar");
+      return merged as T;
+    }
     const parsed = def.schema.safeParse(merged);
-    if (!parsed.success) return defaults;
+    if (!parsed.success) {
+      logSettingFallback(
+        key,
+        "nilai terbit tidak lolos validasi",
+        parsed.error.issues.map((issue) => issue.message)
+      );
+      return defaults;
+    }
     return (def.normalize ? def.normalize(parsed.data) : parsed.data) as T;
-  } catch {
+  } catch (error) {
+    logSettingFallback(key, "gagal menormalkan nilai terbit", error);
     return defaults;
   }
 }
@@ -203,9 +251,16 @@ function normalizeForState(
   try {
     const merged = { ...def.defaults, ...value };
     const parsed = def.schema.safeParse(merged);
-    if (!parsed.success) return value;
+    if (!parsed.success) {
+      console.error(
+        `[settings] ${def.key}: nilai tersimpan tidak lolos validasi; ditampilkan apa adanya.`,
+        parsed.error.issues.map((issue) => issue.message)
+      );
+      return value;
+    }
     return (def.normalize ? def.normalize(parsed.data) : parsed.data) as Record<string, unknown>;
-  } catch {
+  } catch (error) {
+    console.error(`[settings] ${def.key}: gagal menormalkan nilai tersimpan.`, error);
     return value;
   }
 }
@@ -365,15 +420,19 @@ export async function recordSettingAudit(
   metadata: Record<string, unknown>
 ): Promise<void> {
   try {
-    await createAdminClient().from("audit_logs").insert({
+    const { error } = await createAdminClient().from("audit_logs").insert({
       actor_id: actorId,
       action,
       target_type: "site_settings",
       target_id: key,
       metadata,
     });
-  } catch {
-    // Audit tidak boleh menggagalkan aksi utama; kegagalan tetap terlihat di log platform.
+    if (error) {
+      console.error(`[settings] ${key}: gagal menulis audit ${action}.`, error.message);
+    }
+  } catch (error) {
+    // Audit tidak boleh menggagalkan aksi utama, tetapi kegagalannya wajib terlihat.
+    console.error(`[settings] ${key}: gagal menulis audit ${action}.`, error);
   }
 }
 
@@ -383,14 +442,18 @@ export async function recordSystemAudit(
   metadata: Record<string, unknown>
 ): Promise<void> {
   try {
-    await createAdminClient().from("audit_logs").insert({
+    const { error } = await createAdminClient().from("audit_logs").insert({
       actor_id: actorId,
       action,
       target_type: "system",
       target_id: "cache",
       metadata,
     });
-  } catch {
+    if (error) {
+      console.error(`[settings] system: gagal menulis audit ${action}.`, error.message);
+    }
+  } catch (error) {
     // Sama seperti recordSettingAudit: aksi utama tidak dibatalkan.
+    console.error(`[settings] system: gagal menulis audit ${action}.`, error);
   }
 }

@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import {
@@ -77,7 +78,7 @@ async function requireAccess(key: string): Promise<AccessResult> {
   return { user: { id: user.id }, def };
 }
 
-function failure(error: unknown): NextResponse {
+function failure(error: unknown, key: string): NextResponse {
   if (error instanceof SettingConflictError) {
     return NextResponse.json(
       {
@@ -94,7 +95,29 @@ function failure(error: unknown): NextResponse {
   if (error instanceof SettingNotFoundError) {
     return NextResponse.json({ message: "Pengaturan tidak ditemukan." }, { status: 404 });
   }
+  console.error(`[settings] ${key}: gagal memproses pengaturan.`, error);
   return NextResponse.json({ message: "Gagal memproses pengaturan. Coba lagi." }, { status: 500 });
+}
+
+/**
+ * Cocokkan nilai kiriman dengan nilai tersimpan. Hanya kunci yang dikirim yang
+ * dibandingkan: server boleh menambahkan default untuk kunci yang tidak ikut
+ * dikirim (mis. field opsional), tetapi nilai yang dikirim wajib tersimpan apa adanya.
+ */
+function storedMatchesSent(sent: unknown, stored: unknown): boolean {
+  if (sent === stored) return true;
+  if (Array.isArray(sent) || Array.isArray(stored)) {
+    if (!Array.isArray(sent) || !Array.isArray(stored) || sent.length !== stored.length) return false;
+    return sent.every((item, index) => storedMatchesSent(item, stored[index]));
+  }
+  if (sent && stored && typeof sent === "object" && typeof stored === "object") {
+    const sentRecord = sent as Record<string, unknown>;
+    const storedRecord = stored as Record<string, unknown>;
+    return Object.keys(sentRecord).every((key) =>
+      storedMatchesSent(sentRecord[key], storedRecord[key])
+    );
+  }
+  return false;
 }
 
 export async function GET(_request: Request, { params }: RouteContext) {
@@ -105,7 +128,7 @@ export async function GET(_request: Request, { params }: RouteContext) {
     const state = await loadSettingState(params.key);
     return NextResponse.json({ state, defaults: access.def.defaults });
   } catch (error) {
-    return failure(error);
+    return failure(error, params.key);
   }
 }
 
@@ -153,7 +176,7 @@ export async function PUT(request: Request, { params }: RouteContext) {
       });
       return NextResponse.json({ state });
     } catch (error) {
-      return failure(error);
+      return failure(error, params.key);
     }
   }
 
@@ -166,11 +189,17 @@ export async function PUT(request: Request, { params }: RouteContext) {
   let value: Record<string, unknown> | null = null;
   if (action !== "discard_draft") {
     const parsed = parseSettingValue(params.key, input);
-    if (!parsed.ok) return NextResponse.json({ message: parsed.message }, { status: 400 });
+    if (!parsed.ok) {
+      console.error(`[settings] ${params.key}: ${action} ditolak. ${parsed.message}`);
+      return NextResponse.json({ message: parsed.message }, { status: 400 });
+    }
     value = parsed.value;
     if (action === "publish" && access.def.validatePublish) {
       const publishError = access.def.validatePublish(parsed.value);
-      if (publishError) return NextResponse.json({ message: publishError }, { status: 400 });
+      if (publishError) {
+        console.error(`[settings] ${params.key}: publish ditolak. ${publishError}`);
+        return NextResponse.json({ message: publishError }, { status: 400 });
+      }
     }
   }
 
@@ -185,19 +214,44 @@ export async function PUT(request: Request, { params }: RouteContext) {
     }
 
     // Draf dan pemulihan belum mengubah tampilan publik; hanya Terbitkan yang
-    // perlu menginvalidasi tag "settings:<key>" dan tag tambahan kunci terkait.
+    // perlu menginvalidasi tag "settings:<key>" dan tag tambahan kunci terkait,
+    // sekaligus menyegarkan shell layout toko agar navigasi tidak memakai RSC lama.
     const tags = action === "publish" ? revalidateSetting(params.key) : [];
+    if (action === "publish") revalidatePath("/", "layout");
+
+    // Pastikan yang benar-benar tersimpan sama dengan yang dikirim. Tanpa ini,
+    // nilai yang berubah/tertolak di server tampil seperti "berhasil" lalu
+    // kembali ke default saat halaman dimuat ulang.
+    const storedOk = action !== "publish" || storedMatchesSent(value, state.published);
+    if (!storedOk) {
+      console.error(
+        `[settings] ${params.key}: nilai terbit tidak sama dengan kiriman.`,
+        { sent_variant: (value as { variant?: unknown })?.variant ?? null }
+      );
+    }
 
     await recordSettingAudit(access.user.id, AUDIT_ACTIONS[action], params.key, {
       action,
       base_version: baseVersion,
       version: state.version,
       has_draft: state.hasDraft,
+      stored_matches_sent: storedOk,
       ...(tags.length ? { revalidated_tags: tags } : {}),
     });
 
+    if (!storedOk) {
+      return NextResponse.json(
+        {
+          code: "VALUE_MISMATCH",
+          message:
+            "Nilai yang tersimpan berbeda dari pilihan Anda. Muat ulang halaman dan periksa Riwayat Versi sebelum menerbitkan lagi.",
+        },
+        { status: 500 }
+      );
+    }
+
     return NextResponse.json({ state, ...(tags.length ? { revalidated_tags: tags } : {}) });
   } catch (error) {
-    return failure(error);
+    return failure(error, params.key);
   }
 }

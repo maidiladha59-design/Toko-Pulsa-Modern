@@ -396,7 +396,7 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .bottom-nav-item {
   position: relative; z-index: 1; display: flex; flex: 1 1 0%; min-width: 0; min-height: 48px;
   flex-direction: column; align-items: center; justify-content: center; gap: 2px;
-  border: 0; background: transparent; padding: 0; cursor: pointer;
+  border: 0; background: transparent; padding: 0 4px; cursor: pointer;
   border-radius: 20px; color: var(--muted);
   font-family: inherit; font-size: 12px; font-weight: 600; line-height: 1; text-decoration: none;
   transition: color .2s ease, transform .12s ease, background-color .2s ease;
@@ -415,7 +415,25 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
     background: color-mix(in srgb, var(--nav-accent) 14%, transparent);
   }
 }
-.bottom-nav-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+/* Label satu baris tanpa elipsis: tiap item flex 1 1 0 + padding 4px sehingga
+   label tidak saling menempel; "Transaksi" tetap utuh di 360px ke atas. */
+.bottom-nav-label {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-align: center;
+  font-size: 12px;
+  line-height: 1.1;
+}
+@media (max-width: 359px) {
+  .bottom-nav-label { font-size: 11px; }
+}
+/* Pratinjau admin lebih sempit dari nav asli: label diperkecil, bukan dipotong. */
+.bottom-nav[data-embedded="true"] .bottom-nav-label { font-size: 10px; }
+.bottom-nav[data-embedded="true"] .bottom-nav-item { padding: 0 2px; }
+.bottom-nav[data-compact="true"] .bottom-nav-label { font-size: 9px; }
 .bottom-nav[data-labels="false"] .bottom-nav-label { display: none; }
 .bottom-nav-badge {
   position: absolute; top: -4px; right: 2px; display: flex; min-width: 16px; height: 16px;

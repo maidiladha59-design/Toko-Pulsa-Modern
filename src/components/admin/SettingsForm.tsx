@@ -62,7 +62,7 @@ type PendingConfirm =
 
 const SUCCESS_MESSAGE: Record<Action, string> = {
   save_draft: "Draf tersimpan. Pengunjung masih melihat versi yang terbit sebelum ini.",
-  publish: "Pengaturan diterbitkan dan langsung tampil tanpa deploy ulang.",
+  publish: "Berhasil diterbitkan. Pengunjung sekarang melihat versi baru.",
   discard_draft: "Draf dibuang. Formulir kembali ke versi yang sedang terbit.",
   restore: "Versi lama dipulihkan sebagai draf. Tekan Terbitkan untuk menampilkannya.",
   reset_default: "Nilai default disimpan sebagai draf. Tekan Terbitkan untuk menampilkannya.",
@@ -93,13 +93,21 @@ export default function SettingsForm<T extends SettingsFormValue>({
   const [baseline, setBaseline] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
   const [busy, setBusy] = useState<Action | null>(null);
   const [pendingConfirm, setPendingConfirm] = useState<PendingConfirm>(null);
   const [openHistoryId, setOpenHistoryId] = useState<number | null>(null);
 
   const applyState = useCallback(
-    (next: ManagedSettingState, baseDefaults: Record<string, unknown>) => {
-      const base = { ...baseDefaults, ...(next.draft ?? next.published) } as T;
+    (
+      next: ManagedSettingState,
+      baseDefaults: Record<string, unknown>,
+      preferPublished = false
+    ) => {
+      // Setelah Terbitkan, formulir wajib kembali ke nilai yang benar-benar
+      // tersimpan (published), bukan draf lama atau default kode.
+      const source = preferPublished ? next.published : next.draft ?? next.published;
+      const base = { ...baseDefaults, ...source } as T;
       setState(next);
       setValue(base);
       setBaseline(JSON.stringify(base));
@@ -117,13 +125,17 @@ export default function SettingsForm<T extends SettingsFormValue>({
       });
       const json = await res.json().catch(() => null);
       if (!res.ok || !json?.state) {
-        setLoadError(json?.message || "Gagal memuat pengaturan.");
+        const message = json?.message || "Gagal memuat pengaturan.";
+        console.error(`[settings] ${settingKey}: gagal memuat pengaturan.`, message);
+        setLoadError(message);
         return;
       }
       const nextDefaults = (json.defaults ?? {}) as Record<string, unknown>;
       setDefaults(nextDefaults);
       applyState(json.state as ManagedSettingState, nextDefaults);
-    } catch {
+      setServerError(null);
+    } catch (error) {
+      console.error(`[settings] ${settingKey}: gagal memuat pengaturan.`, error);
       setLoadError("Gagal memuat pengaturan. Periksa koneksi Anda lalu coba lagi.");
     } finally {
       setLoading(false);
@@ -184,6 +196,7 @@ export default function SettingsForm<T extends SettingsFormValue>({
   async function request(action: Action, extra: Record<string, unknown> = {}) {
     if (!state || !value) return;
     setBusy(action);
+    setServerError(null);
     try {
       const res = await fetch(`/api/admin/settings/${encodeURIComponent(settingKey)}`, {
         method: "PUT",
@@ -196,14 +209,33 @@ export default function SettingsForm<T extends SettingsFormValue>({
           setPendingConfirm({ kind: "conflict" });
           return;
         }
-        toast.show(json?.message || "Gagal memproses pengaturan. Coba lagi.", "error");
+        const message = json?.message || "Gagal memproses pengaturan. Coba lagi.";
+        console.error(`[settings] ${settingKey}: ${action} gagal.`, message);
+        setServerError(message);
+        toast.show(message, "error");
         return;
       }
-      applyState(json.state as ManagedSettingState, defaults);
+      const next = json?.state as ManagedSettingState | undefined;
+      if (!next?.published) {
+        const message = "Server tidak mengembalikan nilai pengaturan. Muat ulang halaman.";
+        console.error(`[settings] ${settingKey}: respons ${action} tanpa state.published.`);
+        setServerError(message);
+        toast.show(message, "error");
+        return;
+      }
+      applyState(next, defaults, action === "publish");
       setPendingConfirm(null);
       toast.show(SUCCESS_MESSAGE[action], "success");
-    } catch {
-      toast.show("Koneksi gagal. Periksa jaringan Anda lalu coba lagi.", "error");
+      if (action === "publish") {
+        // Bersihkan Router Cache tab ini supaya navigasi berikutnya ke toko
+        // memakai RSC baru, bukan layout yang di-cache sebelum terbit.
+        router.refresh();
+      }
+    } catch (error) {
+      console.error(`[settings] ${settingKey}: koneksi ${action} gagal.`, error);
+      const message = "Koneksi gagal. Periksa jaringan Anda lalu coba lagi.";
+      setServerError(message);
+      toast.show(message, "error");
     } finally {
       setBusy(null);
     }
@@ -362,6 +394,14 @@ export default function SettingsForm<T extends SettingsFormValue>({
             {validationError && (
               <p className="mt-3 text-xs font-bold text-danger-600 dark:text-danger-400">
                 {validationError}
+              </p>
+            )}
+            {serverError && (
+              <p
+                role="alert"
+                className="mt-3 rounded-xl border border-danger-400/40 bg-danger-50 px-3 py-2 text-xs font-bold leading-5 text-danger-700 dark:bg-danger-500/10 dark:text-danger-300"
+              >
+                {serverError}
               </p>
             )}
             {publishIssue && (
