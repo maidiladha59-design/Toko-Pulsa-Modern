@@ -15,16 +15,21 @@ import {
   THEME_CARD_STYLES,
   THEME_FONTS,
   THEME_FONT_KEYS,
+  THEME_HERO_PRESETS,
   THEME_PRESETS,
   THEME_RADII,
   THEME_RADIUS_KEYS,
   THEME_SETTINGS_KEY,
+  applyHeroPreset,
   applyThemePreset,
+  heroCssVariables,
   normalizeHexColor,
   themeContrastChecks,
   themePreviewStyle,
   themePublishError,
   type ThemeColors,
+  type ThemeHeroColors,
+  type ThemeHeroPresetKey,
   type ThemePresetKey,
   type ThemeSettings,
 } from "@/lib/theme-settings";
@@ -47,6 +52,14 @@ const COLOR_FIELDS: ReadonlyArray<{ key: keyof ThemeColors; label: string; hint?
   { key: "danger", label: "Bahaya" },
 ];
 
+const HERO_COLOR_FIELDS: ReadonlyArray<{ key: keyof ThemeHeroColors; label: string; hint?: string }> = [
+  { key: "bgFrom", label: "Latar awal", hint: "Warna kiri atas gradasi hero." },
+  { key: "bgTo", label: "Latar akhir", hint: "Warna kanan bawah gradasi hero." },
+  { key: "text", label: "Warna teks", hint: "Judul, nama, dan saldo." },
+  { key: "textMuted", label: "Warna teks redup", hint: "Sapaan, label, dan keterangan." },
+  { key: "accent", label: "Warna aksen", hint: "Kata highlight, ikon, dan fokus." },
+];
+
 function themeValidate(value: ThemeSettings): string | null {
   if (!value.identity.shopName.trim()) return "Nama toko wajib diisi.";
   if (value.identity.shopName.length > 60) return "Nama toko maksimal 60 karakter.";
@@ -56,6 +69,11 @@ function themeValidate(value: ThemeSettings): string | null {
       if (!normalizeHexColor(value[mode][field.key])) {
         return `Warna ${field.label.toLowerCase()} mode ${mode === "light" ? "terang" : "gelap"} harus format hex.`;
       }
+    }
+  }
+  for (const field of HERO_COLOR_FIELDS) {
+    if (!normalizeHexColor(value.hero[field.key])) {
+      return `${field.label} kartu hero harus format hex.`;
     }
   }
   return null;
@@ -377,6 +395,169 @@ function TypographyCard({ value, set }: { value: ThemeSettings; set: SetTheme })
   );
 }
 
+function HeroCard({ value, set }: { value: ThemeSettings; set: SetTheme }) {
+  const hero = value.hero;
+  const patch = (key: keyof ThemeHeroColors, hex: string) => {
+    set("hero", { ...hero, [key]: hex });
+    set("heroPreset", "custom");
+  };
+
+  return (
+    <Card>
+      <CardTitle>Kartu Hero</CardTitle>
+      <CardDescription>
+        Satu set warna untuk kartu utama di beranda, halaman saldo, peringkat, dan layanan. Nilai ini
+        berlaku di mode terang maupun gelap supaya teks selalu terbaca. Pemeriksa kontras memastikan
+        teks hero minimal {MIN_CONTRAST}:1 terhadap latar awal dan akhir.
+      </CardDescription>
+
+      <div className="mt-4 grid gap-3 sm:grid-cols-3">
+        {THEME_HERO_PRESETS.map((preset) => {
+          const active = value.heroPreset === preset.key;
+          return (
+            <button
+              key={preset.key}
+              type="button"
+              aria-pressed={active}
+              onClick={() => {
+                const next = applyHeroPreset(value, preset.key as ThemeHeroPresetKey);
+                set("hero", next.hero);
+                set("heroPreset", next.heroPreset);
+              }}
+              className={`min-w-0 rounded-2xl border p-3 text-left transition hover:border-gold-400 ${
+                active ? "border-gold-400 bg-app-accent-soft" : "border-app-border bg-app-inset/40"
+              }`}
+            >
+              <div className="flex gap-1.5">
+                {[preset.colors.bgFrom, preset.colors.bgTo, preset.colors.accent].map((color, index) => (
+                  <span
+                    key={`${preset.key}-${index}`}
+                    aria-hidden
+                    className="h-5 w-5 rounded-full border border-white/20"
+                    style={{ backgroundColor: color }}
+                  />
+                ))}
+              </div>
+              <p className="mt-2 text-sm font-black text-app-text">{preset.label}</p>
+              <p className="mt-0.5 text-[11px] leading-4 text-app-subtle">{preset.description}</p>
+            </button>
+          );
+        })}
+      </div>
+
+      <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        {HERO_COLOR_FIELDS.map((field) => (
+          <div key={field.key} className="min-w-0">
+            <ColorField
+              label={field.label}
+              value={hero[field.key]}
+              onChange={(hex) => patch(field.key, hex)}
+            />
+            {field.hint ? <p className="mt-1 text-[10px] leading-4 text-app-subtle">{field.hint}</p> : null}
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-4">
+        <HeroPreview value={value} />
+      </div>
+
+      {value.heroPreset === "custom" && (
+        <p className="mt-3 rounded-xl bg-warning-100 px-3 py-2 text-xs font-bold text-warning-800 dark:bg-warning-500/15 dark:text-warning-300">
+          Warna kartu hero saat ini kustom, bukan salah satu preset.
+        </p>
+      )}
+    </Card>
+  );
+}
+
+function HeroPreview({ value }: { value: ThemeSettings }) {
+  const style = heroCssVariables(value.hero) as React.CSSProperties;
+
+  return (
+    <div className="min-w-0">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <p className="text-xs font-black uppercase tracking-widest text-app-subtle">Pratinjau hero</p>
+        <span className="flex items-center gap-1 text-[10px] font-bold text-app-subtle">
+          <Icon name="sun" size={12} /> <Icon name="moon" size={12} /> Terang &amp; gelap
+        </span>
+      </div>
+
+      <div className="mx-auto w-full max-w-[360px] overflow-hidden rounded-[1.75rem] border border-app-border bg-app-surface p-3">
+        <div className="app-hero rounded-2xl p-4" style={style}>
+          <div className="flex items-start justify-between gap-2">
+            <div className="min-w-0">
+              <p className="text-[9px] font-bold" style={{ color: "var(--hero-text-muted)" }}>
+                Selamat datang
+              </p>
+              <p className="mt-0.5 break-words text-sm font-black" style={{ color: "var(--hero-text)" }}>
+                {value.identity.shopName || "Nama toko"}
+              </p>
+            </div>
+            <span
+              className="shrink-0 rounded-full border px-2 py-0.5 text-[9px] font-black"
+              style={{
+                backgroundColor: "rgba(16, 185, 129, 0.22)",
+                borderColor: "rgba(110, 231, 183, 0.45)",
+                color: "#6ee7b7",
+              }}
+            >
+              Terverifikasi
+            </span>
+          </div>
+
+          <div
+            className="mt-2 rounded-xl border p-2"
+            style={{ backgroundColor: "var(--hero-chip-bg)", borderColor: "var(--hero-chip-border)" }}
+          >
+            <p className="text-[8px] font-black uppercase tracking-widest" style={{ color: "var(--hero-text-muted)" }}>
+              Saldo
+            </p>
+            <p className="text-base font-black" style={{ color: "var(--hero-text)" }}>
+              Rp 1.950
+            </p>
+          </div>
+
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {["Profil", "Rekap", "Bantuan", "Info"].map((label) => (
+              <span
+                key={label}
+                className="rounded-full border px-2 py-0.5 text-[9px] font-bold"
+                style={{
+                  backgroundColor: "var(--hero-chip-bg)",
+                  borderColor: "var(--hero-chip-border)",
+                  color: "var(--hero-text)",
+                }}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+
+          <p className="mt-2 text-[9px] leading-4" style={{ color: "var(--hero-text-muted)" }}>
+            Pulsa, data, dan tagihan{" "}
+            <span className="font-black" style={{ color: "var(--hero-accent)" }}>
+              lebih praktis
+            </span>{" "}
+            di satu akun.
+          </p>
+
+          <span
+            className="mt-2 inline-block rounded-full border px-2 py-0.5 text-[9px] font-bold"
+            style={{
+              backgroundColor: "var(--hero-chip-bg)",
+              borderColor: "var(--hero-chip-border)",
+              color: "var(--hero-text-muted)",
+            }}
+          >
+            ID: AIDIL-0001
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function PhonePreview({ value, mode }: { value: ThemeSettings; mode: "light" | "dark" }) {
   const colors = value[mode];
   const style = themePreviewStyle(colors, value) as React.CSSProperties;
@@ -398,14 +579,17 @@ function PhonePreview({ value, mode }: { value: ThemeSettings; mode: "light" | "
         style={{ ...style, borderColor: "rgb(var(--app-border))" }}
       >
         <div className="space-y-2.5">
-          <div
-            className="rounded-2xl p-4"
-            style={{ backgroundColor: "var(--app-hero-bg)" }}
-          >
-            <p className="text-[9px] font-black uppercase tracking-[0.2em]" style={{ color: "var(--app-kicker)" }}>
+          <div className="app-hero rounded-2xl p-4">
+            <p
+              className="text-[9px] font-black uppercase tracking-[0.2em]"
+              style={{ color: "var(--hero-accent)" }}
+            >
               {value.identity.shopName || "NAMA TOKO"}
             </p>
-            <p className="mt-1.5 break-words text-base font-black leading-5" style={{ color: "var(--app-text)" }}>
+            <p
+              className="mt-1.5 break-words text-base font-black leading-5"
+              style={{ color: "var(--hero-text)" }}
+            >
               {value.identity.tagline || "Tagline toko Anda tampil di sini."}
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
@@ -531,6 +715,7 @@ export default function AdminThemeBrandingPage() {
               <ModeColors mode="dark" settings={value} set={set} />
             </div>
           </Card>
+          <HeroCard value={value} set={set} />
           <ContrastCard value={value} />
           <TypographyCard value={value} set={set} />
           <LivePreview value={value} />

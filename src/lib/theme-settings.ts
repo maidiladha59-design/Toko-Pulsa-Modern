@@ -15,11 +15,13 @@ export const THEME_FONT_KEYS = ["system", "jakarta", "inter", "nunito"] as const
 export const THEME_RADIUS_KEYS = ["small", "medium", "large"] as const;
 export const THEME_CARD_STYLES = ["flat", "shadow"] as const;
 export const THEME_PRESET_KEYS = ["blue-green", "gold-dark", "neutral", "custom"] as const;
+export const THEME_HERO_PRESET_KEYS = ["gelap-biru", "gelap-emas", "gelap-hijau", "custom"] as const;
 
 export type ThemeFontKey = (typeof THEME_FONT_KEYS)[number];
 export type ThemeRadiusKey = (typeof THEME_RADIUS_KEYS)[number];
 export type ThemeCardStyle = (typeof THEME_CARD_STYLES)[number];
 export type ThemePresetKey = (typeof THEME_PRESET_KEYS)[number];
+export type ThemeHeroPresetKey = (typeof THEME_HERO_PRESET_KEYS)[number];
 
 export const THEME_FONTS: ReadonlyArray<{ key: ThemeFontKey; label: string; stack: string }> = [
   {
@@ -54,6 +56,14 @@ export type ThemeColors = {
   danger: string;
 };
 
+export type ThemeHeroColors = {
+  bgFrom: string;
+  bgTo: string;
+  text: string;
+  textMuted: string;
+  accent: string;
+};
+
 export type ThemeSettings = {
   identity: {
     shopName: string;
@@ -65,6 +75,9 @@ export type ThemeSettings = {
   };
   light: ThemeColors;
   dark: ThemeColors;
+  /** Satu set warna kartu hero, berlaku untuk mode terang dan gelap. */
+  hero: ThemeHeroColors;
+  heroPreset: ThemeHeroPresetKey;
   font: ThemeFontKey;
   radius: ThemeRadiusKey;
   cardStyle: ThemeCardStyle;
@@ -94,6 +107,14 @@ export const DEFAULT_THEME_COLORS: { light: ThemeColors; dark: ThemeColors } = {
   },
 };
 
+export const DEFAULT_HERO_COLORS: ThemeHeroColors = {
+  bgFrom: "#0b1220",
+  bgTo: "#123a66",
+  text: "#ffffff",
+  textMuted: "#c3cedb",
+  accent: "#5cc0ff",
+};
+
 export const DEFAULT_THEME_SETTINGS: ThemeSettings = {
   identity: {
     shopName: "AIDIL STORE",
@@ -105,6 +126,8 @@ export const DEFAULT_THEME_SETTINGS: ThemeSettings = {
   },
   light: DEFAULT_THEME_COLORS.light,
   dark: DEFAULT_THEME_COLORS.dark,
+  hero: DEFAULT_HERO_COLORS,
+  heroPreset: "gelap-biru",
   font: "system",
   radius: "large",
   cardStyle: "shadow",
@@ -286,6 +309,56 @@ export function applyThemePreset(settings: ThemeSettings, key: ThemePresetKey): 
   };
 }
 
+type HeroPresetDefinition = {
+  key: Exclude<ThemeHeroPresetKey, "custom">;
+  label: string;
+  description: string;
+  colors: ThemeHeroColors;
+};
+
+export const THEME_HERO_PRESETS: ReadonlyArray<HeroPresetDefinition> = [
+  {
+    key: "gelap-biru",
+    label: "Gelap Biru",
+    description: "Biru malam dengan aksen langit cerah. Bawaan untuk semua tema.",
+    colors: DEFAULT_HERO_COLORS,
+  },
+  {
+    key: "gelap-emas",
+    label: "Gelap Emas",
+    description: "Hitam pekat berpadu emas hangat.",
+    colors: {
+      bgFrom: "#0a0a0a",
+      bgTo: "#3a2a05",
+      text: "#ffffff",
+      textMuted: "#e2d6bc",
+      accent: "#e5b53a",
+    },
+  },
+  {
+    key: "gelap-hijau",
+    label: "Gelap Hijau",
+    description: "Hijau hutan dalam dengan aksen mint.",
+    colors: {
+      bgFrom: "#06150f",
+      bgTo: "#0f3d2a",
+      text: "#ffffff",
+      textMuted: "#c6d6c9",
+      accent: "#8cd93a",
+    },
+  },
+];
+
+export function applyHeroPreset(settings: ThemeSettings, key: ThemeHeroPresetKey): ThemeSettings {
+  const preset = THEME_HERO_PRESETS.find((entry) => entry.key === key);
+  if (!preset) return { ...settings, heroPreset: "custom" };
+  return {
+    ...settings,
+    hero: { ...preset.colors },
+    heroPreset: preset.key,
+  };
+}
+
 // =========================================================
 // Skema
 // =========================================================
@@ -301,6 +374,14 @@ const colorSetSchema = z.object({
   danger: hexColorSchema,
 });
 
+const heroColorSetSchema = z.object({
+  bgFrom: hexColorSchema,
+  bgTo: hexColorSchema,
+  text: hexColorSchema,
+  textMuted: hexColorSchema,
+  accent: hexColorSchema,
+});
+
 const identitySchema = z.object({
   shopName: z.string().trim().min(1, "Nama toko wajib diisi.").max(60, "Nama toko maksimal 60 karakter."),
   tagline: z.string().trim().max(160, "Tagline maksimal 160 karakter."),
@@ -314,6 +395,8 @@ export const themeSettingsInputSchema = z.object({
   identity: identitySchema.default(DEFAULT_THEME_SETTINGS.identity),
   light: colorSetSchema.default(DEFAULT_THEME_SETTINGS.light),
   dark: colorSetSchema.default(DEFAULT_THEME_SETTINGS.dark),
+  hero: heroColorSetSchema.default(DEFAULT_HERO_COLORS),
+  heroPreset: z.enum(THEME_HERO_PRESET_KEYS).default("gelap-biru"),
   font: z.enum(THEME_FONT_KEYS).default("system"),
   radius: z.enum(THEME_RADIUS_KEYS).default("large"),
   cardStyle: z.enum(THEME_CARD_STYLES).default("shadow"),
@@ -331,6 +414,17 @@ function normalizeColorSet(colors: ThemeColors): ThemeColors {
     success: fix(colors.success, "#059669"),
     warning: fix(colors.warning, "#D97706"),
     danger: fix(colors.danger, "#DC2626"),
+  };
+}
+
+function normalizeHeroColors(colors: ThemeHeroColors): ThemeHeroColors {
+  const fix = (value: string, fallback: string) => normalizeHexColor(value) ?? fallback;
+  return {
+    bgFrom: fix(colors.bgFrom, DEFAULT_HERO_COLORS.bgFrom),
+    bgTo: fix(colors.bgTo, DEFAULT_HERO_COLORS.bgTo),
+    text: fix(colors.text, DEFAULT_HERO_COLORS.text),
+    textMuted: fix(colors.textMuted, DEFAULT_HERO_COLORS.textMuted),
+    accent: fix(colors.accent, DEFAULT_HERO_COLORS.accent),
   };
 }
 
@@ -358,6 +452,8 @@ export function normalizeThemeSettings(value: z.infer<typeof themeSettingsInputS
     },
     light: normalizeColorSet(value.light as ThemeColors),
     dark: normalizeColorSet(value.dark as ThemeColors),
+    hero: normalizeHeroColors(value.hero as ThemeHeroColors),
+    heroPreset: value.heroPreset,
     font: value.font,
     radius: value.radius,
     cardStyle: value.cardStyle,
@@ -370,7 +466,7 @@ export function normalizeThemeSettings(value: z.infer<typeof themeSettingsInputS
 // =========================================================
 
 export type ContrastCheck = {
-  mode: "light" | "dark";
+  mode: "light" | "dark" | "hero";
   modeLabel: string;
   label: string;
   ratio: number;
@@ -399,6 +495,24 @@ export function themeContrastChecks(settings: ThemeSettings): ContrastCheck[] {
         pass: ratio >= MIN_CONTRAST,
       });
     }
+  }
+
+  // Hero selalu gelap di kedua mode: teks harus terbaca di warna awal dan
+  // akhir gradasi (bagian paling terang dan paling gelap).
+  const hero = settings.hero ?? DEFAULT_HERO_COLORS;
+  const heroPairs = [
+    { label: "Teks hero pada latar awal", back: hero.bgFrom },
+    { label: "Teks hero pada latar akhir", back: hero.bgTo },
+  ];
+  for (const pair of heroPairs) {
+    const ratio = contrastRatio(hero.text, pair.back);
+    checks.push({
+      mode: "hero",
+      modeLabel: "Hero",
+      label: pair.label,
+      ratio: Math.round(ratio * 100) / 100,
+      pass: ratio >= MIN_CONTRAST,
+    });
   }
   return checks;
 }
@@ -441,6 +555,15 @@ export const THEME_CSS_VARIABLES = [
   "--app-font",
   "--app-radius-card",
   "--app-card-shadow",
+  "--hero-bg-from",
+  "--hero-bg-to",
+  "--hero-glow",
+  "--hero-text",
+  "--hero-text-muted",
+  "--hero-divider",
+  "--hero-chip-bg",
+  "--hero-chip-border",
+  "--hero-accent",
 ] as const;
 
 type ModeVars = Record<string, string>;
@@ -484,6 +607,27 @@ function variablesToCss(vars: ModeVars): string {
 }
 
 /**
+ * Variabel hero diturunkan dari 5 warna hex tervalidasi. Glow/divider/chip
+ * memakai alpha supaya tetap menyatu dengan latar gelap apa pun.
+ */
+export function heroCssVariables(hero: ThemeHeroColors): Record<string, string> {
+  const safe = normalizeHeroColors(hero);
+  const text = hexToRgb(safe.text) ?? { r: 255, g: 255, b: 255 };
+  const accent = hexToRgb(safe.accent) ?? { r: 92, g: 192, b: 255 };
+  return {
+    "--hero-bg-from": safe.bgFrom,
+    "--hero-bg-to": safe.bgTo,
+    "--hero-glow": `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.25)`,
+    "--hero-text": safe.text,
+    "--hero-text-muted": safe.textMuted,
+    "--hero-divider": `rgba(${text.r}, ${text.g}, ${text.b}, 0.12)`,
+    "--hero-chip-bg": `rgba(${text.r}, ${text.g}, ${text.b}, 0.1)`,
+    "--hero-chip-border": `rgba(${text.r}, ${text.g}, ${text.b}, 0.18)`,
+    "--hero-accent": safe.accent,
+  };
+}
+
+/**
  * CSS yang disisipkan server pada <head>. Semua nilai berasal dari hex yang
  * sudah divalidasi dan font/radius dari enum; tidak ada input mentah.
  */
@@ -495,8 +639,9 @@ export function buildThemeCss(settings: ThemeSettings): string {
       ? "none"
       : "0 8px 24px rgba(9, 9, 11, .08)";
   const shared = `--app-font: ${font.stack}; --app-radius-card: ${radius.card}; --app-card-shadow: ${shadow};`;
+  const hero = heroCssVariables(settings.hero ?? DEFAULT_HERO_COLORS);
   return [
-    `html:root { ${variablesToCss(modeVariables(settings.light))} ${shared} }`,
+    `html:root { ${variablesToCss(modeVariables(settings.light))} ${variablesToCss(hero)} ${shared} }`,
     `html.dark { ${variablesToCss(modeVariables(settings.dark))} }`,
     `html body { font-family: var(--app-font); }`,
     `.theme-card { border-radius: var(--app-radius-card); box-shadow: var(--app-card-shadow); }`,
@@ -505,7 +650,7 @@ export function buildThemeCss(settings: ThemeSettings): string {
     `html .btn-gold:disabled { background-image: linear-gradient(135deg, var(--theme-primary-strong) 0%, var(--theme-primary) 100%); }`,
     `html .btn-gold-metal, html .brand-button { background-color: var(--theme-accent); background-image: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-accent-strong) 100%); color: var(--theme-on-accent); }`,
     `html .brand-yellow { color: var(--theme-accent); }`,
-    `html .app-hero { background: radial-gradient(circle at 80% 15%, rgb(var(--theme-accent-rgb) / .24), transparent 30%), radial-gradient(circle at 15% 100%, rgb(var(--theme-primary-rgb) / .12), transparent 38%), rgb(var(--app-hero-bg)); }`,
+    `html .app-hero { color: var(--hero-text); background: radial-gradient(circle at 80% 15%, var(--hero-glow), transparent 34%), linear-gradient(135deg, var(--hero-bg-from) 0%, var(--hero-bg-to) 100%); }`,
   ].join("\n");
 }
 
@@ -515,6 +660,7 @@ export function themePreviewStyle(colors: ThemeColors, settings: ThemeSettings):
   const radius = THEME_RADII[settings.radius] ?? THEME_RADII.large;
   return {
     ...modeVariables(colors),
+    ...heroCssVariables(settings.hero ?? DEFAULT_HERO_COLORS),
     "--app-font": font.stack,
     "--app-radius-card": radius.card,
     "--app-card-shadow": settings.cardStyle === "flat" ? "none" : "0 8px 24px rgba(9, 9, 11, .08)",

@@ -18,11 +18,12 @@ const TONES: Record<"app" | "hero", Record<KycUiStatus, string>> = {
     pending: "border-warning-500/30 bg-warning-500/10 text-warning-700 dark:text-warning-300",
     rejected: "border-danger-500/30 bg-danger-500/10 text-danger-700 dark:text-danger-300",
   },
+  // Di atas hero gelap: latar semi-transparan gelap + teks terang, bukan pastel.
   hero: {
-    verified: "border-success-400/30 bg-success-500/15 text-success-300",
-    unverified: "border-warning-400/30 bg-warning-500/15 text-warning-300",
-    pending: "border-warning-400/30 bg-warning-500/15 text-warning-300",
-    rejected: "border-danger-400/30 bg-danger-500/15 text-danger-300",
+    verified: "border-[rgba(110,231,183,0.45)] bg-[rgba(16,185,129,0.20)] text-[#6ee7b7]",
+    unverified: "border-[rgba(252,211,77,0.45)] bg-[rgba(245,158,11,0.20)] text-[#fcd34d]",
+    pending: "border-[rgba(252,211,77,0.45)] bg-[rgba(245,158,11,0.20)] text-[#fcd34d]",
+    rejected: "border-[rgba(252,165,165,0.45)] bg-[rgba(239,68,68,0.20)] text-[#fca5a5]",
   },
 };
 

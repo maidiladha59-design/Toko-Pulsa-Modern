@@ -125,9 +125,10 @@ test('v98 komponen ticker: dua salinan teks, -50%, ResizeObserver, mask, reduced
   assert.match(ticker, /onTouchStart: pause/);
   assert.match(ticker, /if \(settings\.pause_on_touch\) setPaused\(true\);/);
   assert.match(ticker, /const TEXT_STYLES: Record<TickerStyle, string>/);
-  assert.match(ticker, /default: "text-white"/);
-  assert.match(ticker, /emas: "text-gold-200"/);
-  assert.match(ticker, /peringatan: "text-warning-300"/);
+  // Warna ticker ikut variabel hero supaya terbaca di mode terang dan gelap.
+  assert.match(ticker, /default: "text-\[color:var\(--hero-text\)\]"/);
+  assert.match(ticker, /emas: "text-\[color:var\(--hero-accent\)\]"/);
+  assert.match(ticker, /peringatan: "text-\[#fcd34d\]"/);
   // Teks dari pengaturan tidak pernah dirender sebagai HTML.
   assert.doesNotMatch(ticker, /dangerouslySetInnerHTML|\{__html/);
 });
@@ -152,7 +153,7 @@ test('v98 menu cepat hero: satu baris 4 kolom sama lebar, ikon di atas label, ba
   assert.match(menu, /<NavIcon name=\{item\.icon\} className="h-8 w-8" \/>/);
   assert.match(menu, /text-\[13px\] font-medium leading-4/);
   assert.match(menu, /w-full min-w-0 break-words text-center/);
-  assert.match(menu, /focus-visible:outline-gold-400/);
+  assert.match(menu, /focus-visible:outline-\[color:var\(--hero-accent\)\]/);
   assert.match(menu, /active:scale-\[\.97\]/);
   assert.match(menu, /const showBadge = item\.icon === "bell" && count > 0;/);
   assert.match(menu, /\{count > 9 \? "9\+" : count\}/);
@@ -173,12 +174,12 @@ test('v98 hero beranda: avatar > judul > pemisah > menu cepat > pemisah > ticker
   const hero = home.slice(home.indexOf('<section className="app-hero'), home.indexOf('</section>', home.indexOf('<section className="app-hero')));
   assert.ok(hero.length > 0, 'kartu hero harus ada');
   assert.match(home, /<HeroQuickMenu unread=\{accountData\?\.unread\?\?0\}\/>/);
-  assert.match(home, /\{tickerShouldRender\(ticker\)&&<div className="mt-3 border-t border-white\/10 pt-1"><InfoTicker settings=\{ticker\}\/><\/div>\}/);
+  assert.match(home, /\{tickerShouldRender\(ticker\)&&<div className="mt-3 border-t pt-1" style=\{\{borderColor:"var\(--hero-divider\)"\}\}><InfoTicker settings=\{ticker\}\/><\/div>\}/);
   assert.match(hero, /<HeroUser name=\{accountData\.name\}/);
-  // Judul berasal dari Pengaturan Beranda; bagian highlight tetap berwarna aksen.
-  assert.match(home, /<span className="text-gold-400">\{heroHighlight\}<\/span>/);
+  // Judul berasal dari Pengaturan Beranda; bagian highlight tetap berwarna aksen hero.
+  assert.match(home, /<span style=\{\{color:"var\(--hero-accent\)"\}\}>\{heroHighlight\}<\/span>/);
   assert.match(hero, /\{heroHeading\}/);
-  assert.match(hero, /border-t border-white\/10/);
+  assert.match(hero, /style=\{\{borderColor:"var\(--hero-divider\)"\}\}/);
   assert.ok(hero.indexOf('<HeroUser') < hero.indexOf('{heroHeading}'), 'avatar di atas judul');
   assert.ok(hero.indexOf('{heroHeading}') < hero.indexOf('<HeroQuickMenu'), 'judul di atas menu cepat');
   assert.ok(hero.indexOf('<HeroQuickMenu') < hero.indexOf('<InfoTicker'), 'ticker di bawah menu cepat');

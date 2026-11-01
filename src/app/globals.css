@@ -63,6 +63,17 @@
   --app-accent-soft: 239 248 255;
   --app-kicker: 17 81 184;
   --app-hero-bg: 9 9 11;
+  /* Kartu hero selalu gelap di kedua mode, terpisah dari token tema umum.
+     Nilai bisa ditimpa server dari Tema & Branding (--hero-* di <head>). */
+  --hero-bg-from: #0b1220;
+  --hero-bg-to: #123a66;
+  --hero-glow: rgba(46, 158, 245, 0.25);
+  --hero-text: #ffffff;
+  --hero-text-muted: rgba(255, 255, 255, 0.72);
+  --hero-divider: rgba(255, 255, 255, 0.12);
+  --hero-chip-bg: rgba(255, 255, 255, 0.1);
+  --hero-chip-border: rgba(255, 255, 255, 0.18);
+  --hero-accent: #5cc0ff;
 }
 .dark {
   --app-bg: 9 9 11;
@@ -76,6 +87,15 @@
   --app-accent-soft: 11 50 107;
   --app-kicker: 124 201 252;
   --app-hero-bg: 9 9 11;
+  --hero-bg-from: #0b1220;
+  --hero-bg-to: #123a66;
+  --hero-glow: rgba(46, 158, 245, 0.25);
+  --hero-text: #ffffff;
+  --hero-text-muted: rgba(255, 255, 255, 0.72);
+  --hero-divider: rgba(255, 255, 255, 0.12);
+  --hero-chip-bg: rgba(255, 255, 255, 0.1);
+  --hero-chip-border: rgba(255, 255, 255, 0.18);
+  --hero-accent: #5cc0ff;
   color-scheme: dark;
 }
 
@@ -132,8 +152,11 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
   .toast-error-shake { animation: none !important; }
 }
 
-.app-hero { position: relative; background: radial-gradient(circle at 80% 15%, rgba(46, 158, 245, .24), transparent 30%), radial-gradient(circle at 15% 100%, rgba(140, 217, 58, .12), transparent 38%), rgb(var(--app-hero-bg)); box-shadow: 0 24px 60px rgba(0, 0, 0, .35); }
-.app-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 0%, rgba(182,224,255,.06) 45%, transparent 70%); pointer-events: none; }
+/* Kartu hero memakai variabel --hero-* sendiri (bukan token tema umum) supaya
+   selalu gelap dan teksnya terbaca di mode terang maupun gelap. */
+.app-hero { position: relative; color: var(--hero-text); background: radial-gradient(circle at 80% 15%, var(--hero-glow), transparent 34%), linear-gradient(135deg, var(--hero-bg-from) 0%, var(--hero-bg-to) 100%); box-shadow: 0 24px 60px rgba(0, 0, 0, .28); }
+.app-hero::after { content: ""; position: absolute; inset: 0; background: linear-gradient(120deg, transparent 0%, var(--hero-divider) 45%, transparent 70%); pointer-events: none; }
+.hero-focus:focus-visible { outline-color: var(--hero-accent); }
 
 /* Cincin avatar terverifikasi: hanya lapisan gradasi yang berputar (5 detik
    per putaran, linear) — foto di dalamnya tidak ikut bergerak. Satu-satunya

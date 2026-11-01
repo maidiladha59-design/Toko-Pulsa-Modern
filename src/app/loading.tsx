@@ -22,17 +22,17 @@ function HomeSkeleton() {
     <>
       <section className="app-hero rounded-[2rem] p-5 sm:p-6">
         <div className="flex items-center gap-3">
-          <div className="h-14 w-14 shrink-0 animate-pulse rounded-2xl bg-white/15" />
+          <div className="h-14 w-14 shrink-0 animate-pulse rounded-2xl bg-[color:var(--hero-chip-bg)]" />
           <div className="min-w-0 flex-1 space-y-2">
-            <div className="h-3 w-24 animate-pulse rounded bg-white/20" />
-            <div className="h-4 w-40 animate-pulse rounded bg-white/20" />
+            <div className="h-3 w-24 animate-pulse rounded bg-[color:var(--hero-divider)]" />
+            <div className="h-4 w-40 animate-pulse rounded bg-[color:var(--hero-divider)]" />
           </div>
         </div>
-        <div className="mt-5 h-8 w-3/4 animate-pulse rounded bg-white/20" />
-        <div className="mt-2 h-3 w-2/3 animate-pulse rounded bg-white/20" />
-        <div className="mt-5 grid grid-cols-4 gap-2 border-t border-white/10 pt-3">
+        <div className="mt-5 h-8 w-3/4 animate-pulse rounded bg-[color:var(--hero-divider)]" />
+        <div className="mt-2 h-3 w-2/3 animate-pulse rounded bg-[color:var(--hero-divider)]" />
+        <div className="mt-5 grid grid-cols-4 gap-2 border-t border-[color:var(--hero-divider)] pt-3">
           {Array.from({ length: 4 }).map((_, i) => (
-            <div key={i} className="h-14 animate-pulse rounded bg-white/10" />
+            <div key={i} className="h-14 animate-pulse rounded bg-[color:var(--hero-chip-bg)]" />
           ))}
         </div>
       </section>

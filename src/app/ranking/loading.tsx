@@ -5,9 +5,9 @@ export default function RankingLoading() {
     <div className="customer-shell">
       <div className="mx-auto w-full max-w-[480px] space-y-5" aria-busy="true" aria-live="polite">
         <div className="app-hero rounded-[2rem] p-6">
-          <div className="h-3 w-28 animate-pulse rounded bg-white/20" />
-          <div className="mt-3 h-7 w-52 animate-pulse rounded bg-white/20" />
-          <div className="mt-2 h-3.5 w-64 max-w-full animate-pulse rounded bg-white/15" />
+          <div className="h-3 w-28 animate-pulse rounded bg-[color:var(--hero-divider)]" />
+          <div className="mt-3 h-7 w-52 animate-pulse rounded bg-[color:var(--hero-divider)]" />
+          <div className="mt-2 h-3.5 w-64 max-w-full animate-pulse rounded bg-[color:var(--hero-chip-bg)]" />
         </div>
         <div className="space-y-3">
           {Array.from({ length: 3 }).map((_, i) => (

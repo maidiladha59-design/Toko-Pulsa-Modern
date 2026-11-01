@@ -71,10 +71,10 @@ export default async function PPOBCategoryPage({ params }: { params: { category:
   return (
     <div className="customer-shell"><div className="mx-auto w-full max-w-3xl animate-page-in">
       <Link href="/#layanan" className="inline-flex items-center gap-1.5 rounded-xl px-2 py-2 text-sm font-bold text-app-muted transition hover:bg-app-inset hover:text-app-text"><Icon name="chevron_left" size={16} />Semua layanan</Link>
-      <section className="app-hero mt-3 overflow-hidden rounded-[2rem] p-6 text-white sm:p-8">
+      <section className="app-hero mt-3 overflow-hidden rounded-[2rem] p-6 sm:p-8">
         <div className="flex items-center gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-gold-400 text-zinc-950"><Icon name={config.icon} size={30} /></div>
-          <div><h1 className="text-2xl font-black sm:text-3xl">{config.title}</h1><p className="mt-2 text-sm text-zinc-400">{config.desc}</p></div>
+          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl" style={{ backgroundColor: "var(--hero-accent)", color: "var(--hero-bg-from)" }}><Icon name={config.icon} size={30} /></div>
+          <div className="min-w-0"><h1 className="text-2xl font-black sm:text-3xl">{config.title}</h1><p className="mt-2 text-sm text-[color:var(--hero-text-muted)]">{config.desc}</p></div>
         </div>
         <ServiceTrustBadges />
       </section>

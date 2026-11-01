@@ -38,9 +38,9 @@ export default function HeroQuickMenu({ unread }: { unread: number }) {
           <Link
             key={item.href}
             href={item.href}
-            className="group flex min-h-[52px] min-w-0 flex-col items-center justify-center gap-1.5 rounded-xl py-2 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400 active:scale-[.97]"
+            className="group flex min-h-[52px] min-w-0 flex-col items-center justify-center gap-1.5 rounded-xl py-2 text-center transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--hero-accent)] active:scale-[.97]"
           >
-            <span className="relative flex h-8 w-8 items-center justify-center text-white/85 transition group-hover:text-gold-300 group-active:text-gold-200">
+            <span className="relative flex h-8 w-8 items-center justify-center text-[color:var(--hero-text)] opacity-85 transition group-hover:text-[color:var(--hero-accent)] group-hover:opacity-100 group-active:opacity-70">
               <NavIcon name={item.icon} className="h-8 w-8" />
               {showBadge && (
                 <span className="absolute -right-1.5 -top-1 min-w-[18px] rounded-full bg-danger-500 px-1 text-center text-[10px] font-black leading-[18px] text-white">
@@ -48,7 +48,7 @@ export default function HeroQuickMenu({ unread }: { unread: number }) {
                 </span>
               )}
             </span>
-            <span className="w-full min-w-0 break-words text-center text-[13px] font-medium leading-4 text-white/85 transition group-hover:text-white">{item.label}</span>
+            <span className="w-full min-w-0 break-words text-center text-[13px] font-medium leading-4 text-[color:var(--hero-text)] opacity-85 transition group-hover:text-[color:var(--hero-accent)] group-hover:opacity-100">{item.label}</span>
           </Link>
         );
       })}

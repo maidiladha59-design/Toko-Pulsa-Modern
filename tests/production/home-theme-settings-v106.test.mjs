@@ -210,7 +210,7 @@ test("v106 beranda membaca pengaturan + tema lewat getSetting, urutan bagian dih
   // Hero mengikuti pengaturan dan toggle blok tampilan.
   assert.match(home, /\{home\.hero\.description\?<p/);
   assert.match(home, /\{heroHeading\}/);
-  assert.match(home, /<span className="text-gold-400">\{heroHighlight\}<\/span>/);
+  assert.match(home, /<span style=\{\{color:"var\(--hero-accent\)"\}\}>\{heroHighlight\}<\/span>/);
   assert.match(home, /showBalance=\{home\.hero\.showBalance\}/);
   assert.match(home, /showLevel=\{home\.hero\.showLevel\}/);
   assert.match(home, /showAccountId=\{home\.hero\.showAccountId\}/);

@@ -35,7 +35,7 @@ export default function AvatarRing({
   const settings = useLevelKyc();
   const rainbowEverywhere = settings ? !settings.kyc.rainbowRingVerifiedOnly : false;
   const outer = size + 8;
-  const gapColor = gap === "hero" ? "rgb(var(--app-hero-bg))" : "rgb(var(--app-surface))";
+  const gapColor = gap === "hero" ? "var(--hero-bg-from)" : "rgb(var(--app-surface))";
   const ring =
     status === "verified" || rainbowEverywhere
       ? "avatar-ring-verified avatar-ring-spin avatar-ring-glow"

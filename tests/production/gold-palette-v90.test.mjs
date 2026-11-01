@@ -56,13 +56,27 @@ test('v90 tidak ada hex/kuning lama atau kelas yellow-* di UI & manifest', () =>
   files.push(path.join(root, 'public/manifest.webmanifest'));
 
   // #D4AF37 sengaja diizinkan lagi sebagai stop gradient .btn-gold v92.
-  const legacy = /#F5C542|#B8941F|#E4B93A|#FCD34D|rgba\(\s*245\s*,\s*197\s*,\s*66|(?:bg|text|border|ring|from|via|to)-yellow-\d{2,3}/i;
+  // #FCD34D kini dipakai khusus sebagai emas terang chip KYC/level & teks peringatan di atas hero gelap.
+  const legacy = /#F5C542|#B8941F|#E4B93A|rgba\(\s*245\s*,\s*197\s*,\s*66|(?:bg|text|border|ring|from|via|to)-yellow-\d{2,3}/i;
+  const heroGold = /#FCD34D/i;
+  const heroGoldFiles = new Set([
+    path.join(root, 'src/components/InfoTicker.tsx'),
+    path.join(root, 'src/components/profile/KycChip.tsx'),
+    path.join(root, 'src/components/profile/LevelChip.tsx'),
+  ]);
   for (const file of files) {
+    const source = fs.readFileSync(file, 'utf8');
     assert.doesNotMatch(
-      fs.readFileSync(file, 'utf8'),
+      source,
       legacy,
       `warna kuning lama masih ter-hardcode di ${path.relative(root, file)}`,
     );
+    if (heroGold.test(source)) {
+      assert.ok(
+        heroGoldFiles.has(file),
+        `emas hero #FCD34D hanya boleh dipakai chip hero: ${path.relative(root, file)}`,
+      );
+    }
   }
 });
 

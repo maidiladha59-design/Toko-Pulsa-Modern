@@ -13,16 +13,17 @@ import { useEffect, useRef, useState } from "react";
 // loop terasa tanpa jahitan. Durasi = lebar salinan / kecepatan (px per detik)
 // dan dihitung ulang lewat ResizeObserver saat ukuran berubah.
 
+// Warna diambil dari variabel hero supaya tetap terbaca di mode terang/gelap.
 const TEXT_STYLES: Record<TickerStyle, string> = {
-  default: "text-white",
-  emas: "text-gold-200",
-  peringatan: "text-warning-300",
+  default: "text-[color:var(--hero-text)]",
+  emas: "text-[color:var(--hero-accent)]",
+  peringatan: "text-[#fcd34d]",
 };
 
 const ICON_STYLES: Record<TickerStyle, string> = {
-  default: "text-gold-400",
-  emas: "text-gold-300",
-  peringatan: "text-warning-400",
+  default: "text-[color:var(--hero-accent)]",
+  emas: "text-[color:var(--hero-accent)]",
+  peringatan: "text-[#fcd34d]",
 };
 
 export default function InfoTicker({
@@ -88,7 +89,7 @@ export default function InfoTicker({
   };
 
   const shellClass =
-    "group flex h-10 min-w-0 items-center gap-2 rounded-lg px-1 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-gold-400 active:opacity-80";
+    "group flex h-10 min-w-0 items-center gap-2 rounded-lg px-1 text-left transition focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[color:var(--hero-accent)] active:opacity-80";
 
   const leadingIcon =
     settings.icon === "none" ? null : (

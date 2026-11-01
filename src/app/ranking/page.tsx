@@ -33,13 +33,13 @@ export default function RankingPage() {
   }
 
   return <div className="mx-auto max-w-3xl space-y-5 pb-20">
-    <section className="app-hero rounded-[2rem] p-6 text-white shadow-xl">
+    <section className="app-hero rounded-[2rem] p-6 shadow-xl">
       <h1 className="text-3xl font-black">
         {/* Emoji ikut satu baris dengan judul, tidak pernah jatuh sendiri. */}
         <span className="inline-flex items-center gap-2 whitespace-nowrap">Peringkat Pengguna<Icon name="trophy" size={30} /></span>
       </h1>
-      <p className="mt-2 text-sm text-white/70">Peringkat dihitung dari jumlah transaksi berhasil. Transaksi gagal, dibatalkan, dan refund tidak dihitung.</p>
-      {data?.me ? <div className="mt-5 rounded-2xl bg-white/10 p-4"><p className="text-xs text-white/70">Peringkat Anda</p><p className="mt-1 text-3xl font-black">#{data.me.rank}</p><p className="mt-1 text-sm text-white/70">{data.me.successful_transactions} transaksi berhasil · <span title={formatRupiah(data.me.successful_amount)}>{formatBalanceCompact(data.me.successful_amount)}</span></p></div> : <div className="mt-5 rounded-2xl bg-white/10 p-4 text-sm text-white/70">Anda belum punya transaksi berhasil, jadi belum masuk peringkat.</div>}
+      <p className="mt-2 text-sm text-[color:var(--hero-text-muted)]">Peringkat dihitung dari jumlah transaksi berhasil. Transaksi gagal, dibatalkan, dan refund tidak dihitung.</p>
+      {data?.me ? <div className="mt-5 rounded-2xl bg-[color:var(--hero-chip-bg)] p-4"><p className="text-xs text-[color:var(--hero-text-muted)]">Peringkat Anda</p><p className="mt-1 text-3xl font-black">#{data.me.rank}</p><p className="mt-1 text-sm text-[color:var(--hero-text-muted)]">{data.me.successful_transactions} transaksi berhasil · <span title={formatRupiah(data.me.successful_amount)}>{formatBalanceCompact(data.me.successful_amount)}</span></p></div> : <div className="mt-5 rounded-2xl bg-[color:var(--hero-chip-bg)] p-4 text-sm text-[color:var(--hero-text-muted)]">Anda belum punya transaksi berhasil, jadi belum masuk peringkat.</div>}
     </section>
 
     {error && <div role="alert" className="rounded-2xl border border-danger-500/30 bg-danger-500/10 p-4 text-sm font-bold text-danger-600 dark:text-danger-400">{error}</div>}

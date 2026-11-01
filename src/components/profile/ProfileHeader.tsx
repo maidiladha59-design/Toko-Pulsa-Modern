@@ -123,16 +123,16 @@ export default function ProfileHeader({
           />
           <span
             aria-hidden
-            className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-gold-400/60 bg-zinc-900 text-gold-200 shadow-sm"
+            className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-[color:var(--hero-chip-border)] bg-[color:var(--hero-bg-from)] text-[color:var(--hero-accent)] shadow-sm"
           >
             <Icon name="edit" size={13} />
           </span>
         </button>
 
         <div className="min-w-0 flex-1">
-          <GreetingText className="block text-xs font-semibold text-gold-200" />
+          <GreetingText className="block text-xs font-semibold text-[color:var(--hero-text-muted)]" />
           <div className="mt-1 min-w-0">
-            <p className="block truncate text-[18px] font-semibold leading-6 text-white" title={name}>
+            <p className="block truncate text-[18px] font-semibold leading-6 text-[color:var(--hero-text)]" title={name}>
               {name}
             </p>
           </div>
@@ -145,7 +145,7 @@ export default function ProfileHeader({
                 type="button"
                 onClick={copyId}
                 aria-label={`Salin ID ${shortId}`}
-                className="inline-flex h-6 max-w-full items-center gap-1 rounded-full border border-white/15 bg-white/10 px-2.5 text-[11px] font-semibold leading-4 text-zinc-200 transition hover:bg-white/15"
+                className="inline-flex h-6 max-w-full items-center gap-1 rounded-full border border-[color:var(--hero-chip-border)] bg-[color:var(--hero-chip-bg)] px-2.5 text-[11px] font-semibold leading-4 text-[color:var(--hero-text-muted)] transition hover:brightness-110"
               >
                 <span className="truncate tabular-nums">ID {shortId}</span>
                 <Icon name="copy" size={11} className="shrink-0" />
@@ -154,31 +154,31 @@ export default function ProfileHeader({
           </div>
 
           {status === "unverified" ? (
-            <p className="mt-1.5 max-w-full text-[11px] leading-4 text-zinc-400">{verificationHint || <>{KYC_VERIFY_HINT}</>}</p>
+            <p className="mt-1.5 max-w-full text-[11px] leading-4 text-[color:var(--hero-text-muted)]">{verificationHint || <>{KYC_VERIFY_HINT}</>}</p>
           ) : null}
         </div>
 
         {showBalance && (balance === null ? (
-          <div className="w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 sm:w-48" aria-hidden>
-            <span className="block h-2.5 w-10 animate-pulse rounded bg-white/15" />
-            <span className="mt-2 block h-6 w-24 animate-pulse rounded bg-white/15" />
+          <div className="w-full shrink-0 rounded-2xl border border-[color:var(--hero-divider)] bg-[color:var(--hero-chip-bg)] px-3 py-2.5 sm:w-48" aria-hidden>
+            <span className="block h-2.5 w-10 animate-pulse rounded bg-[color:var(--hero-divider)]" />
+            <span className="mt-2 block h-6 w-24 animate-pulse rounded bg-[color:var(--hero-divider)]" />
           </div>
         ) : (
-          <div className="w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 sm:w-48">
+          <div className="w-full shrink-0 rounded-2xl border border-[color:var(--hero-divider)] bg-[color:var(--hero-chip-bg)] px-3 py-2.5 sm:w-48">
             <div className="flex items-center justify-between gap-2 sm:justify-end">
-              <span className="text-[10px] font-semibold uppercase tracking-widest text-zinc-400">Saldo</span>
+              <span className="text-[10px] font-semibold uppercase tracking-widest text-[color:var(--hero-text-muted)]">Saldo</span>
               <button
                 type="button"
                 onClick={toggleBalance}
                 aria-label={hidden ? "Tampilkan saldo" : "Sembunyikan saldo"}
-                className="-mr-1 shrink-0 rounded-full p-1 text-zinc-300 transition hover:text-white"
+                className="-mr-1 shrink-0 rounded-full p-1 text-[color:var(--hero-text)] opacity-70 transition hover:opacity-100"
               >
                 <EyeToggle hidden={hidden} />
               </button>
             </div>
             <Link
               href="/wallet"
-              className="mt-1 block truncate text-xl font-black leading-7 tabular-nums text-white sm:text-right sm:text-2xl"
+              className="mt-1 block truncate text-xl font-black leading-7 tabular-nums text-[color:var(--hero-text)] sm:text-right sm:text-2xl"
             >
               {hidden ? "Rp ••••" : formatRupiah(balance)}
             </Link>

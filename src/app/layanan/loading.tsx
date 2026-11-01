@@ -6,8 +6,8 @@ export default function LayananLoading() {
     <div className="customer-shell">
       <div className="mx-auto w-full max-w-5xl" aria-busy="true" aria-live="polite">
         <div className="app-hero rounded-3xl p-6">
-          <div className="animate-pulse rounded h-7 w-56 bg-white/20" />
-          <div className="animate-pulse rounded mt-3 h-3.5 w-72 max-w-full bg-white/20" />
+          <div className="animate-pulse rounded h-7 w-56 bg-[color:var(--hero-divider)]" />
+          <div className="animate-pulse rounded mt-3 h-3.5 w-72 max-w-full bg-[color:var(--hero-chip-bg)]" />
         </div>
         <div className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-4 md:grid-cols-6">
           {Array.from({ length: 12 }).map((_, i) => (

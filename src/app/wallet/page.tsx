@@ -56,8 +56,8 @@ export default async function WalletPage() {
   return (
     <div className="customer-shell"><div className="mx-auto w-full max-w-[480px] animate-page-in">
       <section className="app-hero rounded-[2rem] p-6">
-        <p className="text-xs font-black uppercase tracking-widest text-zinc-400">Saldo Anda saat ini</p>
-        <p className="mt-2 text-4xl font-black tabular-nums text-gold-400">{formatRupiah(wallet?.balance || 0)}</p>
+        <p className="text-xs font-black uppercase tracking-widest text-[color:var(--hero-text-muted)]">Saldo Anda saat ini</p>
+        <p className="mt-2 break-words text-4xl font-black tabular-nums text-[color:var(--hero-text)]">{formatRupiah(wallet?.balance || 0)}</p>
         <div className="mt-5 flex flex-wrap gap-2">
           <Link
             href="/wallet/topup"
@@ -67,13 +67,13 @@ export default async function WalletPage() {
           </Link>
           <Link
             href="/transfer-uang"
-            className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-zinc-700 px-4 py-3 text-sm font-bold text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400"
+            className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-[color:var(--hero-chip-border)] px-4 py-3 text-sm font-bold text-[color:var(--hero-text)] transition hover:border-[color:var(--hero-accent)] hover:text-[color:var(--hero-accent)]"
           >
             <Icon name="send" size={16} /> Transfer
           </Link>
           <Link
             href="/transfer-uang/qr"
-            className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-zinc-700 px-4 py-3 text-sm font-bold text-zinc-200 transition hover:border-gold-400/60 hover:text-gold-400"
+            className="inline-flex min-h-[44px] items-center justify-center gap-1.5 rounded-xl border border-[color:var(--hero-chip-border)] px-4 py-3 text-sm font-bold text-[color:var(--hero-text)] transition hover:border-[color:var(--hero-accent)] hover:text-[color:var(--hero-accent)]"
           >
             <Icon name="inbox" size={16} /> Terima Saldo
           </Link>

@@ -9,12 +9,14 @@ import { useLevelKyc } from "@/components/settings/LevelKycProvider";
 // Warna tier memakai palet tema Tailwind; "gold" sengaja amber karena token
 // gold-* di proyek ini sudah menjadi biru brand. Dipakai hanya bila pengaturan
 // level belum tersedia (fallback ke src/config/levels.ts).
+// Latar semi-transparan gelap + teks terang agar chip tetap terbaca di atas
+// kartu hero yang selalu gelap, termasuk di mode terang.
 const TIER_TONES: Record<LevelKey, string> = {
-  bronze: "border-orange-400/30 bg-orange-500/10 text-orange-300",
-  silver: "border-zinc-300/30 bg-white/10 text-zinc-200",
-  gold: "border-amber-400/30 bg-amber-400/10 text-amber-300",
-  platinum: "border-sky-400/30 bg-sky-400/10 text-sky-300",
-  diamond: "border-violet-400/30 bg-violet-400/10 text-violet-300",
+  bronze: "border-[rgba(252,211,77,0.45)] bg-[rgba(245,158,11,0.20)] text-[#fcd34d]",
+  silver: "border-[rgba(228,228,231,0.45)] bg-[rgba(255,255,255,0.12)] text-[#e4e4e7]",
+  gold: "border-[rgba(252,211,77,0.45)] bg-[rgba(245,158,11,0.20)] text-[#fcd34d]",
+  platinum: "border-[rgba(125,211,252,0.45)] bg-[rgba(14,165,233,0.20)] text-[#7dd3fc]",
+  diamond: "border-[rgba(196,181,253,0.45)] bg-[rgba(139,92,246,0.20)] text-[#c4b5fd]",
 };
 
 export default function LevelChip({

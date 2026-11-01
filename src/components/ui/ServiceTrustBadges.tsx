@@ -51,12 +51,12 @@ export default function ServiceTrustBadges({ className = "" }: { className?: str
       {BADGES.map((badge) => (
         <div
           key={badge.label}
-          className="flex h-full min-w-0 flex-col items-center justify-center gap-1.5 rounded-xl bg-white/10 px-2 py-3 text-center"
+          className="flex h-full min-w-0 flex-col items-center justify-center gap-1.5 rounded-xl bg-[color:var(--hero-chip-bg)] px-2 py-3 text-center"
         >
-          <svg aria-hidden viewBox="0 0 24 24" className="h-5 w-5 shrink-0 text-gold-400">
+          <svg aria-hidden viewBox="0 0 24 24" className="h-5 w-5 shrink-0 text-[color:var(--hero-accent)]">
             {badge.icon}
           </svg>
-          <span className="block max-w-full truncate text-[12px] font-bold leading-tight whitespace-nowrap text-zinc-100">
+          <span className="block max-w-full truncate text-[12px] font-bold leading-tight whitespace-nowrap text-[color:var(--hero-text)]">
             {badge.label}
           </span>
         </div>
