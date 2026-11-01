@@ -30,7 +30,7 @@ function Row({ label, value, bold }: { label: string; value: React.ReactNode; bo
 
 function StatusPill({ text, ok }: { text: string; ok: boolean }) {
   return (
-    <span className={`rounded-full px-3 py-0.5 text-xs font-black tracking-wide ${ok ? "bg-gold-400 text-black" : "bg-zinc-950 text-gold-400"}`}>
+    <span className={`rounded-full px-3 py-0.5 text-xs font-black tracking-wide ${ok ? "bg-gold-600 text-white" : "bg-zinc-950 text-gold-300"}`}>
       {text}
     </span>
   );
@@ -76,7 +76,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
   return (
     <div className="customer-shell">
     <main className="mx-auto max-w-md animate-page-in pb-8 print:max-w-none print:pb-0" style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}>
-      <div className="no-print flex items-center justify-between rounded-t-3xl bg-zinc-950 px-5 pb-5 pt-4 text-gold-400">
+      <div className="no-print flex items-center justify-between rounded-t-3xl bg-zinc-950 px-5 pb-5 pt-4 text-gold-300">
         <Link href={`/orders/${order.id}`} aria-label="Kembali" className="flex leading-none"><Icon name="arrow_left" size={24} /></Link>
         <span className="text-xs font-black uppercase tracking-widest">Struk Digital</span>
       </div>
@@ -129,7 +129,7 @@ export default async function PPOBReceiptPage({ params }: { params: { id: string
         </div>
 
         <div className="mt-6 flex items-center justify-between rounded-2xl bg-zinc-950 px-5 py-4 text-xl">
-          <span className="font-black text-gold-400">Harga</span>
+          <span className="font-black text-gold-300">Harga</span>
           <b className="text-gold-400">{plainNumber(order.total_amount)}</b>
         </div>
 

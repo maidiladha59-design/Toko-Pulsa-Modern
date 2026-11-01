@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import { usePathname } from "next/navigation";
 import Icon from "@/components/icons/Icon";
+import FloatingNav from "@/components/FloatingNav";
 import AdminSidebar from "./AdminSidebar";
 import {
   adminActiveHref,
@@ -35,6 +36,10 @@ export default function AdminShell({ groups, badges, adminId, children }: Props)
   const activeHref = adminActiveHref(pathname, groups);
   const allowedHrefs = new Set(groups.flatMap((group) => group.items.map((item) => item.href)));
   const bottomItems = BOTTOM_ITEMS.filter((item) => allowedHrefs.has(item.href));
+  const navItems = bottomItems.map((item) => ({
+    ...item,
+    badge: item.href === "/admin/orders" ? badges.orders : item.href === "/admin/users" ? badges.kyc : undefined,
+  }));
 
   useEffect(() => {
     setMounted(true);
@@ -77,63 +82,26 @@ export default function AdminShell({ groups, badges, adminId, children }: Props)
           </div>
           <Link
             href="/"
-            className="btn-gold flex min-h-[38px] shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-black text-zinc-950 transition"
+            className="btn-gold flex min-h-[38px] shrink-0 items-center gap-1.5 rounded-xl px-3 text-xs font-black transition"
           >
             <Icon name="home" size={15} /> Lihat Toko
           </Link>
         </div>
       </header>
 
-      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 pb-24 md:grid-cols-[240px_1fr] md:items-start md:pb-6">
+      <div className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-5 pb-6 md:grid-cols-[240px_1fr] md:items-start md:pb-6">
         <aside className="hidden md:sticky md:top-[69px] md:block md:max-h-[calc(100dvh-89px)] md:overflow-y-auto">
           <AdminSidebar groups={groups} badges={badges} adminId={adminId} />
         </aside>
         <section className="min-w-0">{children}</section>
       </div>
 
-      <nav className="fixed inset-x-0 bottom-0 z-[60] border-t border-app-border bg-app-bg/95 pt-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgba(0,0,0,.08)] backdrop-blur-xl md:hidden">
-        <div className="mx-auto flex max-w-lg">
-          {bottomItems.map((item) => {
-            const active = activeHref === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-bold transition ${
-                  active ? "text-app-kicker" : "text-app-muted"
-                }`}
-              >
-                <span
-                  className={`flex h-7 min-w-[38px] items-center justify-center rounded-full px-2 transition ${
-                    active ? "bg-gold-400/15" : ""
-                  }`}
-                >
-                  <Icon name={item.icon} size={17} />
-                </span>
-                <span>{item.label}</span>
-              </Link>
-            );
-          })}
-          <button
-            type="button"
-            onClick={() => setDrawerOpen(true)}
-            aria-label="Buka menu admin"
-            aria-expanded={drawerOpen}
-            className={`flex min-h-[52px] flex-1 flex-col items-center justify-center gap-0.5 text-[10px] font-bold transition ${
-              drawerOpen ? "text-app-kicker" : "text-app-muted"
-            }`}
-          >
-            <span
-              className={`flex h-7 min-w-[38px] items-center justify-center rounded-full px-2 transition ${
-                drawerOpen ? "bg-gold-400/15" : ""
-              }`}
-            >
-              <Icon name="menu" size={17} />
-            </span>
-            <span>Menu</span>
-          </button>
-        </div>
-      </nav>
+      <FloatingNav
+        items={navItems}
+        isActive={(href) => activeHref === href}
+        action={{ label: "Menu", icon: "menu", active: drawerOpen, ariaLabel: "Buka menu admin", onClick: () => setDrawerOpen(true) }}
+        ariaLabel="Navigasi admin"
+      />
 
       {mounted && drawerOpen && createPortal(
         <div className="fixed inset-0 z-[900] md:hidden" role="dialog" aria-modal="true" aria-label="Menu admin">

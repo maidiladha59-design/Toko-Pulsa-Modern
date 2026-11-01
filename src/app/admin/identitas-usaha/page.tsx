@@ -237,7 +237,7 @@ export default function AdminIdentitasUsaha() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-3xl bg-gradient-to-r from-zinc-900 via-gold-700 to-black p-6 text-white shadow-lg shadow-gold-500/15">
+      <div className="app-hero rounded-3xl p-6 text-white shadow-lg shadow-black/20">
         <p className="text-xs font-black uppercase tracking-widest text-gold-100">Informasi Publik</p>
         <h1 className="mt-2 text-2xl font-black sm:text-3xl">Identitas Usaha</h1>
         <p className="mt-1 text-sm text-gold-100">

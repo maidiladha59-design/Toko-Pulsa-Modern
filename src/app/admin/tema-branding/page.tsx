@@ -24,6 +24,7 @@ import {
   applyThemePreset,
   heroCssVariables,
   normalizeHexColor,
+  recommendedThemeSettings,
   themeContrastChecks,
   themePreviewStyle,
   themePublishError,
@@ -46,6 +47,8 @@ const COLOR_FIELDS: ReadonlyArray<{ key: keyof ThemeColors; label: string; hint?
   { key: "accent", label: "Warna aksen" },
   { key: "background", label: "Latar halaman" },
   { key: "card", label: "Kartu / permukaan" },
+  { key: "card2", label: "Kartu sekunder" },
+  { key: "border", label: "Garis tepi" },
   { key: "text", label: "Teks utama" },
   { key: "success", label: "Sukses" },
   { key: "warning", label: "Peringatan" },
@@ -232,7 +235,17 @@ function IdentityCard({ value, set }: { value: ThemeSettings; set: SetTheme }) {
   );
 }
 
-function PresetCard({ value, set }: { value: ThemeSettings; set: SetTheme }) {
+function PresetCard({
+  value,
+  set,
+  saveDraft,
+  busy,
+}: {
+  value: ThemeSettings;
+  set: SetTheme;
+  saveDraft: (next?: ThemeSettings) => void;
+  busy: boolean;
+}) {
   return (
     <Card>
       <CardTitle>Preset warna</CardTitle>
@@ -240,6 +253,24 @@ function PresetCard({ value, set }: { value: ThemeSettings; set: SetTheme }) {
         Pilih titik awal, lalu sesuaikan tiap warna bila perlu. Mengubah satu warna menandai tema sebagai
         &ldquo;Kustom&rdquo;. Tombol Kembalikan Default ada di bagian bawah halaman.
       </CardDescription>
+
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-app-border bg-app-inset/40 p-3">
+        <div className="min-w-0">
+          <p className="text-sm font-black text-app-text">Tema rekomendasi</p>
+          <p className="mt-0.5 text-xs leading-5 text-app-muted">
+            Mengisi draf baru dengan warna, huruf, radius, dan hero bawaan. Tema yang sedang tampil
+            tidak berubah sampai Anda menekan Terbitkan.
+          </p>
+        </div>
+        <Button
+          size="sm"
+          variant="outline"
+          onClick={() => saveDraft(recommendedThemeSettings(value))}
+          disabled={busy}
+        >
+          Terapkan tema rekomendasi
+        </Button>
+      </div>
 
       <div className="mt-3 grid gap-3 sm:grid-cols-3">
         {THEME_PRESETS.map((preset) => {
@@ -279,7 +310,14 @@ function PresetCard({ value, set }: { value: ThemeSettings; set: SetTheme }) {
                   />
                 ))}
               </div>
-              <p className="mt-2 text-sm font-black text-app-text">{preset.label}</p>
+              <p className="mt-2 flex flex-wrap items-center gap-1.5 text-sm font-black text-app-text">
+                <span className="min-w-0 break-words">{preset.label}</span>
+                {preset.recommended && (
+                  <Badge tone="gold" className="shrink-0 px-1.5 py-0.5 text-[9px]">
+                    Rekomendasi
+                  </Badge>
+                )}
+              </p>
               <p className="mt-0.5 text-[11px] leading-4 text-app-subtle">{preset.description}</p>
             </button>
           );
@@ -649,9 +687,9 @@ function PhonePreview({ value, mode }: { value: ThemeSettings; mode: "light" | "
               [
                 ["home", "Beranda", true],
                 ["grid", "Layanan", false],
-                ["receipt", "Riwayat", false],
-                ["wallet", "Dompet", false],
-                ["user", "Akun", false],
+                ["wallet", "Saldo", false],
+                ["receipt", "Transaksi", false],
+                ["menu", "Lainnya", false],
               ] as const
             ).map(([icon, label, active]) => (
               <span key={icon} className="flex min-w-0 flex-col items-center gap-0.5">
@@ -700,10 +738,10 @@ export default function AdminThemeBrandingPage() {
       validate={themeValidate}
       publishError={themePublishError}
     >
-      {({ value, set }) => (
+      {({ value, set, saveDraft, busy }) => (
         <>
           <IdentityCard value={value} set={set} />
-          <PresetCard value={value} set={set} />
+          <PresetCard value={value} set={set} saveDraft={saveDraft} busy={busy} />
           <Card>
             <CardTitle>Warna tema</CardTitle>
             <CardDescription>

@@ -33,7 +33,7 @@ export default async function DashboardPage() {
   return (
     <div className="customer-shell">
       <div className="mx-auto w-full max-w-[480px] space-y-5 animate-page-in pb-10 lg:max-w-5xl">
-        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-slate-950 via-zinc-950 to-gold-700 p-6 text-white shadow-2xl sm:p-8">
+        <section className="app-hero relative overflow-hidden rounded-3xl p-6 text-white shadow-2xl sm:p-8">
           <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-gold-400/20 blur-3xl" />
           <div className="absolute -bottom-24 left-1/3 h-64 w-64 rounded-full bg-gold-400/15 blur-3xl" />
           <div className="relative grid items-center gap-5 md:grid-cols-[1fr_300px]">

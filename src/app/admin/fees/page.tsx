@@ -51,7 +51,7 @@ export default function AdminFeesPage() {
             onClick={() => changeTab(item.key)}
             className={`inline-flex min-h-[40px] items-center gap-2 rounded-xl px-4 text-sm font-bold transition ${
               tab === item.key
-                ? "bg-gold-400 text-zinc-950"
+                ? "bg-gold-400 text-app-on-primary"
                 : "border border-app-border bg-app-surface text-app-text hover:border-gold-400/60"
             }`}
           >

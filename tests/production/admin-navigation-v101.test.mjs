@@ -96,10 +96,12 @@ test("v101 shell: header judul + Lihat Toko, drawer portal, bottom nav admin", (
   assert.match(shell, /setDrawerOpen\(false\)/);
   assert.match(shell, /event\.key === "Escape"/);
   assert.match(shell, /md:grid-cols-\[240px_1fr\]/);
+  assert.match(shell, /<FloatingNav/);
   assert.match(shell, /\{ href: "\/admin", label: "Dashboard", icon: "chart_bar" \}/);
   assert.match(shell, /\{ href: "\/admin\/orders", label: "Pesanan", icon: "receipt" \}/);
   assert.match(shell, /\{ href: "\/admin\/users", label: "Pengguna", icon: "users" \}/);
-  assert.match(shell, /<span>Menu<\/span>/);
+  assert.match(shell, /action=\{\{ label: "Menu", icon: "menu"/);
+  assert.match(shell, /ariaLabel="Navigasi admin"/);
   assert.match(shell, /md:hidden/);
 });
 

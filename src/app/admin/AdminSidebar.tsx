@@ -129,7 +129,7 @@ export default function AdminSidebar({ groups, badges, adminId, variant = "deskt
           : "overflow-hidden rounded-3xl border border-app-border bg-app-surface shadow-sm"
       }
     >
-      <div className="flex items-center gap-3 border-b border-white/10 bg-gradient-to-r from-zinc-900 via-gold-700 to-black p-4 text-white">
+      <div className="app-hero flex items-center gap-3 border-b border-white/10 p-4 text-white">
         <Image src="/aidil-logo.png" alt="Logo AIDIL STORE" width={40} height={40} className="h-10 w-10 rounded-xl bg-white p-1" />
         <div className="min-w-0 flex-1">
           <p className="break-words font-black leading-5">AIDIL STORE</p>

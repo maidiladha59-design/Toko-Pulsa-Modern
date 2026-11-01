@@ -87,7 +87,8 @@ test('v101 cincin avatar: gradasi berputar hanya saat terverifikasi', () => {
   assert.match(css, /@keyframes avatar-ring-spin \{ to \{ transform: rotate\(360deg\); \} \}/);
   assert.match(css, /\.avatar-ring-spin \{\s*animation: avatar-ring-spin 5s linear infinite;\s*will-change: transform;/);
   assert.match(css, /conic-gradient\(from 0deg, #f87171, #fb923c, #facc15, #4ade80, #22d3ee, #3b82f6, #a855f7, #f87171\)/);
-  assert.match(css, /--app-hero-bg: 9 9 11;/);
+  assert.match(css, /--app-hero-bg: 243 246 251;/, 'fallback hero mode terang = latar aplikasi');
+  assert.match(css, /--app-hero-bg: 7 11 20;/, 'fallback hero mode gelap = latar aplikasi');
   assert.match(css, /\.avatar-ring-glow \{ box-shadow: 0 0 14px rgb\(var\(--app-accent\) \/ \.38\); \}/);
   assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.avatar-ring-spin \{ animation: none !important; \}/);
 

@@ -26,6 +26,9 @@ export type SettingsFormRenderArgs<T extends SettingsFormValue> = {
   value: T;
   set: <K extends keyof T & string>(key: K, next: T[K]) => void;
   dirty: boolean;
+  /** Simpan nilai pengganti (mis. rekomendasi) sebagai draf baru. */
+  saveDraft: (next?: T) => void;
+  busy: boolean;
 };
 
 export type SettingsFormProps<T extends SettingsFormValue> = {
@@ -210,6 +213,10 @@ export default function SettingsForm<T extends SettingsFormValue>({
     setValue((prev) => (prev ? ({ ...prev, [key]: next } as T) : prev));
   }
 
+  function saveDraft(next?: T) {
+    request("save_draft", next ? { value: next } : {});
+  }
+
   function confirmRestore(entry: SettingHistoryEntry) {
     setPendingConfirm({ kind: "restore", entry });
   }
@@ -313,7 +320,7 @@ export default function SettingsForm<T extends SettingsFormValue>({
         }
       >
         <div className="min-w-0 space-y-5">
-          {children({ value, set, dirty })}
+          {children({ value, set, dirty, saveDraft, busy: busy !== null })}
 
           <Card>
             <div className="flex flex-wrap items-center gap-2">

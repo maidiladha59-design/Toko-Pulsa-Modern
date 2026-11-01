@@ -109,7 +109,7 @@ export default function WelcomeExperience() {
         className="pointer-events-none absolute inset-0 opacity-90"
         style={{
           background:
-            "radial-gradient(circle at 20% 15%, rgba(46,158,245,0.2), transparent 45%), radial-gradient(circle at 85% 80%, rgba(140,217,58,0.12), transparent 50%), linear-gradient(180deg, #0b0b10 0%, #111119 55%, #09090b 100%)",
+            "radial-gradient(circle at 20% 15%, rgba(21,115,209,0.2), transparent 45%), radial-gradient(circle at 85% 80%, rgba(123,211,42,0.12), transparent 50%), linear-gradient(180deg, #0b0b10 0%, #111119 55%, #09090b 100%)",
         }}
       />
 
@@ -124,7 +124,7 @@ export default function WelcomeExperience() {
               width={64}
               height={64}
               priority
-              className="h-16 w-16 rounded-2xl object-cover shadow-[0_0_30px_rgba(46,158,245,0.45)]"
+              className="h-16 w-16 rounded-2xl object-cover shadow-[0_0_30px_rgba(21,115,209,0.45)]"
             />
           </div>
           <div>

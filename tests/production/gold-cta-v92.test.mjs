@@ -15,7 +15,7 @@ test('v92 CTA biru flat glossy: gradient 135deg + highlight overlay tipis', () =
   assert.match(css, /color: #F8FAFC;/);
   assert.match(css, /font-weight: 800;/);
   assert.match(css, /border: none;/);
-  assert.match(css, /border-radius: 12px;/);
+  assert.match(css, /border-radius: var\(--app-radius-button, 12px\);/);
   assert.match(css, /box-shadow: 0 2px 8px rgba\(7, 31, 69, \.35\);/);
   assert.match(css, /transition: filter \.15s ease, box-shadow \.15s ease;/);
   assert.doesNotMatch(css, /\.btn-gold-3d/);

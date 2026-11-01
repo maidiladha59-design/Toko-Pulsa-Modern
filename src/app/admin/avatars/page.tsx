@@ -218,7 +218,7 @@ export default function AdminAvatarsPage() {
               accept="image/png,image/jpeg,image/webp"
               multiple
               onChange={(e) => pickFiles(e.target.files)}
-              className="mt-1 block w-full cursor-pointer rounded-xl border border-app-border bg-app-inset px-3 py-2 text-xs text-app-muted file:mr-3 file:rounded-lg file:border-0 file:bg-gold-400 file:px-3 file:py-1.5 file:text-xs file:font-black file:text-zinc-950"
+              className="mt-1 block w-full cursor-pointer rounded-xl border border-app-border bg-app-inset px-3 py-2 text-xs text-app-muted file:mr-3 file:rounded-lg file:border-0 file:bg-gold-400 file:px-3 file:py-1.5 file:text-xs file:font-black file:text-app-on-primary"
             />
           </div>
         </div>

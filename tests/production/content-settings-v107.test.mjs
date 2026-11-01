@@ -65,7 +65,7 @@ test("v107 preflight mengenal migrasi dan urutan wajib berakhir di 107", () => {
   assert.match(script, /migrations_v107_content_settings\.sql/);
   assert.match(script, /'pages_settings'/);
   assert.match(script, /'notification_templates'/);
-  assert.match(script, /105,106,107,108\]/);
+  assert.match(script, /105,106,107,108,109\]/);
 });
 
 test("v107 halaman statis: JSON blok, render aman, rute publik fallback default", () => {

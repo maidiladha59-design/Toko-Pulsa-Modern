@@ -6,20 +6,21 @@ import path from 'node:path';
 const root = process.cwd();
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
-test('v90 palet biru brand: token pusat + CTA sekunder mint dengan teks gelap', () => {
+test('v90 palet primer & aksen: token pusat mengikuti variabel tema + CTA sekunder mint', () => {
   const cfg = read('tailwind.config.ts');
-  assert.match(cfg, /DEFAULT: "#2E9EF5"/);
+  assert.match(cfg, /DEFAULT: "rgb\(var\(--app-accent\) \/ <alpha-value>\)"/);
   assert.match(cfg, /200: "#B6E0FF"/);
   assert.match(cfg, /300: "#7CC9FC"/);
-  assert.match(cfg, /400: "#2E9EF5"/);
+  assert.match(cfg, /400: "rgb\(var\(--app-accent\) \/ <alpha-value>\)"/);
   assert.match(cfg, /600: "#1565E0"/);
   assert.match(cfg, /700: "#1151B8"/);
   assert.match(cfg, /mint: \{/);
-  assert.match(cfg, /400: "#8CD93A"/);
+  assert.match(cfg, /400: "rgb\(var\(--theme-accent-rgb\) \/ <alpha-value>\)"/);
 
   const css = read('src/app/globals.css');
-  assert.match(css, /--app-accent: 46 158 245;/);
-  assert.match(css, /--app-kicker: 17 81 184;/);
+  assert.match(css, /--app-accent: 21 115 209;/);
+  assert.match(css, /--app-kicker: 18 104 189;/);
+  assert.match(css, /--app-accent: 58 167 255;/, 'mode gelap memakai biru terang default');
   assert.match(css, /\.btn-gold-metal \{/);
   assert.match(css, /linear-gradient\(135deg, #8CD93A 0%, #5BBE1F 100%\)/);
   assert.match(css, /linear-gradient\(135deg, #B8EE70 0%, #8CD93A 100%\)/);
@@ -31,16 +32,18 @@ test('v90 Button bersama memakai kelas CTA pusat (flat glossy sejak v92)', () =>
   assert.match(read('src/components/Button.tsx'), /primary: "btn-gold"/);
 });
 
-test('v90 halaman auth memakai aksen mint + tab aktif kontras gelap', () => {
+test('v90 halaman auth memakai aksen mint + tab aktif kontras putih', () => {
   const login = read('src/app/login/page.tsx');
   assert.match(login, /btn-gold-metal/);
-  assert.match(login, /bg-gold-400/);
-  assert.match(login, /text-\[#1A1200\]/);
+  assert.match(login, /bg-gold-600/);
+  assert.match(login, /text-white/);
+  assert.doesNotMatch(login, /text-\[#1A1200\]/);
 
   const register = read('src/app/register/page.tsx');
   assert.match(register, /btn-gold-metal/);
-  assert.match(register, /bg-gold-400/);
-  assert.match(register, /text-\[#1A1200\]/);
+  assert.match(register, /bg-gold-600/);
+  assert.match(register, /text-white/);
+  assert.doesNotMatch(register, /text-\[#1A1200\]/);
 });
 
 test('v90 tidak ada hex/kuning lama atau kelas yellow-* di UI & manifest', () => {
@@ -55,8 +58,8 @@ test('v90 tidak ada hex/kuning lama atau kelas yellow-* di UI & manifest', () =>
   walk(path.join(root, 'src'));
   files.push(path.join(root, 'public/manifest.webmanifest'));
 
-  // #D4AF37 sengaja diizinkan lagi sebagai stop gradient .btn-gold v92.
-  // #FCD34D kini dipakai khusus sebagai emas terang chip KYC/level & teks peringatan di atas hero gelap.
+  // #D4AF37 sengaja diizinkan sebagai stop gradient .btn-gold v92.
+  // #FCD34D dipakai khusus sebagai emas terang chip KYC/level & teks peringatan di atas hero gelap.
   const legacy = /#F5C542|#B8941F|#E4B93A|rgba\(\s*245\s*,\s*197\s*,\s*66|(?:bg|text|border|ring|from|via|to)-yellow-\d{2,3}/i;
   const heroGold = /#FCD34D/i;
   const heroGoldFiles = new Set([
@@ -82,7 +85,7 @@ test('v90 tidak ada hex/kuning lama atau kelas yellow-* di UI & manifest', () =>
 
 test('v90 manifest PWA memakai warna biru brand tanpa mengubah latar hitam', () => {
   const manifest = JSON.parse(read('public/manifest.webmanifest'));
-  assert.equal(manifest.theme_color, '#2E9EF5');
+  assert.equal(manifest.theme_color, '#1573D1');
   assert.equal(manifest.background_color, '#09090b');
   assert.equal(manifest.icons[0].src, '/aidil-logo.png');
 });

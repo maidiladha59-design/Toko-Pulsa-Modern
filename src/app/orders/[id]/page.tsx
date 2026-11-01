@@ -172,12 +172,12 @@ export default async function OrderDetailPage({ params }: { params: { id: string
                 </div>
               )}
               {refundAmount > 0 && (
-                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-sky-500/25 bg-sky-500/10 p-4">
+                <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-gold-400/25 bg-app-accent-soft p-4">
                   <div className="min-w-0">
                     <p className="flex items-center gap-1.5 font-black text-app-text"><Icon name="undo" size={16} />Dikembalikan ke saldo</p>
                     <p className="mt-1 text-xs text-app-muted">Nominal refund sudah masuk kembali ke Saldo AIDIL STORE.</p>
                   </div>
-                  <b className="shrink-0 tabular-nums text-sky-700 dark:text-sky-300">{formatRupiah(refundAmount)}</b>
+                  <b className="shrink-0 tabular-nums text-app-kicker">{formatRupiah(refundAmount)}</b>
                 </div>
               )}
             </div>
@@ -309,7 +309,7 @@ export default async function OrderDetailPage({ params }: { params: { id: string
               {refundAmount > 0 && (
                 <div className="flex justify-between gap-3 border-t border-app-border pt-4">
                   <span className="text-app-subtle">Dikembalikan</span>
-                  <b className="tabular-nums text-sky-700 dark:text-sky-300">+{formatRupiah(refundAmount)}</b>
+                  <b className="tabular-nums text-app-kicker">+{formatRupiah(refundAmount)}</b>
                 </div>
               )}
             </div>

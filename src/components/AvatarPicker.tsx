@@ -153,7 +153,7 @@ export default function AvatarPicker({
                   <Image src={a.image_url} alt={a.label || "Avatar"} width={140} height={140} className="h-full w-full object-cover" />
                   {active && (
                     <span className="absolute inset-0 flex items-center justify-center bg-black/35">
-                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gold-400 font-black text-zinc-950"><Icon name="check" size={16} /></span>
+                      <span className="flex h-7 w-7 items-center justify-center rounded-full bg-gold-400 font-black text-app-on-primary"><Icon name="check" size={16} /></span>
                     </span>
                   )}
                 </button>

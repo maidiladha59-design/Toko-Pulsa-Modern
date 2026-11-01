@@ -83,7 +83,7 @@ test("v105 preflight mengenal migrasi dan urutan wajib berakhir di 105", () => {
   assert.match(script, /publish_site_setting/);
   assert.match(script, /restore_site_setting_version/);
   assert.match(script, /setting_version_conflict/);
-  assert.match(script, /99,100,105,106,107,108\]/);
+  assert.match(script, /99,100,105,106,107,108,109\]/);
 });
 
 test("v105 lib murni: registry kunci, tag per kunci, hex valid, URL internal/https, teks biasa", () => {

@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useToast } from "./ToastProvider";
 import NotificationBell from "./NotificationBell";
 import ThemeToggle from "./ThemeToggle";
-import NavIcon from "./NavIcon";
+import FloatingNav from "./FloatingNav";
 import Icon from "@/components/icons/Icon";
 import UserAvatar from "./UserAvatar";
 import { resolveAvatarUrl } from "@/lib/avatar";
@@ -204,23 +204,15 @@ function NavbarContent({
         </div>
       </header>
 
-      <nav className="fixed inset-x-0 bottom-0 z-[60] border-t border-app-border bg-app-bg/95 pt-1 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgba(0,0,0,.08)] backdrop-blur-xl md:hidden">
-        <div className="mx-auto grid max-w-lg grid-cols-5">
-          {bottomItems.map((item) => (
-            <Link key={item.href} href={item.href} className={`mobile-link ${isBottomActive(item.href) ? "mobile-link-active" : ""}`}>
-              <NavIcon name={item.icon} />
-              <span>{item.label}</span>
-            </Link>
-          ))}
-          <button onClick={() => setMenuOpen((v) => !v)} className={`mobile-link ${menuOpen ? "mobile-link-active" : ""}`}>
-            <NavIcon name="menu" />
-            <span>Lainnya</span>
-          </button>
-        </div>
-      </nav>
+      <FloatingNav
+        items={bottomItems}
+        isActive={isBottomActive}
+        action={{ label: "Lainnya", icon: "menu", active: menuOpen, ariaLabel: "Buka menu lainnya", onClick: () => setMenuOpen((v) => !v) }}
+        hidden={pathname.startsWith("/checkout") || pathname.startsWith("/scan-qris/qris-confirm")}
+      />
 
       {menuOpen && (
-        <div className="fixed inset-x-0 bottom-0 top-[69px] z-[56] bg-black/40 lg:hidden" onClick={() => setMenuOpen(false)}>
+        <div className="fixed inset-x-0 bottom-0 top-[69px] z-[900] bg-black/40 lg:hidden" onClick={() => setMenuOpen(false)}>
           <div onClick={(e) => e.stopPropagation()} className="max-h-[calc(100dvh-69px-80px)] overflow-y-auto rounded-b-3xl border-b border-app-border bg-app-surface px-4 py-4 shadow-2xl">
             <div className="grid grid-cols-2 gap-2 text-sm">
               {drawerLinks.map(([href, icon, label]) => (

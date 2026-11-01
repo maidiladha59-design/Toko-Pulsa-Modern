@@ -8,18 +8,24 @@ const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
 test('v89 token warna: palet biru (gold legacy) + mint, semantik success/danger/warning alias palet bawaan', () => {
   const cfg = read('tailwind.config.ts');
-  // Identitas baru: token gold-* kini biru, ditambah skala mint terpisah.
-  assert.match(cfg, /DEFAULT: "#2E9EF5"/);
+  // Identitas default "Biru Neon": biru #1573D1 terang / #3AA7FF gelap.
+  // DEFAULT & 400 gold-*/mint-* kini membaca variabel tema sehingga ikut
+  // berubah saat admin menerbitkan tema baru; shade lain tetap statis.
+  assert.match(cfg, /gold: \{[\s\S]*?DEFAULT: "rgb\(var\(--app-accent\) \/ <alpha-value>\)"/);
   assert.match(cfg, /200: "#B6E0FF"/);
   assert.match(cfg, /300: "#7CC9FC"/);
-  assert.match(cfg, /400: "#2E9EF5"/);
+  assert.match(cfg, /gold: \{[\s\S]*?400: "rgb\(var\(--app-accent\) \/ <alpha-value>\)"/);
   assert.match(cfg, /600: "#1565E0"/);
   assert.match(cfg, /700: "#1151B8"/);
   assert.match(cfg, /950: "#071F45"/);
   assert.match(cfg, /mint: \{/);
-  assert.match(cfg, /400: "#8CD93A"/);
+  assert.match(cfg, /mint: \{[\s\S]*?DEFAULT: "rgb\(var\(--theme-accent-rgb\) \/ <alpha-value>\)"/);
+  assert.match(cfg, /mint: \{[\s\S]*?400: "rgb\(var\(--theme-accent-rgb\) \/ <alpha-value>\)"/);
   assert.match(cfg, /600: "#5BBE1F"/);
   assert.match(cfg, /"brand-gradient":/);
+  // Teks di atas warna tema selalu memakai kontras yang dihitung server.
+  assert.match(cfg, /"on-primary": "var\(--primary-contrast\)"/);
+  assert.match(cfg, /"on-accent": "var\(--accent-contrast\)"/);
   // Token semantik = alias 1:1 palet bawaan Tailwind (bukan warna baru).
   assert.match(cfg, /import colors from "tailwindcss\/colors";/);
   assert.match(cfg, /success: \{ \.\.\.colors\.emerald, DEFAULT: colors\.emerald\[600\] \}/);
@@ -38,9 +44,11 @@ test('v89 acuan desain: tipografi, spacing, radius terdokumentasi di atas global
   assert.match(css, /Padding kartu standar\s*:\s*p-5/);
   assert.match(css, /Jarak antar section\s*:\s*mt-5 \/ space-y-5/);
   assert.match(css, /Kartu utama \/ panel\s*:\s*rounded-3xl/);
-  // Token tema memakai biru brand baru.
-  assert.match(css, /--app-accent: 46 158 245;/);
-  assert.match(css, /--app-kicker: 17 81 184;/);
+  // Token tema memakai biru brand default (Biru Neon).
+  assert.match(css, /--app-accent: 21 115 209;/);
+  assert.match(css, /--app-kicker: 18 104 189;/);
+  assert.match(css, /--app-accent: 58 167 255;/, 'mode gelap memakai biru lebih terang');
+  assert.match(css, /--app-radius-button: 0.875rem;/, 'radius tombol 14px');
   assert.match(css, /\.dark \{/, 'mode gelap tetap ada');
 });
 
@@ -53,7 +61,7 @@ test('v89 Button: 5 varian, 3 ukuran, state loading & disabled', () => {
   assert.match(src, /animate-spin/);
   assert.match(src, /disabled:cursor-not-allowed disabled:opacity-50/);
   assert.match(src, /primary: "btn-gold"/);
-  assert.match(src, /secondary:\s*\n\s*"bg-mint-400 text-zinc-950/);
+  assert.match(src, /secondary:\s*\n\s*"bg-mint-400 text-app-on-accent/);
   assert.match(src, /destructive:\s*\n\s*"bg-danger-600 text-white/);
 });
 

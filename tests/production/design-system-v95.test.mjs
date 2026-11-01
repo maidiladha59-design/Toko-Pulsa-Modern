@@ -6,29 +6,33 @@ import path from 'node:path';
 const root = process.cwd();
 const read = (p) => fs.readFileSync(path.join(root, p), 'utf8');
 
-test('v95 token warna baru: gold-* biru, mint-* hijau muda, gradient biru ke mint', () => {
+test('v95 token warna: primer & aksen mengikuti variabel tema, shade tetap sebagai cadangan', () => {
   const cfg = read('tailwind.config.ts');
-  // Biru menempati token legacy gold-* (tanpa rename class di halaman).
-  assert.match(cfg, /gold: \{[\s\S]*?DEFAULT: "#2E9EF5"/);
-  assert.match(cfg, /gold: \{[\s\S]*?400: "#2E9EF5"/);
+  // Biru menempati token legacy gold-* dan kini mengikuti --primary.
+  assert.match(cfg, /gold: \{[\s\S]*?DEFAULT: "rgb\(var\(--app-accent\) \/ <alpha-value>\)"/);
+  assert.match(cfg, /gold: \{[\s\S]*?400: "rgb\(var\(--app-accent\) \/ <alpha-value>\)"/);
   assert.match(cfg, /gold: \{[\s\S]*?600: "#1565E0"/);
   assert.match(cfg, /gold: \{[\s\S]*?950: "#071F45"/);
-  // Hijau muda sebagai token terpisah.
-  assert.match(cfg, /mint: \{[\s\S]*?DEFAULT: "#8CD93A"/);
-  assert.match(cfg, /mint: \{[\s\S]*?400: "#8CD93A"/);
+  // Aksen hijau muda mengikuti --accent.
+  assert.match(cfg, /mint: \{[\s\S]*?DEFAULT: "rgb\(var\(--theme-accent-rgb\) \/ <alpha-value>\)"/);
+  assert.match(cfg, /mint: \{[\s\S]*?400: "rgb\(var\(--theme-accent-rgb\) \/ <alpha-value>\)"/);
   assert.match(cfg, /mint: \{[\s\S]*?600: "#5BBE1F"/);
-  // Gradient identitas diagonal biru → hijau.
+  // Teks di atas latar dinamis selalu memakai kontras dari tema.
+  assert.match(cfg, /"on-primary": "var\(--primary-contrast\)"/);
+  assert.match(cfg, /"on-accent": "var\(--accent-contrast\)"/);
+  // Gradient identitas diagonal memakai variabel tema, bukan hex mati.
   assert.match(
     cfg,
-    /"brand-gradient":\s*\n\s*"linear-gradient\(135deg, #2E9EF5 0%, #1565E0 45%, #5BBE1F 100%\)"/,
+    /"brand-gradient":\s*\n\s*"linear-gradient\(135deg, var\(--primary\) 0%, var\(--theme-primary-strong\) 45%, var\(--theme-accent-strong\) 100%\)"/,
   );
 });
 
 test('v95 CSS pusat: accent biru, CTA primer biru, CTA sekunder mint', () => {
   const css = read('src/app/globals.css');
-  assert.match(css, /--app-accent: 46 158 245;/);
-  assert.match(css, /--app-kicker: 17 81 184;/);
-  assert.match(css, /--app-kicker: 124 201 252;/, 'kicker mode gelap lebih terang');
+  assert.match(css, /--app-accent: 21 115 209;/);
+  assert.match(css, /--app-kicker: 18 104 189;/);
+  assert.match(css, /--app-kicker: 58 167 255;/, 'kicker mode gelap lebih terang');
+  assert.match(css, /--app-accent: 58 167 255;/, 'accent mode gelap lebih terang');
   assert.match(css, /\.btn-gold \{[\s\S]*?linear-gradient\(135deg, #1565E0 0%, #1151B8 100%\)/);
   assert.match(css, /\.btn-gold \{[\s\S]*?color: #F8FAFC;/);
   assert.match(css, /\.btn-gold-metal \{[\s\S]*?linear-gradient\(135deg, #8CD93A 0%, #5BBE1F 100%\)/);
@@ -39,7 +43,7 @@ test('v95 CSS pusat: accent biru, CTA primer biru, CTA sekunder mint', () => {
 test('v95 komponen: primary biru, secondary mint, status Berhasil tetap emerald', () => {
   const button = read('src/components/ui/Button.tsx');
   assert.match(button, /primary: "btn-gold"/);
-  assert.match(button, /secondary:\s*\n\s*"bg-mint-400 text-zinc-950/);
+  assert.match(button, /secondary:\s*\n\s*"bg-mint-400 text-app-on-accent/);
 
   const badge = read('src/components/ui/Badge.tsx');
   assert.match(badge, /success: "bg-success-100 text-success-800/);
@@ -58,13 +62,13 @@ test('v95 komponen: primary biru, secondary mint, status Berhasil tetap emerald'
 
 test('v95 branding hardcoded memakai biru/mint, bukan hex emas lama', () => {
   const manifest = JSON.parse(read('public/manifest.webmanifest'));
-  assert.equal(manifest.theme_color, '#2E9EF5');
+  assert.equal(manifest.theme_color, '#1573D1');
   assert.equal(manifest.background_color, '#09090b');
 
-  assert.match(read('src/components/AppLoader.tsx'), /rgba\(46,158,245,0\.45\)/);
-  assert.match(read('src/components/WelcomeExperience.tsx'), /rgba\(46,158,245,0\.2\)/);
-  assert.match(read('src/components/WelcomeExperience.tsx'), /rgba\(140,217,58,0\.12\)/);
-  assert.match(read('src/components/ToastProvider.tsx'), /bg: "#2E9EF5"/);
+  assert.match(read('src/components/AppLoader.tsx'), /rgba\(21,115,209,0\.45\)/);
+  assert.match(read('src/components/WelcomeExperience.tsx'), /rgba\(21,115,209,0\.2\)/);
+  assert.match(read('src/components/WelcomeExperience.tsx'), /rgba\(123,211,42,0\.12\)/);
+  assert.match(read('src/components/ToastProvider.tsx'), /bg: "var\(--primary\)"/);
 
   const legacyGold = /#C9A227|#F0D878|#D9B73B|#B08D21|#8A6D14|#7A5F12/i;
   const files = [];

@@ -51,7 +51,7 @@ export default function HomeServiceMenu({ items, media }: { items: HomeServiceIt
               onClick={() => setActive(tab.key)}
               className={`h-9 shrink-0 rounded-full px-2.5 text-[12px] transition sm:px-3 sm:text-[13px] ${
                 isActive
-                  ? "bg-gold-400 font-semibold text-zinc-950"
+                  ? "bg-gold-400 font-semibold text-app-on-primary"
                   : "border border-app-border font-medium text-app-muted hover:border-gold-400/50 hover:text-app-text"
               }`}
             >

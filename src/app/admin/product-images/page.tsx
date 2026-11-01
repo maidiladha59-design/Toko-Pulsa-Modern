@@ -297,7 +297,7 @@ export default function AdminProductImagesPage() {
           type="button"
           onClick={() => changeTab("products")}
           className={`inline-flex min-h-[40px] items-center gap-2 rounded-xl px-4 text-sm font-bold transition ${
-            tab === "products" ? "bg-gold-400 text-zinc-950" : "border border-app-border bg-app-surface text-app-text hover:border-gold-400/60"
+            tab === "products" ? "bg-gold-400 text-app-on-primary" : "border border-app-border bg-app-surface text-app-text hover:border-gold-400/60"
           }`}
         >
           <Icon name="box" size={16} /> Produk
@@ -306,7 +306,7 @@ export default function AdminProductImagesPage() {
           type="button"
           onClick={() => changeTab("brands")}
           className={`inline-flex min-h-[40px] items-center gap-2 rounded-xl px-4 text-sm font-bold transition ${
-            tab === "brands" ? "bg-gold-400 text-zinc-950" : "border border-app-border bg-app-surface text-app-text hover:border-gold-400/60"
+            tab === "brands" ? "bg-gold-400 text-app-on-primary" : "border border-app-border bg-app-surface text-app-text hover:border-gold-400/60"
           }`}
         >
           <Icon name="image" size={16} /> Brand
@@ -489,7 +489,7 @@ export default function AdminProductImagesPage() {
                           target="_blank"
                           rel="noreferrer"
                           title="Buka file PDF"
-                          className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-zinc-950 leading-none text-gold-400"
+                          className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-zinc-950 leading-none text-gold-300"
                         >
                           <Icon name="doc" size={20} />
                           <span className="mt-0.5 text-[8px] font-black">PDF</span>
@@ -512,7 +512,7 @@ export default function AdminProductImagesPage() {
                       </div>
                       <div className="flex flex-wrap items-center gap-2">
                         <label
-                          className={`inline-flex min-h-[36px] cursor-pointer items-center rounded-xl bg-zinc-950 px-3 text-xs font-black text-gold-400 transition hover:bg-zinc-800 ${
+                          className={`inline-flex min-h-[36px] cursor-pointer items-center rounded-xl bg-zinc-950 px-3 text-xs font-black text-gold-300 transition hover:bg-zinc-800 ${
                             isBusy ? "pointer-events-none opacity-60" : ""
                           }`}
                         >

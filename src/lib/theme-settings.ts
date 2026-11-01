@@ -14,7 +14,9 @@ export const THEME_SETTINGS_KEY = "theme_settings";
 export const THEME_FONT_KEYS = ["system", "jakarta", "inter", "nunito"] as const;
 export const THEME_RADIUS_KEYS = ["small", "medium", "large"] as const;
 export const THEME_CARD_STYLES = ["flat", "shadow"] as const;
-export const THEME_PRESET_KEYS = ["blue-green", "gold-dark", "neutral", "custom"] as const;
+// Kunci lama (blue-green, neutral) tetap diterima agar tema yang sudah
+// diterbitkan tidak gagal validasi; daftar preset di UI hanya tiga tema baru.
+export const THEME_PRESET_KEYS = ["neon-blue", "gold-dark", "fresh-green", "blue-green", "neutral", "custom"] as const;
 export const THEME_HERO_PRESET_KEYS = ["gelap-biru", "gelap-emas", "gelap-hijau", "custom"] as const;
 
 export type ThemeFontKey = (typeof THEME_FONT_KEYS)[number];
@@ -34,10 +36,10 @@ export const THEME_FONTS: ReadonlyArray<{ key: ThemeFontKey; label: string; stac
   { key: "nunito", label: "Nunito", stack: 'var(--font-nunito), ui-sans-serif, system-ui, sans-serif' },
 ];
 
-export const THEME_RADII: Record<ThemeRadiusKey, { label: string; card: string }> = {
-  small: { label: "Kecil", card: "0.75rem" },
-  medium: { label: "Sedang", card: "1rem" },
-  large: { label: "Besar", card: "1.5rem" },
+export const THEME_RADII: Record<ThemeRadiusKey, { label: string; card: string; button: string }> = {
+  small: { label: "Kecil", card: "0.75rem", button: "0.625rem" },
+  medium: { label: "Sedang", card: "1rem", button: "0.75rem" },
+  large: { label: "Besar", card: "1.25rem", button: "0.875rem" },
 };
 
 export const THEME_CARD_STYLE_LABEL: Record<ThemeCardStyle, string> = {
@@ -50,6 +52,8 @@ export type ThemeColors = {
   accent: string;
   background: string;
   card: string;
+  card2: string;
+  border: string;
   text: string;
   success: string;
   warning: string;
@@ -84,34 +88,41 @@ export type ThemeSettings = {
   preset: ThemePresetKey;
 };
 
+// Nilai bawaan "Biru Neon": biru neon + aksen hijau di atas latar biru-gelap.
+// Semua warna di bawah juga dipakai sebagai fallback bila pengaturan belum ada.
 export const DEFAULT_THEME_COLORS: { light: ThemeColors; dark: ThemeColors } = {
   light: {
-    primary: "#2E9EF5",
-    accent: "#8CD93A",
-    background: "#FAF9F6",
+    primary: "#1573D1",
+    accent: "#7BD32A",
+    background: "#F3F6FB",
     card: "#FFFFFF",
-    text: "#18181B",
+    card2: "#EEF3FA",
+    border: "#E1E8F2",
+    text: "#0F172A",
     success: "#059669",
     warning: "#D97706",
     danger: "#DC2626",
   },
   dark: {
-    primary: "#2E9EF5",
+    primary: "#3AA7FF",
     accent: "#8CD93A",
-    background: "#09090B",
-    card: "#18181B",
-    text: "#F4F4F5",
-    success: "#10B981",
-    warning: "#F59E0B",
-    danger: "#EF4444",
+    background: "#070B14",
+    card: "#0F1626",
+    card2: "#151E33",
+    border: "#1E2A44",
+    text: "#F1F5F9",
+    success: "#34D399",
+    warning: "#FBBF24",
+    danger: "#F87171",
   },
 };
 
 export const DEFAULT_HERO_COLORS: ThemeHeroColors = {
   bgFrom: "#0b1220",
   bgTo: "#123a66",
+  // Teks redup dirender sebagai rgba(teks, 0.72) oleh heroCssVariables.
   text: "#ffffff",
-  textMuted: "#c3cedb",
+  textMuted: "#ffffff",
   accent: "#5cc0ff",
 };
 
@@ -128,10 +139,10 @@ export const DEFAULT_THEME_SETTINGS: ThemeSettings = {
   dark: DEFAULT_THEME_COLORS.dark,
   hero: DEFAULT_HERO_COLORS,
   heroPreset: "gelap-biru",
-  font: "system",
+  font: "inter",
   radius: "large",
   cardStyle: "shadow",
-  preset: "blue-green",
+  preset: "neon-blue",
 };
 
 // =========================================================
@@ -234,15 +245,17 @@ type PresetDefinition = {
   key: Exclude<ThemePresetKey, "custom">;
   label: string;
   description: string;
+  recommended?: boolean;
   light: ThemeColors;
   dark: ThemeColors;
 };
 
 export const THEME_PRESETS: ReadonlyArray<PresetDefinition> = [
   {
-    key: "blue-green",
-    label: "Biru Hijau",
-    description: "Mengikuti maskot: biru listrik + hijau muda di atas latar gelap.",
+    key: "neon-blue",
+    label: "Biru Neon",
+    description: "Rekomendasi: biru neon di atas latar biru-gelap dengan aksen hijau muda.",
+    recommended: true,
     light: DEFAULT_THEME_COLORS.light,
     dark: DEFAULT_THEME_COLORS.dark,
   },
@@ -255,6 +268,8 @@ export const THEME_PRESETS: ReadonlyArray<PresetDefinition> = [
       accent: "#B8860B",
       background: "#FFF9E8",
       card: "#FFFFFF",
+      card2: "#FBF1D6",
+      border: "#EAD9A8",
       text: "#2A1F00",
       success: "#2E7D32",
       warning: "#B45309",
@@ -265,6 +280,8 @@ export const THEME_PRESETS: ReadonlyArray<PresetDefinition> = [
       accent: "#D4A72C",
       background: "#0D0B06",
       card: "#1A160C",
+      card2: "#241E10",
+      border: "#3A3018",
       text: "#F7EFD2",
       success: "#4ADE80",
       warning: "#FBBF24",
@@ -272,25 +289,29 @@ export const THEME_PRESETS: ReadonlyArray<PresetDefinition> = [
     },
   },
   {
-    key: "neutral",
-    label: "Netral",
-    description: "Abu-abu tenang, cocok bila ingin tampilan tanpa aksen mencolok.",
+    key: "fresh-green",
+    label: "Hijau Segar",
+    description: "Hijau segar yang tenang untuk tampilan ramah lingkungan.",
     light: {
-      primary: "#3F3F46",
-      accent: "#71717A",
-      background: "#FAFAFA",
+      primary: "#15803D",
+      accent: "#84CC16",
+      background: "#F4F9F3",
       card: "#FFFFFF",
-      text: "#18181B",
-      success: "#047857",
-      warning: "#B45309",
-      danger: "#B91C1C",
+      card2: "#EAF4E8",
+      border: "#D8E7D5",
+      text: "#0F1F14",
+      success: "#059669",
+      warning: "#D97706",
+      danger: "#DC2626",
     },
     dark: {
-      primary: "#D4D4D8",
-      accent: "#A1A1AA",
-      background: "#09090B",
-      card: "#18181B",
-      text: "#F4F4F5",
+      primary: "#4ADE80",
+      accent: "#A3E635",
+      background: "#06120B",
+      card: "#0D1F14",
+      card2: "#122A1B",
+      border: "#1E3A2A",
+      text: "#F0FDF4",
       success: "#34D399",
       warning: "#FBBF24",
       danger: "#F87171",
@@ -306,6 +327,25 @@ export function applyThemePreset(settings: ThemeSettings, key: ThemePresetKey): 
     light: { ...preset.light },
     dark: { ...preset.dark },
     preset: preset.key,
+  };
+}
+
+/**
+ * Nilai rekomendasi lengkap (warna + huruf + radius + kartu + hero).
+ * Identitas toko sengaja dipertahankan; hasilnya dipakai tombol
+ * "Terapkan tema rekomendasi" untuk mengisi draf baru.
+ */
+export function recommendedThemeSettings(settings: ThemeSettings): ThemeSettings {
+  return {
+    ...settings,
+    light: { ...DEFAULT_THEME_COLORS.light },
+    dark: { ...DEFAULT_THEME_COLORS.dark },
+    hero: { ...DEFAULT_HERO_COLORS },
+    heroPreset: "gelap-biru",
+    font: "inter",
+    radius: "large",
+    cardStyle: "shadow",
+    preset: "neon-blue",
   };
 }
 
@@ -363,11 +403,15 @@ export function applyHeroPreset(settings: ThemeSettings, key: ThemeHeroPresetKey
 // Skema
 // =========================================================
 
+// card2 & border opsional agar pengaturan terbit lama (sebelum v109) tetap
+// terbaca; normalisasi menurunkan nilainya dari warna yang sudah ada.
 const colorSetSchema = z.object({
   primary: hexColorSchema,
   accent: hexColorSchema,
   background: hexColorSchema,
   card: hexColorSchema,
+  card2: hexColorSchema.optional(),
+  border: hexColorSchema.optional(),
   text: hexColorSchema,
   success: hexColorSchema,
   warning: hexColorSchema,
@@ -397,20 +441,29 @@ export const themeSettingsInputSchema = z.object({
   dark: colorSetSchema.default(DEFAULT_THEME_SETTINGS.dark),
   hero: heroColorSetSchema.default(DEFAULT_HERO_COLORS),
   heroPreset: z.enum(THEME_HERO_PRESET_KEYS).default("gelap-biru"),
-  font: z.enum(THEME_FONT_KEYS).default("system"),
+  font: z.enum(THEME_FONT_KEYS).default("inter"),
   radius: z.enum(THEME_RADIUS_KEYS).default("large"),
   cardStyle: z.enum(THEME_CARD_STYLES).default("shadow"),
-  preset: z.enum(THEME_PRESET_KEYS).default("blue-green"),
+  preset: z.enum(THEME_PRESET_KEYS).default("neon-blue"),
 });
 
-function normalizeColorSet(colors: ThemeColors): ThemeColors {
-  const fix = (value: string, fallback: string) => normalizeHexColor(value) ?? fallback;
+type ColorSetInput = Omit<ThemeColors, "card2" | "border"> & { card2?: string; border?: string };
+
+function normalizeColorSet(colors: ColorSetInput): ThemeColors {
+  const fix = (value: string | undefined, fallback: string) => normalizeHexColor(value ?? "") ?? fallback;
+  const primary = fix(colors.primary, "#1573D1");
+  const accent = fix(colors.accent, "#7BD32A");
+  const background = fix(colors.background, "#F3F6FB");
+  const card = fix(colors.card, "#FFFFFF");
+  const text = fix(colors.text, "#0F172A");
   return {
-    primary: fix(colors.primary, "#2E9EF5"),
-    accent: fix(colors.accent, "#8CD93A"),
-    background: fix(colors.background, "#FAF9F6"),
-    card: fix(colors.card, "#FFFFFF"),
-    text: fix(colors.text, "#18181B"),
+    primary,
+    accent,
+    background,
+    card,
+    card2: fix(colors.card2, mixHex(card, background, 0.35)),
+    border: fix(colors.border, mixHex(text, card, 0.16)),
+    text,
     success: fix(colors.success, "#059669"),
     warning: fix(colors.warning, "#D97706"),
     danger: fix(colors.danger, "#DC2626"),
@@ -450,8 +503,8 @@ export function normalizeThemeSettings(value: z.infer<typeof themeSettingsInputS
       faviconUrl: validAssetUrl(value.identity.faviconUrl),
       ogImageUrl: validAssetUrl(value.identity.ogImageUrl),
     },
-    light: normalizeColorSet(value.light as ThemeColors),
-    dark: normalizeColorSet(value.dark as ThemeColors),
+    light: normalizeColorSet(value.light as ColorSetInput),
+    dark: normalizeColorSet(value.dark as ColorSetInput),
     hero: normalizeHeroColors(value.hero as ThemeHeroColors),
     heroPreset: value.heroPreset,
     font: value.font,
@@ -481,9 +534,14 @@ export function themeContrastChecks(settings: ThemeSettings): ContrastCheck[] {
   for (const mode of ["light", "dark"] as const) {
     const colors = settings[mode];
     const modeLabel = mode === "light" ? "Terang" : "Gelap";
+    const muted = ensureContrast(mixHex(colors.text, colors.background, 0.72), colors.background, MIN_CONTRAST);
     const pairs = [
       { label: "Teks pada latar", fore: colors.text, back: colors.background },
       { label: "Teks pada kartu", fore: colors.text, back: colors.card },
+      { label: "Teks pada kartu sekunder", fore: colors.text, back: colors.card2 },
+      { label: "Teks redup pada latar", fore: muted, back: colors.background },
+      { label: "Teks tombol utama", fore: bestTextColor(colors.primary), back: colors.primary },
+      { label: "Teks tombol aksen", fore: bestTextColor(colors.accent), back: colors.accent },
     ];
     for (const pair of pairs) {
       const ratio = contrastRatio(pair.fore, pair.back);
@@ -500,12 +558,16 @@ export function themeContrastChecks(settings: ThemeSettings): ContrastCheck[] {
   // Hero selalu gelap di kedua mode: teks harus terbaca di warna awal dan
   // akhir gradasi (bagian paling terang dan paling gelap).
   const hero = settings.hero ?? DEFAULT_HERO_COLORS;
+  const heroMutedStart = mixHex(hero.textMuted, hero.bgFrom, 0.72);
+  const heroMutedEnd = mixHex(hero.textMuted, hero.bgTo, 0.72);
   const heroPairs = [
-    { label: "Teks hero pada latar awal", back: hero.bgFrom },
-    { label: "Teks hero pada latar akhir", back: hero.bgTo },
+    { label: "Teks hero pada latar awal", fore: hero.text, back: hero.bgFrom },
+    { label: "Teks hero pada latar akhir", fore: hero.text, back: hero.bgTo },
+    { label: "Teks redup hero pada latar awal", fore: heroMutedStart, back: hero.bgFrom },
+    { label: "Teks redup hero pada latar akhir", fore: heroMutedEnd, back: hero.bgTo },
   ];
   for (const pair of heroPairs) {
-    const ratio = contrastRatio(hero.text, pair.back);
+    const ratio = contrastRatio(pair.fore, pair.back);
     checks.push({
       mode: "hero",
       modeLabel: "Hero",
@@ -530,6 +592,20 @@ export function themePublishError(settings: ThemeSettings): string | null {
 // =========================================================
 
 export const THEME_CSS_VARIABLES = [
+  "--bg",
+  "--card",
+  "--card-2",
+  "--text",
+  "--muted",
+  "--border",
+  "--primary",
+  "--primary-contrast",
+  "--accent",
+  "--accent-contrast",
+  "--success",
+  "--warning",
+  "--danger",
+  "--danger-contrast",
   "--app-bg",
   "--app-surface",
   "--app-inset",
@@ -554,6 +630,7 @@ export const THEME_CSS_VARIABLES = [
   "--theme-on-accent",
   "--app-font",
   "--app-radius-card",
+  "--app-radius-button",
   "--app-card-shadow",
   "--hero-bg-from",
   "--hero-bg-to",
@@ -572,13 +649,31 @@ function modeVariables(colors: ThemeColors): ModeVars {
   const kicker = ensureContrast(colors.primary, colors.background, MIN_CONTRAST);
   const muted = ensureContrast(mixHex(colors.text, colors.background, 0.72), colors.background, MIN_CONTRAST);
   const subtle = ensureContrast(mixHex(colors.text, colors.background, 0.55), colors.background, MIN_CONTRAST);
-  const primaryStrong = mixHex("#000000", colors.primary, 0.85);
-  const accentStrong = mixHex("#000000", colors.accent, 0.85);
+  const primaryStrong = mixHex(colors.primary, "#000000", 0.82);
+  const accentStrong = mixHex(colors.accent, "#000000", 0.82);
+  const primaryContrast = bestTextColor(colors.primary);
+  const accentContrast = bestTextColor(colors.accent);
   return {
+    // Variabel kanonis (dipakai komponen baru & dokumentasi tema).
+    "--bg": colors.background,
+    "--card": colors.card,
+    "--card-2": colors.card2,
+    "--text": colors.text,
+    "--muted": muted,
+    "--border": colors.border,
+    "--primary": colors.primary,
+    "--primary-contrast": primaryContrast,
+    "--accent": colors.accent,
+    "--accent-contrast": accentContrast,
+    "--success": colors.success,
+    "--warning": colors.warning,
+    "--danger": colors.danger,
+    "--danger-contrast": bestTextColor(colors.danger),
+    // Lapisan lama: RGB triplet agar utility Tailwind rgb(var()/alpha) tetap jalan.
     "--app-bg": rgbTriplet(colors.background),
     "--app-surface": rgbTriplet(colors.card),
-    "--app-inset": rgbTriplet(mixHex(colors.card, colors.background, 0.5)),
-    "--app-border": rgbTriplet(mixHex(colors.text, colors.card, 0.16)),
+    "--app-inset": rgbTriplet(colors.card2),
+    "--app-border": rgbTriplet(colors.border),
     "--app-text": rgbTriplet(colors.text),
     "--app-muted": rgbTriplet(muted),
     "--app-subtle": rgbTriplet(subtle),
@@ -595,8 +690,8 @@ function modeVariables(colors: ThemeColors): ModeVars {
     "--theme-accent": colors.accent,
     "--theme-accent-strong": accentStrong,
     "--theme-accent-rgb": rgbTriplet(colors.accent),
-    "--theme-on-primary": bestTextColor(primaryStrong),
-    "--theme-on-accent": bestTextColor(colors.accent),
+    "--theme-on-primary": primaryContrast,
+    "--theme-on-accent": accentContrast,
   };
 }
 
@@ -613,13 +708,14 @@ function variablesToCss(vars: ModeVars): string {
 export function heroCssVariables(hero: ThemeHeroColors): Record<string, string> {
   const safe = normalizeHeroColors(hero);
   const text = hexToRgb(safe.text) ?? { r: 255, g: 255, b: 255 };
+  const muted = hexToRgb(safe.textMuted) ?? text;
   const accent = hexToRgb(safe.accent) ?? { r: 92, g: 192, b: 255 };
   return {
     "--hero-bg-from": safe.bgFrom,
     "--hero-bg-to": safe.bgTo,
-    "--hero-glow": `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.25)`,
+    "--hero-glow": `rgba(${accent.r}, ${accent.g}, ${accent.b}, 0.28)`,
     "--hero-text": safe.text,
-    "--hero-text-muted": safe.textMuted,
+    "--hero-text-muted": `rgba(${muted.r}, ${muted.g}, ${muted.b}, 0.72)`,
     "--hero-divider": `rgba(${text.r}, ${text.g}, ${text.b}, 0.12)`,
     "--hero-chip-bg": `rgba(${text.r}, ${text.g}, ${text.b}, 0.1)`,
     "--hero-chip-border": `rgba(${text.r}, ${text.g}, ${text.b}, 0.18)`,
@@ -638,18 +734,21 @@ export function buildThemeCss(settings: ThemeSettings): string {
     settings.cardStyle === "flat"
       ? "none"
       : "0 8px 24px rgba(9, 9, 11, .08)";
-  const shared = `--app-font: ${font.stack}; --app-radius-card: ${radius.card}; --app-card-shadow: ${shadow};`;
+  const shared = `--app-font: ${font.stack}; --app-radius-card: ${radius.card}; --app-radius-button: ${radius.button}; --app-card-shadow: ${shadow};`;
   const hero = heroCssVariables(settings.hero ?? DEFAULT_HERO_COLORS);
+  // Mode gelap selalu memakai garis tipis tanpa bayangan agar tidak terlihat
+  // seperti kartu mengambang di atas latar gelap.
+  const darkShadow = "none";
   return [
     `html:root { ${variablesToCss(modeVariables(settings.light))} ${variablesToCss(hero)} ${shared} }`,
-    `html.dark { ${variablesToCss(modeVariables(settings.dark))} }`,
+    `html.dark { ${variablesToCss(modeVariables(settings.dark))} --app-card-shadow: ${darkShadow}; }`,
     `html body { font-family: var(--app-font); }`,
     `.theme-card { border-radius: var(--app-radius-card); box-shadow: var(--app-card-shadow); }`,
-    // CTA mengikuti warna utama tanpa mengubah berkas globals.css (kontrak v92).
-    `html .btn-gold { background-image: linear-gradient(135deg, var(--theme-primary-strong) 0%, var(--theme-primary) 100%), linear-gradient(180deg, rgba(255, 255, 255, .22) 0%, rgba(255, 255, 255, 0) 50%); color: var(--theme-on-primary); }`,
-    `html .btn-gold:disabled { background-image: linear-gradient(135deg, var(--theme-primary-strong) 0%, var(--theme-primary) 100%); }`,
-    `html .btn-gold-metal, html .brand-button { background-color: var(--theme-accent); background-image: linear-gradient(135deg, var(--theme-accent) 0%, var(--theme-accent-strong) 100%); color: var(--theme-on-accent); }`,
-    `html .brand-yellow { color: var(--theme-accent); }`,
+    // CTA utama: bidang warna utama + teks kontras; server mengalahkan fallback statis.
+    `html .btn-gold { background-color: var(--primary); background-image: linear-gradient(180deg, rgba(255, 255, 255, .16) 0%, rgba(255, 255, 255, 0) 55%); background-blend-mode: normal; color: var(--primary-contrast); border-radius: var(--app-radius-button); }`,
+    `html .btn-gold:disabled { background-image: none; }`,
+    `html .btn-gold-metal, html .brand-button { background-color: var(--accent); background-image: linear-gradient(135deg, var(--accent) 0%, var(--theme-accent-strong) 100%); color: var(--accent-contrast); }`,
+    `html .brand-yellow { color: var(--accent); }`,
     `html .app-hero { color: var(--hero-text); background: radial-gradient(circle at 80% 15%, var(--hero-glow), transparent 34%), linear-gradient(135deg, var(--hero-bg-from) 0%, var(--hero-bg-to) 100%); }`,
   ].join("\n");
 }
@@ -663,6 +762,7 @@ export function themePreviewStyle(colors: ThemeColors, settings: ThemeSettings):
     ...heroCssVariables(settings.hero ?? DEFAULT_HERO_COLORS),
     "--app-font": font.stack,
     "--app-radius-card": radius.card,
+    "--app-radius-button": radius.button,
     "--app-card-shadow": settings.cardStyle === "flat" ? "none" : "0 8px 24px rgba(9, 9, 11, .08)",
     backgroundColor: colors.background,
     color: colors.text,

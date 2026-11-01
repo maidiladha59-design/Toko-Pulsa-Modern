@@ -18,7 +18,7 @@ export default async function UlasanPage() {
 
   return (
     <div className="mx-auto max-w-3xl animate-page-in space-y-5">
-      <section className="overflow-hidden rounded-3xl border border-app-border bg-gradient-to-br from-zinc-950 via-zinc-950 to-gold-700 p-6 text-white shadow-xl">
+      <section className="app-hero overflow-hidden rounded-3xl p-6 text-white shadow-xl">
         <h1 className="text-3xl font-black">Ulasan Pelanggan</h1>
         <p className="mt-2 text-sm leading-6 text-white/70">
           Penilaian dari pengguna yang sudah menyelesaikan transaksi. Hanya ulasan yang disetujui

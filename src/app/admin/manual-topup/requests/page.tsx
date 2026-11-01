@@ -197,7 +197,7 @@ export default function AdminManualTopupRequestsPage() {
               {item.label}
               <span
                 className={`rounded-full px-2 py-0.5 text-xs font-black tabular-nums ${
-                  active ? "bg-gold-400 text-zinc-950" : "bg-app-inset text-app-muted"
+                  active ? "bg-gold-400 text-app-on-primary" : "bg-app-inset text-app-muted"
                 }`}
               >
                 {counts[item.value]}

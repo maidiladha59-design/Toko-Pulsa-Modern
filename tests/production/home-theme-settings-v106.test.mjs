@@ -50,7 +50,7 @@ test("v106 preflight mengenal migrasi dan urutan wajib berakhir di 106", () => {
   assert.match(script, /migrations_v106_home_theme_settings\.sql/);
   assert.match(script, /'settings-assets'/);
   assert.match(script, /site_settings_public_read/);
-  assert.match(script, /99,100,105,106,107,108\]/);
+  assert.match(script, /99,100,105,106,107,108,109\]/);
 });
 
 test("v106 pengaturan beranda: default dari config, normalisasi, banner terjadwal", () => {
@@ -87,9 +87,25 @@ test("v106 tema: font/radius terbatas, kontras 4,5:1, preset, CSS dari nilai ter
   assert.match(lib, /export function themePublishError/);
   assert.match(lib, /Kontras .* minimal/);
   assert.match(lib, /export function applyThemePreset/);
-  assert.match(lib, /label: "Biru Hijau"/);
+  assert.match(lib, /label: "Biru Neon"/);
   assert.match(lib, /label: "Emas Gelap"/);
-  assert.match(lib, /label: "Netral"/);
+  assert.match(lib, /label: "Hijau Segar"/);
+  assert.match(lib, /recommended: true/);
+  assert.match(lib, /export function recommendedThemeSettings/);
+
+  // Default "Biru Neon" (seed + fallback) memakai pasangan warna lengkap.
+  assert.match(lib, /primary: "#1573D1"/);
+  assert.match(lib, /accent: "#7BD32A"/);
+  assert.match(lib, /background: "#F3F6FB"/);
+  assert.match(lib, /card2: "#EEF3FA"/);
+  assert.match(lib, /border: "#E1E8F2"/);
+  assert.match(lib, /primary: "#3AA7FF"/);
+  assert.match(lib, /background: "#070B14"/);
+  assert.match(lib, /accent: "#8CD93A"/);
+  assert.match(lib, /bgFrom: "#0b1220"/);
+  assert.match(lib, /bgTo: "#123a66"/);
+  assert.match(lib, /font: "inter"/);
+  assert.match(lib, /radius: "large"/);
 
   assert.match(lib, /export const THEME_CSS_VARIABLES = \[/);
   assert.match(lib, /export function buildThemeCss/);
@@ -184,6 +200,8 @@ test("v106 halaman admin memakai SettingsForm dengan validasi + penjaga terbit",
   assert.match(theme, /publishError=\{themePublishError\}/);
   assert.match(theme, /themeContrastChecks\(value\)/);
   assert.match(theme, /applyThemePreset\(value, preset\.key as ThemePresetKey\)/);
+  assert.match(theme, /saveDraft\(recommendedThemeSettings\(value\)\)/);
+  assert.match(theme, /Terapkan tema rekomendasi/);
   assert.match(theme, /function PhonePreview/);
   assert.match(theme, /max-w-\[360px\]/);
   assert.match(theme, /<PhonePreview value=\{value\} mode="light" \/>/);

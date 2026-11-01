@@ -15,12 +15,13 @@ Token internal masih bernama `gold-*` (nama legacy) agar ribuan class lama tidak
 
 | Token | Nilai kunci | Pakai untuk |
 | --- | --- | --- |
-| `gold-50 … gold-950` (legacy, kini **biru**) | `gold-400` = `#2E9EF5` (DEFAULT), `gold-300` = `#7CC9FC` (shine), `gold-600` = `#1565E0`, `gold-700` = `#1151B8`, `gold-950` = `#071F45` | aksi utama, CTA primer, fokus input, kicker, badge proses |
-| `mint-50 … mint-950` (**hijau muda**) | `mint-400` = `#8CD93A` (DEFAULT), `mint-300` = `#B8EE70` (hover/terang), `mint-600` = `#5BBE1F`, `mint-800` = `#367712`, `mint-950` = `#17330A` | aksen sekunder, highlight, status aktif, CTA sekunder |
-| `brand` | `DEFAULT` = `#2E9EF5`, `dark` = `#1565E0`, `mint` = `#8CD93A` | akses cepat tiga warna identitas |
-| `bg-brand-gradient` | utility Tailwind: `linear-gradient(135deg, #2E9EF5 0%, #1565E0 45%, #5BBE1F 100%)` | branding penting: logo container, header utama, CTA terpenting |
+| `gold-50 … gold-950` (legacy, kini **primer tema**) | `gold-400`/`DEFAULT` = `rgb(var(--app-accent) / <alpha-value>)` (mengikuti `--primary`), `gold-300` = `#7CC9FC` (shine), `gold-600` = `#1565E0` (`--theme-primary-strong`), `gold-700` = `#1151B8`, `gold-950` = `#071F45` | aksi utama, CTA primer, fokus input, kicker, badge proses |
+| `mint-50 … mint-950` (**accent tema**) | `mint-400`/`DEFAULT` = `rgb(var(--theme-accent-rgb) / <alpha-value>)` (mengikuti `--accent`), `mint-300` = `#B8EE70` (hover/terang), `mint-600` = `#5BBE1F` (`--theme-accent-strong`), `mint-800` = `#367712`, `mint-950` = `#17330A` | aksen sekunder, highlight, status aktif, CTA sekunder |
+| `on-primary` / `on-accent` | `var(--primary-contrast)` / `var(--accent-contrast)` | teks di atas latar primer/aksen dinamis (selalu ≥4.5:1) |
+| `brand` | `DEFAULT` = `var(--primary)`, `dark` = `#1565E0`, `mint` = `var(--accent)` | akses cepat tiga warna identitas |
+| `bg-brand-gradient` | utility Tailwind: `linear-gradient(135deg, var(--primary) 0%, var(--theme-primary-strong) 45%, var(--theme-accent-strong) 100%)` | branding penting: logo container, header utama, CTA terpenting |
 | `zinc-*` | `zinc-950` = `#09090b` | latar gelap identitas, netral, teks sekunder |
-| `app-bg / app-surface / app-inset / app-border / app-text / app-muted / app-subtle / app-accent / app-accent-soft / app-kicker` | CSS var di `globals.css` | **latar, teks, border** semua permukaan (dual-mode terang/gelap). WAJIB dipakai agar tema tidak rusak. `app-accent` = biru `#2E9EF5`. |
+| `app-bg / app-surface / app-inset / app-border / app-text / app-muted / app-subtle / app-accent / app-accent-soft / app-kicker` | CSS var di `globals.css` | **latar, teks, border** semua permukaan (dual-mode terang/gelap). WAJIB dipakai agar tema tidak rusak. `app-accent` mengikuti `--primary` (default `#1573D1`). |
 | `success-*` (emerald) | alias 1:1 `colors.emerald` | status **Berhasil** — BUKAN mint |
 | `danger-*` (red) | alias 1:1 `colors.red` | status **Gagal/Ditolak**, tombol destructive |
 | `warning-*` (amber) | alias 1:1 `colors.amber` | status **Pending/Menunggu/Peringatan** |

@@ -145,7 +145,7 @@ export default function PPOBServiceGrid({ services, category }: { services: Serv
       {grouped.map(([brand, items]) => (
         <section key={brand} className="overflow-hidden rounded-3xl border border-app-border bg-app-surface">
           <div className="flex items-center gap-3 border-b border-app-border bg-app-inset px-4 py-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gold-400 text-zinc-950">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-gold-400 text-app-on-primary">
               {logoMap[brand.trim().toLowerCase()] ? (
                 <ProductImage src={logoMap[brand.trim().toLowerCase()]} alt={`Logo ${brand}`} className="h-full w-full" iconSize={20} fallbackIcon={brandIcon(brand)} fit="contain" sizes="36px" />
               ) : (

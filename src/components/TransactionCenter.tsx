@@ -232,7 +232,7 @@ export default function TransactionCenter({
               onClick={() => setTab(item.value)}
               className={`shrink-0 whitespace-nowrap rounded-full px-3.5 py-2 text-xs font-black transition ${
                 tab === item.value
-                  ? "bg-gold-400 text-zinc-950"
+                  ? "bg-gold-400 text-app-on-primary"
                   : "bg-app-inset text-app-muted hover:bg-app-accent-soft hover:text-app-kicker"
               }`}
             >

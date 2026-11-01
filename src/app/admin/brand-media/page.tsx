@@ -60,14 +60,14 @@ export default function AdminBrandMedia(){
           <Card key={brand.brand_key} className="p-4">
             <div className="flex flex-wrap items-center gap-3">
               <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-zinc-950">
-                {brand.logo_url?(brand.logo_url.toLowerCase().endsWith('.pdf')?<a href={brand.logo_url} target="_blank" rel="noreferrer" title="Buka file PDF" className="flex h-full w-full flex-col items-center justify-center leading-none text-gold-400"><Icon name="doc" size={16} /><span className="mt-0.5 text-[8px] font-black">PDF</span></a>:<img src={brand.logo_url} alt={brand.brand_name} className="h-full w-full object-contain"/>):<span className="text-gold-400"><Icon name="image" size={20} /></span>}
+                {brand.logo_url?(brand.logo_url.toLowerCase().endsWith('.pdf')?<a href={brand.logo_url} target="_blank" rel="noreferrer" title="Buka file PDF" className="flex h-full w-full flex-col items-center justify-center leading-none text-gold-300"><Icon name="doc" size={16} /><span className="mt-0.5 text-[8px] font-black">PDF</span></a>:<img src={brand.logo_url} alt={brand.brand_name} className="h-full w-full object-contain"/>):<span className="text-gold-300"><Icon name="image" size={20} /></span>}
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-black text-app-text">{brand.brand_name}</p>
                 <p className="text-xs text-app-subtle">{brand.product_count} produk · key: <code className="rounded bg-app-inset px-1">{brand.brand_key}</code></p>
               </div>
               <div className="flex items-center gap-2">
-                <label className={`inline-flex cursor-pointer items-center rounded-xl bg-zinc-950 px-4 py-2.5 text-xs font-black text-gold-400 transition hover:bg-zinc-800 ${busyKey===brand.brand_key?'pointer-events-none opacity-60':''}`}>
+                <label className={`inline-flex cursor-pointer items-center rounded-xl bg-zinc-950 px-4 py-2.5 text-xs font-black text-gold-300 transition hover:bg-zinc-800 ${busyKey===brand.brand_key?'pointer-events-none opacity-60':''}`}>
                   {busyKey===brand.brand_key?'Mengunggah...':brand.logo_url?'Ganti Logo':'Upload Logo'}
                   <input type="file" accept="image/jpeg,image/png,image/webp,image/svg+xml,application/pdf" className="hidden" disabled={busyKey===brand.brand_key} onChange={e=>{const f=e.target.files?.[0];if(f)uploadLogo(brand,f);e.target.value=''}}/>
                 </label>

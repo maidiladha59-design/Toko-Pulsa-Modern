@@ -130,7 +130,7 @@ function LoginForm() {
 
             <div className="mt-4 space-y-3">
               <div className="flex gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-600 text-xs font-black text-white">
                   1
                 </span>
                 <p className="text-xs leading-5 text-zinc-300">
@@ -139,7 +139,7 @@ function LoginForm() {
               </div>
 
               <div className="flex gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-600 text-xs font-black text-white">
                   2
                 </span>
                 <p className="text-xs leading-5 text-zinc-300">
@@ -148,7 +148,7 @@ function LoginForm() {
               </div>
 
               <div className="flex gap-3">
-                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">
+                <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-gold-600 text-xs font-black text-white">
                   3
                 </span>
                 <p className="text-xs leading-5 text-zinc-300">
@@ -167,7 +167,7 @@ function LoginForm() {
         <div className="mb-6 flex rounded-2xl bg-black p-1 text-sm font-bold">
           <Link
             href="/login"
-            className="flex-1 rounded-xl bg-gold-400 px-4 py-2.5 text-center text-[#1A1200] shadow-sm transition hover:bg-gold-300"
+            className="flex-1 rounded-xl bg-gold-600 px-4 py-2.5 text-center text-white shadow-sm transition hover:bg-gold-700"
           >
             Login
           </Link>
@@ -181,7 +181,7 @@ function LoginForm() {
         </div>
 
         <div className="mb-6">
-          <p className="text-xs font-black uppercase tracking-[.18em] text-gold-400">
+          <p className="text-xs font-black uppercase tracking-[.18em] text-gold-300">
             AIDIL STORE
           </p>
 

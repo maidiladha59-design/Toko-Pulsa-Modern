@@ -17,7 +17,7 @@ function isOkStatus(value: string) {
 function StatusPill({ text }: { text: string }) {
   const ok = isOkStatus(text);
   return (
-    <span className={`rounded-full px-3 py-0.5 text-xs font-black tracking-wide ${ok ? "bg-gold-400 text-black" : "bg-zinc-950 text-gold-400"}`}>
+    <span className={`rounded-full px-3 py-0.5 text-xs font-black tracking-wide ${ok ? "bg-gold-400 text-app-on-primary" : "bg-zinc-950 text-gold-300"}`}>
       {text}
     </span>
   );
@@ -65,7 +65,7 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
         className="mx-auto max-w-md animate-page-in pb-8 print:max-w-none print:pb-0"
         style={{ WebkitPrintColorAdjust: "exact", printColorAdjust: "exact" }}
       >
-        <div className="no-print flex items-center justify-between rounded-t-3xl bg-zinc-950 px-5 pb-5 pt-[calc(env(safe-area-inset-top)+16px)] text-gold-400">
+        <div className="no-print flex items-center justify-between rounded-t-3xl bg-zinc-950 px-5 pb-5 pt-[calc(env(safe-area-inset-top)+16px)] text-gold-300">
           <button type="button" onClick={goBack} aria-label="Kembali" className="font-black leading-none"><Icon name="arrow_left" size={24} /></button>
           <span className="text-xs font-black uppercase tracking-widest">Struk Digital</span>
         </div>
@@ -93,8 +93,8 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
           </dl>
 
           <div className="mt-6 flex items-center justify-between rounded-2xl bg-zinc-950 px-5 py-4 text-xl">
-            <span className="font-black text-gold-400">{total.label}</span>
-            <b className="text-gold-400">{total.value}</b>
+            <span className="font-black text-gold-300">{total.label}</span>
+            <b className="text-gold-300">{total.value}</b>
           </div>
 
           <p className="mt-5 text-center text-xs leading-5 text-zinc-500">
@@ -109,11 +109,11 @@ export default function ReceiptView({ title, rows, total, footer, backHref = "/t
               type="button"
               disabled={busy}
               onClick={printBluetooth}
-              className={`rounded-xl px-4 py-3 text-sm font-black ${busy ? "animate-pulse bg-gold-100 text-zinc-900" : "bg-zinc-950 text-gold-400"}`}
+              className={`rounded-xl px-4 py-3 text-sm font-black ${busy ? "animate-pulse bg-gold-100 text-zinc-900" : "bg-zinc-950 text-gold-300"}`}
             >
               {busy ? "Menghubungkan..." : <span className="inline-flex items-center gap-1.5"><Icon name="printer" size={16} />Cetak via Bluetooth</span>}
             </button>
-            <button type="button" onClick={() => window.print()} className="rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-black hover:bg-gold-300">
+            <button type="button" onClick={() => window.print()} className="rounded-xl bg-gold-400 px-4 py-3 text-sm font-black text-app-on-primary hover:bg-gold-300">
               <span className="inline-flex items-center gap-1.5"><Icon name="printer" size={16} />Cetak / Simpan PDF</span>
             </button>
           </div>

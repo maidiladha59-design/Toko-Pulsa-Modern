@@ -67,7 +67,7 @@ export default function PrintButton({ receiptText = "AIDIL STORE\nStruk Transaks
         type="button"
         disabled={busy}
         onClick={connectAndPrint}
-        className={`w-full rounded-xl px-4 py-3 text-sm font-black ${busy ? "animate-pulse bg-gold-400/50 text-zinc-950" : "border border-zinc-700 bg-zinc-950 text-gold-400 hover:border-gold-400/60"}`}
+        className={`w-full rounded-xl px-4 py-3 text-sm font-black ${busy ? "animate-pulse bg-gold-400 text-app-on-primary" : "border border-zinc-700 bg-zinc-950 text-gold-300 hover:border-gold-400/60"}`}
       >
         {busy ? "Menghubungkan..." : <span className="inline-flex items-center gap-1.5">{bluetooth ? <><Icon name="check" size={16} />Cetak Bluetooth Berhasil</> : <><Icon name="printer" size={16} />Cetak via Bluetooth</>}</span>}
       </button>

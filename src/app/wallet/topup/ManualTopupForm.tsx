@@ -309,7 +309,7 @@ export default function ManualTopupForm() {
                             : "border-app-border bg-app-inset hover:border-gold-400/50"
                         }`}
                       >
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-xs font-black text-gold-400">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-xs font-black text-gold-300">
                           {channelIcon(channel.channel_type)}
                         </span>
                         <span className="min-w-0 flex-1">
@@ -465,7 +465,7 @@ export default function ManualTopupForm() {
                 disabled={submitting || channels.length === 0}
                 className="btn-gold inline-flex min-h-[44px] w-full items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-black transition disabled:cursor-not-allowed disabled:opacity-50"
               >
-                {submitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-zinc-950/30 border-t-zinc-950" />}
+                {submitting && <span className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent" />}
                 Kirim Konfirmasi Top Up
               </button>
               <p className="mt-2 text-center text-xs text-app-subtle">

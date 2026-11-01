@@ -4,7 +4,8 @@
 
 /* =====================================================================
    ACUAN DESAIN AIDIL STORE (Design System) — gaya profesional-minimalis,
-   identitas gelap + biru listrik (#2E9EF5) + hijau muda (#8CD93A).
+   identitas biru neon (#1573D1 terang / #3AA7FF gelap) + hijau muda (#7BD32A).
+   Palet dapat diubah admin lewat Tema & Branding; nilai di token adalah default.
    Rincian lengkap: src/components/ui/README.md
    ---------------------------------------------------------------------
    TIPOGRAFI (ukuran dibatasi xs–3xl, keluarga font mengikuti body):
@@ -47,27 +48,58 @@
    memakai mint-* untuk status "Berhasil" — hijau brand berbeda dari emerald.
    ===================================================================== */
 
-/* Token tema AIDIL STORE. Nilai RGB (spasi) supaya bisa dipakai dengan alpha
-   oleh Tailwind (mis. bg-app-surface/60). Biru #2E9EF5 di kedua mode; kicker
-   dibuat lebih gelap di mode terang dan lebih terang di mode gelap agar
-   kontras teks tetap AA. */
+/* Token tema AIDIL STORE. Dua lapis:
+   1. Variabel kanonis (--bg, --card, --primary, ...) berisi warna hex/rgba
+      yang dipakai komponen baru dan dokumentasi tema.
+   2. Variabel --app-* berupa triplet RGB untuk utility Tailwind
+      rgb(var()/alpha) (mis. bg-app-surface/60).
+   Nilai di bawah adalah default "Biru Neon"; server menimpanya dari
+   Tema & Branding lewat <style id="theme-vars"> tanpa kilatan warna. */
 :root {
-  --app-bg: 250 249 246;
+  --bg: #F3F6FB;
+  --card: #FFFFFF;
+  --card-2: #EEF3FA;
+  --text: #0F172A;
+  --muted: #5B6B82;
+  --border: #E1E8F2;
+  --primary: #1573D1;
+  --primary-contrast: #FFFFFF;
+  --accent: #7BD32A;
+  --accent-contrast: #0B1A05;
+  --success: #059669;
+  --warning: #D97706;
+  --danger: #DC2626;
+  --danger-contrast: #FFFFFF;
+  --app-bg: 243 246 251;
   --app-surface: 255 255 255;
-  --app-inset: 244 244 240;
-  --app-border: 228 228 231;
-  --app-text: 24 24 27;
-  --app-muted: 82 82 91;
-  --app-subtle: 113 113 122;
-  --app-accent: 46 158 245;
-  --app-accent-soft: 239 248 255;
-  --app-kicker: 17 81 184;
-  --app-hero-bg: 9 9 11;
+  --app-inset: 238 243 250;
+  --app-border: 225 232 242;
+  --app-text: 15 23 42;
+  --app-muted: 91 107 130;
+  --app-subtle: 117 123 136;
+  --app-accent: 21 115 209;
+  --app-accent-soft: 232 241 250;
+  --app-kicker: 18 104 189;
+  --app-hero-bg: 243 246 251;
+  --app-success: 5 150 105;
+  --app-warning: 217 119 6;
+  --app-danger: 220 38 38;
+  --theme-primary: #1573D1;
+  --theme-primary-strong: #115EAB;
+  --theme-primary-rgb: 21 115 209;
+  --theme-accent: #7BD32A;
+  --theme-accent-strong: #63AB22;
+  --theme-accent-rgb: 123 211 42;
+  --theme-on-primary: #FFFFFF;
+  --theme-on-accent: #0B1A05;
+  --app-radius-card: 1.25rem;
+  --app-radius-button: 0.875rem;
+  --app-card-shadow: 0 8px 24px rgba(9, 9, 11, .08);
   /* Kartu hero selalu gelap di kedua mode, terpisah dari token tema umum.
      Nilai bisa ditimpa server dari Tema & Branding (--hero-* di <head>). */
   --hero-bg-from: #0b1220;
   --hero-bg-to: #123a66;
-  --hero-glow: rgba(46, 158, 245, 0.25);
+  --hero-glow: rgba(58, 167, 255, 0.28);
   --hero-text: #ffffff;
   --hero-text-muted: rgba(255, 255, 255, 0.72);
   --hero-divider: rgba(255, 255, 255, 0.12);
@@ -76,20 +108,46 @@
   --hero-accent: #5cc0ff;
 }
 .dark {
-  --app-bg: 9 9 11;
-  --app-surface: 24 24 27;
-  --app-inset: 15 15 18;
-  --app-border: 39 39 42;
-  --app-text: 244 244 245;
-  --app-muted: 161 161 170;
-  --app-subtle: 113 113 122;
-  --app-accent: 46 158 245;
-  --app-accent-soft: 11 50 107;
-  --app-kicker: 124 201 252;
-  --app-hero-bg: 9 9 11;
+  --bg: #070B14;
+  --card: #0F1626;
+  --card-2: #151E33;
+  --text: #F1F5F9;
+  --muted: #9AA8BF;
+  --border: #1E2A44;
+  --primary: #3AA7FF;
+  --primary-contrast: #05121F;
+  --accent: #8CD93A;
+  --accent-contrast: #0B1A05;
+  --success: #34D399;
+  --warning: #FBBF24;
+  --danger: #F87171;
+  --danger-contrast: #09090B;
+  --app-bg: 7 11 20;
+  --app-surface: 15 22 38;
+  --app-inset: 21 30 51;
+  --app-border: 30 42 68;
+  --app-text: 241 245 249;
+  --app-muted: 154 168 191;
+  --app-subtle: 136 140 146;
+  --app-accent: 58 167 255;
+  --app-accent-soft: 19 37 60;
+  --app-kicker: 58 167 255;
+  --app-hero-bg: 7 11 20;
+  --app-success: 52 211 153;
+  --app-warning: 251 191 36;
+  --app-danger: 248 113 113;
+  --theme-primary: #3AA7FF;
+  --theme-primary-strong: #3089D1;
+  --theme-primary-rgb: 58 167 255;
+  --theme-accent: #8CD93A;
+  --theme-accent-strong: #72B22F;
+  --theme-accent-rgb: 140 217 58;
+  --theme-on-primary: #05121F;
+  --theme-on-accent: #0B1A05;
+  --app-card-shadow: none;
   --hero-bg-from: #0b1220;
   --hero-bg-to: #123a66;
-  --hero-glow: rgba(46, 158, 245, 0.25);
+  --hero-glow: rgba(58, 167, 255, 0.28);
   --hero-text: #ffffff;
   --hero-text-muted: rgba(255, 255, 255, 0.72);
   --hero-divider: rgba(255, 255, 255, 0.12);
@@ -102,8 +160,8 @@
 html { scroll-behavior: smooth; }
 html, body { min-height: 100%; }
 body { @apply bg-app-bg text-app-text antialiased; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-::selection { @apply bg-zinc-950 text-[#B6E0FF]; }
-.dark ::selection { background: #2E9EF5; color: #071F45; }
+::selection { background: var(--primary); color: var(--primary-contrast); }
+.dark ::selection { background: var(--primary); color: var(--primary-contrast); }
 button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 
 @keyframes page-in { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
@@ -138,13 +196,13 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 @keyframes app-loader-rise { from { opacity: 0; transform: translateY(6px) scale(.94); } to { opacity: 1; transform: translateY(0) scale(1); } }
 @keyframes app-loader-halo { 0%, 100% { opacity: .38; transform: scale(.9); } 50% { opacity: .12; transform: scale(1.1); } }
 @keyframes app-loader-bar { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-.app-loader-aura { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 45%, rgba(46, 158, 245, .2), transparent 55%); }
+.app-loader-aura { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(circle at 50% 45%, rgba(21, 115, 209, .2), transparent 55%); }
 .app-loader-logo { animation: app-loader-rise .5s ease-out both; }
 .app-loader-word { animation: app-loader-rise .6s .1s ease-out both; }
-.app-loader-halo { background: radial-gradient(circle, rgba(140, 217, 58, .55), transparent 62%); animation: app-loader-halo 1.2s ease-in-out infinite; }
+.app-loader-halo { background: radial-gradient(circle, rgba(123, 211, 42, .55), transparent 62%); animation: app-loader-halo 1.2s ease-in-out infinite; }
 .app-loader-bar { animation: app-loader-bar 1.15s cubic-bezier(.22, .61, .36, 1) both; }
 .dashboard-card { transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease; }
-.dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 18px 35px rgba(9, 9, 11, .18); border-color: #2E9EF5; }
+.dashboard-card:hover { transform: translateY(-4px); box-shadow: 0 18px 35px rgba(9, 9, 11, .18); border-color: var(--primary); }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; transition-duration: .01ms !important; }
@@ -179,19 +237,19 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .section-title { margin-top: .25rem; font-size: 1.35rem; line-height: 1.25; font-weight: 900; color: rgb(var(--app-text)); }
 .app-panel { border: 1px solid rgb(var(--app-border)); border-radius: 1.5rem; background: rgb(var(--app-surface)); padding: 1rem; box-shadow: 0 8px 25px rgba(9,9,11,.06); }
 .service-tile { display: block; border: 1px solid rgb(var(--app-border)); border-radius: 1.25rem; background: rgb(var(--app-surface)); padding: 1rem; box-shadow: 0 5px 18px rgba(9,9,11,.04); transition: transform .2s ease, border-color .2s ease, box-shadow .2s ease; }
-.service-tile:hover { transform: translateY(-3px); border-color: #2E9EF5; box-shadow: 0 14px 28px rgba(9,9,11,.10); }
+.service-tile:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 14px 28px rgba(9,9,11,.10); }
 .service-icon { display: flex; width: 3rem; height: 3rem; align-items: center; justify-content: center; border-radius: 1rem; background: rgb(var(--app-accent-soft)); font-size: 1.45rem; }
 /* Kotak ikon layanan (src/components/icons/IconTile): radius 16px, gradasi brand
    halus, ukuran kotak lewat inline style. Warna ikon dari currentColor (kelas text-*). */
 .icon-tile { display: flex; width: 3.5rem; height: 3.5rem; flex: 0 0 auto; align-items: center; justify-content: center; border-radius: 1rem; border: 1px solid rgb(var(--app-border)); background-image: linear-gradient(135deg, rgb(var(--app-accent-soft)), rgb(var(--app-surface))); }
 .icon-tile-hero { border-color: rgba(255, 255, 255, .14); background-image: linear-gradient(135deg, rgba(255, 255, 255, .18), rgba(255, 255, 255, .05)); }
 .product-card { overflow: hidden; border: 1px solid rgb(var(--app-border)); border-radius: 1.25rem; background: rgb(var(--app-surface)); box-shadow: 0 5px 18px rgba(9,9,11,.04); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
-.product-card:hover { transform: translateY(-3px); border-color: #2E9EF5; box-shadow: 0 16px 30px rgba(9,9,11,.10); }
+.product-card:hover { transform: translateY(-3px); border-color: var(--primary); box-shadow: 0 16px 30px rgba(9,9,11,.10); }
 .feature-card { display: flex; gap: .8rem; border: 1px solid rgb(var(--app-border)); border-radius: 1.25rem; background: rgb(var(--app-surface)); padding: 1rem; }
 .feature-card > span { display: flex; height: 2.7rem; width: 2.7rem; flex: 0 0 auto; align-items: center; justify-content: center; border-radius: .9rem; background: rgb(var(--app-accent-soft)); font-size: 1.2rem; }
-.app-footer { border-radius: 1.5rem; background: #09090b; padding: 1.25rem; color: #fff; }
-.brand-purple { color:#09090b; }
-.brand-yellow { color:#8CD93A; }
+.app-footer { border-radius: 1.5rem; background: #070B14; padding: 1.25rem; color: #fff; }
+.brand-purple { color: var(--text); }
+.brand-yellow { color: var(--accent); }
 .brand-card { border:1px solid rgb(var(--app-border)); background:rgb(var(--app-surface)); border-radius:1.5rem; box-shadow:0 12px 32px rgba(9,9,11,.10); }
 
 /* Gradasi identitas AIDIL STORE (utility Tailwind `bg-brand-gradient`):
@@ -210,7 +268,7 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
   color: #F8FAFC;
   font-weight: 800;
   border: none;
-  border-radius: 12px;
+  border-radius: var(--app-radius-button, 12px);
   box-shadow: 0 2px 8px rgba(7, 31, 69, .35);
   transition: filter .15s ease, box-shadow .15s ease;
 }
@@ -257,7 +315,8 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .brand-button { background-color:#8CD93A; background-image:linear-gradient(135deg,#8CD93A,#5BBE1F 100%); color:#0B1A05; font-weight:800; }
 .brand-button:hover { background-image:linear-gradient(135deg,#B8EE70,#8CD93A 100%); }
 @media (min-width: 640px) { .app-panel { padding: 1.25rem; } .section-title { font-size: 1.5rem; } .app-footer { padding: 1.5rem; } }
-@media (max-width: 767px) { body { padding-bottom: 4.4rem; } }
+/* Ruang bawah untuk nav melayang: 64px nav + 24px jeda + 12px offset + safe-area. */
+@media (max-width: 767px) { body { padding-bottom: calc(100px + env(safe-area-inset-bottom)); } }
 @media print {
   @page { margin: 10mm; }
   body { background:#fff !important; padding-bottom:0 !important; }
@@ -268,17 +327,70 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 .nav-link { border-radius:.75rem; padding:.5rem .75rem; font-size:.875rem; font-weight:700; color:rgb(var(--app-muted)); transition: color .18s ease, background-color .18s ease; }
 .nav-link:hover { background:rgb(var(--app-accent-soft)); color:rgb(var(--app-text)); }
 .nav-link-active { background:rgb(var(--app-accent-soft)); color:rgb(var(--app-kicker)); }
-.mobile-link {
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.15rem;
-  min-height:48px; padding:.4rem .25rem .35rem;
-  font-size:12px; font-weight:500; line-height:1rem; color:rgb(var(--app-subtle));
-  border-radius:.75rem; position:relative;
-  transition: color .18s ease, transform .12s ease;
+/* Bottom navigation melayang (kapsul) dipakai bersama toko dan admin.
+   Offset 12px dari tepi + safe-area; tinggi 64px, radius 28px, konten di
+   belakangnya tetap terlihat lewat latar semi-solid + blur (fallback solid). */
+.floating-nav {
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: calc(12px + env(safe-area-inset-bottom));
+  z-index: 60;
+  display: flex;
+  align-items: stretch;
+  height: 64px;
+  max-width: 480px;
+  margin-inline: auto;
+  padding: 0 6px;
+  border: 1px solid var(--border);
+  border-radius: 28px;
+  background: var(--card);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, .18);
+  transition: transform .22s ease, opacity .22s ease;
 }
-.mobile-link svg { width:1.25rem; height:1.25rem; }
-.mobile-link:active { transform: scale(.94); color:rgb(var(--app-kicker)); }
-.mobile-link-active { color:rgb(var(--app-kicker)); }
-.mobile-link span { transition: color .18s ease; }
+@supports (background: color-mix(in srgb, white 50%, transparent)) {
+  .floating-nav {
+    background: color-mix(in srgb, var(--card) 86%, transparent);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+}
+.dark .floating-nav { box-shadow: 0 10px 30px rgba(0, 0, 0, .5); }
+.floating-nav[data-hidden="true"] { transform: translateY(calc(100% + 28px)); opacity: 0; pointer-events: none; }
+.floating-nav-item {
+  position: relative; display: flex; flex: 1 1 0%; min-width: 0; min-height: 48px;
+  flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+  border-radius: 20px; color: var(--muted);
+  font-size: 12px; font-weight: 600; line-height: 1; text-decoration: none;
+  transition: color .2s ease, transform .12s ease;
+}
+.floating-nav-item:active { transform: scale(.94); }
+.floating-nav-item:focus-visible { outline: 2px solid var(--primary); outline-offset: -2px; }
+.floating-nav-item[data-active="true"] { color: var(--primary); font-weight: 700; }
+.floating-nav-icon {
+  position: relative; display: flex; height: 30px; width: 44px;
+  align-items: center; justify-content: center; border-radius: 999px;
+  transition: background-color .2s ease;
+}
+.floating-nav-item[data-active="true"] .floating-nav-icon { background: rgb(var(--app-accent) / .14); }
+@supports (background: color-mix(in srgb, white 50%, transparent)) {
+  .floating-nav-item[data-active="true"] .floating-nav-icon {
+    background: color-mix(in srgb, var(--primary) 14%, transparent);
+  }
+}
+.floating-nav-label { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.floating-nav-badge {
+  position: absolute; top: -4px; right: 2px; display: flex; min-width: 16px; height: 16px;
+  align-items: center; justify-content: center; border-radius: 999px;
+  background: var(--danger); color: var(--danger-contrast);
+  padding: 0 4px; font-size: 9px; font-weight: 800; line-height: 1;
+  box-shadow: 0 0 0 2px var(--card);
+}
+@media (min-width: 768px) { .floating-nav { display: none; } }
+@media (prefers-reduced-motion: reduce) {
+  .floating-nav, .floating-nav-item, .floating-nav-icon { transition: none; }
+}
+@media print { .floating-nav { display: none; } }
 
 /* Kanvas halaman pelanggan, mengikuti tema aktif (light: krem terang, dark: hitam-biru).
    Margin negatif menetralkan padding main (px-4 py-6 / sm:px-6 sm:py-8) agar full-bleed. */

@@ -124,7 +124,7 @@ function LevelsCard({ value, set }: { value: LevelKycSettings; set: SetLevel }) 
         id: `level-${lastIndex + 1}`,
         label: `Level ${lastIndex + 1}`,
         min: (last?.min ?? 0) + 10,
-        color: "#2E9EF5",
+        color: "#1573D1",
         icon: "star_fill",
       },
     ]);
@@ -216,7 +216,7 @@ function LevelsCard({ value, set }: { value: LevelKycSettings; set: SetLevel }) 
                     <input
                       type="color"
                       aria-label={`Warna level ${level.label || index + 1}`}
-                      value={/^#[0-9a-fA-F]{6}$/.test(level.color) ? level.color : "#2E9EF5"}
+                      value={/^#[0-9a-fA-F]{6}$/.test(level.color) ? level.color : "#1573D1"}
                       onChange={(event) => patchLevel(index, { color: event.target.value.toUpperCase() })}
                       className="h-11 w-12 shrink-0 cursor-pointer rounded-xl border border-app-border bg-app-surface p-1"
                     />
@@ -224,7 +224,7 @@ function LevelsCard({ value, set }: { value: LevelKycSettings; set: SetLevel }) 
                       id={`level-color-${index}`}
                       value={level.color}
                       maxLength={7}
-                      placeholder="#2E9EF5"
+                      placeholder="#1573D1"
                       onChange={(event) => patchLevel(index, { color: event.target.value })}
                       className={`min-w-0 flex-1 rounded-xl border bg-app-surface px-4 py-3 text-sm text-app-text outline-none transition focus:ring-4 ${
                         /^#[0-9a-fA-F]{6}$/.test(level.color)
@@ -235,7 +235,7 @@ function LevelsCard({ value, set }: { value: LevelKycSettings; set: SetLevel }) 
                   </div>
                   {/^#[0-9a-fA-F]{6}$/.test(level.color) ? null : (
                     <p role="alert" className="mt-1.5 text-xs font-medium text-danger-600 dark:text-danger-400">
-                      Warna harus format heksa 6 digit, contoh #2E9EF5.
+                      Warna harus format heksa 6 digit, contoh #1573D1.
                     </p>
                   )}
                 </div>

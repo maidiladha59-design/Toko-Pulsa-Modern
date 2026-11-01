@@ -287,13 +287,13 @@ function RegisterForm() {
           <Link href="/login" className="flex-1 rounded-xl px-4 py-2.5 text-center text-white transition hover:bg-zinc-950">
             Login
           </Link>
-          <Link href="/register" className="flex-1 rounded-xl bg-gold-400 px-4 py-2.5 text-center text-[#1A1200] shadow-sm transition hover:bg-gold-300">
+          <Link href="/register" className="flex-1 rounded-xl bg-gold-600 px-4 py-2.5 text-center text-white shadow-sm transition hover:bg-gold-700">
             Daftar
           </Link>
         </div>
 
         <div className="mb-6">
-          <p className="text-xs font-black uppercase tracking-[.18em] text-gold-400">AIDIL STORE</p>
+          <p className="text-xs font-black uppercase tracking-[.18em] text-gold-300">AIDIL STORE</p>
           <h1 className="mt-2 text-2xl font-black text-white sm:text-3xl">Buat akun baru</h1>
           <p className="mt-2 text-sm leading-6 text-white/65">
             Yuk buat akun AIDIL STORE dan mulai gunakan berbagai layanan digital dengan mudah.
@@ -414,10 +414,10 @@ function RegisterForm() {
           <div className="mt-10 rounded-2xl border border-white/10 bg-white/5 p-5 backdrop-blur-sm">
             <p className="inline-flex items-center gap-1.5 text-sm font-black text-gold-200"><Icon name="book" size={16} /> Panduan Pendaftaran</p>
             <div className="mt-4 space-y-4">
-              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">1</span><div><p className="text-sm font-bold text-white">Isi data akun</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan nama, email, nomor WhatsApp dan password.</p></div></div>
-              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">2</span><div><p className="text-sm font-bold text-white">Verifikasi email</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan OTP 6 digit yang berlaku selama 5 menit.</p></div></div>
+              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-600 text-xs font-black text-white">1</span><div><p className="text-sm font-bold text-white">Isi data akun</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan nama, email, nomor WhatsApp dan password.</p></div></div>
+              <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-600 text-xs font-black text-white">2</span><div><p className="text-sm font-bold text-white">Verifikasi email</p><p className="mt-1 text-xs leading-5 text-zinc-400">Masukkan OTP 6 digit yang berlaku selama 5 menit.</p></div></div>
               <div className="flex gap-3">
-                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-400 text-xs font-black text-[#1A1200]">3</span>
+                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gold-600 text-xs font-black text-white">3</span>
                 <div>
                   <p className="text-sm font-bold text-white">Selesai &amp; login</p>
                   <p className="mt-1 text-xs leading-5 text-zinc-400">Akun langsung aktif dan siap digunakan.</p>

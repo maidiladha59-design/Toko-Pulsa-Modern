@@ -530,7 +530,7 @@ export default function AdminManualTopupChannelsPage() {
                   <div key={channel.id} className="rounded-2xl border border-app-border bg-app-inset p-4">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div className="flex min-w-0 items-start gap-3">
-                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-xs font-black text-gold-400">
+                        <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-zinc-950 text-xs font-black text-gold-300">
                           {channelInitial(channel.channel_type)}
                         </span>
                         <div className="min-w-0">
