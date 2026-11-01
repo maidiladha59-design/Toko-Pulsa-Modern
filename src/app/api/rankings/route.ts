@@ -23,8 +23,24 @@ export async function GET() {
   }
   const map = new Map(profiles.map((p) => [p.id, p]));
 
+  // Hanya status untuk lencana tampilan; data ranking dan urutannya tidak berubah.
+  const statusIds = [...new Set([...ids, ...(me ? [user.id] : [])])];
+  const verifiedIds = new Set<string>();
+  if (statusIds.length) {
+    const { data: verified } = await admin
+      .from('kyc_verifications')
+      .select('user_id')
+      .in('user_id', statusIds)
+      .eq('status', 'VERIFIED');
+    for (const row of verified || []) verifiedIds.add(row.user_id);
+  }
+
   return NextResponse.json({
-    me: me || null,
-    top: (top || []).map((r) => ({ ...r, profile: map.get(r.user_id) || null })),
+    me: me ? { ...me, verified: verifiedIds.has(user.id) } : null,
+    top: (top || []).map((r) => ({
+      ...r,
+      verified: verifiedIds.has(r.user_id),
+      profile: map.get(r.user_id) || null,
+    })),
   });
 }

@@ -224,7 +224,7 @@ test('v94 halaman admin chat-moderation: daftar dibisukan + buka bisu + sidebar'
   assert.match(sidebar, /"\/admin\/chat-moderation"/);
   assert.match(sidebar, /Moderasi Diskusi/);
 
-  const navbar = read('src/components/Navbar.tsx');
+  const navbar = read('src/components/Navbar.tsx') + read('src/config/user-menu.ts');
   assert.match(navbar, /href="\/diskusi"/);
   assert.match(navbar, /Ruang Diskusi/);
 });

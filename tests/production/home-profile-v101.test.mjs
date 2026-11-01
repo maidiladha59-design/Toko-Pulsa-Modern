@@ -93,6 +93,7 @@ test('v101 cincin avatar: gradasi berputar hanya saat terverifikasi', () => {
   assert.match(css, /@media \(prefers-reduced-motion: reduce\) \{\s*\.avatar-ring-spin \{ animation: none !important; \}/);
 
   const ring = read('src/components/profile/AvatarRing.tsx');
+  const badge = read('src/components/icons/VerifiedBadge.tsx');
   assert.match(ring, /export type AvatarRingStatus = "verified" \| "unverified" \| "pending" \| "rejected";/);
   assert.match(ring, /gap\?: "surface" \| "hero";/);
   assert.match(ring, /status === "pending"\s*\?\s*"bg-warning"/);
@@ -100,7 +101,15 @@ test('v101 cincin avatar: gradasi berputar hanya saat terverifikasi', () => {
   assert.match(ring, /avatar-ring-verified avatar-ring-spin avatar-ring-glow/);
   assert.match(ring, /inset-\[2px\]/, 'celah 2px antara cincin dan foto');
   assert.match(ring, /inset-\[4px\]/);
-  assert.match(ring, /viewBox="0 0 12 12"/, 'lencana centang digambar sendiri, bukan emoji');
+  assert.match(ring, /<VerifiedBadge/, 'lencana centang memakai seal bersama');
+  assert.match(ring, /-bottom-0\.5 -right-0\.5 z-10/, 'lencana di pojok kanan bawah, di atas cincin');
+  assert.match(badge, /viewBox="0 0 24 24"/, 'lencana centang digambar sendiri, bukan emoji');
+  assert.match(badge, /role="img"/);
+  assert.match(badge, /aria-label="Akun terverifikasi"/);
+  assert.match(badge, /strokeWidth=\{2\.2\}/);
+  assert.match(badge, /var\(--success\)/);
+  assert.match(css, /@keyframes verified-badge-pop/);
+  assert.match(css, /\.verified-badge-pop \{ transform-box: fill-box; transform-origin: center; animation: verified-badge-pop \.2s ease-out both; \}/);
   assert.doesNotMatch(ring, /✎|✅|✔/u);
   assert.doesNotMatch(ring, /\u{1F600}-\u{1F64F}/u);
 });

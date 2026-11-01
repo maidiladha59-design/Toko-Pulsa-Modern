@@ -248,6 +248,13 @@ button, a, input, select, textarea { -webkit-tap-highlight-color: transparent; }
 @media (prefers-reduced-motion: reduce) {
   .avatar-ring-spin { animation: none !important; }
 }
+
+/* Lencana verifikasi: scale 0.6 → 1 sekali saat halaman dibuka. */
+@keyframes verified-badge-pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
+.verified-badge-pop { transform-box: fill-box; transform-origin: center; animation: verified-badge-pop .2s ease-out both; }
+@media (prefers-reduced-motion: reduce) {
+  .verified-badge-pop { animation: none !important; }
+}
 .section-kicker { font-size: 10px; font-weight: 900; letter-spacing: .18em; text-transform: uppercase; color: rgb(var(--app-kicker)); }
 .section-title { margin-top: .25rem; font-size: 1.35rem; line-height: 1.25; font-weight: 900; color: rgb(var(--app-text)); }
 .app-panel { border: 1px solid rgb(var(--app-border)); border-radius: 1.5rem; background: rgb(var(--app-surface)); padding: 1rem; box-shadow: 0 8px 25px rgba(9,9,11,.06); }

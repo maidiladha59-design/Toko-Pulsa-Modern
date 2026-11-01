@@ -9,6 +9,7 @@ const exists = (p) => fs.existsSync(path.join(root, p));
 
 const MENU = "src/lib/admin-menu.ts";
 const SIDEBAR = "src/app/admin/AdminSidebar.tsx";
+const NAV_DRAWER = "src/components/NavDrawer.tsx";
 const SHELL = "src/app/admin/AdminShell.tsx";
 const LAYOUT = "src/app/admin/layout.tsx";
 const NAVBAR = "src/components/Navbar.tsx";
@@ -69,8 +70,9 @@ test("v101 badge antrean memakai hitungan ringan tanpa query berat", () => {
 });
 
 test("v101 sidebar: pencarian, favorit, grup lipat, state per admin di localStorage + try/catch", () => {
-  const sidebar = read(SIDEBAR);
-  assert.match(sidebar, /placeholder="Cari menu\.\.\."/);
+  // Isi drawer admin kini dipasok komponen bersama NavDrawerContent.
+  const sidebar = read(SIDEBAR) + read(NAV_DRAWER);
+  assert.match(sidebar, /searchPlaceholder="Cari menu\.\.\."/);
   assert.match(sidebar, /Menu tidak ditemukan/);
   assert.match(sidebar, /Icon name="star_fill" size=\{12\} \/> Favorit/);
   assert.match(sidebar, /aidil_admin_favs_v1_\$\{adminId\}/);

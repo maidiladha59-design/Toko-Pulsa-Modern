@@ -22,9 +22,12 @@ const TIER_TONES: Record<LevelKey, string> = {
 export default function LevelChip({
   transactions,
   className = "",
+  linkable = true,
 }: {
   transactions: number;
   className?: string;
+  /** false untuk chip di dalam kartu yang sudah berupa tautan (hindari anchor bersarang). */
+  linkable?: boolean;
 }) {
   const settings = useLevelKyc();
   const configured = settings !== null && settings.levels.length > 0;
@@ -40,6 +43,26 @@ export default function LevelChip({
       ? { borderColor: `${tier.color}55`, backgroundColor: `${tier.color}1a`, color: tier.color }
       : undefined;
 
+  const content = (
+    <>
+      <Icon name={icon} size={11} className="shrink-0" />
+      <span className="whitespace-nowrap">Lv. {tier.label}</span>
+    </>
+  );
+
+  if (!linkable) {
+    return (
+      <span
+        title={hint}
+        aria-label={`Level ${tier.label}. ${hint}`}
+        style={colorStyle}
+        className={`inline-flex h-6 items-center gap-1 rounded-full border px-2.5 text-[11px] font-semibold leading-4 ${tone} ${className}`}
+      >
+        {content}
+      </span>
+    );
+  }
+
   return (
     <Link
       href="/ranking"
@@ -48,8 +71,7 @@ export default function LevelChip({
       style={colorStyle}
       className={`inline-flex h-6 items-center gap-1 rounded-full border px-2.5 text-[11px] font-semibold leading-4 transition hover:brightness-110 ${tone} ${className}`}
     >
-      <Icon name={icon} size={11} className="shrink-0" />
-      <span className="whitespace-nowrap">Lv. {tier.label}</span>
+      {content}
     </Link>
   );
 }

@@ -11,6 +11,7 @@ import Select from "@/components/ui/Select";
 import { Card } from "@/components/ui/Card";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
 import ExportCsvPanel from "@/components/ExportCsvPanel";
+import VerifiedBadge from "@/components/icons/VerifiedBadge";
 
 const ROLES = ["USER", "ADMIN", "SUPER_ADMIN"] as const;
 const TEXTAREA_CLASS =
@@ -30,6 +31,7 @@ type User = {
   blocked_at: string | null;
   blocked_reason: string | null;
   balance: number;
+  verified: boolean;
 };
 
 type BalanceDirection = "CREDIT" | "DEBIT";
@@ -63,7 +65,7 @@ export default function AdminUsersPage() {
   async function load() {
     setLoading(true);
 
-    const [profilesRes, walletsRes] = await Promise.all([
+    const [profilesRes, walletsRes, verifiedRes] = await Promise.all([
       supabase
         .from("profiles")
         .select(
@@ -71,10 +73,15 @@ export default function AdminUsersPage() {
         )
         .order("created_at", { ascending: false }),
       supabase.from("wallets").select("user_id, balance"),
+      // Status KYC hanya bisa dibaca lintas pengguna lewat service role.
+      fetch("/api/admin/kyc/status", { cache: "no-store" }).catch(() => null),
     ]);
 
     if (profilesRes.error) toast.show(profilesRes.error.message, "error");
     if (walletsRes.error) toast.show(walletsRes.error.message, "error");
+
+    const verifiedJson = verifiedRes?.ok ? await verifiedRes.json().catch(() => null) : null;
+    const verifiedIds = new Set<string>(verifiedJson?.verified || []);
 
     const balances = new Map<string, number>();
     for (const row of (walletsRes.data as { user_id: string; balance: number | string }[] | null) ||
@@ -82,10 +89,11 @@ export default function AdminUsersPage() {
       balances.set(row.user_id, Number(row.balance) || 0);
     }
 
-    const rows = ((profilesRes.data as Omit<User, "balance">[] | null) || []).map((row) => ({
+    const rows = ((profilesRes.data as Omit<User, "balance" | "verified">[] | null) || []).map((row) => ({
       ...row,
       account_status: (row.account_status || "ACTIVE") as AccountStatus,
       balance: balances.get(row.id) ?? 0,
+      verified: verifiedIds.has(row.id),
     }));
 
     setUsers(rows);
@@ -297,7 +305,12 @@ export default function AdminUsersPage() {
                 ) : (
                   visibleUsers.map((u) => (
                     <tr key={u.id} className="border-b border-app-border last:border-0">
-                      <td className="px-4 py-3 font-bold text-app-text">{u.full_name || "-"}</td>
+                      <td className="px-4 py-3 font-bold text-app-text">
+                        <span className="flex min-w-0 items-center gap-1.5">
+                          <span className="min-w-0 break-words">{u.full_name || "-"}</span>
+                          {u.verified ? <VerifiedBadge size={15} /> : null}
+                        </span>
+                      </td>
                       <td className="max-w-[14rem] truncate px-4 py-3 text-app-muted" title={u.email}>
                         {u.email}
                       </td>

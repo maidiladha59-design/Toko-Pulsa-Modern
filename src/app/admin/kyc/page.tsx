@@ -1,5 +1,5 @@
 'use client';
-import{useEffect,useState}from'react';import Button from'@/components/ui/Button';import{Card}from'@/components/ui/Card';import Badge from'@/components/ui/Badge';import EmptyState from'@/components/ui/EmptyState';import LoadingSkeleton from'@/components/ui/LoadingSkeleton';import{useToast}from'@/components/ToastProvider';import Icon from'@/components/icons/Icon';
+import{useEffect,useState}from'react';import Button from'@/components/ui/Button';import{Card}from'@/components/ui/Card';import Badge from'@/components/ui/Badge';import EmptyState from'@/components/ui/EmptyState';import LoadingSkeleton from'@/components/ui/LoadingSkeleton';import{useToast}from'@/components/ToastProvider';import Icon from'@/components/icons/Icon';import VerifiedBadge from'@/components/icons/VerifiedBadge';
 export default function AdminKYC(){const toast=useToast();const[rows,setRows]=useState<any[]>([]);const[loading,setLoading]=useState(true);async function load(){setLoading(true);const r=await fetch('/api/admin/kyc');const j=await r.json();if(r.ok)setRows(j.kyc||[]);else toast.show(j.message||'Gagal memuat KYC','error');setLoading(false)}useEffect(()=>{load()},[]);async function review(user_id:string,status:'VERIFIED'|'REJECTED',rejected_stage?:'KTP'|'SELFIE'|null){let reason='',review_note='';if(status==='REJECTED'){reason=prompt('Alasan penolakan KYC:')||'';if(reason.trim().length<3)return}else review_note=prompt('Catatan pemeriksaan admin (opsional):')||'';const r=await fetch('/api/admin/kyc',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({user_id,status,reason,review_note,rejected_stage})});const j=await r.json();if(!r.ok){toast.show(j.message||'Gagal memproses KYC','error');return}toast.show(status==='VERIFIED'?'KYC diverifikasi dan notifikasi Reseller dikirim.':'KYC ditolak dan notifikasi dikirim.','success');load()}
 const proofClass="inline-flex items-center rounded-xl border border-app-border bg-app-inset px-3 py-2 text-app-text transition hover:border-gold-400 hover:bg-app-accent-soft";
 return (
@@ -19,7 +19,10 @@ return (
           <Card key={x.user_id}>
             <div className="flex flex-wrap justify-between gap-4">
               <div className="min-w-0">
-                <p className="font-black text-app-text">{x.profiles?.full_name || 'Pengguna'}</p>
+                <p className="flex min-w-0 items-center gap-1.5 font-black text-app-text">
+                  <span className="min-w-0 break-words">{x.profiles?.full_name || 'Pengguna'}</span>
+                  {x.status === 'VERIFIED' ? <VerifiedBadge size={16} /> : null}
+                </p>
                 <p className="mt-1 text-xs text-app-muted">{x.profiles?.email} · {x.profiles?.phone || '-'}</p>
                 <p className="mt-3 flex flex-wrap items-center gap-2 text-xs font-bold text-app-text">
                   <Badge tone={x.status === 'VERIFIED' ? 'success' : x.status === 'REJECTED' ? 'danger' : 'warning'}>{x.status}</Badge>

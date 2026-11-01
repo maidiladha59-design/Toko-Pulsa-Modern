@@ -208,7 +208,7 @@ test('v75 UI: form transfer, halaman QR, dan scan QR pribadi terpasang', () => {
 test('v75 navigasi & label TRANSFER terpasang di wallet, navbar, profil, admin', () => {
   assert.match(read('src/app/wallet/page.tsx'), /TRANSFER: "Transfer"/);
   assert.match(read('src/lib/admin-menu.ts'), /"\/admin\/transfers"/);
-  assert.match(read('src/components/Navbar.tsx'), /"\/transfer-uang\/qr"/);
+  assert.match(read('src/components/Navbar.tsx') + read('src/config/user-menu.ts'), /"\/transfer-uang\/qr"/);
   assert.match(read('src/app/profile/page.tsx'), /'\/transfer-uang\/qr'/);
   assert.match(read('src/app/transactions/wallet/[id]/page.tsx'), /TRANSFER: "Transfer Saldo"/);
 });

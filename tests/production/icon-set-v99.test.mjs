@@ -20,7 +20,9 @@ const ENGINE = "src/lib/notification-engine.ts";
 const PICTOGRAPHIC = /\p{Extended_Pictographic}/u;
 
 function registryNames() {
-  return [...read(REGISTRY).matchAll(/^ {2}([a-z][a-z0-9_]*): \[/gm)].map((m) => m[1]);
+  const source = read(REGISTRY);
+  const registry = source.slice(source.indexOf("export const ICON_REGISTRY"));
+  return [...registry.matchAll(/^ {2}([a-z][a-z0-9_]*): \[/gm)].map((m) => m[1]);
 }
 
 /** Escape satu karakter ke bentuk yang dipakai emoji-map.ts (\u{1F4F1} atau \u26A1). */

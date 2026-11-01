@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Icon from "@/components/icons/Icon";
+import VerifiedBadge from "@/components/icons/VerifiedBadge";
 import { KYC_UI_LABELS, type KycUiStatus } from "@/lib/labels";
 
 // Chip status verifikasi akun. Warna mengikuti token tema: emerald untuk
@@ -40,7 +41,11 @@ export default function KycChip({
   const base = `inline-flex min-h-6 max-w-full items-center gap-1 rounded-full border px-2.5 text-[11px] font-semibold leading-4 ${TONES[tone][status]} ${className}`;
   const content = (
     <>
-      <Icon name={ICONS[status]} size={12} className="shrink-0" />
+      {status === "verified" ? (
+        <VerifiedBadge size={16} className="shrink-0" />
+      ) : (
+        <Icon name={ICONS[status]} size={12} className="shrink-0" />
+      )}
       <span className="min-w-0 break-words">{KYC_UI_LABELS[status]}</span>
     </>
   );

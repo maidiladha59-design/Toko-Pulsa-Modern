@@ -6,14 +6,25 @@ Emoji tidak dipakai lagi sebagai ikon — lihat penjaga `npm run check:emoji`.
 ## Pemakaian
 
 ```tsx
-import { Icon, IconTile, StarRating } from "@/components/icons";
+import { Icon, IconTile, StarRating, VerifiedBadge } from "@/components/icons";
 
 <Icon name="wallet" size={20} />                 {/* dekoratif: aria-hidden */}
 <Icon name="close" size={18} title="Tutup" />    {/* bermakna: role=img + aria-label */}
 <IconTile name="pulsa" />                        {/* kotak 56px radius 16 + gradasi brand */}
 <IconTile name="pln" size={44} iconSize={24} tone="mint" />
 <StarRating value={4} />                         {/* deret bintang rating */}
+<VerifiedBadge size={18} />                      {/* seal terverifikasi + centang putih */}
 ```
+
+### Lencana verifikasi
+
+`VerifiedBadge` adalah seal 10 lengkungan dengan centang putih, bukan lingkaran
+polos dan bukan emoji. Isi memakai `var(--success)`, outline `var(--card)`,
+dan centang putih; animasi scale 0.6 → 1 (200ms) berhenti otomatis saat
+`prefers-reduced-motion`. Pakai **hanya** untuk status akun terverifikasi —
+status belum/menunggu/ditolak tetap memakai `Icon` biasa. Komponen ini berdiri
+sendiri karena registry hanya mendukung satu warna `currentColor`, sedangkan
+seal butuh isi berwarna + centang putih.
 
 `name` juga menerima emoji lama (mis. `"\u{1F4E6}"`) dan nilai tak dikenal: keduanya
 dipetakan lewat `mapEmojiToIcon` dan jatuh ke ikon `default`, jadi komponen tidak
@@ -37,7 +48,8 @@ Nilai yang dikirim ke server adalah nama ikon; API memvalidasi dengan daftar
 1. Tambahkan satu entri pada `ICON_NAMES`/`registry.ts` (satu nama = satu makna,
    huruf kecil dengan garis bawah, mis. `money_send`).
 2. Aturan gaya wajib, kalau tidak ikon akan terlihat berbeda dari yang lain:
-   - `viewBox="0 0 24 24"`, isi gambar berada di area aman **3.5 - 20.5**;
+   - `viewBox="0 0 24 24"`, isi gambar berada di area aman **3.5 - 20.5**
+     (khusus seal `verified` boleh lebih lebar agar gerigi terbaca di 12–28px);
    - garis luar saja (`fill: none`, `stroke: currentColor`) — warna mengikuti teks;
    - `stroke-width` 1.8 (naik ke 2 otomatis pada ukuran >= 40px);
    - ujung dan sudut membulat (`strokeLinecap`/`strokeLinejoin: round`);
@@ -50,7 +62,7 @@ Nilai yang dikirim ke server adalah nama ikon; API memvalidasi dengan daftar
 ## Daftar nama ikon
 
 sistem: home, grid, menu, user, users, logout, bell, megaphone, ticker, star, star_fill,
-heart, heart_fill, sun, moon, monitor, check, check_circle, close, close_circle, plus,
+heart, heart_fill, sun, moon, monitor, check, check_circle, verified, close, close_circle, plus,
 minus, search, filter, arrow_right, arrow_left, arrow_up, arrow_down, chevron_right,
 chevron_left, chevron_down, chevron_up, refresh, swap, transfer, settings, tools, sliders,
 puzzle, rocket, ban

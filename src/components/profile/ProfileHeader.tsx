@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import AvatarRing from "@/components/profile/AvatarRing";
+import VerifiedBadge from "@/components/icons/VerifiedBadge";
 import GreetingText from "@/components/profile/GreetingText";
 import KycChip from "@/components/profile/KycChip";
 import LevelChip from "@/components/profile/LevelChip";
@@ -123,7 +124,7 @@ export default function ProfileHeader({
           />
           <span
             aria-hidden
-            className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-[color:var(--hero-chip-border)] bg-[color:var(--hero-bg-from)] text-[color:var(--hero-accent)] shadow-sm"
+            className="absolute -bottom-1 -left-1 flex h-6 w-6 items-center justify-center rounded-full border border-[color:var(--hero-chip-border)] bg-[color:var(--hero-bg-from)] text-[color:var(--hero-accent)] shadow-sm"
           >
             <Icon name="edit" size={13} />
           </span>
@@ -131,10 +132,13 @@ export default function ProfileHeader({
 
         <div className="min-w-0 flex-1">
           <GreetingText className="block text-xs font-semibold text-[color:var(--hero-text-muted)]" />
-          <div className="mt-1 min-w-0">
-            <p className="block truncate text-[18px] font-semibold leading-6 text-[color:var(--hero-text)]" title={name}>
-              {name}
-            </p>
+          <div className="mt-1 flex min-w-0 items-center gap-1.5">
+            <div className="min-w-0">
+              <p className="block truncate text-[18px] font-semibold leading-6 text-[color:var(--hero-text)]" title={name}>
+                {name}
+              </p>
+            </div>
+            {status === "verified" ? <VerifiedBadge size={18} className="shrink-0" /> : null}
           </div>
 
           <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">

@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import { DEFAULT_AVATAR_URL } from "@/lib/avatar";
 import { useLevelKyc } from "@/components/settings/LevelKycProvider";
+import VerifiedBadge from "@/components/icons/VerifiedBadge";
 
 // Cincin avatar mengikuti status verifikasi akun:
 //   verified   → gradasi warna berputar pelan + glow tipis + lencana centang
@@ -47,7 +48,7 @@ export default function AvatarRing({
 
   return (
     <span
-      className="relative inline-flex shrink-0 items-center justify-center rounded-full"
+      className="relative inline-flex shrink-0 items-center justify-center overflow-visible rounded-full"
       style={{ width: outer, height: outer }}
     >
       <span aria-hidden className={`absolute inset-0 rounded-full ${ring}`} />
@@ -63,22 +64,8 @@ export default function AvatarRing({
         />
       </span>
       {status === "verified" && (
-        <span
-          role="img"
-          aria-label="Terverifikasi"
-          className="absolute bottom-0 left-0 flex h-[18px] w-[18px] items-center justify-center rounded-full bg-success-500 text-white"
-          style={{ boxShadow: `0 0 0 2px ${gapColor}` }}
-        >
-          <svg viewBox="0 0 12 12" className="h-3 w-3" aria-hidden>
-            <path
-              d="M2.4 6.2 4.8 8.5 9.6 3.6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+        <span className="pointer-events-none absolute -bottom-0.5 -right-0.5 z-10 flex">
+          <VerifiedBadge size={size >= 56 ? 26 : size >= 40 ? 20 : 16} />
         </span>
       )}
       {children}

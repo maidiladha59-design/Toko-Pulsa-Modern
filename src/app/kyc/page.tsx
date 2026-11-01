@@ -7,6 +7,7 @@ import { useToast } from "@/components/ToastProvider";
 import Icon from "@/components/icons/Icon";
 import { isImageTooBlurry } from "@/lib/blur-check";
 import { statusLabel } from "@/lib/labels";
+import VerifiedBadge from "@/components/icons/VerifiedBadge";
 import { useCamera, type CameraErrorKind } from "@/hooks/useCamera";
 import { useLevelKyc } from "@/components/settings/LevelKycProvider";
 
@@ -280,7 +281,12 @@ export default function KYC() {
       </div>
 
       <p className="mt-3 text-sm leading-6 text-app-muted">
-        Status verifikasi: <b className="text-app-text">{statusLabel(status)}</b>. Data ini hanya dipakai untuk memverifikasi akun Anda.
+        Status verifikasi:{" "}
+        <b className="inline-flex items-center gap-1 text-app-text">
+          {statusLabel(status)}
+          {status === "VERIFIED" ? <VerifiedBadge size={16} /> : null}
+        </b>
+        . Data ini hanya dipakai untuk memverifikasi akun Anda.
       </p>
       {verificationHint && status !== "VERIFIED" ? (
         <p className="mt-2 break-words text-xs leading-5 text-app-muted">{verificationHint}</p>

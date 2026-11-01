@@ -3,6 +3,8 @@
 // isi gambar berada pada area aman 3.5-20.5 supaya tajam di ukuran kecil.
 // File ini murni data (tanpa React) supaya bisa dipakai validasi di API route.
 
+import { VERIFIED_CHECK_PATH, VERIFIED_SEAL_PATH } from "./verified-path";
+
 export type StrokeNode =
   | { d: string }
   | { circle: [number, number, number] }
@@ -46,6 +48,9 @@ export const ICON_REGISTRY = {
   monitor: [r(3.2, 4.4, 17.6, 12, 2.4), d("M8.6 20.2h6.8"), d("M12 16.4v3.8")],
   check: [d("M5 12.6 9.6 17.2 19 7.4")],
   check_circle: [c(12, 12, 8.4), d("M8.3 12.3 10.9 15l5-5.6")],
+  // Seal verifikasi untuk pemilih ikon; tampilan lencana berwarna memakai
+  // komponen <VerifiedBadge> (isi sukses + centang putih).
+  verified: [d(VERIFIED_SEAL_PATH), d(VERIFIED_CHECK_PATH)],
   close: [d("M6.6 6.6 17.4 17.4"), d("M17.4 6.6 6.6 17.4")],
   close_circle: [c(12, 12, 8.4), d("M9.3 9.3 14.7 14.7"), d("M14.7 9.3 9.3 14.7")],
   plus: [d("M12 6.2v11.6"), d("M6.2 12h11.6")],

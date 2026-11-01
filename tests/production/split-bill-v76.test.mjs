@@ -236,7 +236,8 @@ test('v76 UI split bill terpasang: daftar+buat, detail, bayar, ingatkan', () => 
 });
 
 test('v76 navigasi Split Bill terpasang di Navbar (desktop & mobile)', () => {
-  const navbar = read('src/components/Navbar.tsx');
+  // Menu mobile kini didefinisikan di src/config/user-menu.ts.
+  const navbar = read('src/components/Navbar.tsx') + read('src/config/user-menu.ts');
   assert.match(navbar, /\["\/split-bill", "receipt", "Split Bill"\]/);
   assert.ok((navbar.match(/\/split-bill/g) || []).length >= 2, 'link dropdown akun + menu mobile');
 });

@@ -12,6 +12,7 @@ import LevelKycProvider from "@/components/settings/LevelKycProvider";
 import { isFeatureEnabled } from "@/lib/features";
 import { getSetting } from "@/lib/settings";
 import { getBottomNav } from "@/lib/site-settings";
+import { createClient } from "@/lib/supabase/server";
 import { DEFAULT_THEME_SETTINGS, THEME_SETTINGS_KEY, buildThemeCss, themeHtmlVariables } from "@/lib/theme-settings";
 import { DEFAULT_LEVEL_KYC_SETTINGS, LEVEL_KYC_SETTINGS_KEY } from "@/lib/level-kyc-settings";
 
@@ -63,12 +64,23 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   // Tema terbit harus ikut berubah tanpa deploy. Tanpa ini layout bisa
   // diprerender saat build dan menyimpan warna lama di shell rute statis.
   noStore();
-  const [scanQrisEnabled, theme, levelKyc, navSettings] = await Promise.all([
+  const supabase = createClient();
+  const [scanQrisEnabled, theme, levelKyc, navSettings, auth] = await Promise.all([
     isFeatureEnabled("scan_qris"),
     getSetting(THEME_SETTINGS_KEY, DEFAULT_THEME_SETTINGS),
     getSetting(LEVEL_KYC_SETTINGS_KEY, DEFAULT_LEVEL_KYC_SETTINGS),
     getBottomNav("shop"),
+    supabase.auth.getUser(),
   ]);
+
+  // Menu Panel Admin hanya boleh muncul untuk peran yang sah. Pemeriksaan ini
+  // di server agar flag tidak bisa dipalsukan dari browser; rute /admin tetap
+  // punya penjaga izinnya sendiri.
+  let isAdmin = false;
+  if (auth.data.user) {
+    const { data: viewer } = await supabase.from("profiles").select("role").eq("id", auth.data.user.id).maybeSingle();
+    isAdmin = viewer?.role === "ADMIN" || viewer?.role === "SUPER_ADMIN";
+  }
   return (
     <html
       lang="id"
@@ -93,6 +105,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                 logoLight={theme.identity.logoLight}
                 logoDark={theme.identity.logoDark}
                 navSettings={navSettings}
+                isAdmin={isAdmin}
               />
               <main className="mx-auto min-h-[calc(100vh-80px)] max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
             </LevelKycProvider>
