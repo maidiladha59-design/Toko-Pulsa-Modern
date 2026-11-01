@@ -18,7 +18,7 @@ test('v103 hero profile: dua kolom avatar + identitas, saldo blok sendiri', () =
   assert.match(header, /aria-label=\{hidden \? "Tampilkan saldo" : "Sembunyikan saldo"\}/);
   assert.match(header, /w-full shrink-0 rounded-2xl border border-white\/10 bg-white\/5 px-3 py-2\.5 sm:w-48/);
   // Satu wadah deretan lencana, jarak konsisten.
-  assert.match(header, /<div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">\n\s+\{status \? <KycChip status=\{status\} tone="hero" \/> : null\}\n\s+<LevelChip transactions=\{transactions\} \/>/);
+  assert.match(header, /<div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">\n\s+\{status \? <KycChip status=\{status\} tone="hero" \/> : null\}\n\s+\{showLevel \? <LevelChip transactions=\{transactions\} \/> : null\}/);
   assert.doesNotMatch(header, /overflow-x-hidden/);
 });
 

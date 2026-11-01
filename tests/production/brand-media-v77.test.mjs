@@ -12,7 +12,7 @@ const MIGRATION = "supabase/migrations_v77_brand_media.sql";
 const ROUTE = "src/app/api/admin/brand-media/route.ts";
 const PAGE = "src/app/admin/brand-media/page.tsx";
 const GRID = "src/components/PPOBServiceGrid.tsx";
-const SIDEBAR = "src/app/admin/AdminSidebar.tsx";
+const MENU = "src/lib/admin-menu.ts";
 const MEDIA_ROUTE = "src/app/api/admin/media/route.ts";
 const PLATFORM = "src/app/admin/platform/page.tsx";
 
@@ -99,9 +99,10 @@ test('v77 halaman platform: accept baru, ikon PDF banner, indikator Mengunggah',
   assert.match(p, /file_type:f\.type==='application\/pdf'\?'pdf':'image'/);
 });
 
-test('v77 menu "Logo Brand" terpasang di AdminSidebar', () => {
-  const s = read(SIDEBAR);
-  assert.match(s, new RegExp(esc('["/admin/brand-media", "image", "Logo Brand"]')));
+test('v77 menu Logo Brand digabung ke Gambar & Logo Brand, URL lama dialihkan', () => {
+  assert.ok(exists(PAGE));
+  assert.match(read(MENU), /href: "\/admin\/product-images", icon: "image", label: "Gambar & Logo Brand"/);
+  assert.match(read('next.config.js'), /source: "\/admin\/brand-media", destination: "\/admin\/product-images\?tab=brand"/);
 });
 
 test('v77 PPOBServiceGrid membaca brand_media (client publik) dan fallback ikon tetap ada', () => {

@@ -4,6 +4,8 @@ import { createClient } from "@/lib/supabase/server";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import StatusBadge from "@/components/StatusBadge";
 import Icon from "@/components/icons/Icon";
+import { getSetting } from "@/lib/settings";
+import { PAGES_SETTINGS_KEY, DEFAULT_PAGES_SETTINGS } from "@/lib/pages-settings";
 
 export default async function OrdersPage() {
   const supabase = createClient();
@@ -15,6 +17,9 @@ export default async function OrdersPage() {
     .select("id, order_number, total_amount, status, created_at")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false });
+  const pages = await getSetting(PAGES_SETTINGS_KEY, DEFAULT_PAGES_SETTINGS);
+  const emptyTitle = pages.labels.emptyOrdersTitle.trim() || DEFAULT_PAGES_SETTINGS.labels.emptyOrdersTitle;
+  const emptyDescription = pages.labels.emptyOrdersDescription.trim() || DEFAULT_PAGES_SETTINGS.labels.emptyOrdersDescription;
 
   return (
     <div className="customer-shell">
@@ -45,8 +50,8 @@ export default async function OrdersPage() {
           ) : (
             <div className="flex flex-col items-center gap-2 px-6 py-12 text-center">
               <Icon name="box" size={30} />
-              <p className="text-sm font-bold text-app-text">Belum ada pesanan</p>
-              <p className="text-xs leading-5 text-app-muted">Pesanan yang Anda buat akan muncul di sini.</p>
+              <p className="text-sm font-bold text-app-text">{emptyTitle}</p>
+              <p className="text-xs leading-5 text-app-muted">{emptyDescription}</p>
             </div>
           )}
         </div>

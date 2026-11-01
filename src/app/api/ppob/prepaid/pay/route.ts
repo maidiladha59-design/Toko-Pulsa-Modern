@@ -3,6 +3,7 @@ import { z } from "zod";
 import { createClient } from "@/lib/supabase/server";
 import { fulfillPpobOrder } from "@/lib/ppob/fulfill";
 import { verifyTransactionPin } from "@/lib/security/transaction-pin";
+import { checkKycLimit } from "@/lib/kyc-limits-server";
 
 const schema = z.object({
   product_id: z.string().uuid(),
@@ -21,6 +22,11 @@ export async function POST(request: Request) {
   if (!parsed.success) return NextResponse.json({ message: "Data pembayaran PPOB tidak valid." }, { status: 400 });
 
   const { product_id, customer_no, target_data, idempotency_key, pin } = parsed.data;
+
+  const { data: product } = await supabase.from("products").select("price").eq("id", product_id).maybeSingle();
+  const kyc = await checkKycLimit(user.id, "purchase", Number(product?.price || 0));
+  if (!kyc.ok) return NextResponse.json({ message: kyc.message }, { status: kyc.status });
+
   if (!pin) return NextResponse.json({ message: "PIN transaksi wajib diisi." }, { status: 400 });
   try { await verifyTransactionPin(user.id, pin); } catch (e: any) {
     if (e?.message === "PIN_NOT_SET") return NextResponse.json({ message: "Buat PIN transaksi terlebih dahulu di Pengaturan." }, { status: 409 });

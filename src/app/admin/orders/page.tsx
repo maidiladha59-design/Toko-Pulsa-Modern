@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import { formatRupiah, formatDate } from "@/lib/utils";
@@ -12,6 +12,7 @@ import { Card } from "@/components/ui/Card";
 import Input from "@/components/ui/Input";
 import Icon from "@/components/icons/Icon";
 import Select from "@/components/ui/Select";
+import ExportCsvPanel from "@/components/ExportCsvPanel";
 
 const STATUSES = ["PENDING", "PROCESSING", "COMPLETED", "FAILED", "CANCELLED", "REFUNDED"] as const;
 type Order = { id: string; order_number: string; total_amount: number; status: string; created_at: string; payment_method: string; profiles: { full_name: string | null; email: string } | null };
@@ -24,9 +25,20 @@ export default function AdminOrdersPage() {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [detail, setDetail] = useState<Record<string, { items: OrderItem[]; submission: Submission | null; fileUrl?: string }>>({});
   const [detailLoading, setDetailLoading] = useState<string | null>(null);
+  const [exportFilters, setExportFilters] = useState({ status: "", q: "" });
 
   async function load() { setLoading(true); const { data, error } = await supabase.from("orders").select("id, order_number, total_amount, status, created_at, payment_method, profiles(full_name, email)").order("created_at", { ascending: false }).limit(100); if (error) toast.show(error.message, "error"); setOrders((data as Order[]) || []); setLoading(false); }
   useEffect(()=>{load(); /* eslint-disable-next-line react-hooks/exhaustive-deps */},[]);
+  const visibleOrders = useMemo(() => {
+    const term = exportFilters.q.trim().toLowerCase();
+    return orders.filter((order) => {
+      if (exportFilters.status && order.status !== exportFilters.status) return false;
+      if (!term) return true;
+      return [order.order_number, order.profiles?.full_name, order.profiles?.email]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(term));
+    });
+  }, [orders, exportFilters]);
   async function updateStatus(id:string,status:string) { setActing(id); try { const res=await fetch(`/api/admin/orders/${id}/status`,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({status,note:notes[id]||undefined})}); const json=await res.json(); if(!res.ok){toast.show(json.message||"Gagal mengubah status.","error");return;} toast.show(json.message,"success"); await load(); } catch { toast.show("Koneksi bermasalah.","error"); } finally {setActing(null);} }
 
   async function toggleDetail(orderId: string) {
@@ -57,9 +69,17 @@ export default function AdminOrdersPage() {
         </div>
         <Button variant="outline" onClick={load}><Icon name="refresh" size={16} />Refresh</Button>
       </div>
-      {loading ? <LoadingSkeleton rows={6} /> : orders.length === 0 ? <EmptyState icon="receipt" title="Belum ada order" /> : (
+      <ExportCsvPanel
+        kind="orders"
+        statusLabel="Status"
+        searchPlaceholder="Cari nomor pesanan, nama, atau email"
+        onFiltersChange={({ status, q }) => setExportFilters({ status, q })}
+      />
+      {loading ? <LoadingSkeleton rows={6} /> : orders.length === 0 ? <EmptyState icon="receipt" title="Belum ada order" /> : visibleOrders.length === 0 ? (
+        <EmptyState icon="search" title="Tidak ada pesanan yang cocok" description="Ubah status atau kata pencarian pada filter di atas." />
+      ) : (
         <div className="space-y-3">
-          {orders.map((o) => (
+          {visibleOrders.map((o) => (
             <Card key={o.id}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>

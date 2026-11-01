@@ -6,6 +6,7 @@ import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigu
 import { renderQrImage } from '@/lib/qr-image';
 import { fulfillPpobOrder } from '@/lib/ppob/fulfill';
 import { verifyTransactionPin } from '@/lib/security/transaction-pin';
+import { checkKycLimit } from '@/lib/kyc-limits-server';
 
 const schema = z.object({
   inquiry_id: z.string().uuid(),
@@ -41,6 +42,9 @@ export async function POST(request: Request) {
     await admin.from('ppob_inquiries').update({ status: 'EXPIRED' }).eq('id', inquiry.id).eq('status', 'ACTIVE');
     return NextResponse.json({ message: 'Inquiry sudah kedaluwarsa. Silakan cek tagihan lagi.' }, { status: 410 });
   }
+
+  const kyc = await checkKycLimit(user.id, 'purchase', Number(inquiry.quote_amount || 0));
+  if (!kyc.ok) return NextResponse.json({ message: kyc.message }, { status: kyc.status });
 
   if (method === 'WALLET') {
     if (!pin) return NextResponse.json({ message: 'PIN transaksi wajib diisi.' }, { status: 400 });

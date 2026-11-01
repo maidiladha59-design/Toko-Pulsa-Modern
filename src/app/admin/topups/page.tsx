@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
@@ -13,6 +13,7 @@ import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import { formatRupiah, formatDate } from "@/lib/utils";
 import Icon from "@/components/icons/Icon";
+import ExportCsvPanel from "@/components/ExportCsvPanel";
 
 type FeeConfig = { enabled: boolean; fee_type: "FIXED" | "PERCENTAGE"; fee_value: number; min_topup: number; max_topup: number; deadline_minutes: number; updated_at?: string };
 type FeeTier = { id: string; min_amount: number; max_amount: number | null; fee_amount: number; is_active: boolean; sort_order: number; updated_at?: string };
@@ -34,6 +35,7 @@ export default function AdminTopupsPage() {
   const [tierForm, setTierForm] = useState({ min_amount: "", max_amount: "", fee_amount: "", sort_order: "" });
   const [savingTier, setSavingTier] = useState(false);
   const [deletingTierId, setDeletingTierId] = useState<string | null>(null);
+  const [exportFilters, setExportFilters] = useState({ status: "", q: "" });
 
   async function loadFee() {
     const res = await fetch("/api/admin/topup-fee");
@@ -107,6 +109,17 @@ export default function AdminTopupsPage() {
   }
   useEffect(() => { load(); loadFee(); loadTiers(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, []);
 
+  const visibleTopups = useMemo(() => {
+    const term = exportFilters.q.trim().toLowerCase();
+    return topups.filter((topup) => {
+      if (exportFilters.status && topup.status !== exportFilters.status) return false;
+      if (!term) return true;
+      return [topup.id, topup.profiles?.full_name, topup.profiles?.email]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(term));
+    });
+  }, [topups, exportFilters]);
+
   async function handleApprove(id: string) {
     setActingId(id); try { const res = await fetch(`/api/topup/${id}/approve`, { method: "POST" }); const json = await res.json(); if (!res.ok) { toast.show(json.message || "Gagal menyetujui Top Up.", "error"); return; } toast.show("Top Up berhasil disetujui.", "success"); await load(); } catch { toast.show("Koneksi bermasalah.", "error"); } finally { setActingId(null); }
   }
@@ -118,6 +131,13 @@ export default function AdminTopupsPage() {
   return (
     <div className="animate-page-in space-y-5">
       <div><p className="text-xs font-black uppercase tracking-widest text-app-kicker">Keuangan</p><h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Top Up & Biaya Admin</h1><p className="mt-1 text-sm text-app-muted">Atur biaya Top Up otomatis dan pantau seluruh transaksi wallet.</p></div>
+
+      <ExportCsvPanel
+        kind="topups"
+        statusLabel="Status"
+        searchPlaceholder="Cari ID, nama, atau email pengguna"
+        onFiltersChange={({ status, q }) => setExportFilters({ status, q })}
+      />
 
       <Card>
         <div className="flex flex-wrap items-center justify-between gap-3"><div><CardTitle>Biaya Top Up</CardTitle><CardDescription>Biaya ini ditambahkan ke nominal pembayaran; saldo pengguna tetap menerima nominal Top Up.</CardDescription></div><label className="flex items-center gap-2 text-sm font-bold text-app-text"><input type="checkbox" checked={fee.enabled} onChange={(e) => setFee({ ...fee, enabled: e.target.checked })} className="h-4 w-4 rounded border-app-border accent-gold-400" /> Aktif</label></div>
@@ -164,7 +184,7 @@ export default function AdminTopupsPage() {
       </Card>
 
       <div className="flex flex-wrap items-end justify-between gap-3"><div><h2 className="text-xl font-black text-app-text">Riwayat Top Up</h2><p className="mt-1 text-sm text-app-muted">Top Up Midtrans yang sudah lunas masuk otomatis tanpa approve manual.</p></div><Button variant="outline" size="sm" onClick={load}><Icon name="refresh" size={16} />Refresh</Button></div>
-      {loading ? <LoadingSkeleton rows={5} /> : topups.length === 0 ? <EmptyState icon="wallet" title="Belum ada transaksi Top Up" description="Transaksi baru akan muncul di sini." /> : <div className="space-y-3">{topups.map((t) => { const automatic = t.provider === "midtrans" || t.provider === "fr3newera"; return (
+      {loading ? <LoadingSkeleton rows={5} /> : topups.length === 0 ? <EmptyState icon="wallet" title="Belum ada transaksi Top Up" description="Transaksi baru akan muncul di sini." /> : visibleTopups.length === 0 ? <EmptyState icon="search" title="Tidak ada Top Up yang cocok" description="Ubah status atau kata pencarian pada filter di atas." /> : <div className="space-y-3">{visibleTopups.map((t) => { const automatic = t.provider === "midtrans" || t.provider === "fr3newera"; return (
         <Card key={t.id}>
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div><p className="font-bold text-app-text">{t.profiles?.full_name || t.profiles?.email || "Pengguna"}</p><p className="mt-1 text-xs text-app-muted">{t.profiles?.email || ""} · {formatDate(t.created_at)}</p></div>

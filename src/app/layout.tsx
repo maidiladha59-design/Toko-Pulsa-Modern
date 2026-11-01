@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { Inter, Nunito, Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "next-themes";
 import AppLoader from "@/components/AppLoader";
@@ -6,49 +7,87 @@ import Navbar from "@/components/Navbar";
 import RouteProgress from "@/components/RouteProgress";
 import ToastProvider from "@/components/ToastProvider";
 import WelcomeExperience from "@/components/WelcomeExperience";
+import LevelKycProvider from "@/components/settings/LevelKycProvider";
 import { isFeatureEnabled } from "@/lib/features";
+import { getSetting } from "@/lib/settings";
+import { DEFAULT_THEME_SETTINGS, THEME_SETTINGS_KEY, buildThemeCss } from "@/lib/theme-settings";
+import { DEFAULT_LEVEL_KYC_SETTINGS, LEVEL_KYC_SETTINGS_KEY } from "@/lib/level-kyc-settings";
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://aidil-store.example.com";
-const title = "AIDIL STORE — Digital Marketplace";
-const description =
+const fallbackDescription =
   "Marketplace digital modern dengan pembayaran otomatis QRIS, e-wallet, Virtual Account bank, wallet internal, dan delivery produk digital.";
 
-export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title: { default: title, template: "%s — AIDIL STORE" },
-  description,
-  icons: { icon: "/aidil-logo.png", apple: "/aidil-logo.png" },
-  manifest: "/manifest.webmanifest",
-  appleWebApp: { capable: true, statusBarStyle: "default", title: "AIDIL STORE" },
-  openGraph: {
-    type: "website",
-    locale: "id_ID",
-    siteName: "AIDIL STORE",
-    title,
+// Font hanya dari daftar tetap ini (dipilih admin lewat Tema & Branding).
+// next/font menyajikan berkasnya sendiri, jadi tidak ada permintaan ke Google
+// saat halaman dibuka pengunjung.
+const jakarta = Plus_Jakarta_Sans({ subsets: ["latin"], display: "swap", variable: "--font-jakarta" });
+const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" });
+const nunito = Nunito({ subsets: ["latin"], display: "swap", variable: "--font-nunito" });
+
+export async function generateMetadata(): Promise<Metadata> {
+  const theme = await getSetting(THEME_SETTINGS_KEY, DEFAULT_THEME_SETTINGS);
+  const shopName = theme.identity.shopName || "AIDIL STORE";
+  const title = `${shopName} — Digital Marketplace`;
+  const description = theme.identity.tagline || fallbackDescription;
+  const icon = theme.identity.faviconUrl || "/aidil-logo.png";
+  const ogImage = theme.identity.ogImageUrl || "/aidil-logo.png";
+
+  return {
+    metadataBase: new URL(siteUrl),
+    title: { default: title, template: `%s — ${shopName}` },
     description,
-    url: siteUrl,
-    images: [{ url: "/aidil-logo.png", width: 512, height: 512, alt: "AIDIL STORE" }],
-  },
-  twitter: {
-    card: "summary",
-    title,
-    description,
-    images: ["/aidil-logo.png"],
-  },
-};
+    icons: { icon, apple: icon },
+    manifest: "/manifest.webmanifest",
+    appleWebApp: { capable: true, statusBarStyle: "default", title: shopName },
+    openGraph: {
+      type: "website",
+      locale: "id_ID",
+      siteName: shopName,
+      title,
+      description,
+      url: siteUrl,
+      images: [{ url: ogImage, alt: shopName }],
+    },
+    twitter: {
+      card: "summary",
+      title,
+      description,
+      images: [ogImage],
+    },
+  };
+}
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const scanQrisEnabled = await isFeatureEnabled("scan_qris");
+  const [scanQrisEnabled, theme, levelKyc] = await Promise.all([
+    isFeatureEnabled("scan_qris"),
+    getSetting(THEME_SETTINGS_KEY, DEFAULT_THEME_SETTINGS),
+    getSetting(LEVEL_KYC_SETTINGS_KEY, DEFAULT_LEVEL_KYC_SETTINGS),
+  ]);
   return (
-    <html lang="id" suppressHydrationWarning>
+    <html
+      lang="id"
+      suppressHydrationWarning
+      className={`${jakarta.variable} ${inter.variable} ${nunito.variable}`}
+    >
+      <head>
+        {/* Variabel tema dari server: tidak ada kilatan warna lama sebelum hidrasi. */}
+        <style id="theme-vars" dangerouslySetInnerHTML={{ __html: buildThemeCss(theme) }} />
+      </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <ToastProvider>
             <RouteProgress />
             <AppLoader />
             <WelcomeExperience />
-            <Navbar scanQrisEnabled={scanQrisEnabled} />
-            <main className="mx-auto min-h-[calc(100vh-80px)] max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+            <LevelKycProvider settings={levelKyc}>
+              <Navbar
+                scanQrisEnabled={scanQrisEnabled}
+                brandName={theme.identity.shopName}
+                logoLight={theme.identity.logoLight}
+                logoDark={theme.identity.logoDark}
+              />
+              <main className="mx-auto min-h-[calc(100vh-80px)] max-w-7xl px-4 py-6 sm:px-6 sm:py-8">{children}</main>
+            </LevelKycProvider>
           </ToastProvider>
         </ThemeProvider>
       </body>

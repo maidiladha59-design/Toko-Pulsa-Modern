@@ -183,6 +183,12 @@ export async function updateSession(request: NextRequest) {
     // Verifikasi OTP membuat sesi di browser, jadi halaman ini harus bisa
     // dibuka walau middleware belum melihat sesi di cookie.
     "/reset-password",
+    // Halaman statis publik (dibaca dari pengaturan "Teks & Halaman").
+    "/halaman",
+    "/terms",
+    "/privacy",
+    "/tentang-kami",
+    "/kontak",
   ];
 
   const isPublicPath = publicPaths.some(

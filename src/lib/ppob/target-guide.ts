@@ -1,6 +1,13 @@
 // Panduan & validasi "data tujuan" per jenis produk (pulsa, game, PLN, e-wallet, tagihan, dst).
 // Dipakai di halaman checkout supaya pelanggan tahu persis apa yang harus diisi.
 
+import {
+  DEFAULT_OPERATOR_SETTINGS,
+  detectOperatorEntry,
+  sameOperatorFamily,
+  type OperatorEntry,
+} from "@/lib/operator-settings";
+
 export type GuideField = {
   name: string;
   label: string;
@@ -31,6 +38,8 @@ export type GuideInput = {
   productName?: string | null;
   serviceKind: "prepaid" | "postpaid";
   schemaFields?: Array<{ name: string; label: string; type?: string; required?: boolean; placeholder?: string }> | null;
+  /** Peta operator dari pengaturan admin (v107); kosong = peta bawaan. */
+  operators?: readonly OperatorEntry[] | null;
 };
 
 // ---------- Nomor HP & operator ----------
@@ -79,7 +88,8 @@ function phoneField(label = "Nomor HP", placeholder = "Contoh: 081234567890"): G
   return { name: "customer_no", label, placeholder, inputMode: "tel", maxLength: 16, numeric: true };
 }
 
-function phoneGuide(opts: { heading: string; intro: string; label?: string; productOperator?: Operator | null; tips: string[]; help?: string }): TargetGuide {
+function phoneGuide(opts: { heading: string; intro: string; label?: string; productOperator?: Operator | null; tips: string[]; help?: string; operators: readonly OperatorEntry[] }): TargetGuide {
+  const detect = (raw: string) => detectOperatorEntry(raw, { operators: [...opts.operators] });
   return {
     heading: opts.heading,
     intro: opts.intro,
@@ -87,16 +97,16 @@ function phoneGuide(opts: { heading: string; intro: string; label?: string; prod
     tips: opts.tips,
     compose: (v) => normalizePhone(v.customer_no),
     detect: (v) => {
-      const op = detectOperator(v.customer_no || "");
-      return op ? `Operator terdeteksi: ${op}` : null;
+      const op = detect(v.customer_no || "");
+      return op ? `Operator terdeteksi: ${op.name}` : null;
     },
     validate: (v) => {
       const n = normalizePhone(v.customer_no);
       if (!n) return "Nomor HP wajib diisi.";
       if (!/^08\d{8,12}$/.test(n)) return "Nomor HP harus diawali 08 (atau 62) dan terdiri dari 10–13 digit. Contoh: 081234567890.";
-      const detected = detectOperator(n);
-      if (opts.productOperator && detected && detected !== opts.productOperator) {
-        return `Nomor ini terdeteksi ${detected}, sedangkan produk yang dipilih untuk ${opts.productOperator}. Silakan pilih produk ${detected} yang sesuai.`;
+      const found = detect(n);
+      if (opts.productOperator && found && !sameOperatorFamily(found.name, opts.productOperator)) {
+        return `Nomor ini terdeteksi ${found.name}, sedangkan produk yang dipilih untuk ${opts.productOperator}. Silakan pilih produk ${found.name} yang sesuai.`;
       }
       return null;
     },
@@ -214,8 +224,11 @@ export function guideFor(input: GuideInput): TargetGuide {
   const brand = String(input.brand || "").trim();
   const text = `${category} ${brand} ${input.productName || ""}`.toLowerCase();
   const kind = input.serviceKind;
+  const operators = (input.operators && input.operators.length ? input.operators : DEFAULT_OPERATOR_SETTINGS.operators).filter(
+    (operator) => operator.active
+  );
 
-  let guide = baseGuide(category, brand, text, kind);
+  let guide = baseGuide(category, brand, text, kind, operators);
 
   // Jika admin mendefinisikan form sendiri (lebih dari satu kolom / bukan customer_no), hormati itu.
   const schema = (input.schemaFields || []).filter((f) => f && f.name);
@@ -239,7 +252,7 @@ export function guideFor(input: GuideInput): TargetGuide {
   return guide;
 }
 
-function baseGuide(category: string, brand: string, text: string, kind: "prepaid" | "postpaid"): TargetGuide {
+function baseGuide(category: string, brand: string, text: string, kind: "prepaid" | "postpaid", operators: readonly OperatorEntry[]): TargetGuide {
   // 1) Game
   if (category === "top-up-game" || /mobile\s*legend|mlbb|free\s*fire|pubg|genshin|honkai|zenless|call\s*of\s*duty|higgs/.test(text)) {
     for (const g of GAMES) if (g.re.test(text)) return g.guide();
@@ -264,7 +277,7 @@ function baseGuide(category: string, brand: string, text: string, kind: "prepaid
     }
     const wallet = /ovo|dana|gopay|go-pay|shopee|linkaja|isaku|doku|sakuku/.exec(text)?.[0];
     const walletName = wallet ? wallet.replace("go-pay", "gopay").toUpperCase() : "e-wallet";
-    return phoneGuide({ heading: `Nomor ${walletName}`, intro: `Masukkan nomor HP yang terdaftar di akun ${walletName}.`, label: `Nomor HP ${walletName}`, tips: [`Gunakan nomor yang sama dengan yang terdaftar di aplikasi ${walletName}.`, "Contoh: 081234567890. Awalan +62 atau 62 juga bisa."] });
+    return phoneGuide({ heading: `Nomor ${walletName}`, intro: `Masukkan nomor HP yang terdaftar di akun ${walletName}.`, label: `Nomor HP ${walletName}`, tips: [`Gunakan nomor yang sama dengan yang terdaftar di aplikasi ${walletName}.`, "Contoh: 081234567890. Awalan +62 atau 62 juga bisa."], operators });
   }
 
   // 4) Pulsa, kuota, dan produk berbasis nomor HP
@@ -281,6 +294,7 @@ function baseGuide(category: string, brand: string, text: string, kind: "prepaid
         op ? `Produk ini khusus kartu ${op}. Operator akan dicek otomatis dari nomor yang Anda isi.` : "Operator akan dicek otomatis dari nomor yang Anda isi.",
         "Periksa kembali nomor sebelum membayar. Transaksi yang sudah berhasil tidak bisa dibatalkan.",
       ],
+      operators,
     });
   }
   if (/china|malaysia|philippines|singapore|thailand|vietnam/.test(category)) {

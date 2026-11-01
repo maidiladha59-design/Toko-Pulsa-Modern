@@ -161,7 +161,7 @@ test('v93 preflight mendaftarkan file, versi, dan definisi wajib', () => {
   const script = read('scripts/migration-preflight.mjs');
 
   assert.match(script, /migrations_v93_manual_topup\.sql/);
-  assert.match(script, /90,93,94,97,98,99,100]/);
+  assert.match(script, /90,93,94,97,98,99,100,105,106,107,108]/);
   for (const keyword of [
     'manual_topup_channels',
     'manual_topup_requests',
@@ -327,9 +327,9 @@ test('v93 UI admin: channel, QRIS, settings, tab permintaan, bukti, approve/tola
   assert.match(requests, /Saldo pengguna akan langsung bertambah\./);
   assert.match(requests, /Alasan sudah dikirim ke pengguna\./);
 
-  const sidebar = read('src/app/admin/AdminSidebar.tsx');
-  assert.match(sidebar, /"\/admin\/manual-topup\/requests", "inbox", "Top Up Manual"/);
-  assert.match(sidebar, /"\/admin\/manual-topup\/channels", "bank", "Channel Top Up Manual"/);
+  const sidebar = read('src/lib/admin-menu.ts');
+  assert.match(sidebar, /"\/admin\/manual-topup\/requests", icon: "inbox", label: "Top Up Manual"/);
+  assert.match(sidebar, /"\/admin\/manual-topup\/channels", icon: "bank", label: "Channel Top Up Manual"/);
 });
 
 test('v93 tidak menyentuh alur Midtrans/ledger gateway dan tidak memuat kredensial', () => {

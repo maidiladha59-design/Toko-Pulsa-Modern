@@ -50,7 +50,7 @@ test('v98 preflight mengenal migrasi site_settings', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v98_info_ticker\.sql/);
   assert.match(script, /site_settings_public_read/);
-  assert.match(script, /97,98,99,100\]/);
+  assert.match(script, /97,98,99,100,105,106,107,108\]/);
 });
 
 test('v98 lib murni: default, rentang, dan aturan link', () => {
@@ -86,15 +86,22 @@ test('v98 lib murni: default, rentang, dan aturan link', () => {
 });
 
 test('v98 pembaca server memakai cache 60 detik + tag revalidasi, gagal baca = default tanpa error', () => {
+  // v105 memindahkan pembaca bertag ke lapisan getSetting; site-settings.ts kini
+  // hanya meneruskan kunci info_ticker ke fondasi tersebut.
   const lib = read('src/lib/site-settings.ts');
   assert.match(lib, /export \* from "@\/lib\/info-ticker";/);
-  assert.match(lib, /unstable_cache\(/);
-  assert.match(lib, /\{ revalidate: 60, tags: \[SITE_SETTINGS_TAG\] \}/);
-  assert.match(lib, /NEXT_PUBLIC_SUPABASE_ANON_KEY/);
-  assert.doesNotMatch(lib, /SUPABASE_SERVICE_ROLE_KEY/, 'pembacaan beranda tidak memakai service role');
-  assert.match(lib, /\.eq\("key", INFO_TICKER_KEY\)\.maybeSingle\(\)/);
-  assert.match(lib, /if \(!value\) return DEFAULT_INFO_TICKER;/);
-  assert.match(lib, /catch \{\s*return DEFAULT_INFO_TICKER;/);
+  assert.match(lib, /getSetting<InfoTickerSettings>\(INFO_TICKER_KEY, DEFAULT_INFO_TICKER\)/);
+  assert.doesNotMatch(lib, /SUPABASE_SERVICE_ROLE_KEY/);
+
+  const settings = read('src/lib/settings.ts');
+  assert.match(settings, /unstable_cache\(/);
+  assert.match(settings, /revalidate: 60, tags/);
+  assert.match(settings, /NEXT_PUBLIC_SUPABASE_ANON_KEY/);
+  assert.doesNotMatch(settings, /SUPABASE_SERVICE_ROLE_KEY/, 'pembacaan beranda tidak memakai service role');
+  assert.match(settings, /\.eq\("key", key\)\s*\.maybeSingle\(\)/);
+  assert.match(settings, /if \(!raw\) return defaults;/);
+  assert.match(settings, /if \(error \|\| !data\?\.value\) return null;/);
+  assert.match(settings, /catch \{\s*return null;\s*\}/);
 });
 
 test('v98 komponen ticker: dua salinan teks, -50%, ResizeObserver, mask, reduced motion, teks biasa', () => {
@@ -168,10 +175,12 @@ test('v98 hero beranda: avatar > judul > pemisah > menu cepat > pemisah > ticker
   assert.match(home, /<HeroQuickMenu unread=\{accountData\?\.unread\?\?0\}\/>/);
   assert.match(home, /\{tickerShouldRender\(ticker\)&&<div className="mt-3 border-t border-white\/10 pt-1"><InfoTicker settings=\{ticker\}\/><\/div>\}/);
   assert.match(hero, /<HeroUser name=\{accountData\.name\}/);
-  assert.match(hero, /Semua transaksi digital, <span className="text-gold-400">lebih praktis\.<\/span>/);
+  // Judul berasal dari Pengaturan Beranda; bagian highlight tetap berwarna aksen.
+  assert.match(home, /<span className="text-gold-400">\{heroHighlight\}<\/span>/);
+  assert.match(hero, /\{heroHeading\}/);
   assert.match(hero, /border-t border-white\/10/);
-  assert.ok(hero.indexOf('<HeroUser') < hero.indexOf('Semua transaksi digital'), 'avatar di atas judul');
-  assert.ok(hero.indexOf('Semua transaksi digital') < hero.indexOf('<HeroQuickMenu'), 'judul di atas menu cepat');
+  assert.ok(hero.indexOf('<HeroUser') < hero.indexOf('{heroHeading}'), 'avatar di atas judul');
+  assert.ok(hero.indexOf('{heroHeading}') < hero.indexOf('<HeroQuickMenu'), 'judul di atas menu cepat');
   assert.ok(hero.indexOf('<HeroQuickMenu') < hero.indexOf('<InfoTicker'), 'ticker di bawah menu cepat');
   // Kartu "Info AIDIL STORE" terpisah tidak boleh ada lagi.
   assert.doesNotMatch(home, /Info AIDIL STORE/);
@@ -234,8 +243,8 @@ test('v98 panel admin Info Berjalan: fields lengkap, pratinjau 360px, simpan non
   assert.doesNotMatch(page, /dangerouslySetInnerHTML/);
   assert.doesNotMatch(page, /overflow-x-hidden/);
 
-  const sidebar = read('src/app/admin/AdminSidebar.tsx');
-  assert.match(sidebar, /\["\/admin\/info-ticker", "ticker", "Info Berjalan"\]/);
+  const sidebar = read('src/lib/admin-menu.ts');
+  assert.match(sidebar, /href: "\/admin\/info-ticker", icon: "ticker", label: "Info Berjalan"/);
 });
 
 test('v98 pembayaran, saldo, PIN, dan routing transaksi tidak tersentuh', () => {

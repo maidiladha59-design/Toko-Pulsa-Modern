@@ -170,7 +170,9 @@ test('v85 admin: API, audit, simulator, halaman, dan menu', () => {
   assert.match(page, /Biaya per Channel/);
   assert.match(page, /Simulator/);
   assert.match(page, /api\/admin\/payment-channel-fees/);
-  const sidebar = read('src/app/admin/AdminSidebar.tsx');
-  assert.match(sidebar, /\/admin\/payment-channel-fees/);
-  assert.match(sidebar, /Biaya Channel/);
+  const sidebar = read('src/lib/admin-menu.ts');
+  assert.match(sidebar, /href: "\/admin\/fees"/);
+  assert.match(sidebar, /label: "Biaya"/);
+  assert.match(read('src/app/admin/fees/page.tsx'), /Biaya Channel/);
+  assert.match(read('next.config.js'), /source: "\/admin\/payment-channel-fees", destination: "\/admin\/fees\?tab=channel"/);
 });

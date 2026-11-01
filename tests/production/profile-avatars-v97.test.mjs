@@ -130,8 +130,8 @@ test('v97 komponen UserAvatar dipakai di navbar, AvatarRing + KycChip di profil'
   assert.match(avatar, /shrink-0/);
   assert.match(avatar, /rounded-full/);
 
-  const sidebar = read('src/app/admin/AdminSidebar.tsx');
-  assert.match(sidebar, /\["\/admin\/avatars", "user", "Foto Profil"\]/);
+  const sidebar = read('src/lib/admin-menu.ts');
+  assert.match(sidebar, /href: "\/admin\/avatars", icon: "user", label: "Foto Profil"/);
   assert.match(read('src/app/admin/avatars/page.tsx'), /accept="image\/png,image\/jpeg,image\/webp"/);
   assert.match(read('src/app/admin/avatars/page.tsx'), /Pratinjau \(dipotong 1:1, 500×500\)/);
 });
@@ -156,5 +156,5 @@ test('v97 pemilih avatar: portal ke body, overlay full viewport, scroll terkunci
 test('v97 preflight mewajibkan migrasi v97', () => {
   const script = read('scripts/migration-preflight.mjs');
   assert.match(script, /migrations_v97_profile_avatars\.sql/);
-  assert.match(script, /90,93,94,97,98,99,100\]/);
+  assert.match(script, /90,93,94,97,98,99,100,105,106,107,108\]/);
 });

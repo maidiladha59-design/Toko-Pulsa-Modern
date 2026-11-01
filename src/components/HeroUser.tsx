@@ -12,6 +12,9 @@ export default function HeroUser({
   balance,
   transactions,
   accountId,
+  showBalance = true,
+  showLevel = true,
+  showAccountId = true,
 }: {
   name: string;
   avatarId: string | null;
@@ -20,6 +23,10 @@ export default function HeroUser({
   balance: number | null;
   transactions: number;
   accountId: string;
+  /** Toggle tampilan dari Pengaturan Beranda. */
+  showBalance?: boolean;
+  showLevel?: boolean;
+  showAccountId?: boolean;
 }) {
   return (
     <ProfileHeader
@@ -30,6 +37,9 @@ export default function HeroUser({
       balance={balance}
       transactions={transactions}
       accountId={accountId}
+      showBalance={showBalance}
+      showLevel={showLevel}
+      showAccountId={showAccountId}
     />
   );
 }

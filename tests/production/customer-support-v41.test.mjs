@@ -31,4 +31,5 @@ test('v41 support routes and admin center remain present', () => {
   assert.ok(fs.existsSync(path.join(root, 'src/app/bantuan/page.tsx')));
   assert.ok(fs.existsSync(path.join(root, 'src/app/admin/support/page.tsx')));
   assert.ok(fs.existsSync(path.join(root, 'src/app/admin/AdminSidebar.tsx')));
+  assert.ok(fs.existsSync(path.join(root, 'src/lib/admin-menu.ts')));
 });

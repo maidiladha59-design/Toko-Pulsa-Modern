@@ -20,7 +20,7 @@ const HOME = "src/app/page.tsx";
 const DETAIL = "src/app/products/[slug]/page.tsx";
 const CHECKOUT = "src/app/checkout/page.tsx";
 const PROFILE = "src/app/profile/page.tsx";
-const SIDEBAR = "src/app/admin/AdminSidebar.tsx";
+const MENU = "src/lib/admin-menu.ts";
 
 test("v100 migrasi product_images terpisah dari data sync + aman dijalankan ulang", () => {
   const sql = read(MIGRATION);
@@ -191,10 +191,10 @@ test("v100 panel Produk: kolom thumbnail, ubah gambar per baris, filter belum ad
   assert.match(p, /const MAX_IMAGE_SIZE = 2 \* 1024 \* 1024;/);
 });
 
-test("v100 menu Gambar Produk & Brand di AdminSidebar, menu Logo Brand lama tetap", () => {
-  const s = read(SIDEBAR);
-  assert.match(s, new RegExp(esc('["/admin/product-images", "image", "Gambar Produk & Brand"]')));
-  assert.match(s, new RegExp(esc('["/admin/brand-media", "image", "Logo Brand"]')));
+test("v100 menu Gambar & Logo Brand di admin-menu, URL Logo Brand lama dialihkan", () => {
+  assert.match(read(MENU), /href: "\/admin\/product-images", icon: "image", label: "Gambar & Logo Brand"/);
+  assert.match(read('next.config.js'), /source: "\/admin\/brand-media", destination: "\/admin\/product-images\?tab=brand"/);
+  assert.match(read('src/app/admin/product-images/page.tsx'), /tab.*brand|brand.*tab/);
 });
 
 test("v100 tampilan user: beranda, detail, checkout, favorit profil memakai gambar dengan fallback", () => {

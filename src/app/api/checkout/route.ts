@@ -5,6 +5,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { fulfillPpobOrder } from "@/lib/ppob/fulfill";
 import { verifyTransactionPin } from "@/lib/security/transaction-pin";
 import { notifyUser } from "@/lib/notification-engine";
+import { checkKycLimit } from "@/lib/kyc-limits-server";
 
 const bodySchema = z.object({
   items: z.array(z.object({ product_id: z.string().uuid(), quantity: z.number().int().positive() })).min(1),
@@ -31,6 +32,19 @@ export async function POST(request: Request) {
   }
 
   const { items, idempotency_key, targets = {}, pin, voucher_code } = parsed.data;
+
+  const productIds = [...new Set(items.map((item) => item.product_id))];
+  const { data: pricedProducts } = await supabase
+    .from("products")
+    .select("id,price")
+    .in("id", productIds);
+  const priceById = new Map((pricedProducts || []).map((row: any) => [String(row.id), Number(row.price || 0)]));
+  if (priceById.size === productIds.length) {
+    const total = items.reduce((sum, item) => sum + (priceById.get(item.product_id) || 0) * item.quantity, 0);
+    const kyc = await checkKycLimit(user.id, "purchase", total);
+    if (!kyc.ok) return NextResponse.json({ message: kyc.message }, { status: kyc.status });
+  }
+
   if (!pin) return NextResponse.json({ message: "PIN transaksi wajib diisi." }, { status: 400 });
   try { await verifyTransactionPin(user.id, pin); } catch (e: any) {
     if (e?.message === "PIN_NOT_SET") return NextResponse.json({ message: "Buat PIN transaksi terlebih dahulu di Pengaturan." }, { status: 409 });

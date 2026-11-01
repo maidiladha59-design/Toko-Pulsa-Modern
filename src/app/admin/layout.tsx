@@ -1,8 +1,20 @@
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { ADMIN_2FA_COOKIE, verifyAdmin2FAToken } from "@/lib/security/admin-2fa";
-import AdminSidebar from "./AdminSidebar";
+import { ADMIN_MENU, filterAdminMenu, flattenAdminMenu, type AdminBadgeCounts } from "@/lib/admin-menu";
+import AdminShell from "./AdminShell";
+
+// Hitung antrean untuk badge menu. Gagal satu hitungan tidak boleh memblokir panel.
+async function safeCount(run: () => PromiseLike<{ count: number | null; error: unknown }>) {
+  try {
+    const { count, error } = await run();
+    return error ? 0 : Number(count || 0);
+  } catch {
+    return 0;
+  }
+}
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
@@ -17,5 +29,32 @@ export default async function AdminLayout({ children }: { children: React.ReactN
   const twoFactorToken = cookies().get(ADMIN_2FA_COOKIE)?.value;
   if (!verifyAdmin2FAToken(twoFactorToken, user.id)) redirect("/admin-login");
 
-  return <div className="mx-auto grid max-w-7xl grid-cols-1 gap-5 md:grid-cols-[230px_1fr] md:items-start"><div className="md:sticky md:top-[87px] md:max-h-[calc(100dvh-103px)] md:overflow-y-auto"><AdminSidebar /></div><section className="min-w-0">{children}</section></div>;
+  const isSuperAdmin = profile.role === "SUPER_ADMIN";
+
+  const { data: permissionRows, error: permissionError } = await supabase
+    .from("admin_role_permissions")
+    .select("permission,enabled")
+    .eq("role", profile.role);
+
+  // Fallback hanya untuk tampilan menu; otorisasi API tetap di database.
+  const allowed = permissionError || !permissionRows?.length
+    ? new Set(flattenAdminMenu(ADMIN_MENU).map((item) => item.permission).filter((permission) => isSuperAdmin || permission !== "permissions.manage"))
+    : new Set(permissionRows.filter((row) => row.enabled).map((row) => String(row.permission)));
+  const groups = filterAdminMenu(ADMIN_MENU, allowed);
+
+  const [orders, kyc, support, manualTopup] = await Promise.all([
+    safeCount(() => supabase.from("orders").select("id", { count: "exact", head: true }).eq("status", "PROCESSING")),
+    // kyc_verifications hanya bisa dihitung lewat service role; klien dibuat di dalam
+    // safeCount agar env yang belum diisi tidak menjatuhkan seluruh panel.
+    safeCount(async () => createAdminClient().from("kyc_verifications").select("user_id", { count: "exact", head: true }).eq("status", "SUBMITTED")),
+    safeCount(() => supabase.from("support_tickets").select("id", { count: "exact", head: true }).eq("status", "OPEN")),
+    safeCount(() => supabase.from("manual_topup_requests").select("id", { count: "exact", head: true }).eq("status", "PENDING")),
+  ]);
+  const badges: AdminBadgeCounts = { orders, kyc, support, manualTopup };
+
+  return (
+    <AdminShell groups={groups} badges={badges} adminId={user.id}>
+      {children}
+    </AdminShell>
+  );
 }

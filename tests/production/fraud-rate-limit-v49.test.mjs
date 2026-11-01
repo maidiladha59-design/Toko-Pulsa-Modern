@@ -20,5 +20,5 @@ test('transaction PIN failures feed the risk engine', () => {
 test('admin Fraud & Risk center exists', () => {
   assert.match(read('src/app/api/admin/fraud/route.ts'), /admin_set_risk_status/);
   assert.match(read('src/app/admin/fraud/page.tsx'), /Fraud & Risk Center/);
-  assert.match(read('src/app/admin/AdminSidebar.tsx'), /Fraud & Risk/);
+  assert.match(read('src/lib/admin-menu.ts'), /Fraud & Risk/);
 });

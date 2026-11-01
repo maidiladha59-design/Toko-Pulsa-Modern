@@ -126,7 +126,7 @@ test('v94 preflight mendaftarkan file, versi 94, dan definisi wajib', () => {
   const script = read('scripts/migration-preflight.mjs');
 
   assert.match(script, /migrations_v94_community_chat\.sql/);
-  assert.match(script, /90,93,94,97,98,99,100]/);
+  assert.match(script, /90,93,94,97,98,99,100,105,106,107,108]/);
   for (const keyword of [
     'community_chat_messages',
     'chat_user_status',
@@ -220,7 +220,7 @@ test('v94 halaman admin chat-moderation: daftar dibisukan + buka bisu + sidebar'
   assert.match(mutedRoute, /full_name/);
   assert.match(mutedRoute, /muted_reason/);
 
-  const sidebar = read('src/app/admin/AdminSidebar.tsx');
+  const sidebar = read('src/lib/admin-menu.ts');
   assert.match(sidebar, /"\/admin\/chat-moderation"/);
   assert.match(sidebar, /Moderasi Diskusi/);
 

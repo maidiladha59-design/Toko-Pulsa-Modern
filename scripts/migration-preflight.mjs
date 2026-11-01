@@ -12,7 +12,7 @@ for (const file of files) {
   if (!byVersion.has(v)) byVersion.set(v, []);
   byVersion.get(v).push(file);
 }
-const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83,85,86,87,88,89,90,93,94,97,98,99,100];
+const required = [5,6,7,8,9,10,11,13,14,15,16,18,19,21,24,25,34,35,36,37,38,39,40,41,42,43,44,45,46,47,48,49,50,51,52,53,54,55,73,75,76,77,78,79,80,81,82,83,85,86,87,88,89,90,93,94,97,98,99,100,105,106,107,108];
 const missing = required.filter(v => !byVersion.has(v));
 const duplicateVersions = [...byVersion.entries()].filter(([, list]) => list.length > 1);
 const errors = [];
@@ -66,6 +66,10 @@ const checks = [
   ['v98', 'migrations_v98_info_ticker.sql', ['site_settings', 'site_settings_key_format', 'site_settings_value_object', 'site_settings_public_read', 'site_settings_info_ticker_bounds', 'info_ticker', 'site_announcements', 'on conflict (key) do nothing']],
   ['v99', 'migrations_v99_icon_registry.sql', ['emoji_icon_map', 'icon_key_from_text', 'strip_pictographs', 'add column if not exists icon', 'notification_templates_icon_key', 'notifications_icon_key', 'site_settings_info_ticker_bounds', "^(none|[a-z][a-z0-9_]{1,23})$"]],
   ['v100', 'migrations_v100_product_images.sql', ['product_images', 'product_images_select_all', 'product_images_admin_write', 'product_id uuid primary key', 'image_url text not null check', 'is_admin()', 'on delete cascade']],
+  ['v105', 'migrations_v105_managed_settings.sql', ['add column if not exists draft jsonb', 'version integer not null default 1', 'draft_updated_by', 'site_settings_history', "action in ('publish', 'restore')", 'site_settings_history_key_created_idx', 'save_site_setting_draft', 'publish_site_setting', 'discard_site_setting_draft', 'restore_site_setting_version', 'setting_version_conflict', 'enable row level security', 'grant execute', 'service_role', 'on conflict (key) do nothing']],
+  ['v106', 'migrations_v106_home_theme_settings.sql', ['site_settings_public_read', "'home_settings'", "'theme_settings'", 'on conflict (key) do nothing', 'settings-assets', 'settings_assets_public_read', 'settings_assets_admin_insert', 'settings_assets_admin_delete', 'is_admin_or_staff()']],
+  ['v107', 'migrations_v107_content_settings.sql', ['site_settings_public_read', "'pages_settings'", "'level_kyc_settings'", "'notification_templates'", "'operator_settings'", 'on conflict (key) do nothing']],
+  ['v108', 'migrations_v108_admin_export.sql', ['admin_role_permissions', "'export'", 'on conflict (role, permission) do nothing', 'audit_logs']],
 ];
 for (const [label, file, needles] of checks) {
   const p = path.join(dir, file);

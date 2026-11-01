@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import { formatBalanceCompact, formatDate, formatRupiah } from "@/lib/utils";
@@ -10,6 +10,7 @@ import Input from "@/components/ui/Input";
 import Select from "@/components/ui/Select";
 import { Card } from "@/components/ui/Card";
 import LoadingSkeleton from "@/components/ui/LoadingSkeleton";
+import ExportCsvPanel from "@/components/ExportCsvPanel";
 
 const ROLES = ["USER", "ADMIN", "SUPER_ADMIN"] as const;
 const TEXTAREA_CLASS =
@@ -57,6 +58,7 @@ export default function AdminUsersPage() {
   const [statusDraft, setStatusDraft] = useState<StatusDraft | null>(null);
   const [balanceError, setBalanceError] = useState<string | null>(null);
   const [statusError, setStatusError] = useState<string | null>(null);
+  const [exportFilters, setExportFilters] = useState({ status: "", q: "" });
 
   async function load() {
     setLoading(true);
@@ -94,6 +96,17 @@ export default function AdminUsersPage() {
     void load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const visibleUsers = useMemo(() => {
+    const term = exportFilters.q.trim().toLowerCase();
+    return users.filter((user) => {
+      if (exportFilters.status && user.account_status !== exportFilters.status) return false;
+      if (!term) return true;
+      return [user.full_name, user.email, user.id]
+        .filter(Boolean)
+        .some((value) => String(value).toLowerCase().includes(term));
+    });
+  }, [users, exportFilters]);
 
   function openBalanceModal(user: User) {
     setBalanceError(null);
@@ -244,6 +257,13 @@ export default function AdminUsersPage() {
         </Button>
       </div>
 
+      <ExportCsvPanel
+        kind="users"
+        statusLabel="Status Akun"
+        searchPlaceholder="Cari nama, email, atau ID pengguna"
+        onFiltersChange={({ status, q }) => setExportFilters({ status, q })}
+      />
+
       {loading ? (
         <LoadingSkeleton rows={6} />
       ) : (
@@ -268,8 +288,14 @@ export default function AdminUsersPage() {
                       Belum ada pengguna.
                     </td>
                   </tr>
+                ) : visibleUsers.length === 0 ? (
+                  <tr>
+                    <td colSpan={7} className="px-4 py-10 text-center text-sm text-app-muted">
+                      Tidak ada pengguna yang cocok dengan filter. Ubah status atau kata pencarian.
+                    </td>
+                  </tr>
                 ) : (
-                  users.map((u) => (
+                  visibleUsers.map((u) => (
                     <tr key={u.id} className="border-b border-app-border last:border-0">
                       <td className="px-4 py-3 font-bold text-app-text">{u.full_name || "-"}</td>
                       <td className="max-w-[14rem] truncate px-4 py-3 text-app-muted" title={u.email}>

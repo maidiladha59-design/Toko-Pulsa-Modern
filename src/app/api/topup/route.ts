@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createGatewayTransaction, extractGatewayPaymentNumber, isGatewayConfigured, GatewayError, GATEWAY_PROVIDER, GATEWAY_METHODS } from "@/lib/midtrans";
 import { calculateTopupFee, FEE_FORMULA_VERSION, toChannelFeeInput, type FeeBreakdown } from "@/lib/topup-fee";
+import { checkKycLimit } from "@/lib/kyc-limits-server";
 
 // Midtrans Core API: QRIS + Virtual Account bca/bni/bri/permata.
 const METHODS = GATEWAY_METHODS;
@@ -179,6 +180,13 @@ export async function POST(request: Request) {
     const { data: existing } = await admin.from("topups").select("id, amount, admin_fee, payment_amount, status, provider_order_id, payment_method, payment_number, gateway_fee, gateway_total_payment, expires_at, fee_snapshot").eq("idempotency_key", idempotency_key).eq("user_id", user.id).maybeSingle();
     if (existing?.provider_order_id && ["PENDING", "VERIFYING"].includes(existing.status)) {
       return NextResponse.json({ ok: true, id: existing.id, amount: existing.amount, admin_fee: existing.admin_fee ?? 0, payment_amount: existing.payment_amount ?? existing.amount + (existing.admin_fee ?? 0), status: existing.status, order_id: existing.provider_order_id, payment_method: existing.payment_method, payment_number: existing.payment_number, fee: existing.gateway_fee ?? 0, total_payment: existing.gateway_total_payment, expired_at: existing.expires_at, ...snapshotFields(existing.fee_snapshot) }, { status: 200 });
+    }
+
+    step = "kyc_limit";
+    // Batas KYC ditegakkan di server; replay idempoten di atas tidak terkena.
+    const kyc = await checkKycLimit(user.id, "topup", amount);
+    if (!kyc.ok) {
+      return NextResponse.json({ ok: false, error: kyc.message, code: "KYC_LIMIT_EXCEEDED" }, { status: kyc.status });
     }
 
     step = "insert_topup";

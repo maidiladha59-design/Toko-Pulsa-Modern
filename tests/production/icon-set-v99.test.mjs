@@ -148,7 +148,8 @@ test('v99 validasi server info berjalan memakai daftar ikon registry', () => {
 
 test('v99 notifikasi menyimpan dan menampilkan kunci ikon dengan fallback bell', () => {
   const engine = read(ENGINE);
-  assert.match(engine, /icon: template\.icon \?\? 'bell'/);
+  assert.match(engine, /icon = dbTemplate\?\.icon \?\? 'bell';/);
+  assert.match(engine, /icon = dbTemplate\.icon \?\? 'bell';/);
   const page = read(NOTIF_PAGE);
   assert.match(page, /import Icon from'@\/components\/icons\/Icon';/);
   assert.match(page, /<Icon name=\{x\.icon\|\|'bell'\} size=\{18\}\/>/);
@@ -191,7 +192,7 @@ test('v99 tidak ada emoji tersisa di src di luar file pemetaan', () => {
 
 test('v99 terdaftar di migration preflight', () => {
   const preflight = read("scripts/migration-preflight.mjs");
-  assert.match(preflight, /,99,100\]/);
+  assert.match(preflight, /99,100,105,106,107,108\]/);
   assert.match(preflight, /migrations_v99_icon_registry\.sql/);
   assert.match(preflight, /emoji_icon_map/);
   assert.match(preflight, /icon_key_from_text/);

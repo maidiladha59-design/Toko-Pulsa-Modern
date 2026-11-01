@@ -28,13 +28,33 @@ const ACCOUNT_LINKS: [string, string, string][] = [
   ["/bantuan", "help", "Bantuan"],
 ];
 
-export default function Navbar({ scanQrisEnabled = true }: { scanQrisEnabled?: boolean }) {
+export default function Navbar({
+  scanQrisEnabled = true,
+  brandName = "AIDIL STORE",
+  logoLight = "",
+  logoDark = "",
+}: {
+  scanQrisEnabled?: boolean;
+  brandName?: string;
+  logoLight?: string;
+  logoDark?: string;
+}) {
   const pathname = usePathname();
-  if (pathname === "/login" || pathname === "/register" || pathname === "/admin-login") return null;
-  return <NavbarContent scanQrisEnabled={scanQrisEnabled} />;
+  if (pathname === "/login" || pathname === "/register" || pathname === "/admin-login" || pathname.startsWith("/admin")) return null;
+  return <NavbarContent scanQrisEnabled={scanQrisEnabled} brandName={brandName} logoLight={logoLight} logoDark={logoDark} />;
 }
 
-function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
+function NavbarContent({
+  scanQrisEnabled,
+  brandName,
+  logoLight,
+  logoDark,
+}: {
+  scanQrisEnabled: boolean;
+  brandName: string;
+  logoLight: string;
+  logoDark: string;
+}) {
   const pathname = usePathname();
   const supabase = createClient(), router = useRouter(), toast = useToast();
   const [profile, setProfile] = useState<Profile | null>(null), [avatarUrl, setAvatarUrl] = useState<string | null>(null), [loading, setLoading] = useState(true), [menuOpen, setMenuOpen] = useState(false), [accountOpen, setAccountOpen] = useState(false), [offline, setOffline] = useState(false);
@@ -75,6 +95,10 @@ function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
 
   const name = profile?.full_name || profile?.email?.split("@")[0] || "Pengguna";
   const isAdmin = profile?.role === "ADMIN" || profile?.role === "SUPER_ADMIN";
+  const brand = String(brandName || "AIDIL STORE").trim() || "AIDIL STORE";
+  const [brandFirst, ...brandRestParts] = brand.split(/\s+/);
+  const brandRest = brandRestParts.join(" ");
+  const brandLightLogo = logoLight || "/aidil-logo.png";
 
   useEffect(() => {
     const onAvatarUpdated = (event: Event) => {
@@ -120,11 +144,16 @@ function NavbarContent({ scanQrisEnabled }: { scanQrisEnabled: boolean }) {
         <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-3 sm:px-6">
           <Link href="/" className="group flex shrink-0 items-center gap-3">
             <span className="flex h-11 w-11 overflow-hidden rounded-2xl bg-black shadow-lg shadow-zinc-950/20 ring-1 ring-gold-400/50 transition group-hover:scale-105">
-              <Image src="/aidil-logo.png" alt="Logo AIDIL STORE" width={44} height={44} priority className="h-full w-full object-cover" />
+              <Image src={brandLightLogo} alt={`Logo ${brand}`} width={44} height={44} priority className={`h-full w-full object-cover${logoDark ? " dark:hidden" : ""}`} />
+              {logoDark ? (
+                <Image src={logoDark} alt={`Logo ${brand}`} width={44} height={44} className="hidden h-full w-full object-cover dark:block" />
+              ) : null}
             </span>
             <span className="leading-none">
-              <span className="block text-[15px] font-black tracking-tight text-app-text">AIDIL</span>
-              <span className="text-[10px] font-black tracking-[.24em] text-app-kicker">STORE</span>
+              <span className="block text-[15px] font-black tracking-tight text-app-text">{brandFirst}</span>
+              {brandRest ? (
+                <span className="text-[10px] font-black tracking-[.24em] text-app-kicker">{brandRest}</span>
+              ) : null}
             </span>
           </Link>
           <nav className="ml-auto hidden items-center gap-1 lg:flex">

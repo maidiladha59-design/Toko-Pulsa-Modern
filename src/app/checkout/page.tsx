@@ -8,6 +8,7 @@ import { createClient } from "@/lib/supabase/client";
 import { useToast } from "@/components/ToastProvider";
 import { formatRupiah } from "@/lib/utils";
 import { guideFor } from "@/lib/ppob/target-guide";
+import type { OperatorEntry } from "@/lib/operator-settings";
 import { Skeleton } from "@/components/ui/LoadingSkeleton";
 import Badge from "@/components/ui/Badge";
 import Icon from "@/components/icons/Icon";
@@ -58,6 +59,22 @@ function CheckoutForm() {
   const [targetFile, setTargetFile] = useState<File | null>(null);
   const [productImage, setProductImage] = useState<string | null>(null);
   const [pin, setPin] = useState("");
+  const [operators, setOperators] = useState<OperatorEntry[] | null>(null);
+
+  // Validasi operator mengikuti pengaturan admin; bila gagal, panduan bawaan
+  // tetap dipakai (tanpa memblokir checkout).
+  useEffect(() => {
+    let cancelled = false;
+    fetch("/api/public/operators")
+      .then((res) => res.json())
+      .then((data) => {
+        if (!cancelled && Array.isArray(data?.operators)) setOperators(data.operators);
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const idempotencyKey = useMemo(
     () => `${productId}-${qty}-${Date.now()}-${Math.random().toString(36).slice(2)}`,
@@ -65,8 +82,8 @@ function CheckoutForm() {
   );
   const isJasa = product?.product_type === "jasa";
   const guide = useMemo(
-    () => (ppob && product ? guideFor({ category: ppob.category, brand: ppob.brand, productName: product.name, serviceKind: ppob.service_kind, schemaFields: ppob.target_schema?.fields || null }) : null),
-    [ppob, product]
+    () => (ppob && product ? guideFor({ category: ppob.category, brand: ppob.brand, productName: product.name, serviceKind: ppob.service_kind, schemaFields: ppob.target_schema?.fields || null, operators }) : null),
+    [ppob, product, operators]
   );
   const customerNo = guide ? guide.compose(ppobTargets) : "";
   const targetError = guide ? guide.validate(ppobTargets) : null;

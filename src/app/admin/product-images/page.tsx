@@ -59,6 +59,8 @@ const SOURCE_TONE: Record<ProductImageSource, "success" | "gold" | "warning" | "
 };
 
 const ACCEPT = "image/png,image/jpeg,image/webp";
+// Logo vektor/dokumen tidak bisa dikompres WEBP; diunggah apa adanya lewat API media yang sudah ada.
+const RAW_ACCEPT = "image/svg+xml,application/pdf";
 
 export default function AdminProductImagesPage() {
   const toast = useToast();
@@ -71,6 +73,7 @@ export default function AdminProductImagesPage() {
   const [missingOnly, setMissingOnly] = useState(false);
   const [pending, setPending] = useState<Pending | null>(null);
   const [dragActive, setDragActive] = useState(false);
+  const [rawBusy, setRawBusy] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
@@ -90,9 +93,20 @@ export default function AdminProductImagesPage() {
   }
 
   useEffect(() => {
+    // Dibaca setelah mount agar redirect ?tab=brand dari menu lama tetap bekerja tanpa hydration mismatch.
+    const requested = new URLSearchParams(window.location.search).get("tab");
+    if (requested === "brand" || requested === "brands") setTab("brands");
     load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function changeTab(next: "products" | "brands") {
+    setTab(next);
+    const url = new URL(window.location.href);
+    if (next === "brands") url.searchParams.set("tab", "brand");
+    else url.searchParams.delete("tab");
+    window.history.replaceState(null, "", url.toString());
+  }
 
   function closePending() {
     if (pending) URL.revokeObjectURL(pending.preview);
@@ -208,6 +222,38 @@ export default function AdminProductImagesPage() {
     if (failed.length) toast.show(`Gagal menyimpan logo: ${failed.join(", ")}.`, "error");
   }
 
+  async function uploadBrandRaw(brand: AdminBrand, file: File | undefined) {
+    if (!file) return;
+    setRawBusy(brand.brand_key);
+    try {
+      const body = new FormData();
+      body.append("file", file);
+      body.append("folder", "brand-logos");
+      const upload = await fetch("/api/admin/media", { method: "POST", body });
+      const uploadJson = await upload.json().catch(() => ({}));
+      if (!upload.ok || !uploadJson.url) {
+        toast.show(uploadJson.message || "Gagal mengunggah logo. Pastikan format SVG/PDF dan maksimal 5 MB.", "error");
+        return;
+      }
+      const response = await fetch("/api/admin/brand-media", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ brand_key: brand.brand_key, brand_name: brand.brand_name, logo_url: uploadJson.url }),
+      });
+      const json = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        toast.show(json.message || "Gagal menyimpan logo brand.", "error");
+        return;
+      }
+      toast.show(`Logo ${brand.brand_name} tersimpan.`, "success");
+      await load();
+    } catch {
+      toast.show("Jaringan gagal. Periksa koneksi lalu coba lagi.", "error");
+    } finally {
+      setRawBusy(null);
+    }
+  }
+
   const filteredProducts = useMemo(() => {
     const q = query.trim().toLowerCase();
     return products.filter((product) => {
@@ -239,7 +285,7 @@ export default function AdminProductImagesPage() {
     <div className="space-y-5 pb-10">
       <div>
         <p className="text-xs font-black uppercase tracking-widest text-app-kicker">Katalog</p>
-        <h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Gambar Produk &amp; Brand</h1>
+        <h1 className="mt-2 text-2xl font-black text-app-text sm:text-3xl">Gambar &amp; Logo Brand</h1>
         <p className="mt-1 text-sm text-app-muted">
           Unggah gambar produk atau logo brand. Gambar otomatis dipotong persegi 1:1, diperkecil ke 512×512, dan dikompres WEBP.
           Produk tanpa gambar khusus otomatis memakai logo brand.
@@ -249,7 +295,7 @@ export default function AdminProductImagesPage() {
       <div className="flex flex-wrap gap-2">
         <button
           type="button"
-          onClick={() => setTab("products")}
+          onClick={() => changeTab("products")}
           className={`inline-flex min-h-[40px] items-center gap-2 rounded-xl px-4 text-sm font-bold transition ${
             tab === "products" ? "bg-gold-400 text-zinc-950" : "border border-app-border bg-app-surface text-app-text hover:border-gold-400/60"
           }`}
@@ -258,7 +304,7 @@ export default function AdminProductImagesPage() {
         </button>
         <button
           type="button"
-          onClick={() => setTab("brands")}
+          onClick={() => changeTab("brands")}
           className={`inline-flex min-h-[40px] items-center gap-2 rounded-xl px-4 text-sm font-bold transition ${
             tab === "brands" ? "bg-gold-400 text-zinc-950" : "border border-app-border bg-app-surface text-app-text hover:border-gold-400/60"
           }`}
@@ -408,7 +454,8 @@ export default function AdminProductImagesPage() {
             <span className="mt-2 text-sm font-black text-app-text">Tarik beberapa logo ke sini</span>
             <span className="mt-1 max-w-xl text-xs leading-5 text-app-muted">
               Multi-upload desktop: nama file harus sama dengan nama brand (contoh <b>Free Fire.png</b>, <b>XL.webp</b>).
-              Maksimal 2 MB per file; semua otomatis dipotong persegi dan dikompres WEBP.
+              Maksimal 2 MB per file; semua otomatis dipotong persegi dan dikompres WEBP. Logo SVG/PDF diunggah
+              per brand lewat tombol <b>SVG/PDF</b>.
             </span>
             <input
               type="file"
@@ -431,18 +478,32 @@ export default function AdminProductImagesPage() {
           ) : (
             <div className="space-y-3">
               {filteredBrands.map((brand) => {
-                const isBusy = busy === brand.brand_key;
+                const isBusy = busy === brand.brand_key || rawBusy === brand.brand_key;
+                const isPdf = Boolean(brand.logo_url?.toLowerCase().endsWith(".pdf"));
                 return (
                   <Card key={brand.brand_key} className="p-4">
                     <div className="flex flex-wrap items-center gap-3">
-                      <ProductImage
-                        src={brand.logo_url}
-                        alt={`Logo ${brand.brand_name}`}
-                        className="h-14 w-14 shrink-0 rounded-xl"
-                        iconSize={22}
-                        fit="contain"
-                        sizes="56px"
-                      />
+                      {isPdf ? (
+                        <a
+                          href={brand.logo_url || "#"}
+                          target="_blank"
+                          rel="noreferrer"
+                          title="Buka file PDF"
+                          className="flex h-14 w-14 shrink-0 flex-col items-center justify-center rounded-xl bg-zinc-950 leading-none text-gold-400"
+                        >
+                          <Icon name="doc" size={20} />
+                          <span className="mt-0.5 text-[8px] font-black">PDF</span>
+                        </a>
+                      ) : (
+                        <ProductImage
+                          src={brand.logo_url}
+                          alt={`Logo ${brand.brand_name}`}
+                          className="h-14 w-14 shrink-0 rounded-xl"
+                          iconSize={22}
+                          fit="contain"
+                          sizes="56px"
+                        />
+                      )}
                       <div className="min-w-0 flex-1">
                         <p className="line-clamp-2 break-words text-sm font-black text-app-text">{brand.brand_name}</p>
                         <p className="text-xs text-app-subtle">
@@ -463,6 +524,24 @@ export default function AdminProductImagesPage() {
                             disabled={isBusy}
                             onChange={(event) => {
                               prepare(event.target.files?.[0], "brand", brand.brand_key, brand.brand_name);
+                              event.target.value = "";
+                            }}
+                          />
+                        </label>
+                        <label
+                          title="Unggah logo SVG atau PDF tanpa dikompres"
+                          className={`inline-flex min-h-[36px] cursor-pointer items-center rounded-xl border border-app-border bg-app-surface px-3 text-xs font-bold text-app-text transition hover:border-gold-400/60 ${
+                            isBusy ? "pointer-events-none opacity-60" : ""
+                          }`}
+                        >
+                          SVG/PDF
+                          <input
+                            type="file"
+                            accept={RAW_ACCEPT}
+                            className="hidden"
+                            disabled={isBusy}
+                            onChange={(event) => {
+                              uploadBrandRaw(brand, event.target.files?.[0]);
                               event.target.value = "";
                             }}
                           />

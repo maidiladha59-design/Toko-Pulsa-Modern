@@ -8,6 +8,7 @@ import Icon from "@/components/icons/Icon";
 import { isImageTooBlurry } from "@/lib/blur-check";
 import { statusLabel } from "@/lib/labels";
 import { useCamera, type CameraErrorKind } from "@/hooks/useCamera";
+import { useLevelKyc } from "@/components/settings/LevelKycProvider";
 
 type Status = "PENDING" | "KTP_SUBMITTED" | "SUBMITTED" | "VERIFIED" | "REJECTED";
 type Stage = "ktp" | "selfie";
@@ -82,6 +83,7 @@ function StepDots({ stage }: { stage: Stage }) {
 export default function KYC() {
   const s = createClient();
   const toast = useToast();
+  const verificationHint = useLevelKyc()?.kyc.verificationHint.trim();
 
   const [status, setStatus] = useState<Status>("PENDING");
   const [reviewNote, setReviewNote] = useState("");
@@ -280,6 +282,9 @@ export default function KYC() {
       <p className="mt-3 text-sm leading-6 text-app-muted">
         Status verifikasi: <b className="text-app-text">{statusLabel(status)}</b>. Data ini hanya dipakai untuk memverifikasi akun Anda.
       </p>
+      {verificationHint && status !== "VERIFIED" ? (
+        <p className="mt-2 break-words text-xs leading-5 text-app-muted">{verificationHint}</p>
+      ) : null}
 
       {!locked && <StepDots stage={stage} />}
 

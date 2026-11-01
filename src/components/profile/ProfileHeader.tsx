@@ -11,6 +11,7 @@ import Icon from "@/components/icons/Icon";
 import { useToast } from "@/components/ToastProvider";
 import { formatRupiah } from "@/lib/utils";
 import { KYC_VERIFY_HINT, kycUiStatus } from "@/lib/labels";
+import { useLevelKyc } from "@/components/settings/LevelKycProvider";
 
 // Kunci localStorage: pilihan sembunyikan saldo bertahan antar kunjungan.
 const BALANCE_HIDDEN_KEY = "aidilstore_balance_hidden";
@@ -43,6 +44,9 @@ export default function ProfileHeader({
   balance,
   transactions,
   accountId,
+  showBalance = true,
+  showLevel = true,
+  showAccountId = true,
 }: {
   name: string;
   avatarId: string | null;
@@ -52,6 +56,10 @@ export default function ProfileHeader({
   balance: number | null;
   transactions: number;
   accountId: string;
+  /** Blok tampilan dari Pengaturan Beranda; data tetap dimuat server. */
+  showBalance?: boolean;
+  showLevel?: boolean;
+  showAccountId?: boolean;
 }) {
   const toast = useToast();
   const [current, setCurrent] = useState({ id: avatarId, url: avatarUrl });
@@ -71,6 +79,7 @@ export default function ProfileHeader({
   }, []);
 
   const status = kycUiStatus(kycStatus);
+  const verificationHint = useLevelKyc()?.kyc.verificationHint.trim();
   const shortId = accountId ? accountId.replaceAll("-", "").slice(0, 8).toUpperCase() : "";
 
   function toggleBalance() {
@@ -130,8 +139,8 @@ export default function ProfileHeader({
 
           <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
             {status ? <KycChip status={status} tone="hero" /> : null}
-            <LevelChip transactions={transactions} />
-            {shortId ? (
+            {showLevel ? <LevelChip transactions={transactions} /> : null}
+            {showAccountId && shortId ? (
               <button
                 type="button"
                 onClick={copyId}
@@ -145,11 +154,11 @@ export default function ProfileHeader({
           </div>
 
           {status === "unverified" ? (
-            <p className="mt-1.5 max-w-full text-[11px] leading-4 text-zinc-400">{KYC_VERIFY_HINT}</p>
+            <p className="mt-1.5 max-w-full text-[11px] leading-4 text-zinc-400">{verificationHint || <>{KYC_VERIFY_HINT}</>}</p>
           ) : null}
         </div>
 
-        {balance === null ? (
+        {showBalance && (balance === null ? (
           <div className="w-full shrink-0 rounded-2xl border border-white/10 bg-white/5 px-3 py-2.5 sm:w-48" aria-hidden>
             <span className="block h-2.5 w-10 animate-pulse rounded bg-white/15" />
             <span className="mt-2 block h-6 w-24 animate-pulse rounded bg-white/15" />
@@ -174,7 +183,7 @@ export default function ProfileHeader({
               {hidden ? "Rp ••••" : formatRupiah(balance)}
             </Link>
           </div>
-        )}
+        ))}
       </div>
 
       <AvatarPicker

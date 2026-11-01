@@ -1,3 +1,16 @@
-import Link from "next/link";
-import { getBusinessIdentity } from "@/lib/business";
-export default async function Privacy(){const biz=await getBusinessIdentity();return <article className="mx-auto max-w-3xl rounded-3xl border border-app-border bg-app-surface p-6 text-app-text shadow-sm"><h1 className="text-3xl font-black">Kebijakan Privasi</h1><p className="mt-2 text-xs text-app-muted">Pengendali data: <b>{biz.legalName}</b>. Kontak resmi terkait data pribadi: {biz.email||"lihat"} <Link href="/identitas-usaha" className="font-bold text-app-kicker underline">halaman Identitas Usaha</Link>.</p><p className="mt-3 text-sm leading-6 text-app-muted">AIDIL STORE memproses data secara terbatas untuk membuat akun, menjalankan pembayaran, memproses transaksi, memberikan bantuan, mencegah penyalahgunaan, dan memenuhi kewajiban yang berlaku.</p><h2 className="mt-7 text-xl font-black text-app-text">Data yang dapat diproses</h2><p className="mt-2 text-sm leading-6 text-app-muted">Data dapat mencakup nama, email, nomor WhatsApp/telepon, data akun, data transaksi, data perangkat yang diperlukan untuk keamanan, serta dokumen KYC yang diberikan pengguna.</p><h2 className="mt-6 text-xl font-black text-app-text">Penggunaan data</h2><p className="mt-2 text-sm leading-6 text-app-muted">Data digunakan untuk autentikasi, verifikasi, pembayaran, pengiriman layanan digital, riwayat transaksi, dukungan pelanggan, keamanan, audit, dan pencegahan penyalahgunaan.</p><h2 className="mt-6 text-xl font-black text-app-text">KYC</h2><p className="mt-2 text-sm leading-6 text-app-muted">Dokumen KYC disimpan pada storage privat dan hanya dapat diakses melalui jalur yang diizinkan untuk proses verifikasi. Dokumen tidak ditampilkan sebagai file publik.</p><h2 className="mt-6 text-xl font-black text-app-text">Keamanan</h2><p className="mt-2 text-sm leading-6 text-app-muted">AIDIL STORE menerapkan kontrol akses, autentikasi, pembatasan hak akses, dan mekanisme keamanan transaksi. Pengguna tetap bertanggung jawab menjaga kredensial dan PIN.</p><h2 className="mt-6 text-xl font-black text-app-text">Hak pengguna</h2><p className="mt-2 text-sm leading-6 text-app-muted">Pengguna dapat meminta koreksi atau penghapusan data melalui proses dukungan yang tersedia, dengan tetap memperhatikan data yang wajib disimpan berdasarkan transaksi, keamanan, atau kewajiban hukum.</p><h2 className="mt-6 text-xl font-black text-app-text">Perubahan kebijakan</h2><p className="mt-2 text-sm leading-6 text-app-muted">Kebijakan dapat diperbarui ketika layanan atau kewajiban hukum berubah. Versi terbaru berlaku setelah dipublikasikan pada halaman ini.</p></article>}
+import type { Metadata } from "next";
+import StaticPageView from "@/components/StaticPageView";
+import { getSetting } from "@/lib/settings";
+import { DEFAULT_PAGES_SETTINGS, PAGES_SETTINGS_KEY, pageFor, type PagesSettings } from "@/lib/pages-settings";
+
+export const metadata: Metadata = { title: "Kebijakan Privasi" };
+
+export default async function Privacy() {
+  const settings = await getSetting<PagesSettings>(PAGES_SETTINGS_KEY, DEFAULT_PAGES_SETTINGS);
+  const page = pageFor(settings, "kebijakan-privasi");
+  return (
+    <main className="mx-auto w-full max-w-4xl px-4 py-6 sm:py-10">
+      <StaticPageView page={page} />
+    </main>
+  );
+}

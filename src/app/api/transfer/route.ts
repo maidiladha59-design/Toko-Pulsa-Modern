@@ -7,6 +7,7 @@ import { consumeRateLimit } from "@/lib/security/rate-limit";
 import { notifyUser } from "@/lib/notification-engine";
 import { createTransferSchema } from "@/lib/transfer/schemas";
 import { formatRupiah } from "@/lib/utils";
+import { checkKycLimit } from "@/lib/kyc-limits-server";
 
 // Transfer saldo antar-user. Semua perubahan saldo terjadi di dalam RPC
 // atomic create_wallet_transfer (wallet ledger + audit log + idempotent).
@@ -50,6 +51,11 @@ export async function POST(request: Request) {
   const rate = await consumeRateLimit(rateKeyHash, 10, 15 * 60);
   if (!rate.allowed) {
     return NextResponse.json({ message: `Terlalu banyak percobaan transfer. Coba lagi dalam ${rate.retryAfter} detik.` }, { status: 429 });
+  }
+
+  const kyc = await checkKycLimit(user.id, "transfer", amount);
+  if (!kyc.ok) {
+    return NextResponse.json({ message: kyc.message }, { status: kyc.status });
   }
 
   try {

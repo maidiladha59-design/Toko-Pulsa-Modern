@@ -124,7 +124,7 @@ test('v101 blok profil hero: chip KYC, level, ID, saldo', () => {
   assert.match(level, /href="\/ranking"/);
   assert.match(level, /Lv\. \{tier\.label\}/);
   assert.match(level, /transaksi lagi menuju/);
-  assert.match(level, /<Icon name="star_fill" size=\{11\} className="shrink-0" \/>/);
+  assert.match(level, /<Icon name=\{icon\} size=\{11\} className="shrink-0" \/>/);
 
   const chip = read('src/components/profile/KycChip.tsx');
   assert.match(chip, /status === "unverified" \|\| status === "rejected"/);

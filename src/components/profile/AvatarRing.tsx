@@ -1,12 +1,16 @@
+"use client";
+
 import type { ReactNode } from "react";
 import Image from "next/image";
 import { DEFAULT_AVATAR_URL } from "@/lib/avatar";
+import { useLevelKyc } from "@/components/settings/LevelKycProvider";
 
 // Cincin avatar mengikuti status verifikasi akun:
 //   verified   → gradasi warna berputar pelan + glow tipis + lencana centang
 //   pending    → cincin kuning polos (tanpa animasi)
 //   rejected   → cincin merah lembut
 //   unverified → cincin abu-abu redup
+// Admin dapat memilih agar gradasi warna-warni hanya untuk akun terverifikasi.
 // Hanya lapisan gradasi yang berputar; foto tidak ikut bergerak.
 export type AvatarRingStatus = "verified" | "unverified" | "pending" | "rejected";
 
@@ -28,10 +32,12 @@ export default function AvatarRing({
   priority?: boolean;
   children?: ReactNode;
 }) {
+  const settings = useLevelKyc();
+  const rainbowEverywhere = settings ? !settings.kyc.rainbowRingVerifiedOnly : false;
   const outer = size + 8;
   const gapColor = gap === "hero" ? "rgb(var(--app-hero-bg))" : "rgb(var(--app-surface))";
   const ring =
-    status === "verified"
+    status === "verified" || rainbowEverywhere
       ? "avatar-ring-verified avatar-ring-spin avatar-ring-glow"
       : status === "pending"
         ? "bg-warning"

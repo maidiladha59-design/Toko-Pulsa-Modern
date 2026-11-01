@@ -8,7 +8,8 @@ const migration=fs.readFileSync(path.join(root,'supabase','migrations_v38_financ
 const page=fs.readFileSync(path.join(root,'src','app','admin','finance','page.tsx'),'utf8');
 const api=fs.readFileSync(path.join(root,'src','app','api','admin','finance','route.ts'),'utf8');
 const csv=fs.readFileSync(path.join(root,'src','app','api','admin','finance','export','route.ts'),'utf8');
-const sidebar=fs.readFileSync(path.join(root,'src','app','admin','AdminSidebar.tsx'),'utf8');
+const exportServer=fs.readFileSync(path.join(root,'src','lib','admin-export-server.ts'),'utf8');
+const sidebar=fs.readFileSync(path.join(root,'src','lib','admin-menu.ts'),'utf8');
 
 test('v38 financial schema and idempotent triggers exist',()=>{
  assert.match(migration,/create table if not exists public\.financial_ledger/);
@@ -26,8 +27,9 @@ test('v38 dashboard supports daily weekly monthly and csv',()=>{
  assert.match(page,/Hari ini/);
  assert.match(page,/7 hari/);
  assert.match(page,/30 hari/);
- assert.match(page,/Export CSV/);
- assert.match(csv,/Content-Type.*text\/csv/);
+ assert.match(page,/ExportCsvPanel/);
+ assert.match(csv,/handleAdminExport\(request, "finance"\)/);
+ assert.match(exportServer,/Content-Type": "text\/csv; charset=utf-8"/);
 });
 
 test('v38 dashboard is linked in admin navigation',()=>assert.match(sidebar,/\/admin\/finance.*Keuangan/));

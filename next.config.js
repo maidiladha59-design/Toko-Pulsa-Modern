@@ -27,6 +27,15 @@ const nextConfig = {
     dangerouslyAllowSVG: true,
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",
   },
+  async redirects() {
+    // URL lama tetap berlaku setelah menu digabung; halaman sumber tidak dihapus.
+    return [
+      { source: "/admin/brand-media", destination: "/admin/product-images?tab=brand", permanent: false },
+      { source: "/admin/payment-channel-fees", destination: "/admin/fees?tab=channel", permanent: false },
+      { source: "/admin/platform", destination: "/admin/fees?tab=platform", permanent: false },
+      { source: "/admin/pricing", destination: "/admin/fees?tab=harga", permanent: false },
+    ];
+  },
   async headers() {
     return [{
       source: "/(.*)",
